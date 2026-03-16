@@ -120,6 +120,26 @@ def fetch_discrete_for_site(site_id: str, max_retries: int = 3) -> pd.DataFrame:
     return pd.DataFrame()
 
 
+def get_site_date_range(site_id: str, param_code: str) -> tuple:
+    """Query the actual date range for a site+param from time series metadata.
+
+    Returns (start_year, end_year) or (None, None) if unavailable.
+    """
+    try:
+        ts, _ = waterdata.get_time_series_metadata(
+            monitoring_location_id=site_id,
+            parameter_code=param_code,
+        )
+        if ts is not None and len(ts) > 0:
+            begin = pd.to_datetime(ts["begin"].iloc[0])
+            end = pd.to_datetime(ts["end"].iloc[0])
+            if pd.notna(begin) and pd.notna(end):
+                return begin.year, end.year + 1
+    except Exception:
+        pass
+    return None, None
+
+
 def fetch_continuous_for_site(
     site_id: str,
     param_code: str,
@@ -130,14 +150,24 @@ def fetch_continuous_for_site(
 ) -> pd.DataFrame:
     """Fetch continuous data for a site+param in 3-year chunks. Cache per year.
 
-    Only caches non-empty results. Rate-limit errors (429) trigger retries
-    with exponential backoff, NOT empty cache files.
+    Queries the site's actual data availability period rather than using a
+    fixed window. Only caches non-empty results. Rate-limit errors (429)
+    trigger retries with exponential backoff, NOT empty cache files.
     """
     cache_dir = DATA_DIR / "continuous" / site_id.replace("-", "_") / param_code
     cache_dir.mkdir(parents=True, exist_ok=True)
 
-    end_year = 2026
-    start_year = end_year - n_years
+    # Query actual date range for this site+param
+    meta_start, meta_end = get_site_date_range(site_id, param_code)
+    if meta_start and meta_end:
+        start_year = meta_start
+        end_year = meta_end
+        logger.info(f"  {param_name}: metadata says {start_year}-{end_year}")
+    else:
+        # Fallback: try a broad window
+        end_year = 2027
+        start_year = end_year - n_years
+        logger.info(f"  {param_name}: no metadata dates, trying {start_year}-{end_year}")
 
     all_chunks = []
     for year in range(start_year, end_year + 1, 3):
