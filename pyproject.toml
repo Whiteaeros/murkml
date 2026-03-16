@@ -1,0 +1,58 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "murkml"
+version = "0.1.0dev0"
+description = "Predict water quality from continuous sensor data using ML surrogate models."
+readme = "README.md"
+license = {text = "BSD-3-Clause"}
+requires-python = ">=3.10"
+authors = [
+    {name = "Kaleb"},
+]
+keywords = ["water-quality", "machine-learning", "surrogate-model", "hydrology", "USGS"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: BSD License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Hydrology",
+]
+
+dependencies = [
+    "dataretrieval>=1.1",
+    "pandas>=2.0",
+    "numpy>=1.24",
+    "scikit-learn>=1.3",
+    "matplotlib>=3.7",
+    "pyarrow>=14.0",
+]
+
+[project.optional-dependencies]
+boost = ["catboost>=1.2"]
+explain = ["shap>=0.42"]
+all = ["catboost>=1.2", "shap>=0.42", "jupyter"]
+dev = ["pytest>=7.0", "ruff>=0.4"]
+
+[project.urls]
+Homepage = "https://github.com/kaleb/murkml"
+Documentation = "https://github.com/kaleb/murkml"
+Repository = "https://github.com/kaleb/murkml"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/murkml"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 99
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

@@ -1,0 +1,16 @@
+/data/
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+.eggs/
+wandb/
+.env
+*.parquet
+.ruff_cache/
+.pytest_cache/
+.mypy_cache/
+*.ipynb_checkpoints/
