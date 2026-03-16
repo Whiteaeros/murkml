@@ -65,19 +65,19 @@ def filter_continuous(
     else:
         logger.warning(f"No '{approval_col}' column found — skipping approval filter")
 
-    # Step 2: Exclude bad qualifiers
+    # Step 2: Exclude bad qualifiers (vectorized for performance on large datasets)
     if qualifier_col in df.columns:
-        mask_exclude = pd.Series(False, index=df.index)
+        def _has_bad_qualifier(val) -> bool:
+            """Check if a qualifier value contains any excluded qualifier."""
+            if val is None or (isinstance(val, float) and pd.isna(val)):
+                return False
+            val_str = str(val).strip()
+            if val_str in ("", "None", "nan"):
+                return False
+            quals = {q.strip() for q in val_str.split(",")}
+            return bool(quals & EXCLUDE_QUALIFIERS)
 
-        for _, row in df.iterrows():
-            qual = row.get(qualifier_col)
-            if pd.isna(qual) or qual == "":
-                continue
-            # Qualifiers may be comma-separated
-            quals = {q.strip() for q in str(qual).split(",")}
-            if quals & EXCLUDE_QUALIFIERS:
-                mask_exclude.loc[row.name] = True
-
+        mask_exclude = df[qualifier_col].apply(_has_bad_qualifier)
         stats["n_bad_qualifier"] = int(mask_exclude.sum())
         df = df[~mask_exclude].copy()
     else:

@@ -177,16 +177,17 @@ def align_site(site_id: str) -> pd.DataFrame:
             continue
 
         # Match each aligned sample to nearest continuous reading
-        cont_times = pd.to_datetime(cont_filtered["time"], utc=True)
-        cont_values = cont_filtered["value"].values
+        cont_clean = cont_filtered[["time", "value"]].copy().reset_index(drop=True)
+        cont_clean["time"] = pd.to_datetime(cont_clean["time"], utc=True)
+        cont_clean = cont_clean.sort_values("time").reset_index(drop=True)
 
         instant_values = []
         for _, row in aligned.iterrows():
             sample_time = row["sample_time"]
-            time_diffs = (cont_times - sample_time).abs()
-            if time_diffs.min() <= pd.Timedelta(minutes=30):
-                nearest_idx = time_diffs.idxmin()
-                instant_values.append(cont_values[nearest_idx])
+            time_diffs = (cont_clean["time"] - sample_time).abs()
+            min_idx = time_diffs.idxmin()
+            if time_diffs.iloc[min_idx] <= pd.Timedelta(minutes=30):
+                instant_values.append(cont_clean["value"].iloc[min_idx])
             else:
                 instant_values.append(np.nan)
 
