@@ -51,21 +51,27 @@ def discover_sites(
 
     Args:
         parameter_code: USGS parameter code (default: 63680 = turbidity FNU).
-        states: List of state codes to search. If None, searches all states.
+        states: List of state NAMES to search. If None, searches all states.
+            Must be full names like "Kansas", not codes like "KS".
         min_years: Minimum years of record to include.
 
     Returns:
-        DataFrame with site_id, name, lat, lon, drainage_area, state,
-        begin_date, end_date, record_years.
+        DataFrame with time series metadata including monitoring_location_id.
     """
     from dataretrieval import waterdata
 
+    # API requires full state names, not codes
     all_states = states or [
-        "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA",
-        "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD",
-        "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ",
-        "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC",
-        "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY",
+        "Alabama", "Alaska", "Arizona", "Arkansas", "California",
+        "Colorado", "Connecticut", "Delaware", "Florida", "Georgia",
+        "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa",
+        "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland",
+        "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri",
+        "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey",
+        "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio",
+        "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina",
+        "South Dakota", "Tennessee", "Texas", "Utah", "Vermont",
+        "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming",
     ]
 
     results = []
@@ -73,7 +79,7 @@ def discover_sites(
         try:
             df, _ = waterdata.get_time_series_metadata(
                 parameter_code=parameter_code,
-                state_code=state,
+                state_name=state,
             )
             if df is not None and len(df) > 0:
                 results.append(df)
@@ -217,12 +223,15 @@ def fetch_continuous(
             logger.debug(f"Cache hit: {cache_file}")
             chunk_df = pd.read_parquet(cache_file)
         else:
+            # API uses ISO 8601 interval format for time parameter
+            time_range = (
+                f"{current.strftime('%Y-%m-%d')}/{chunk_end.strftime('%Y-%m-%d')}"
+            )
             chunk_df = _fetch_with_retry(
                 waterdata.get_continuous,
-                site=site_id,
+                monitoring_location_id=site_id,
                 parameter_code=parameter_code,
-                start_date=current.strftime("%Y-%m-%d"),
-                end_date=chunk_end.strftime("%Y-%m-%d"),
+                time=time_range,
                 max_retries=max_retries,
             )
             if chunk_df is not None and len(chunk_df) > 0:
