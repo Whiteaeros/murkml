@@ -469,7 +469,9 @@ def train_catboost_logo(
         verbose=0,
         loss_function="RMSE",
     )
-    final_model.fit(X, y)
+    # Impute for final model using full-dataset median
+    X_final = X_df.fillna(X_df.median()).values
+    final_model.fit(X_final, y)
 
     return results, final_model
 
