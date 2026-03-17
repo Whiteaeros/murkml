@@ -52,14 +52,45 @@ RESULTS_DIR = PROJECT_ROOT / "data" / "results"
 FIGURES_DIR = PROJECT_ROOT / "notebooks" / "figures"
 MODEL_DIR = PROJECT_ROOT / "data" / "results" / "models"
 
-# Columns that are NOT features
+# Parameter-specific dataset paths and target columns
+PARAM_CONFIG = {
+    "ssc": {
+        "dataset": "turbidity_ssc_paired.parquet",
+        "target_col": "ssc_log1p",
+        "primary_sensor": "turbidity_instant",
+    },
+    "total_phosphorus": {
+        "dataset": "total_phosphorus_paired.parquet",
+        "target_col": "total_phosphorus_log1p",
+        "primary_sensor": "turbidity_instant",
+    },
+    "nitrate_nitrite": {
+        "dataset": "nitrate_nitrite_paired.parquet",
+        "target_col": "nitrate_nitrite_log1p",
+        "primary_sensor": "conductance_instant",
+    },
+    "orthophosphate": {
+        "dataset": "orthophosphate_paired.parquet",
+        "target_col": "orthophosphate_log1p",
+        "primary_sensor": "turbidity_instant",
+    },
+}
+
+# Columns that are NOT features (expanded for multi-parameter)
 EXCLUDE_COLS = {
     "site_id",
     "sample_time",
     "lab_value",
-    "ssc_log1p",
     "match_gap_seconds",
     "window_count",
+    "is_nondetect",
+    "hydro_event",
+    # All possible target columns
+    "ssc_log1p", "ssc_value",
+    "total_phosphorus_log1p",
+    "nitrate_nitrite_log1p",
+    "orthophosphate_log1p",
+    "tds_evaporative_log1p",
 }
 
 logging.basicConfig(
@@ -647,13 +678,20 @@ def print_comparison_table(results_df: pd.DataFrame) -> None:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Train baseline models on the turbidity-SSC dataset."
+        description="Train baseline models on assembled water quality datasets."
+    )
+    parser.add_argument(
+        "--target",
+        type=str,
+        default="ssc",
+        choices=list(PARAM_CONFIG.keys()),
+        help="Target parameter (default: ssc)",
     )
     parser.add_argument(
         "--dataset",
         type=Path,
-        default=DATASET_PATH,
-        help="Path to the assembled parquet dataset",
+        default=None,
+        help="Path to dataset (auto-detected from --target if not specified)",
     )
     parser.add_argument(
         "--skip-catboost",
@@ -682,13 +720,23 @@ def main():
         pass
 
     # ------------------------------------------------------------------
+    # Resolve target parameter config
+    # ------------------------------------------------------------------
+    param_cfg = PARAM_CONFIG[args.target]
+    target_col = param_cfg["target_col"]
+
+    if args.dataset is None:
+        args.dataset = PROJECT_ROOT / "data" / "processed" / param_cfg["dataset"]
+
+    # ------------------------------------------------------------------
     # Load dataset
     # ------------------------------------------------------------------
+    logger.info(f"Target parameter: {args.target}")
     logger.info(f"Loading dataset from {args.dataset}")
     if not args.dataset.exists():
         logger.error(
             f"Dataset not found at {args.dataset}. "
-            "Run scripts/assemble_dataset.py first."
+            f"Run scripts/assemble_{'dataset' if args.target == 'ssc' else 'multi_param'}.py first."
         )
         sys.exit(1)
 
@@ -700,10 +748,17 @@ def main():
     feature_cols = identify_features(df)
     logger.info(f"Feature columns ({len(feature_cols)}): {feature_cols}")
 
+    # Map target column to 'ssc_log1p' so all downstream code works unchanged
+    # (the model functions all reference ssc_log1p — renaming avoids touching 30+ lines)
+    if target_col != "ssc_log1p":
+        assert target_col in df.columns, f"Missing target column '{target_col}'"
+        df = df.rename(columns={target_col: "ssc_log1p"})
+        logger.info(f"Mapped '{target_col}' → 'ssc_log1p' for model compatibility")
+
     # Sanity checks
     assert "ssc_log1p" in df.columns, "Missing target column 'ssc_log1p'"
     assert "site_id" in df.columns, "Missing 'site_id' column"
-    assert "turbidity_instant" in df.columns or len(feature_cols) > 0, "No features found"
+    assert len(feature_cols) > 0, "No features found"
 
     # ------------------------------------------------------------------
     # Train all models, collect results
