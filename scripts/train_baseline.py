@@ -362,27 +362,42 @@ def train_catboost_logo(
         )
         return [], None
 
+    # Fix 4: Do NOT impute before CV split — do it inside the loop
     clean = df.dropna(subset=["ssc_log1p"]).copy()
-    for col in feature_cols:
-        if clean[col].isna().any():
-            clean[col] = clean[col].fillna(clean[col].median())
 
-    X = clean[feature_cols].values
+    X_df = clean[feature_cols].copy()  # Keep as DataFrame for imputation
     y = clean["ssc_log1p"].values
     groups = clean["site_id"].values
 
     logo = LeaveOneGroupOut()
     results = []
     all_y_true, all_y_pred = [], []
+    all_train_resids = []  # Fix 9: collect training residuals for pooled smearing
+    per_fold_smearing = []
 
-    for fold_idx, (train_idx, test_idx) in enumerate(logo.split(X, y, groups)):
+    for fold_idx, (train_idx, test_idx) in enumerate(logo.split(X_df.values, y, groups)):
         held_out_site = groups[test_idx[0]]
         if len(test_idx) < 3:
             logger.warning(f"  Fold {fold_idx}: {held_out_site} has <3 samples, skipping")
             continue
 
-        X_train, X_test = X[train_idx], X[test_idx]
+        # Fix 4: Impute with TRAINING median only (no test data leakage)
+        X_train_df = X_df.iloc[train_idx].copy()
+        X_test_df = X_df.iloc[test_idx].copy()
+        train_median = X_train_df.median()
+        X_train_df = X_train_df.fillna(train_median)
+        X_test_df = X_test_df.fillna(train_median)  # Use TRAINING median for test
+
+        X_train = X_train_df.values
+        X_test = X_test_df.values
         y_train, y_test = y[train_idx], y[test_idx]
+
+        # Fix 2: Split training into train+validation for early stopping
+        # Do NOT use test set for early stopping (leakage — all 4 reviewers flagged)
+        train_site_ids = groups[train_idx]
+        from sklearn.model_selection import GroupShuffleSplit
+        gss = GroupShuffleSplit(n_splits=1, test_size=0.15, random_state=RANDOM_SEED)
+        sub_train_idx, val_idx = next(gss.split(X_train, y_train, groups=train_site_ids))
 
         model = CatBoostRegressor(
             iterations=500,
@@ -393,13 +408,19 @@ def train_catboost_logo(
             verbose=0,
             loss_function="RMSE",
         )
-        model.fit(X_train, y_train, eval_set=(X_test, y_test), early_stopping_rounds=50)
+        model.fit(
+            X_train[sub_train_idx], y_train[sub_train_idx],
+            eval_set=(X_train[val_idx], y_train[val_idx]),
+            early_stopping_rounds=50,
+        )
 
         y_pred = model.predict(X_test)
 
         # Smearing factor from training residuals
         train_resid = y_train - model.predict(X_train)
         sf = duan_smearing(train_resid)
+        all_train_resids.append(train_resid)
+        per_fold_smearing.append(sf)
 
         metrics = compute_metrics_both_spaces(y_test, y_pred, sf)
         metrics.update({
@@ -419,11 +440,12 @@ def train_catboost_logo(
             f"n_test={len(test_idx)}"
         )
 
-    # Overall cross-validated metrics (smearing from pooled residuals is approximate)
+    # Fix 9: Overall CV metrics with pooled TRAINING smearing factor
     if all_y_true:
         all_y_true_arr = np.array(all_y_true)
         all_y_pred_arr = np.array(all_y_pred)
-        overall = compute_metrics_both_spaces(all_y_true_arr, all_y_pred_arr, smearing_factor=1.0)
+        pooled_smearing = np.mean(per_fold_smearing)  # Average of per-fold training smearing
+        overall = compute_metrics_both_spaces(all_y_true_arr, all_y_pred_arr, smearing_factor=pooled_smearing)
         overall.update({
             "model": "catboost_logo",
             "site_id": "ALL_CV",

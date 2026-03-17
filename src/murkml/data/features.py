@@ -19,51 +19,142 @@ def add_hydrograph_features(
     df: pd.DataFrame,
     discharge_col: str = "discharge_instant",
     time_col: str = "sample_time",
-    continuous_discharge: pd.DataFrame | None = None,
+    site_col: str = "site_id",
+    continuous_dir: str | None = None,
 ) -> pd.DataFrame:
-    """Add hydrograph position features critical for sediment prediction.
+    """Add hydrograph position + antecedent features from continuous discharge.
 
-    Features:
-    - dQ_dt: rate of change of discharge (rising vs falling limb)
-    - rising_limb: binary indicator (1 = rising, 0 = falling)
-    - Q_ratio_peak: current Q / recent peak Q
+    Fix 3: dQ/dt must come from continuous discharge record, NOT diff() on
+    sporadic grab samples (which are days/weeks apart — garbage).
+    Fix 5: Antecedent features require 7-30 day discharge history.
+    Combined per Rivera/Chen: share one continuous-discharge loading function.
 
-    These capture the hysteresis in turbidity-SSC relationships that
-    all three reviewers flagged as critical.
+    Hydrograph features:
+    - discharge_slope_2hr: slope of Q over ±2hr window from continuous record
+    - rising_limb: binary from discharge_slope_2hr > 0
+
+    Antecedent features:
+    - Q_7day_mean: mean discharge over prior 7 days
+    - Q_30day_mean: mean discharge over prior 30 days
+    - Q_ratio_7d: current Q / Q_7day_mean
     """
+    from pathlib import Path
+
     df = df.copy()
 
-    if discharge_col not in df.columns:
-        logger.warning(f"No {discharge_col} column — skipping hydrograph features")
+    if discharge_col not in df.columns or site_col not in df.columns:
+        logger.warning(f"No {discharge_col} or {site_col} — skipping hydrograph features")
+        df["discharge_slope_2hr"] = np.nan
+        df["rising_limb"] = np.nan
+        df["Q_7day_mean"] = np.nan
+        df["Q_30day_mean"] = np.nan
+        df["Q_ratio_7d"] = np.nan
         return df
 
-    # Simple dQ/dt from the aligned data
-    # For proper implementation, we need the full continuous discharge record
-    # For now, use what's available in the aligned features
-    df["dQ_dt"] = df[discharge_col].diff() / df[time_col].diff().dt.total_seconds()
-    df["rising_limb"] = (df["dQ_dt"] > 0).astype(int)
+    if continuous_dir is None:
+        continuous_dir = Path(__file__).parent.parent.parent.parent / "data" / "continuous"
+    else:
+        continuous_dir = Path(continuous_dir)
 
-    return df
+    # Process each site separately
+    results = []
+    for site_id, group in df.groupby(site_col):
+        group = group.copy()
 
+        # Load continuous discharge for this site
+        q_dir = continuous_dir / site_id.replace("-", "_") / "00060"
+        q_continuous = None
+        if q_dir.exists():
+            chunks = []
+            for f in sorted(q_dir.glob("*.parquet")):
+                chunk = pd.read_parquet(f)
+                if len(chunk) > 0:
+                    chunks.append(chunk)
+            if chunks:
+                q_continuous = pd.concat(chunks, ignore_index=True)
+                q_continuous = q_continuous.drop_duplicates(subset=["time"]).sort_values("time")
+                q_continuous["time"] = pd.to_datetime(q_continuous["time"], utc=True)
+                q_continuous["value"] = pd.to_numeric(q_continuous["value"], errors="coerce")
+                q_continuous = q_continuous.dropna(subset=["time", "value"])
 
-def add_antecedent_features(
-    df: pd.DataFrame,
-    discharge_col: str = "discharge_instant",
-) -> pd.DataFrame:
-    """Add antecedent condition features.
+        if q_continuous is None or len(q_continuous) < 10:
+            # No continuous discharge — fill with NaN
+            group["discharge_slope_2hr"] = np.nan
+            group["rising_limb"] = np.nan
+            group["Q_7day_mean"] = np.nan
+            group["Q_30day_mean"] = np.nan
+            group["Q_ratio_7d"] = np.nan
+            results.append(group)
+            continue
 
-    Features:
-    - Q_7day_cumulative: 7-day cumulative discharge (wetness proxy)
-    - Q_30day_cumulative: 30-day cumulative discharge (supply exhaustion)
-    - days_since_high_flow: days since last Q > Q75 event
+        q_times = q_continuous["time"].values
+        q_values = q_continuous["value"].values
 
-    These capture supply exhaustion / first-flush effects on 7-30 day
-    timescales (domain scientist flagged 24hr as too short).
-    """
-    df = df.copy()
-    # Placeholder — requires full continuous discharge record
-    # Will be implemented when we have the data pipeline producing
-    # site-level continuous data alongside aligned samples
+        slopes = []
+        q7_means = []
+        q30_means = []
+        q_ratios = []
+
+        for _, row in group.iterrows():
+            t = row[time_col]
+            if pd.isna(t):
+                slopes.append(np.nan)
+                q7_means.append(np.nan)
+                q30_means.append(np.nan)
+                q_ratios.append(np.nan)
+                continue
+
+            t_np = np.datetime64(t)
+
+            # ±2hr window for slope
+            window_2hr = (np.abs(q_times - t_np) <= np.timedelta64(2, "h"))
+            if window_2hr.sum() >= 2:
+                w_vals = q_values[window_2hr]
+                w_times = q_times[window_2hr]
+                t_seconds = (w_times - w_times[0]).astype("timedelta64[s]").astype(float)
+                if t_seconds[-1] > 0:
+                    slope = np.polyfit(t_seconds, w_vals, 1)[0]
+                else:
+                    slope = 0.0
+                slopes.append(slope)
+            else:
+                slopes.append(np.nan)
+
+            # 7-day lookback for antecedent mean
+            window_7d = (q_times >= t_np - np.timedelta64(7, "D")) & (q_times <= t_np)
+            if window_7d.sum() > 0:
+                q7 = q_values[window_7d].mean()
+                q7_means.append(q7)
+            else:
+                q7_means.append(np.nan)
+
+            # 30-day lookback for antecedent mean
+            window_30d = (q_times >= t_np - np.timedelta64(30, "D")) & (q_times <= t_np)
+            if window_30d.sum() > 0:
+                q30 = q_values[window_30d].mean()
+                q30_means.append(q30)
+            else:
+                q30_means.append(np.nan)
+
+            # Q ratio
+            q_current = row.get(discharge_col, np.nan)
+            q7_val = q7_means[-1]
+            if pd.notna(q_current) and pd.notna(q7_val) and q7_val > 0:
+                q_ratios.append(q_current / q7_val)
+            else:
+                q_ratios.append(np.nan)
+
+        group["discharge_slope_2hr"] = slopes
+        group["rising_limb"] = (np.array(slopes) > 0).astype(float)
+        group.loc[pd.isna(group["discharge_slope_2hr"]), "rising_limb"] = np.nan
+        group["Q_7day_mean"] = q7_means
+        group["Q_30day_mean"] = q30_means
+        group["Q_ratio_7d"] = q_ratios
+
+        results.append(group)
+
+    if results:
+        return pd.concat(results, ignore_index=True)
     return df
 
 
@@ -115,10 +206,18 @@ def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
     """Apply all feature engineering steps.
 
     This is the main entry point for feature engineering.
-    Applies in order: hydrograph, antecedent, cross-sensor, seasonality.
+    Applies in order: hydrograph+antecedent (from continuous), cross-sensor, seasonality.
+
+    Fix 3+5: Hydrograph and antecedent features now computed from continuous
+    discharge record, not from diff() on sporadic grab samples.
     """
-    df = add_hydrograph_features(df)
-    df = add_antecedent_features(df)
+    df = add_hydrograph_features(df)  # Now includes antecedent features
     df = add_cross_sensor_features(df)
     df = add_seasonality(df)
+
+    # Remove old garbage features if they somehow exist
+    for col in ["dQ_dt"]:
+        if col in df.columns:
+            df = df.drop(columns=[col])
+
     return df
