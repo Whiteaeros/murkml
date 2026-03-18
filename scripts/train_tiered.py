@@ -58,15 +58,27 @@ def train_catboost_logo_quick(
     df: pd.DataFrame,
     feature_cols: list[str],
     target_col: str = "ssc_log1p",
+    cat_features: list[str] | None = None,
 ) -> dict:
     """Run CatBoost LOGO CV and return median metrics. Streamlined version."""
-    from catboost import CatBoostRegressor
+    from catboost import CatBoostRegressor, Pool
 
     clean = df.dropna(subset=[target_col]).copy()
     sites = clean["site_id"].values
     y = clean[target_col].values
 
     X_df = clean[feature_cols].copy()
+
+    # Identify categorical vs numeric columns
+    if cat_features is None:
+        cat_features = []
+    cat_indices = [i for i, c in enumerate(feature_cols) if c in cat_features]
+    num_cols = [c for c in feature_cols if c not in cat_features]
+
+    # Fill categorical NaN with "missing" string, numeric NaN handled by CatBoost
+    for c in cat_features:
+        if c in X_df.columns:
+            X_df[c] = X_df[c].fillna("missing").astype(str)
 
     logo = LeaveOneGroupOut()
     fold_metrics = []
@@ -81,27 +93,38 @@ def train_catboost_logo_quick(
         if len(y_test) < 5:
             continue
 
-        # Train median imputation
-        train_median = X_train_df.median()
-        X_train = X_train_df.fillna(train_median).values
-        X_test = X_test_df.fillna(train_median).values
+        # Numeric median imputation (categoricals already filled)
+        train_median = X_train_df[num_cols].median()
+        X_train_df = X_train_df.copy()
+        X_test_df = X_test_df.copy()
+        X_train_df[num_cols] = X_train_df[num_cols].fillna(train_median)
+        X_test_df[num_cols] = X_test_df[num_cols].fillna(train_median)
 
         # Early stopping split
         gss = GroupShuffleSplit(n_splits=1, test_size=0.15, random_state=42)
         train_sites = sites[train_idx]
-        sub_train_idx, val_idx = next(gss.split(X_train, y_train, groups=train_sites))
+        sub_train_idx, val_idx = next(gss.split(X_train_df, y_train, groups=train_sites))
+
+        train_pool = Pool(
+            X_train_df.iloc[sub_train_idx], y_train[sub_train_idx],
+            cat_features=cat_indices,
+        )
+        val_pool = Pool(
+            X_train_df.iloc[val_idx], y_train[val_idx],
+            cat_features=cat_indices,
+        )
+        test_pool = Pool(
+            X_test_df, cat_features=cat_indices,
+        )
 
         model = CatBoostRegressor(
             iterations=500, learning_rate=0.05, depth=6,
             l2_leaf_reg=3, random_seed=42, verbose=0,
             early_stopping_rounds=50,
         )
-        model.fit(
-            X_train[sub_train_idx], y_train[sub_train_idx],
-            eval_set=(X_train[val_idx], y_train[val_idx]),
-        )
+        model.fit(train_pool, eval_set=val_pool)
 
-        y_pred = model.predict(X_test)
+        y_pred = model.predict(test_pool)
 
         fold_metrics.append({
             "site_id": test_site,
@@ -130,17 +153,19 @@ def run_tier(param_name: str, tier_name: str, tier_data: pd.DataFrame,
         tier_data = tier_data.rename(columns={target_col: "ssc_log1p"})
         target_col = "ssc_log1p"
 
-    # Filter feature cols to those actually in the data and numeric
+    # Filter feature cols to those actually in the data
     available = [c for c in feature_cols if c in tier_data.columns and c not in EXCLUDE_COLS]
     numeric_available = [c for c in available if tier_data[c].dtype in [np.float64, np.float32, np.int64, np.int32, float, int]]
+    cat_available = [c for c in available if tier_data[c].dtype == object]
+    all_available = numeric_available + cat_available
 
     logger.info(f"  {param_name} / {tier_name}: {tier_data['site_id'].nunique()} sites, "
-                f"{len(tier_data)} samples, {len(numeric_available)} features")
+                f"{len(tier_data)} samples, {len(numeric_available)} numeric + {len(cat_available)} categorical features")
 
     if len(numeric_available) == 0:
         return {"r2_log": np.nan, "kge_log": np.nan, "n_folds": 0, "n_samples": 0}
 
-    result = train_catboost_logo_quick(tier_data, numeric_available, target_col)
+    result = train_catboost_logo_quick(tier_data, all_available, target_col, cat_features=cat_available)
     result["param"] = param_name
     result["tier"] = tier_name
     result["n_features"] = len(numeric_available)
@@ -214,10 +239,104 @@ def main():
         logger.info(f"\nMedian KGE (log) by parameter × tier:")
         logger.info(f"\n{pivot_kge.to_string()}")
 
-        # Save
+        # Save CV results
         out_path = DATA_DIR / "results" / "tiered_comparison.parquet"
         results_df.to_parquet(out_path, index=False)
         logger.info(f"\nSaved: {out_path}")
+
+    # =========================================================
+    # Save final trained models (one per param × tier)
+    # =========================================================
+    logger.info(f"\n{'='*60}")
+    logger.info("SAVING FINAL MODELS")
+    logger.info(f"{'='*60}")
+
+    from catboost import CatBoostRegressor, Pool
+    import json
+
+    model_dir = DATA_DIR / "results" / "models"
+    model_dir.mkdir(parents=True, exist_ok=True)
+
+    for param_name, cfg in params.items():
+        dataset_path = DATA_DIR / "processed" / cfg["dataset"]
+        if not dataset_path.exists():
+            continue
+
+        assembled = pd.read_parquet(dataset_path)
+        target_col = cfg["target_col"]
+        tiers = build_feature_tiers(assembled, basic_attrs, gagesii_attrs)
+
+        for tier_name, tier_info in tiers.items():
+            if args.tier and not tier_name.startswith(args.tier):
+                continue
+
+            tier_data = tier_info["data"].copy()
+            feature_cols = tier_info["feature_cols"]
+
+            # Remap target col
+            if target_col != "ssc_log1p" and target_col in tier_data.columns:
+                tier_data = tier_data.rename(columns={target_col: "ssc_log1p"})
+                tc = "ssc_log1p"
+            else:
+                tc = target_col
+
+            available = [c for c in feature_cols if c in tier_data.columns and c not in EXCLUDE_COLS]
+            numeric_cols = [c for c in available if tier_data[c].dtype in [np.float64, np.float32, np.int64, np.int32, float, int]]
+            cat_cols = [c for c in available if tier_data[c].dtype == object]
+            all_cols = numeric_cols + cat_cols
+            cat_indices = [i for i, c in enumerate(all_cols) if c in cat_cols]
+
+            if len(numeric_cols) == 0:
+                continue
+
+            clean = tier_data.dropna(subset=[tc]).copy()
+            y = clean[tc].values
+            X_df = clean[all_cols].copy()
+
+            for c in cat_cols:
+                X_df[c] = X_df[c].fillna("missing").astype(str)
+            train_median = X_df[numeric_cols].median()
+            X_df[numeric_cols] = X_df[numeric_cols].fillna(train_median)
+
+            # Early stopping split
+            sites = clean["site_id"].values
+            gss = GroupShuffleSplit(n_splits=1, test_size=0.15, random_state=42)
+            train_idx, val_idx = next(gss.split(X_df, y, groups=sites))
+
+            train_pool = Pool(X_df.iloc[train_idx], y[train_idx], cat_features=cat_indices)
+            val_pool = Pool(X_df.iloc[val_idx], y[val_idx], cat_features=cat_indices)
+
+            model = CatBoostRegressor(
+                iterations=500, learning_rate=0.05, depth=6,
+                l2_leaf_reg=3, random_seed=42, verbose=0,
+                early_stopping_rounds=50,
+            )
+            model.fit(train_pool, eval_set=val_pool)
+
+            # Save model
+            safe_tier = tier_name.replace("/", "_")
+            model_path = model_dir / f"{param_name}_{safe_tier}.cbm"
+            model.save_model(str(model_path))
+
+            # Save metadata
+            meta = {
+                "param": param_name,
+                "tier": tier_name,
+                "feature_cols": all_cols,
+                "cat_cols": cat_cols,
+                "cat_indices": cat_indices,
+                "train_median": train_median.to_dict(),
+                "n_sites": int(clean["site_id"].nunique()),
+                "n_samples": len(clean),
+                "n_trees": model.tree_count_,
+            }
+            meta_path = model_dir / f"{param_name}_{safe_tier}_meta.json"
+            with open(meta_path, "w") as f:
+                json.dump(meta, f, indent=2)
+
+            size_kb = model_path.stat().st_size / 1024
+            logger.info(f"  Saved {param_name}/{tier_name}: {model.tree_count_} trees, "
+                       f"{size_kb:.0f} KB → {model_path.name}")
 
 
 if __name__ == "__main__":
