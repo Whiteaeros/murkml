@@ -27,7 +27,7 @@ from sklearn.model_selection import LeaveOneGroupOut, GroupShuffleSplit
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
-from murkml.data.attributes import prune_gagesii, build_feature_tiers
+from murkml.data.attributes import prune_gagesii, build_feature_tiers, get_gagesii_original_sites
 from murkml.evaluate.metrics import kge, percent_bias, r_squared, rmse
 
 logging.basicConfig(
@@ -59,29 +59,33 @@ def train_catboost_logo_quick(
     feature_cols: list[str],
     target_col: str = "ssc_log1p",
     cat_features: list[str] | None = None,
-) -> dict:
-    """Run CatBoost LOGO CV and return median metrics. Streamlined version."""
+) -> tuple[dict, pd.DataFrame, pd.DataFrame]:
+    """Run CatBoost LOGO CV. Returns (summary, fold_metrics_df, per_sample_df)."""
     from catboost import CatBoostRegressor, Pool
 
     clean = df.dropna(subset=[target_col]).copy()
     sites = clean["site_id"].values
     y = clean[target_col].values
 
+    # Grab discharge for per-sample output (needed for flow stratification)
+    discharge_col = "discharge_instant"
+    has_discharge = discharge_col in clean.columns
+    discharge_vals = clean[discharge_col].values if has_discharge else np.full(len(clean), np.nan)
+
     X_df = clean[feature_cols].copy()
 
-    # Identify categorical vs numeric columns
     if cat_features is None:
         cat_features = []
     cat_indices = [i for i, c in enumerate(feature_cols) if c in cat_features]
     num_cols = [c for c in feature_cols if c not in cat_features]
 
-    # Fill categorical NaN with "missing" string, numeric NaN handled by CatBoost
     for c in cat_features:
         if c in X_df.columns:
             X_df[c] = X_df[c].fillna("missing").astype(str)
 
     logo = LeaveOneGroupOut()
     fold_metrics = []
+    sample_records = []
 
     for fold_idx, (train_idx, test_idx) in enumerate(logo.split(X_df, y, groups=sites)):
         X_train_df = X_df.iloc[train_idx]
@@ -93,14 +97,12 @@ def train_catboost_logo_quick(
         if len(y_test) < 5:
             continue
 
-        # Numeric median imputation (categoricals already filled)
         train_median = X_train_df[num_cols].median()
         X_train_df = X_train_df.copy()
         X_test_df = X_test_df.copy()
         X_train_df[num_cols] = X_train_df[num_cols].fillna(train_median)
         X_test_df[num_cols] = X_test_df[num_cols].fillna(train_median)
 
-        # Early stopping split
         gss = GroupShuffleSplit(n_splits=1, test_size=0.15, random_state=42)
         train_sites = sites[train_idx]
         sub_train_idx, val_idx = next(gss.split(X_train_df, y_train, groups=train_sites))
@@ -113,9 +115,7 @@ def train_catboost_logo_quick(
             X_train_df.iloc[val_idx], y_train[val_idx],
             cat_features=cat_indices,
         )
-        test_pool = Pool(
-            X_test_df, cat_features=cat_indices,
-        )
+        test_pool = Pool(X_test_df, cat_features=cat_indices)
 
         model = CatBoostRegressor(
             iterations=500, learning_rate=0.05, depth=6,
@@ -126,23 +126,44 @@ def train_catboost_logo_quick(
 
         y_pred = model.predict(test_pool)
 
+        # KGE with decomposition
+        kge_result = kge(y_test, y_pred, return_components=True)
+
         fold_metrics.append({
             "site_id": test_site,
             "r2_log": r_squared(y_test, y_pred),
-            "kge_log": kge(y_test, y_pred),
+            "kge_log": kge_result["kge"],
+            "kge_r": kge_result["kge_r"],
+            "kge_alpha": kge_result["kge_alpha"],
+            "kge_beta": kge_result["kge_beta"],
             "n_test": len(y_test),
         })
 
+        # Per-sample predictions for flow stratification
+        test_discharge = discharge_vals[test_idx]
+        for i in range(len(y_test)):
+            sample_records.append({
+                "site_id": test_site,
+                "y_true_log": float(y_test[i]),
+                "y_pred_log": float(y_pred[i]),
+                "discharge_instant": float(test_discharge[i]),
+            })
+
     if not fold_metrics:
-        return {"r2_log": np.nan, "kge_log": np.nan, "n_folds": 0}
+        empty_folds = pd.DataFrame()
+        empty_samples = pd.DataFrame()
+        return {"r2_log": np.nan, "kge_log": np.nan, "n_folds": 0}, empty_folds, empty_samples
 
     metrics_df = pd.DataFrame(fold_metrics)
-    return {
+    samples_df = pd.DataFrame(sample_records)
+
+    summary = {
         "r2_log": metrics_df["r2_log"].median(),
         "kge_log": metrics_df["kge_log"].median(),
         "n_folds": len(metrics_df),
         "n_samples": len(clean),
     }
+    return summary, metrics_df, samples_df
 
 
 def run_tier(param_name: str, tier_name: str, tier_data: pd.DataFrame,
@@ -165,11 +186,23 @@ def run_tier(param_name: str, tier_name: str, tier_data: pd.DataFrame,
     if len(numeric_available) == 0:
         return {"r2_log": np.nan, "kge_log": np.nan, "n_folds": 0, "n_samples": 0}
 
-    result = train_catboost_logo_quick(tier_data, all_available, target_col, cat_features=cat_available)
-    result["param"] = param_name
-    result["tier"] = tier_name
-    result["n_features"] = len(numeric_available)
-    return result
+    summary, folds_df, samples_df = train_catboost_logo_quick(
+        tier_data, all_available, target_col, cat_features=cat_available
+    )
+    summary["param"] = param_name
+    summary["tier"] = tier_name
+    summary["n_features"] = len(all_available)
+
+    # Save per-fold and per-sample results
+    results_dir = DATA_DIR / "results"
+    results_dir.mkdir(parents=True, exist_ok=True)
+    safe_tier = tier_name.replace("/", "_")
+    if not folds_df.empty:
+        folds_df.to_parquet(results_dir / f"logo_folds_{param_name}_{safe_tier}.parquet", index=False)
+    if not samples_df.empty:
+        samples_df.to_parquet(results_dir / f"logo_predictions_{param_name}_{safe_tier}.parquet", index=False)
+
+    return summary
 
 
 def main():
@@ -187,6 +220,10 @@ def main():
     if gagesii_path.exists():
         gagesii_raw = pd.read_parquet(gagesii_path)
         gagesii_attrs = prune_gagesii(gagesii_raw)
+
+    # Identify original GAGES-II sites (not NLCD backfill) for vintage confound test
+    original_gagesii_sites = get_gagesii_original_sites(DATA_DIR)
+    logger.info(f"Original GAGES-II sites: {len(original_gagesii_sites)}")
 
     # Select parameters
     params = {args.param: PARAM_CONFIG[args.param]} if args.param else PARAM_CONFIG
@@ -207,7 +244,7 @@ def main():
         target_col = cfg["target_col"]
 
         # Build tiers
-        tiers = build_feature_tiers(assembled, basic_attrs, gagesii_attrs)
+        tiers = build_feature_tiers(assembled, basic_attrs, gagesii_attrs, original_gagesii_sites)
 
         for tier_name, tier_info in tiers.items():
             if args.tier and not tier_name.startswith(args.tier):
@@ -264,7 +301,7 @@ def main():
 
         assembled = pd.read_parquet(dataset_path)
         target_col = cfg["target_col"]
-        tiers = build_feature_tiers(assembled, basic_attrs, gagesii_attrs)
+        tiers = build_feature_tiers(assembled, basic_attrs, gagesii_attrs, original_gagesii_sites)
 
         for tier_name, tier_info in tiers.items():
             if args.tier and not tier_name.startswith(args.tier):
@@ -318,14 +355,53 @@ def main():
             model_path = model_dir / f"{param_name}_{safe_tier}.cbm"
             model.save_model(str(model_path))
 
-            # Save metadata
+            # Save metadata (schema v2 with applicability fields)
+            # Feature ranges for applicability domain detection
+            feature_ranges = {}
+            for col in numeric_cols:
+                if col in X_df.columns:
+                    feature_ranges[col] = {
+                        "min": float(X_df[col].min()),
+                        "max": float(X_df[col].max()),
+                    }
+
+            # Categorical values seen
+            cat_values_seen = {}
+            for col in cat_cols:
+                if col in X_df.columns:
+                    cat_values_seen[col] = sorted(X_df[col].unique().tolist())
+
+            # Per-regime site counts
+            sites_per_ecoregion = {}
+            sites_per_geology = {}
+            site_df = clean[["site_id"]].drop_duplicates()
+            if "ecoregion" in clean.columns:
+                eco_map = clean.drop_duplicates("site_id").groupby("ecoregion")["site_id"].nunique()
+                sites_per_ecoregion = eco_map.to_dict()
+            elif "ecoregion" in X_df.columns:
+                eco_map = X_df.assign(site_id=clean["site_id"]).drop_duplicates("site_id")
+                sites_per_ecoregion = eco_map["ecoregion"].value_counts().to_dict()
+            if "geol_class" in clean.columns:
+                geo_map = clean.drop_duplicates("site_id").groupby("geol_class")["site_id"].nunique()
+                sites_per_geology = geo_map.to_dict()
+            elif "geol_class" in X_df.columns:
+                geo_map = X_df.assign(site_id=clean["site_id"]).drop_duplicates("site_id")
+                sites_per_geology = geo_map["geol_class"].value_counts().to_dict()
+
             meta = {
+                "schema_version": 2,
                 "param": param_name,
                 "tier": tier_name,
                 "feature_cols": all_cols,
                 "cat_cols": cat_cols,
                 "cat_indices": cat_indices,
                 "train_median": train_median.to_dict(),
+                "feature_ranges": feature_ranges,
+                "categorical_values_seen": cat_values_seen,
+                "target_range": {"min": float(y.min()), "max": float(y.max())},
+                "target_range_native": {"min": float(np.expm1(y.min())), "max": float(np.expm1(y.max()))},
+                "sites_per_ecoregion": sites_per_ecoregion,
+                "sites_per_geology": sites_per_geology,
                 "n_sites": int(clean["site_id"].nunique()),
                 "n_samples": len(clean),
                 "n_trees": model.tree_count_,

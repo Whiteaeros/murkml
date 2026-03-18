@@ -108,21 +108,50 @@ def _safe_col(df: pd.DataFrame, col: str, default):
     return pd.Series(default, index=df.index)
 
 
+def get_gagesii_original_sites(data_dir: Path) -> set[str]:
+    """Return site_ids with genuine GAGES-II attributes (not NLCD backfill).
+
+    Computes: sites in merged gagesii file MINUS sites in nlcd backfill file.
+    """
+    gagesii_path = data_dir / "site_attributes_gagesii.parquet"
+    nlcd_path = data_dir / "site_attributes_nlcd.parquet"
+
+    if not gagesii_path.exists():
+        return set()
+
+    gagesii_sites = set(pd.read_parquet(gagesii_path, columns=["site_id"])["site_id"])
+
+    if nlcd_path.exists():
+        nlcd_df = pd.read_parquet(nlcd_path)
+        # Only count sites that actually got NLCD data (have forest_pct)
+        if "forest_pct" in nlcd_df.columns:
+            nlcd_sites = set(nlcd_df.dropna(subset=["forest_pct"])["site_id"])
+        else:
+            nlcd_sites = set()
+    else:
+        nlcd_sites = set()
+
+    return gagesii_sites - nlcd_sites
+
+
 def build_feature_tiers(
     assembled_df: pd.DataFrame,
     basic_attrs: pd.DataFrame,
     gagesii_attrs: pd.DataFrame | None = None,
+    nlcd_original_sites: set[str] | None = None,
 ) -> dict[str, dict]:
-    """Build 3-tier feature sets for ablation study.
+    """Build feature tiers for ablation study.
 
     Tier A (all sites): Sensor-only features
     Tier B (all sites): Sensor + basic attributes (drainage area, elevation, HUC)
     Tier C (GAGES-II sites only): Sensor + basic + pruned GAGES-II
+    Tier C_gagesii_only: Tier C restricted to original GAGES-II sites (no NLCD backfill)
 
     Args:
         assembled_df: Paired sensor+discrete dataset with site_id column.
         basic_attrs: Basic site attributes (drainage area, elevation, HUC) for all sites.
         gagesii_attrs: Pruned GAGES-II attributes (from prune_gagesii). Optional.
+        nlcd_original_sites: Set of site_ids that are NOT NLCD backfill (from get_gagesii_original_sites).
 
     Returns:
         Dict mapping tier name to {"data": DataFrame, "sites": list, "feature_cols": list}.
@@ -228,6 +257,17 @@ def build_feature_tiers(
                 "sites": sorted(tier_b_restricted["site_id"].unique()),
                 "feature_cols": sensor_cols + basic_cols_to_add,
                 "description": f"Sensor + basic (restricted to {len(gagesii_sites)} GAGES-II sites)",
+            }
+
+    # --- Tier C_gagesii_only: exclude NLCD-backfilled sites ---
+    if gagesii_attrs is not None and nlcd_original_sites is not None:
+        tier_c_orig = tier_c_data[tier_c_data["site_id"].isin(nlcd_original_sites)].copy()
+        if not tier_c_orig.empty:
+            tiers["C_gagesii_only"] = {
+                "data": tier_c_orig,
+                "sites": sorted(tier_c_orig["site_id"].unique()),
+                "feature_cols": sensor_cols + basic_cols_to_add + gagesii_feature_cols,
+                "description": f"Sensor + basic + GAGES-II (original {len(nlcd_original_sites)} sites, no NLCD backfill)",
             }
 
     # Summary

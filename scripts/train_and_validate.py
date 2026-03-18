@@ -321,6 +321,7 @@ def main():
             "cat_indices": cat_indices,
             "train_median": train_median,
             "target_col": target_col,
+            "target_max_native": float(np.expm1(y.max())),
         }
 
     # =========================================================
@@ -430,13 +431,31 @@ def main():
                 logger.warning(f"    Only {len(y_true_log)} samples, skipping")
                 continue
 
+            # Determine attribute source
+            attr_source = "sensor_only"
+            if gagesii_attrs is not None and site_id in set(gagesii_attrs["site_id"]):
+                attr_source = "GAGES-II"
+            elif not site_attrs.empty:
+                attr_source = "basic_only"
+
             # Predict
             test_pool = Pool(X_df, cat_features=cat_indices)
             y_pred_log = model.predict(test_pool)
 
+            # Output clipping in native space (Chen: clip in native, not log)
+            target_max = tm.get("target_max_native", np.inf)
+            y_pred_native = np.expm1(y_pred_log)
+            y_pred_native = np.clip(y_pred_native, 0, target_max)
+            y_pred_log = np.log1p(y_pred_native)
+
             cb_r2 = r_squared(y_true_log, y_pred_log)
             cb_kge = kge(y_true_log, y_pred_log)
             cb_rmse = rmse(y_true_log, y_pred_log)
+
+            # Native-space metrics
+            y_true_native = np.expm1(y_true_log)
+            cb_r2_native = r_squared(y_true_native, y_pred_native)
+            cb_rmse_native = rmse(y_true_native, y_pred_native)
 
             # Per-site OLS baseline
             ols_r2 = np.nan
@@ -453,7 +472,8 @@ def main():
                         ols_r2 = r_squared(y_ols[n_train:], y_ols_pred)
 
             logger.info(f"    n={len(assembled)}, CatBoost R²={cb_r2:.3f}, "
-                       f"KGE={cb_kge:.3f}, OLS R²={ols_r2:.3f}")
+                       f"KGE={cb_kge:.3f}, OLS R²={ols_r2:.3f}, "
+                       f"RMSE={cb_rmse_native:.1f} mg/L, src={attr_source}")
 
             all_results.append({
                 "site_id": site_id,
@@ -462,7 +482,10 @@ def main():
                 "catboost_r2_log": cb_r2,
                 "catboost_kge_log": cb_kge,
                 "catboost_rmse_log": cb_rmse,
+                "catboost_r2_native": cb_r2_native,
+                "catboost_rmse_native_mgL": cb_rmse_native,
                 "per_site_ols_r2_log": ols_r2,
+                "attribute_source": attr_source,
             })
 
     # =========================================================
