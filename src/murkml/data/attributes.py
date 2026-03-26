@@ -33,12 +33,38 @@ def prune_gagesii(df: pd.DataFrame) -> pd.DataFrame:
     Merges correlated groups to reduce dimensionality for 37-site models.
     Chen review: 44 features is too many for 37 sites. Target 20-25.
 
+    IMPORTANT: This function expects RAW GAGES-II column names (e.g., FORESTNLCD06,
+    GEOL_HUNT_DOM_CODE). If the input already has pruned names (e.g., forest_pct,
+    geol_class), it returns the input unchanged.
+
     Args:
         df: GAGES-II matched attributes DataFrame (must have 'site_id' column).
 
     Returns:
         DataFrame with pruned/merged feature columns + site_id.
     """
+    # Guard: detect already-pruned input (bug discovered 2026-03-24)
+    if "forest_pct" in df.columns and "FORESTNLCD06" not in df.columns:
+        logger.warning(
+            "prune_gagesii: input already has pruned column names "
+            f"({len(df.columns)} cols, {len(df)} rows). Returning as-is."
+        )
+        return df
+
+    # Guard: verify enough expected raw columns exist
+    expected_raw_cols = [
+        "FORESTNLCD06", "CROPSNLCD06", "DEVNLCD06", "GEOL_HUNT_DOM_CODE",
+        "CLAYAVE", "SANDAVE", "PERMAVE", "PPTAVG_BASIN", "T_AVG_BASIN",
+        "ELEV_MEAN_M_BASIN", "SLOPE_PCT", "BFI_AVE", "CLASS", "AGGECOREGION",
+    ]
+    n_found = sum(1 for c in expected_raw_cols if c in df.columns)
+    if n_found < len(expected_raw_cols) * 0.5:
+        raise ValueError(
+            f"prune_gagesii: only {n_found}/{len(expected_raw_cols)} expected raw "
+            f"GAGES-II columns found. Input may have wrong column names. "
+            f"Expected columns like FORESTNLCD06, got: {list(df.columns[:5])}..."
+        )
+
     out = pd.DataFrame()
     out["site_id"] = df["site_id"]
 
@@ -106,6 +132,65 @@ def _safe_col(df: pd.DataFrame, col: str, default):
     if col in df.columns:
         return df[col]
     return pd.Series(default, index=df.index)
+
+
+def validate_gagesii_schema(df: pd.DataFrame, expected_format: str = "pruned") -> None:
+    """Validate that a GAGES-II DataFrame has the expected column name format.
+
+    Args:
+        df: DataFrame to validate.
+        expected_format: "pruned" (forest_pct, geol_class) or "raw" (FORESTNLCD06).
+
+    Raises:
+        ValueError: If column names don't match expected format.
+    """
+    if expected_format == "pruned":
+        if "forest_pct" not in df.columns:
+            raise ValueError(
+                f"Expected pruned GAGES-II format (forest_pct, geol_class, ...) "
+                f"but got columns: {list(df.columns[:5])}..."
+            )
+        if "FORESTNLCD06" in df.columns:
+            raise ValueError(
+                "DataFrame has raw GAGES-II column names but expected pruned format."
+            )
+        # Verify categorical columns are string dtype
+        for cat_col in ["geol_class", "ecoregion", "reference_class"]:
+            if cat_col in df.columns:
+                non_null = df[cat_col].dropna()
+                if len(non_null) > 0 and non_null.dtype != object:
+                    raise ValueError(
+                        f"Column {cat_col} should be dtype=object (string) but is "
+                        f"{non_null.dtype}. Categorical columns were likely destroyed."
+                    )
+    elif expected_format == "raw":
+        if "FORESTNLCD06" not in df.columns:
+            raise ValueError(
+                f"Expected raw GAGES-II format (FORESTNLCD06, GEOL_HUNT_DOM_CODE, ...) "
+                f"but got columns: {list(df.columns[:5])}..."
+            )
+    else:
+        raise ValueError(f"Unknown format: {expected_format}. Use 'pruned' or 'raw'.")
+
+
+def _assert_merge_integrity(
+    result: pd.DataFrame,
+    expected_rows: int,
+    label: str,
+    check_cols: list[str] | None = None,
+) -> None:
+    """Post-merge sanity check. Warns on row count changes and all-NaN columns."""
+    if len(result) != expected_rows:
+        logger.warning(
+            f"Merge '{label}': row count changed {expected_rows} → {len(result)}. "
+            f"Possible duplicate site_ids in attribute file."
+        )
+    if check_cols:
+        for col in check_cols:
+            if col in result.columns and result[col].isna().all():
+                logger.warning(
+                    f"Merge '{label}': column '{col}' is entirely NaN after merge."
+                )
 
 
 def get_gagesii_original_sites(data_dir: Path) -> set[str]:
@@ -217,18 +302,28 @@ def build_feature_tiers(
 
     # --- Tier C: Sensor + basic + GAGES-II ---
     if gagesii_attrs is not None and not gagesii_attrs.empty:
+        # Validate schema before using GAGES-II attributes
+        validate_gagesii_schema(gagesii_attrs, expected_format="pruned")
+
         gagesii_sites = set(gagesii_attrs["site_id"])
         tier_c_base = assembled_df[assembled_df["site_id"].isin(gagesii_sites)].copy()
 
         if basic_cols_to_add:
+            n_before = len(tier_c_base)
             tier_c_base = tier_c_base.merge(
                 basic_attrs[["site_id"] + basic_cols_to_add],
                 on="site_id",
                 how="left",
             )
+            _assert_merge_integrity(tier_c_base, n_before, "Tier C basic attrs")
 
         gagesii_feature_cols = [c for c in gagesii_attrs.columns if c != "site_id"]
+        n_before = len(tier_c_base)
         tier_c_data = tier_c_base.merge(gagesii_attrs, on="site_id", how="left")
+        _assert_merge_integrity(
+            tier_c_data, n_before, "Tier C GAGES-II",
+            check_cols=["forest_pct", "geol_class", "ecoregion"],
+        )
 
         # Okafor fix: guard HUC2 NaN
         if "huc2" in tier_c_data.columns:

@@ -25,6 +25,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 from murkml.data.align import align_samples, FEATURE_WINDOW
 from murkml.data.features import engineer_features
 from murkml.data.qc import filter_continuous
+from murkml.provenance import start_run, log_step, log_file, end_run
 
 logging.basicConfig(
     level=logging.INFO,
@@ -167,6 +168,8 @@ def load_discrete(site_id: str) -> pd.DataFrame:
     return valid[["datetime", "ssc_value", "is_nondetect"]]
 
 
+_CONTINUOUS_COLS = ["time", "value", "approval_status", "qualifier"]
+
 def load_continuous(site_id: str, param_code: str) -> pd.DataFrame:
     """Load all cached continuous data for a site+param, concat chunks."""
     cont_dir = DATA_DIR / "continuous" / site_id.replace("-", "_") / param_code
@@ -175,7 +178,10 @@ def load_continuous(site_id: str, param_code: str) -> pd.DataFrame:
 
     chunks = []
     for f in sorted(cont_dir.glob("*.parquet")):
-        chunk = pd.read_parquet(f)
+        try:
+            chunk = pd.read_parquet(f, columns=_CONTINUOUS_COLS)
+        except Exception:
+            chunk = pd.read_parquet(f)
         if len(chunk) > 0:
             chunks.append(chunk)
 
@@ -269,17 +275,17 @@ def align_site(site_id: str) -> pd.DataFrame:
         cont_clean["time"] = pd.to_datetime(cont_clean["time"], utc=True)
         cont_clean = cont_clean.sort_values("time").reset_index(drop=True)
 
-        instant_values = []
-        for _, row in aligned.iterrows():
-            anchor_time = row["sample_time"]  # turbidity match time
-            time_diffs = (cont_clean["time"] - anchor_time).abs()
-            min_idx = time_diffs.idxmin()
-            if time_diffs.iloc[min_idx] <= pd.Timedelta(minutes=15):
-                instant_values.append(cont_clean["value"].iloc[min_idx])
-            else:
-                instant_values.append(np.nan)
-
-        aligned[f"{pname}_instant"] = instant_values
+        sample_df = aligned[["sample_time"]].copy().reset_index(drop=True)
+        sample_df["sample_time"] = pd.to_datetime(sample_df["sample_time"], utc=True)
+        cont_clean["time"] = pd.to_datetime(cont_clean["time"], utc=True)
+        merged = pd.merge_asof(
+            sample_df.rename(columns={"sample_time": "_t"}),
+            cont_clean.rename(columns={"time": "_t", "value": "_v"}),
+            on="_t",
+            direction="nearest",
+            tolerance=pd.Timedelta(minutes=15),
+        )
+        aligned[f"{pname}_instant"] = merged["_v"].values
 
     # Add is_nondetect flag (Fix 11)
     aligned["is_nondetect"] = aligned["sample_time"].map(
@@ -297,8 +303,11 @@ def main():
     import warnings
     warnings.filterwarnings("ignore")
 
+    start_run("assemble_ssc")
+
     # Load site catalog
     catalog = pd.read_parquet(DATA_DIR / "site_catalog.parquet")
+    log_file(DATA_DIR / "site_catalog.parquet", role="input")
     logger.info(f"Site catalog: {len(catalog)} sites")
 
     # Check which sites have downloaded data
@@ -317,8 +326,10 @@ def main():
             aligned = align_site(site_id)
             if not aligned.empty:
                 all_aligned.append(aligned)
+                log_step("align_site", site_id=site_id, rows_out=len(aligned))
         except Exception as e:
             logger.error(f"  Error processing {site_id}: {e}")
+            log_step("align_site", site_id=site_id, error=str(e))
             continue
 
     if not all_aligned:
@@ -338,6 +349,12 @@ def main():
     output_path = DATA_DIR / "processed" / "turbidity_ssc_paired.parquet"
     output_path.parent.mkdir(parents=True, exist_ok=True)
     dataset.to_parquet(output_path, index=False)
+    log_file(output_path, role="output")
+
+    log_step("assemble_complete",
+             n_sites=int(dataset["site_id"].nunique()),
+             n_samples=len(dataset),
+             n_features=len([c for c in dataset.columns if c not in {"site_id", "sample_time", "lab_value", "ssc_log1p", "is_nondetect"}]))
 
     # Summary
     logger.info(f"\n{'='*60}")
@@ -347,6 +364,8 @@ def main():
     logger.info(f"States: {catalog[catalog['site_id'].isin(dataset['site_id'].unique())]['state'].unique()}")
     logger.info(f"SSC range: {dataset['lab_value'].min():.0f} - {dataset['lab_value'].max():.0f} mg/L")
     logger.info(f"Columns: {list(dataset.columns)}")
+
+    end_run()
 
     # Per-site summary
     logger.info(f"\nPer-site summary:")

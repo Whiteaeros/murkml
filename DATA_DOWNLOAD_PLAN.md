@@ -1,6 +1,19 @@
 # Data Download Plan — Multi-Parameter + Catchment Attributes
 
-## Goal
+> **STATUS (2026-03-25): LARGELY COMPLETE.**
+> Multi-parameter discrete data has been downloaded for all parameters (SSC, TP, nitrate, orthoP) across the expanded 102-site network. GAGES-II and NLCD attributes have been downloaded and merged. TDS was deprioritized. See actual results below.
+>
+> **What was achieved vs planned:**
+> - Discrete data for TP (72 sites), nitrate (66 sites), orthoP (62 sites) — downloaded and assembled
+> - GAGES-II attributes matched for 58 sites (Tier 1)
+> - NLCD 2019 backfill for 37 additional sites (Tier 3 via pygeohydro)
+> - NLDI characteristics pulled for gap-filling (Tier 2)
+> - TDS (pcode 70300) was not pursued — SC-TDS relationship is near-linear and not a priority
+> - StreamCat (Tier 4) is now the PLANNED replacement for the two-source attribute problem
+>
+> **Remaining:** StreamCat migration to replace GAGES-II + NLCD with a single consistent source for all 102 sites.
+
+## Goal (original)
 Download all remaining data needed for the multi-target model: discrete lab data for 4 new parameters at all 57 existing sites, plus catchment/watershed attributes.
 
 **Rule:** Same sites for all parameters. We are building complete site profiles, not mixing data across sites.

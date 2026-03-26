@@ -1,18 +1,25 @@
 # Fix Plan: murkml Audit Remediation
 
+> **STATUS (2026-03-25): ORIGINAL AUDIT SUBSTANTIALLY COMPLETE.**
+> All critical and most important fixes from this 4-reviewer audit (Mar 16-17) have been implemented. The project has since expanded to 102 sites, R² reached 0.80 (log) / 0.61 (native), and a **new 5-reviewer red team panel** was conducted on 2026-03-24 with additional findings.
+>
+> **For the current plan, see `RESULTS_LOG.md`** — sections on "Red Team Panel Review" and "Code Fixes Implemented" document the new findings and their status.
+>
+> The content below is preserved as historical record of the original audit. Items marked [DONE] have been implemented.
+
 ## Context
 
 Four expert reviewers (ML Engineer, Domain Scientist, Critical Reviewer, Data Engineer) independently audited the murkml codebase and results. They found **4 critical bugs, 15 important issues, and 10 minor issues.** Three of the critical bugs were flagged by all four reviewers independently (highest confidence). The current R²=0.67 result is **inflated and unreliable** due to information leakage and data corruption. This plan addresses every finding, prioritized by impact.
 
-**Current state:** 57 sites, 17,054 paired samples, 11 states, 4.9GB continuous data. CatBoost LOGO R²=0.67 (log) — but this number is wrong due to bugs below. The real number is probably 0.55-0.62.
+**Current state (at time of audit):** 57 sites, 17,054 paired samples, 11 states, 4.9GB continuous data. CatBoost LOGO R²=0.67 (log) — but this number is wrong due to bugs below. The real number is probably 0.55-0.62.
 
 **Goal:** Fix all critical and important issues, re-run baselines, and get honest numbers we can stand behind.
 
 ---
 
-## CRITICAL FIXES (must do first — results are invalid without these)
+## CRITICAL FIXES (must do first — results are invalid without these) — ALL DONE
 
-### Fix 1: Timezone Bug (Okafor — confirmed)
+### [DONE] Fix 1: Timezone Bug (Okafor — confirmed)
 **File:** `scripts/assemble_dataset.py` lines 57-66
 **Problem:** Discrete sample timestamps are in local time (EST, CST, MST, etc.) but `pd.to_datetime(..., utc=True)` labels them as UTC without converting. Every temporal alignment is off by 5-8 hours. Continuous data IS in UTC (from the new API). So a Kansas sample collected at 10:00 AM CST is matched to the 10:00 AM UTC sensor reading (which is 4:00 AM local — 6 hours wrong).
 **Evidence:** Data confirms EST, EDT, CST, CDT, MST, MDT timezone codes in `Activity_StartTimeZone` column — all ignored.
@@ -25,7 +32,7 @@ Four expert reviewers (ML Engineer, Domain Scientist, Critical Reviewer, Data En
 6. **Sanity check (Okafor):** Verify no converted timestamps fall outside the site's continuous data range by more than expected — catches the "EST year-round ignoring DST" problem.
 **Test:** Add tests for CST→UTC, EST→UTC, missing timezone → dropped, missing time → dropped, column-absent → dropped
 
-### Fix 2: Early Stopping on Test Set (Chen, Rivera, Okafor, Patel — all four)
+### [DONE] Fix 2: Early Stopping on Test Set (Chen, Rivera, Okafor, Patel — all four)
 **File:** `scripts/train_baseline.py` line 396
 **Problem:** `model.fit(X_train, y_train, eval_set=(X_test, y_test), early_stopping_rounds=50)` — the held-out test site is used to decide when to stop training. The model peeks at the test distribution. Inflates R² by ~0.02-0.05.
 **Fix:** Split training sites into 85% train / 15% validation (Chen: 10% gives only 5-6 sites, too noisy; 15% = 8-9 sites for more stable stopping). Use `GroupShuffleSplit` with site-level groups for the validation split.
@@ -38,7 +45,7 @@ model.fit(X_train_sub, y_train_sub, eval_set=(X_val, y_val), early_stopping_roun
 **Quantile model (line ~505):** Currently has NO early stopping (fixed 500 iterations). Add early stopping with the same validation split. (Patel: not a blocker if kept at 500, but consistency is better.)
 **Note (Chen):** X_train is a numpy array at this point (line 370). Use `np.where(np.isnan(...), median, ...)` for imputation, not `fillna`.
 
-### Fix 3 + Fix 5 Combined: Hydrograph & Antecedent Features from Continuous Record (all four)
+### [DONE] Fix 3 + Fix 5 Combined: Hydrograph & Antecedent Features from Continuous Record (all four)
 **Files:** `src/murkml/data/features.py` lines 43-44, 49-67; `scripts/assemble_dataset.py` line 242
 **Problem:** `df[discharge_col].diff()` computes difference between consecutive rows in the concatenated multi-site DataFrame — garbage across sites AND within a single site (grab samples are days/weeks apart). `rising_limb` inherits this. Antecedent features are stubs.
 **Chen clarification:** The groupby-only approach will NOT fix this — even within a single site, grab samples are too sparse for `diff()` to approximate dQ/dt. MUST use continuous discharge record.
@@ -62,7 +69,7 @@ model.fit(X_train_sub, y_train_sub, eval_set=(X_val, y_val), early_stopping_roun
 
 **Also:** Ensure `add_cross_sensor_features()` doesn't produce garbage across site boundaries (Rivera: turb_Q_ratio will also be wrong if discharge magnitudes differ). Add `groupby(site_id)` to all feature functions that use row-ordering operations.
 
-### Fix 4: Median Imputation Before CV Split (Chen, Okafor, Patel)
+### [DONE] Fix 4: Median Imputation Before CV Split (Chen, Okafor, Patel)
 **File:** `scripts/train_baseline.py` lines 366-368, 283-285, 472-476
 **Problem:** Missing values filled with global median (includes test site data) before the LOGO loop. Leaks test-site feature distributions into training.
 **Fix:** Move imputation inside the CV loop. For each fold:
@@ -74,9 +81,9 @@ X_test = X_test.fillna(train_median)  # use TRAINING median for test
 
 ---
 
-## IMPORTANT FIXES (do after critical fixes, before re-running baselines)
+## IMPORTANT FIXES (do after critical fixes, before re-running baselines) — MOSTLY DONE
 
-### Fix 5: Implement Antecedent Features (all four)
+### [DONE] Fix 5: Implement Antecedent Features (all four)
 **File:** `src/murkml/data/features.py` lines 49-67
 **Problem:** `add_antecedent_features()` is a stub that returns input unchanged. These are the features domain experts say matter most (7-day/30-day cumulative discharge, days since high flow).
 **Fix:** For each sample, load the site's continuous discharge data for the 30 days prior. Compute:
@@ -86,7 +93,7 @@ X_test = X_test.fillna(train_median)  # use TRAINING median for test
 - `days_since_high_Q`: days since Q exceeded the 90th percentile for that site
 **Requires:** Access to continuous discharge data during assembly. The data exists in `data/continuous/{site}/00060/`.
 
-### Fix 6: Tighten Alignment Window + Drop Bad Timestamps
+### [DONE] Fix 6: Tighten Alignment Window + Drop Bad Timestamps
 **Files:** `scripts/assemble_dataset.py` line 145, lines 58-59
 **Problems:**
 - Alignment window relaxed to ±30 min (should be ±15 min for turbidity-SSC)
@@ -96,14 +103,14 @@ X_test = X_test.fillna(train_median)  # use TRAINING median for test
 - Replace `time_str.fillna("12:00:00")` with dropping rows where time is null
 - Accept the data loss — bad timestamps = bad training pairs
 
-### Fix 7: Make All Baselines Use Same CV Protocol (Patel)
+### [DONE] Fix 7: Make All Baselines Use Same CV Protocol (Patel)
 **File:** `scripts/train_baseline.py`
 **Problem:** Per-site OLS uses temporal split within each site. CatBoost uses LOGO. Comparing R² across different CV protocols is apples-to-oranges.
 **Fix:** Add LOGO versions of Global OLS and Multi-feature Linear. Keep per-site OLS as the "ceiling" with clear labeling. The comparison table should separate:
 - **Cross-site models (LOGO):** Global OLS, Multi-feature Linear, CatBoost
 - **Per-site ceiling (temporal split):** Per-site OLS (labeled as "upper bound — requires per-site calibration")
 
-### Fix 8: Value-Range QC (Rivera — revised per plan review)
+### [DONE] Fix 8: Value-Range QC (Rivera — revised per plan review)
 **File:** `src/murkml/data/qc.py`
 **Problem:** No check for physically impossible values. Turbidity of -5? SSC of 500,000?
 **Fix:** Add bounds checking (Rivera corrections applied):
@@ -116,7 +123,7 @@ X_test = X_test.fillna(train_median)  # use TRAINING median for test
 - Conductance: 0 to 100,000 µS/cm; flag > 10,000 for non-brine sites
 Log and count excluded/flagged records. **Run BEFORE alignment** (Rivera: impossible values shouldn't participate in window feature computation).
 
-### Fix 9: Fix Smearing Factor for Overall CV Metrics (Chen, Rivera, Patel — ALL FOUR flagged revision)
+### [DONE] Fix 9: Fix Smearing Factor for Overall CV Metrics (Chen, Rivera, Patel — ALL FOUR flagged revision)
 **File:** `scripts/train_baseline.py` line 426
 **Problem:** `smearing_factor=1.0` for pooled LOGO metrics = no bias correction in natural space.
 **REVISION (all four reviewers):** Original fix proposed using TEST residuals — WRONG. Duan's smearing estimator must use TRAINING residuals (the residuals of the model on data it was trained on). Using test residuals peeks at test values to correct predictions.
@@ -132,7 +139,7 @@ pooled_smearing = np.mean(np.exp(np.concatenate(all_train_resids)))
 ```
 Alternative (simpler): average the per-fold smearing factors: `pooled_smearing = np.mean(per_fold_smearing_factors)`
 
-### Fix 10: QC Buffer Periods (Rivera, Okafor, Patel)
+### [DONE] Fix 10: QC Buffer Periods (Rivera, Okafor, Patel)
 **File:** `src/murkml/data/qc.py` lines 86-89
 **Problem:** 48-hour post-Ice and 4-hour post-Mnt buffers defined but never implemented.
 **Fix:** Extend exclusion window forward by buffer duration after each Ice/Mnt episode.
@@ -142,7 +149,7 @@ Alternative (simpler): average the per-fold smearing factors: `pooled_smearing =
 3. Create the buffer exclusion mask
 4. THEN apply qualifier + buffer exclusion together
 
-### Fix 11: Non-Detect and Zero Handling (Okafor — revised per plan review)
+### [DONE] Fix 11: Non-Detect and Zero Handling (Okafor — revised per plan review)
 **File:** `scripts/assemble_dataset.py` lines 72-81
 **Problems:**
 - Non-detects handled inconsistently (lab-dependent)
@@ -153,16 +160,16 @@ Alternative (simpler): average the per-fold smearing factors: `pooled_smearing =
 - Change `ssc_value > 0` to `ssc_value >= 0` — log1p(0) = 0 is valid
 - Add a `is_nondetect` boolean column so the model can learn from it
 
-### Fix 12: Secondary Sensor Time Coordination (Okafor)
+### [DONE] Fix 12: Secondary Sensor Time Coordination (Okafor)
 **File:** `scripts/assemble_dataset.py` lines 180-193
 **Problem:** Each secondary sensor (conductance, DO, pH, temp, discharge) is independently matched to the sample time. Two sensors in the same row could be from readings 30+ minutes apart.
 **Fix:** Use the PRIMARY turbidity match timestamp as the anchor. For secondary sensors, find the reading nearest to the TURBIDITY match time, not the grab sample time. This ensures all sensor readings in a row are from the same moment.
 
-### Fix 13: Reduce Collinear Turbidity Features (Chen)
+### [DONE] Fix 13: Reduce Collinear Turbidity Features (Chen)
 **Problem:** 7 turbidity window features from the same 1hr signal. Dilutes feature importance and SHAP interpretability.
 **Fix:** Keep `turbidity_instant`, `turbidity_slope_1hr`, `turbidity_std_1hr`. Drop `turbidity_mean_1hr`, `turbidity_min_1hr`, `turbidity_max_1hr`, `turbidity_range_1hr`. Run ablation to confirm no performance loss.
 
-### Fix 14: Add Catchment Attributes as Features
+### [DONE] Fix 14: Add Catchment Attributes as Features
 **File:** `scripts/train_baseline.py`, `data/site_attributes.parquet`
 **Problem:** Model has no information about what kind of watershed each site is in. Can't distinguish mountain stream from agricultural plains river.
 **Fix:** Join `site_attributes.parquet` (already downloaded: drainage area, elevation, HUC2 region) to the training data. Add as features:
@@ -191,12 +198,12 @@ Do NOT add lat/lon (leakage in LOGO).
 **Problem:** Excluding ALL provisional data loses 1-3 years of recent data at active sites.
 **Fix:** Include Provisional data but add a `is_provisional` boolean flag. Run models with and without provisional data. Report both. If performance is similar, include it.
 
-### Fix 18: Duplicate Sample Check (Chen)
+### [DONE] Fix 18: Duplicate Sample Check (Chen)
 **File:** `scripts/assemble_dataset.py`
 **Problem:** No deduplication of discrete samples (same site, same time, same value).
 **Fix:** Add `df.drop_duplicates(subset=["site_id", "datetime", "ssc_value"])` after loading discrete data.
 
-### Fix 19: Add Missing Tests for Critical Code Paths (Okafor)
+### [DONE] Fix 19: Add Missing Tests for Critical Code Paths (Okafor)
 **File:** `tests/`
 **Problem:** No tests for timezone handling, non-detect handling, cross-site dQ/dt, or the full assembly pipeline.
 **Fix:** Add tests for:
@@ -215,8 +222,8 @@ Change `np.std(y_pred)` to `np.std(y_pred, ddof=1)` for sample std.
 ### Fix 21: Dead code in models/baseline.py (Chen, Patel)
 Remove `src/murkml/models/baseline.py` divergent CatBoost config or sync it with train_baseline.py.
 
-### Fix 22: DO saturation formula (Rivera) — `features.py` line 88
-Replace `14.6 - 0.4 * T` with Benson & Krause (1984) nonlinear formula. Low priority — CatBoost compensates.
+### [DONE] Fix 22: DO saturation formula (Rivera) — `features.py` line 88
+Replace `14.6 - 0.4 * T` with Benson & Krause (1984) nonlinear formula. **Fixed 2026-03-24. The linear approximation had 27-65% error at common stream temperatures.** Turned out to be higher priority than originally assessed.
 
 ### Fix 23: Alignment performance (Okafor, Patel) — `align.py`
 Replace O(N*M) brute-force with `pd.merge_asof()`. Same results, orders of magnitude faster.

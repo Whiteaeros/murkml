@@ -28,7 +28,11 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
 from murkml.data.attributes import prune_gagesii, build_feature_tiers, get_gagesii_original_sites
-from murkml.evaluate.metrics import kge, percent_bias, r_squared, rmse
+from murkml.evaluate.metrics import (
+    kge, percent_bias, r_squared, rmse,
+    duan_smearing_factor, native_space_metrics,
+)
+from murkml.provenance import start_run, log_step, log_file, end_run
 
 logging.basicConfig(
     level=logging.INFO,
@@ -42,8 +46,10 @@ DATA_DIR = PROJECT_ROOT / "data"
 PARAM_CONFIG = {
     "ssc": {"dataset": "turbidity_ssc_paired.parquet", "target_col": "ssc_log1p"},
     "total_phosphorus": {"dataset": "total_phosphorus_paired.parquet", "target_col": "total_phosphorus_log1p"},
-    "nitrate_nitrite": {"dataset": "nitrate_nitrite_paired.parquet", "target_col": "nitrate_nitrite_log1p"},
-    "orthophosphate": {"dataset": "orthophosphate_paired.parquet", "target_col": "orthophosphate_log1p"},
+    # Nitrate and orthoP are confirmed negative results (R² < -1.5 across all tiers).
+    # Skipping to avoid ~1000 unnecessary LOGO CV folds per retrain.
+    # "nitrate_nitrite": {"dataset": "nitrate_nitrite_paired.parquet", "target_col": "nitrate_nitrite_log1p"},
+    # "orthophosphate": {"dataset": "orthophosphate_paired.parquet", "target_col": "orthophosphate_log1p"},
 }
 
 EXCLUDE_COLS = {
@@ -52,6 +58,119 @@ EXCLUDE_COLS = {
     "ssc_log1p", "ssc_value", "total_phosphorus_log1p",
     "nitrate_nitrite_log1p", "orthophosphate_log1p", "tds_evaporative_log1p",
 }
+
+
+def train_ridge_logo(
+    df: pd.DataFrame,
+    feature_cols: list[str],
+    target_col: str = "ssc_log1p",
+    cat_features: list[str] | None = None,
+) -> tuple[dict, pd.DataFrame, pd.DataFrame]:
+    """Run Ridge regression LOGO CV as a linear baseline.
+
+    Uses the same splits and preprocessing as CatBoost for fair comparison.
+    Categorical features are one-hot encoded. Returns same format as CatBoost version.
+    """
+    from sklearn.linear_model import Ridge
+    from sklearn.preprocessing import OneHotEncoder
+
+    clean = df.dropna(subset=[target_col]).copy()
+    sites = clean["site_id"].values
+    y = clean[target_col].values
+
+    discharge_col = "discharge_instant"
+    has_discharge = discharge_col in clean.columns
+    discharge_vals = clean[discharge_col].values if has_discharge else np.full(len(clean), np.nan)
+
+    if cat_features is None:
+        cat_features = []
+    num_cols = [c for c in feature_cols if c not in cat_features]
+    cat_cols_present = [c for c in cat_features if c in df.columns]
+
+    X_num = clean[num_cols].copy()
+
+    logo = LeaveOneGroupOut()
+    fold_metrics = []
+    sample_records = []
+
+    for fold_idx, (train_idx, test_idx) in enumerate(logo.split(X_num, y, groups=sites)):
+        y_train = y[train_idx]
+        y_test = y[test_idx]
+        test_site = sites[test_idx][0]
+
+        if len(y_test) < 5:
+            continue
+
+        # Numeric features: fill NaN with training median
+        X_train_num = X_num.iloc[train_idx].copy()
+        X_test_num = X_num.iloc[test_idx].copy()
+        train_median = X_train_num.median()
+        X_train_num = X_train_num.fillna(train_median)
+        X_test_num = X_test_num.fillna(train_median)
+
+        # One-hot encode categoricals
+        if cat_cols_present:
+            cat_train = clean[cat_cols_present].iloc[train_idx].fillna("missing").astype(str)
+            cat_test = clean[cat_cols_present].iloc[test_idx].fillna("missing").astype(str)
+            enc = OneHotEncoder(sparse_output=False, handle_unknown="ignore")
+            enc.fit(cat_train)
+            cat_train_enc = enc.transform(cat_train)
+            cat_test_enc = enc.transform(cat_test)
+            X_train = np.hstack([X_train_num.values, cat_train_enc])
+            X_test = np.hstack([X_test_num.values, cat_test_enc])
+        else:
+            X_train = X_train_num.values
+            X_test = X_test_num.values
+
+        model = Ridge(alpha=1.0)
+        model.fit(X_train, y_train)
+        y_pred = model.predict(X_test)
+
+        bcf = duan_smearing_factor(y_train, model.predict(X_train))
+        kge_result = kge(y_test, y_pred, return_components=True)
+        native = native_space_metrics(y_test, y_pred, smearing_factor=bcf)
+
+        fold_metrics.append({
+            "site_id": test_site,
+            "r2_log": r_squared(y_test, y_pred),
+            "kge_log": kge_result["kge"],
+            "kge_r": kge_result["kge_r"],
+            "kge_alpha": kge_result["kge_alpha"],
+            "kge_beta": kge_result["kge_beta"],
+            "r2_native": native["r2_native"],
+            "rmse_native_mgL": native["rmse_native_mgL"],
+            "pbias_native": native["pbias_native"],
+            "smearing_factor": bcf,
+            "n_test": len(y_test),
+        })
+
+        test_discharge = discharge_vals[test_idx]
+        for i in range(len(y_test)):
+            sample_records.append({
+                "site_id": test_site,
+                "y_true_log": float(y_test[i]),
+                "y_pred_log": float(y_pred[i]),
+                "y_pred_native_mgL": float(np.expm1(y_pred[i]) * bcf),
+                "y_true_native_mgL": float(np.expm1(y_test[i])),
+                "discharge_instant": float(test_discharge[i]),
+            })
+
+    if not fold_metrics:
+        return {"r2_log": np.nan, "kge_log": np.nan, "n_folds": 0}, pd.DataFrame(), pd.DataFrame()
+
+    metrics_df = pd.DataFrame(fold_metrics)
+    samples_df = pd.DataFrame(sample_records)
+    summary = {
+        "r2_log": metrics_df["r2_log"].median(),
+        "kge_log": metrics_df["kge_log"].median(),
+        "r2_native": metrics_df["r2_native"].median(),
+        "rmse_native_mgL": metrics_df["rmse_native_mgL"].median(),
+        "pbias_native": metrics_df["pbias_native"].median(),
+        "smearing_factor": metrics_df["smearing_factor"].median(),
+        "n_folds": len(metrics_df),
+        "n_samples": len(clean),
+    }
+    return summary, metrics_df, samples_df
 
 
 def train_catboost_logo_quick(
@@ -126,8 +245,17 @@ def train_catboost_logo_quick(
 
         y_pred = model.predict(test_pool)
 
-        # KGE with decomposition
+        # Compute Duan's smearing factor from training residuals
+        y_train_pred = model.predict(
+            Pool(X_train_df.iloc[sub_train_idx], cat_features=cat_indices)
+        )
+        bcf = duan_smearing_factor(y_train[sub_train_idx], y_train_pred)
+
+        # KGE with decomposition (log-space)
         kge_result = kge(y_test, y_pred, return_components=True)
+
+        # Native-space metrics (mg/L) with smearing correction
+        native = native_space_metrics(y_test, y_pred, smearing_factor=bcf)
 
         fold_metrics.append({
             "site_id": test_site,
@@ -136,6 +264,10 @@ def train_catboost_logo_quick(
             "kge_r": kge_result["kge_r"],
             "kge_alpha": kge_result["kge_alpha"],
             "kge_beta": kge_result["kge_beta"],
+            "r2_native": native["r2_native"],
+            "rmse_native_mgL": native["rmse_native_mgL"],
+            "pbias_native": native["pbias_native"],
+            "smearing_factor": bcf,
             "n_test": len(y_test),
         })
 
@@ -146,6 +278,8 @@ def train_catboost_logo_quick(
                 "site_id": test_site,
                 "y_true_log": float(y_test[i]),
                 "y_pred_log": float(y_pred[i]),
+                "y_pred_native_mgL": float(np.expm1(y_pred[i]) * bcf),
+                "y_true_native_mgL": float(np.expm1(y_test[i])),
                 "discharge_instant": float(test_discharge[i]),
             })
 
@@ -160,6 +294,10 @@ def train_catboost_logo_quick(
     summary = {
         "r2_log": metrics_df["r2_log"].median(),
         "kge_log": metrics_df["kge_log"].median(),
+        "r2_native": metrics_df["r2_native"].median(),
+        "rmse_native_mgL": metrics_df["rmse_native_mgL"].median(),
+        "pbias_native": metrics_df["pbias_native"].median(),
+        "smearing_factor": metrics_df["smearing_factor"].median(),
         "n_folds": len(metrics_df),
         "n_samples": len(clean),
     }
@@ -183,15 +321,50 @@ def run_tier(param_name: str, tier_name: str, tier_data: pd.DataFrame,
     logger.info(f"  {param_name} / {tier_name}: {tier_data['site_id'].nunique()} sites, "
                 f"{len(tier_data)} samples, {len(numeric_available)} numeric + {len(cat_available)} categorical features")
 
+    # Data integrity checks (added 2026-03-24 after prune_gagesii bug)
+    if "gagesii" in tier_name.lower() or "C_" in tier_name:
+        expected_cats = {"geol_class", "ecoregion", "reference_class", "huc2"}
+        found_cats = set(cat_available)
+        missing_cats = expected_cats - found_cats - {"huc2"}  # huc2 may be in basic, not gagesii
+        if missing_cats:
+            logger.warning(
+                f"  INTEGRITY: Tier {tier_name} missing expected categoricals: {missing_cats}. "
+                f"Found: {found_cats}. Check that GAGES-II attributes were not destroyed."
+            )
+    # Check for all-NaN numeric features
+    all_nan_cols = [c for c in numeric_available if tier_data[c].isna().all()]
+    if all_nan_cols:
+        logger.warning(
+            f"  INTEGRITY: {len(all_nan_cols)} feature(s) are entirely NaN: {all_nan_cols[:5]}..."
+        )
+    # Check for zero-variance numeric features
+    zero_var_cols = [c for c in numeric_available if tier_data[c].dropna().nunique() <= 1]
+    if zero_var_cols:
+        logger.warning(
+            f"  INTEGRITY: {len(zero_var_cols)} feature(s) have zero variance: {zero_var_cols[:5]}..."
+        )
+
     if len(numeric_available) == 0:
         return {"r2_log": np.nan, "kge_log": np.nan, "n_folds": 0, "n_samples": 0}
 
+    # Run Ridge linear baseline
+    ridge_summary, ridge_folds, ridge_samples = train_ridge_logo(
+        tier_data, all_available, target_col, cat_features=cat_available
+    )
+    logger.info(
+        f"    Ridge baseline: R²(log)={ridge_summary['r2_log']:.3f}  "
+        f"R²(mg/L)={ridge_summary.get('r2_native', float('nan')):.3f}"
+    )
+
+    # Run CatBoost
     summary, folds_df, samples_df = train_catboost_logo_quick(
         tier_data, all_available, target_col, cat_features=cat_available
     )
     summary["param"] = param_name
     summary["tier"] = tier_name
     summary["n_features"] = len(all_available)
+    summary["ridge_r2_log"] = ridge_summary["r2_log"]
+    summary["ridge_r2_native"] = ridge_summary.get("r2_native", np.nan)
 
     # Save per-fold and per-sample results
     results_dir = DATA_DIR / "results"
@@ -201,12 +374,16 @@ def run_tier(param_name: str, tier_name: str, tier_data: pd.DataFrame,
         folds_df.to_parquet(results_dir / f"logo_folds_{param_name}_{safe_tier}.parquet", index=False)
     if not samples_df.empty:
         samples_df.to_parquet(results_dir / f"logo_predictions_{param_name}_{safe_tier}.parquet", index=False)
+    # Save Ridge folds too for comparison
+    if not ridge_folds.empty:
+        ridge_folds.to_parquet(results_dir / f"logo_folds_{param_name}_{safe_tier}_ridge.parquet", index=False)
 
     return summary
 
 
 def main():
     warnings.filterwarnings("ignore")
+    start_run("train_tiered")
 
     parser = argparse.ArgumentParser(description="Train tiered models")
     parser.add_argument("--param", type=str, default=None, choices=list(PARAM_CONFIG.keys()))
@@ -215,11 +392,13 @@ def main():
 
     # Load attributes
     basic_attrs = pd.read_parquet(DATA_DIR / "site_attributes.parquet")
+    log_file(DATA_DIR / "site_attributes.parquet", role="input")
     gagesii_path = DATA_DIR / "site_attributes_gagesii.parquet"
     gagesii_attrs = None
     if gagesii_path.exists():
         gagesii_raw = pd.read_parquet(gagesii_path)
         gagesii_attrs = prune_gagesii(gagesii_raw)
+        log_file(gagesii_path, role="input")
 
     # Identify original GAGES-II sites (not NLCD backfill) for vintage confound test
     original_gagesii_sites = get_gagesii_original_sites(DATA_DIR)
@@ -241,6 +420,7 @@ def main():
         logger.info(f"{'='*60}")
 
         assembled = pd.read_parquet(dataset_path)
+        log_file(dataset_path, role="input")
         target_col = cfg["target_col"]
 
         # Build tiers
@@ -255,7 +435,13 @@ def main():
                 tier_info["data"], tier_info["feature_cols"], target_col
             )
             all_results.append(result)
-            logger.info(f"    R²(log)={result['r2_log']:.3f}  KGE(log)={result['kge_log']:.3f}")
+            logger.info(
+                f"    R²(log)={result['r2_log']:.3f}  KGE(log)={result['kge_log']:.3f}  |  "
+                f"R²(mg/L)={result.get('r2_native', float('nan')):.3f}  "
+                f"RMSE(mg/L)={result.get('rmse_native_mgL', float('nan')):.1f}  "
+                f"Bias={result.get('pbias_native', float('nan')):.1f}%  "
+                f"BCF={result.get('smearing_factor', float('nan')):.3f}"
+            )
 
     # Summary table
     if all_results:
@@ -267,18 +453,47 @@ def main():
         pivot = results_df.pivot_table(
             index="param", columns="tier", values="r2_log", aggfunc="first"
         )
-        logger.info(f"\nMedian R² (log) by parameter × tier:")
+        logger.info(f"\nMedian R² (log-space) by parameter × tier:")
         logger.info(f"\n{pivot.to_string()}")
+
+        pivot_native = results_df.pivot_table(
+            index="param", columns="tier", values="r2_native", aggfunc="first"
+        )
+        logger.info(f"\nMedian R² (native mg/L, Duan-corrected) by parameter × tier:")
+        logger.info(f"\n{pivot_native.to_string()}")
+
+        pivot_rmse = results_df.pivot_table(
+            index="param", columns="tier", values="rmse_native_mgL", aggfunc="first"
+        )
+        logger.info(f"\nMedian RMSE (mg/L) by parameter × tier:")
+        logger.info(f"\n{pivot_rmse.to_string()}")
+
+        pivot_bias = results_df.pivot_table(
+            index="param", columns="tier", values="pbias_native", aggfunc="first"
+        )
+        logger.info(f"\nMedian % Bias (native) by parameter × tier:")
+        logger.info(f"\n{pivot_bias.to_string()}")
 
         pivot_kge = results_df.pivot_table(
             index="param", columns="tier", values="kge_log", aggfunc="first"
         )
-        logger.info(f"\nMedian KGE (log) by parameter × tier:")
+        logger.info(f"\nMedian KGE (log-space) by parameter × tier:")
         logger.info(f"\n{pivot_kge.to_string()}")
 
         # Save CV results
         out_path = DATA_DIR / "results" / "tiered_comparison.parquet"
         results_df.to_parquet(out_path, index=False)
+        log_file(out_path, role="output")
+        for _, row in results_df.iterrows():
+            log_step("logo_cv", param=row["param"], tier=row["tier"],
+                     r2_log=round(float(row["r2_log"]), 4),
+                     kge_log=round(float(row["kge_log"]), 4),
+                     r2_native=round(float(row.get("r2_native", float("nan"))), 4),
+                     rmse_native_mgL=round(float(row.get("rmse_native_mgL", float("nan"))), 2),
+                     pbias_native=round(float(row.get("pbias_native", float("nan"))), 2),
+                     smearing_factor=round(float(row.get("smearing_factor", float("nan"))), 4),
+                     n_folds=int(row["n_folds"]),
+                     n_samples=int(row["n_samples"]))
         logger.info(f"\nSaved: {out_path}")
 
     # =========================================================
@@ -350,6 +565,10 @@ def main():
             )
             model.fit(train_pool, eval_set=val_pool)
 
+            # Compute Duan's smearing factor for the final model
+            y_train_pred_final = model.predict(train_pool)
+            final_bcf = duan_smearing_factor(y[train_idx], y_train_pred_final)
+
             # Save model
             safe_tier = tier_name.replace("/", "_")
             model_path = model_dir / f"{param_name}_{safe_tier}.cbm"
@@ -405,7 +624,27 @@ def main():
                 "n_sites": int(clean["site_id"].nunique()),
                 "n_samples": len(clean),
                 "n_trees": model.tree_count_,
+                "duan_smearing_factor": final_bcf,
             }
+            # Post-training integrity checks (added 2026-03-24)
+            nan_ranges = [c for c, r in feature_ranges.items()
+                          if np.isnan(r["min"]) or np.isnan(r["max"])]
+            if nan_ranges:
+                logger.warning(
+                    f"  INTEGRITY: {len(nan_ranges)} feature(s) have NaN min/max in ranges: "
+                    f"{nan_ranges[:5]}... Features may have been destroyed."
+                )
+            if "gagesii" in tier_name.lower() and not cat_values_seen:
+                logger.warning(
+                    f"  INTEGRITY: Tier {tier_name} has no categorical values seen. "
+                    f"Expected geol_class, ecoregion, reference_class."
+                )
+            if "gagesii" in tier_name.lower() and not sites_per_ecoregion:
+                logger.warning(
+                    f"  INTEGRITY: Tier {tier_name} has empty sites_per_ecoregion. "
+                    f"Ecoregion data may not have been loaded."
+                )
+
             meta_path = model_dir / f"{param_name}_{safe_tier}_meta.json"
             with open(meta_path, "w") as f:
                 json.dump(meta, f, indent=2)
@@ -413,6 +652,61 @@ def main():
             size_kb = model_path.stat().st_size / 1024
             logger.info(f"  Saved {param_name}/{tier_name}: {model.tree_count_} trees, "
                        f"{size_kb:.0f} KB → {model_path.name}")
+            log_file(model_path, role="output")
+            log_file(meta_path, role="output")
+            log_step("save_model", param=param_name, tier=tier_name,
+                     n_trees=model.tree_count_, n_sites=meta["n_sites"],
+                     n_cat_cols=len(cat_cols))
+
+            # SHAP analysis for Tier C models (where GAGES-II features are)
+            if "C_" in tier_name or "gagesii" in tier_name.lower():
+                try:
+                    import shap
+                    logger.info(f"  Computing SHAP values for {param_name}/{tier_name}...")
+
+                    # Use a sample for speed (SHAP on full dataset is slow)
+                    shap_sample_size = min(2000, len(X_df))
+                    rng = np.random.default_rng(42)
+                    shap_idx = rng.choice(len(X_df), shap_sample_size, replace=False)
+                    X_shap = X_df.iloc[shap_idx]
+
+                    explainer = shap.TreeExplainer(model)
+                    shap_values = explainer.shap_values(Pool(X_shap, cat_features=cat_indices))
+
+                    # Global feature importance (mean |SHAP|)
+                    mean_abs_shap = np.abs(shap_values).mean(axis=0)
+                    shap_importance = sorted(
+                        zip(all_cols, mean_abs_shap),
+                        key=lambda x: x[1], reverse=True
+                    )
+
+                    logger.info(f"  SHAP top-15 features:")
+                    for fname, fval in shap_importance[:15]:
+                        logger.info(f"    {fname:30s} {fval:.4f}")
+
+                    # Save SHAP values and importance
+                    shap_df = pd.DataFrame(shap_values, columns=all_cols)
+                    shap_df["site_id"] = clean["site_id"].iloc[shap_idx].values
+                    shap_path = results_dir / f"shap_values_{param_name}_{safe_tier}.parquet"
+                    shap_df.to_parquet(shap_path, index=False)
+
+                    importance_df = pd.DataFrame(shap_importance, columns=["feature", "mean_abs_shap"])
+                    importance_path = results_dir / f"shap_importance_{param_name}_{safe_tier}.parquet"
+                    importance_df.to_parquet(importance_path, index=False)
+
+                    log_file(shap_path, role="output")
+                    log_file(importance_path, role="output")
+                    log_step("shap_analysis", param=param_name, tier=tier_name,
+                             n_samples=shap_sample_size,
+                             top_feature=shap_importance[0][0],
+                             top_feature_importance=round(float(shap_importance[0][1]), 4))
+
+                except ImportError:
+                    logger.warning("  shap package not installed — skipping SHAP analysis")
+                except Exception as e:
+                    logger.warning(f"  SHAP analysis failed: {e}")
+
+    end_run()
 
 
 if __name__ == "__main__":

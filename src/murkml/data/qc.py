@@ -13,16 +13,26 @@ import pandas as pd
 
 logger = logging.getLogger(__name__)
 
-# Qualifiers that indicate bad data
-EXCLUDE_QUALIFIERS = {"Ice", "Eqp", "Bkw", "Mnt", "e", "***", "--"}
+# Qualifiers that indicate bad/unusable data (case-insensitive matching)
+# NOTE: USGS API returns qualifiers as array strings like "['ICE' 'EQUIP']"
+# or as comma-separated like "Ice,Eqp". We normalize to uppercase for matching.
+#
+# ICE/EQUIP/BACKWATER/MAINT: sensor readings are physically compromised
+# DRY/DISCONTINUED: no valid measurement
+# DEBRIS: sensor obscured
+#
+# NOT excluded: ESTIMATED (hydrographer-reviewed gap fills — Nair: "may be more
+# reliable than raw sensor reading"), REVISED (corrected data)
+EXCLUDE_QUALIFIERS = {"ICE", "EQUIP", "EQP", "BACKWATER", "BKW", "MAINT", "MNT",
+                       "DISCONTINUED", "UNAVAIL", "DRY", "DEBRIS"}
 
-# Qualifiers to keep (valuable for ML)
-KEEP_QUALIFIERS = {"Fld"}
+# Qualifiers to keep even if co-occurring with bad qualifiers
+KEEP_QUALIFIERS = {"FLD", "FLOOD"}
 
-# Buffer periods after certain qualifiers end
+# Buffer periods after certain qualifiers end (keys are uppercase for matching)
 QUALIFIER_BUFFERS = {
-    "Ice": pd.Timedelta(hours=48),  # Bottom ice releases trapped sediment
-    "Mnt": pd.Timedelta(hours=4),   # Freshly cleaned sensor step discontinuity
+    "ICE": pd.Timedelta(hours=48),   # Bottom ice releases trapped sediment during thaw
+    "MAINT": pd.Timedelta(hours=4),  # Freshly cleaned sensor step discontinuity
 }
 
 
@@ -37,10 +47,14 @@ def filter_continuous(
     Rules (from domain expert review):
     - Keep only approval_status = "Approved"
     - Exclude records with qualifiers: Ice, Eqp, Bkw, Mnt, e, ***, --
-    - Extend Ice exclusion by 48hr after flag ends
-    - Extend Mnt exclusion by 4hr after flag ends
+    - Extend Ice exclusion by 48hr after flag ends (NOT YET IMPLEMENTED — see TODO below)
+    - Extend Mnt exclusion by 4hr after flag ends (NOT YET IMPLEMENTED — see TODO below)
     - Keep Fld (flood) data — critical for storm events
     - Exclude Provisional data for MVP
+
+    WARNING: If approval_col or qualifier_col are missing from the input DataFrame,
+    the corresponding filter is silently SKIPPED (only a log warning is emitted).
+    This means unfiltered data passes through without error.
 
     Args:
         df: Raw continuous data DataFrame.
@@ -52,7 +66,7 @@ def filter_continuous(
         Tuple of (filtered DataFrame, stats dict with filter counts).
     """
     n_original = len(df)
-    stats = {"n_original": n_original}
+    stats = {"n_original": n_original, "approval_filter_applied": False, "qualifier_filter_applied": False}
 
     if df.empty:
         return df, stats
@@ -61,40 +75,105 @@ def filter_continuous(
     if approval_col in df.columns:
         mask_approved = df[approval_col] == "Approved"
         stats["n_not_approved"] = int((~mask_approved).sum())
+        stats["approval_filter_applied"] = True
         df = df[mask_approved].copy()
     else:
-        logger.warning(f"No '{approval_col}' column found — skipping approval filter")
+        raise ValueError(
+            f"QC filter: expected column '{approval_col}' not found in DataFrame "
+            f"(columns: {list(df.columns[:10])}...). Cannot apply approval filter. "
+            f"This may indicate a schema change in the upstream data source."
+        )
+
+    # Save qualifier + time columns before filtering for buffer detection in Step 3
+    # (only the columns we need, not a full DataFrame copy)
+    datetime_actual = datetime_col if datetime_col in df.columns else "time"
+    if qualifier_col in df.columns and datetime_actual in df.columns:
+        _orig_qualifiers = df[qualifier_col].copy()
+        _orig_times = pd.to_datetime(df[datetime_actual], utc=True)
+    else:
+        _orig_qualifiers = None
+        _orig_times = None
 
     # Step 2: Exclude bad qualifiers (vectorized for performance on large datasets)
     if qualifier_col in df.columns:
         def _has_bad_qualifier(val) -> bool:
-            """Check if a qualifier value contains any excluded qualifier."""
+            """Check if a qualifier value contains any excluded qualifier.
+
+            Handles multiple formats:
+            - Array strings from USGS API: "['ICE' 'EQUIP']"
+            - Comma-separated: "Ice,Eqp"
+            - Single values: "Ice"
+            """
             if val is None or (isinstance(val, float) and pd.isna(val)):
                 return False
             val_str = str(val).strip()
             if val_str in ("", "None", "nan"):
                 return False
-            quals = {q.strip() for q in val_str.split(",")}
-            return bool(quals & EXCLUDE_QUALIFIERS)
+            # Parse array string format: "['ICE' 'EQUIP']" -> {"ICE", "EQUIP"}
+            cleaned = val_str.strip("[]").replace("'", "").replace('"', '')
+            # Split on whitespace or commas
+            quals = {q.strip().upper() for q in cleaned.replace(",", " ").split() if q.strip()}
+            # Check for exclusions, but preserve KEEP qualifiers
+            bad = quals & EXCLUDE_QUALIFIERS
+            keep = quals & KEEP_QUALIFIERS
+            # If the record has a keep qualifier (e.g., FLOOD), don't exclude
+            if keep and not bad:
+                return False
+            return bool(bad)
 
         mask_exclude = df[qualifier_col].apply(_has_bad_qualifier)
         stats["n_bad_qualifier"] = int(mask_exclude.sum())
+        stats["qualifier_filter_applied"] = True
         df = df[~mask_exclude].copy()
     else:
-        logger.warning(f"No '{qualifier_col}' column found — skipping qualifier filter")
+        raise ValueError(
+            f"QC filter: expected column '{qualifier_col}' not found in DataFrame "
+            f"(columns: {list(df.columns[:10])}...). Cannot apply qualifier filter. "
+            f"This may indicate a schema change in the upstream data source."
+        )
 
-    # Step 3: Apply buffer periods after Ice and Mnt flags (Fix 10)
-    # NOTE: This must run on the PRE-filtered data to find flag boundaries,
-    # then apply the buffer mask to the post-filtered data.
-    # Rivera: If we filter Ice first, we lose info about when Ice ENDED.
-    # Implementation: we already have the filtered df, so we use the original
-    # df to find Ice/Mnt episode end times, then exclude buffered periods.
-    if qualifier_col in df.columns and "time" in df.columns:
-        # We need the original data to find flag boundaries — but we already
-        # filtered. For now, mark this as a known limitation.
-        # TODO: Refactor to identify flag boundaries BEFORE step 2 filtering.
-        # This requires access to the original unfiltered df.
-        stats["n_buffer_excluded"] = 0  # Placeholder until refactored
+    # Step 3: Apply buffer periods after Ice and Mnt flags
+    # We use the pre-filter qualifier data to find where Ice/Mnt flags
+    # ended, then exclude buffered periods from the post-filtered data.
+    stats["n_buffer_excluded"] = 0
+    if _orig_qualifiers is not None and datetime_actual in df.columns:
+        df_times = pd.to_datetime(df[datetime_actual], utc=True)
+
+        buffer_mask = pd.Series(False, index=df.index)
+
+        for qual_code, buffer_duration in QUALIFIER_BUFFERS.items():
+            # Find rows in original data with this qualifier (case-insensitive)
+            orig_qual = _orig_qualifiers.astype(str).str.upper()
+            flagged_mask = orig_qual.str.contains(qual_code, na=False)
+            if not flagged_mask.any():
+                continue
+
+            flagged_times = _orig_times[flagged_mask].sort_values()
+            if flagged_times.empty:
+                continue
+
+            # Find episode end times: where there's a gap > 1hr between
+            # consecutive flagged records (i.e., the flag ended)
+            time_diffs = flagged_times.diff()
+            # Each gap > 1 hour marks the start of a new episode;
+            # the record before the gap is the end of the previous episode
+            episode_ends = []
+            for i in range(1, len(time_diffs)):
+                if time_diffs.iloc[i] > pd.Timedelta(hours=1):
+                    episode_ends.append(flagged_times.iloc[i - 1])
+            # Last flagged record is always an episode end
+            episode_ends.append(flagged_times.iloc[-1])
+
+            # Mark records in filtered df that fall within buffer after each episode end
+            for end_time in episode_ends:
+                in_buffer = (df_times > end_time) & (df_times <= end_time + buffer_duration)
+                buffer_mask = buffer_mask | in_buffer
+
+        n_buffered = buffer_mask.sum()
+        if n_buffered > 0:
+            df = df[~buffer_mask].copy()
+            stats["n_buffer_excluded"] = int(n_buffered)
+            logger.info(f"  Buffer exclusion: removed {n_buffered} records within post-Ice/Mnt buffer")
 
     # Step 4: Value-range QC (Fix 8 — Rivera revised)
     if "value" in df.columns:

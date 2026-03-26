@@ -25,6 +25,8 @@ import pandas as pd
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
+from murkml.provenance import start_run, log_step, log_file, end_run
+
 # Load .env file if it exists (for API_USGS_PAT)
 env_file = Path(__file__).parent.parent / ".env"
 if env_file.exists():
@@ -249,6 +251,7 @@ def main():
         )
 
     logger.info(f"Downloading data for {args.n_sites} sites, {args.years} years each")
+    start_run("download_data")
 
     sites = select_sites(args.n_sites)
     total_sites = len(sites)
@@ -275,6 +278,10 @@ def main():
     n_cont = len(list(cont_dir.rglob("*.parquet"))) if cont_dir.exists() else 0
     logger.info(f"Discrete files: {n_disc}")
     logger.info(f"Continuous files: {n_cont}")
+
+    log_step("download_complete", n_sites=total_sites,
+             n_discrete_files=n_disc, n_continuous_files=n_cont)
+    end_run()
 
 
 if __name__ == "__main__":

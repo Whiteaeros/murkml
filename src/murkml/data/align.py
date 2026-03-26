@@ -63,77 +63,95 @@ def align_samples(
     continuous[continuous_time_col] = pd.to_datetime(continuous[continuous_time_col], utc=True)
     discrete[discrete_time_col] = pd.to_datetime(discrete[discrete_time_col], utc=True)
 
-    # Sort continuous by time for efficient lookup
+    # Sort both by time for merge_asof
     continuous = continuous.sort_values(continuous_time_col).reset_index(drop=True)
+    discrete = discrete.sort_values(discrete_time_col).reset_index(drop=True)
 
-    results = []
-    n_matched = 0
-    n_missed = 0
+    # --- Primary match: nearest continuous reading within ±max_gap ---
+    merged = pd.merge_asof(
+        discrete.rename(columns={discrete_time_col: "_sample_time", discrete_value_col: "_lab_value"}),
+        continuous.rename(columns={continuous_time_col: "_cont_time", continuous_value_col: "_cont_value"}),
+        left_on="_sample_time",
+        right_on="_cont_time",
+        direction="nearest",
+        tolerance=max_gap,
+    )
 
-    for _, sample in discrete.iterrows():
-        sample_time = sample[discrete_time_col]
-        lab_value = sample[discrete_value_col]
+    # Drop unmatched samples
+    matched = merged[merged["_cont_time"].notna()].copy()
+    n_matched = len(matched)
+    n_missed = len(discrete) - n_matched
 
-        # Find nearest continuous reading (primary match)
-        time_diffs = (continuous[continuous_time_col] - sample_time).abs()
-        nearest_idx = time_diffs.idxmin()
-        nearest_gap = time_diffs.loc[nearest_idx]
-
-        if nearest_gap > max_gap:
-            n_missed += 1
-            continue
-
-        sensor_instant = continuous.loc[nearest_idx, continuous_value_col]
-
-        # Extract ±1hr feature window
-        window_mask = (
-            (continuous[continuous_time_col] >= sample_time - FEATURE_WINDOW)
-            & (continuous[continuous_time_col] <= sample_time + FEATURE_WINDOW)
+    if n_matched == 0:
+        logger.info(
+            f"Aligned 0 samples, {n_missed} missed "
+            f"(no sensor data within {max_gap})"
         )
-        window = continuous.loc[window_mask, continuous_value_col]
+        return pd.DataFrame()
 
-        # Compute window features
-        row = {
-            "sample_time": sample_time,
-            "lab_value": lab_value,
-            "sensor_instant": sensor_instant,
-            "match_gap_seconds": nearest_gap.total_seconds(),
-        }
+    matched["match_gap_seconds"] = (
+        (matched["_sample_time"] - matched["_cont_time"]).abs().dt.total_seconds()
+    )
 
-        if len(window) > 0:
-            row["window_mean"] = window.mean()
-            row["window_min"] = window.min()
-            row["window_max"] = window.max()
-            row["window_std"] = window.std() if len(window) > 1 else 0.0
-            row["window_range"] = window.max() - window.min()
-            row["window_count"] = len(window)
+    # --- Window features: ±1hr stats using searchsorted ---
+    cont_times = continuous[continuous_time_col].values  # sorted numpy datetime64
+    cont_values = continuous[continuous_value_col].values
+    sample_times = matched["_sample_time"].values
 
-            # Slope: linear regression of value over time in window
-            if len(window) >= 2:
-                window_times = continuous.loc[window_mask, continuous_time_col]
-                t_seconds = (window_times - window_times.iloc[0]).dt.total_seconds().values
-                values = window.values
-                if t_seconds[-1] > 0:
-                    slope = np.polyfit(t_seconds, values, 1)[0]
-                    row["window_slope"] = slope
+    fw_ns = FEATURE_WINDOW.value  # nanoseconds
+    lo_indices = np.searchsorted(cont_times, sample_times - fw_ns, side="left")
+    hi_indices = np.searchsorted(cont_times, sample_times + fw_ns, side="right")
+
+    w_means = np.empty(n_matched)
+    w_mins = np.empty(n_matched)
+    w_maxs = np.empty(n_matched)
+    w_stds = np.empty(n_matched)
+    w_ranges = np.empty(n_matched)
+    w_counts = np.empty(n_matched, dtype=int)
+    w_slopes = np.empty(n_matched)
+
+    for i in range(n_matched):
+        lo, hi = lo_indices[i], hi_indices[i]
+        if hi > lo:
+            wv = cont_values[lo:hi]
+            w_means[i] = wv.mean()
+            w_mins[i] = wv.min()
+            w_maxs[i] = wv.max()
+            w_stds[i] = wv.std() if len(wv) > 1 else 0.0
+            w_ranges[i] = wv.max() - wv.min()
+            w_counts[i] = len(wv)
+            if len(wv) >= 2:
+                wt = cont_times[lo:hi]
+                t_sec = (wt - wt[0]).astype("timedelta64[s]").astype(float)
+                if t_sec[-1] > 0:
+                    w_slopes[i] = np.polyfit(t_sec, wv, 1)[0]
                 else:
-                    row["window_slope"] = 0.0
+                    w_slopes[i] = 0.0
             else:
-                row["window_slope"] = 0.0
+                w_slopes[i] = 0.0
         else:
-            for feat in ["window_mean", "window_min", "window_max", "window_std",
-                         "window_range", "window_count", "window_slope"]:
-                row[feat] = np.nan
+            w_means[i] = w_mins[i] = w_maxs[i] = w_stds[i] = np.nan
+            w_ranges[i] = np.nan
+            w_counts[i] = 0
+            w_slopes[i] = np.nan
 
-        results.append(row)
-        n_matched += 1
+    result = pd.DataFrame({
+        "sample_time": matched["_sample_time"].values,
+        "lab_value": matched["_lab_value"].values,
+        "sensor_instant": matched["_cont_value"].values,
+        "match_gap_seconds": matched["match_gap_seconds"].values,
+        "window_mean": w_means,
+        "window_min": w_mins,
+        "window_max": w_maxs,
+        "window_std": w_stds,
+        "window_range": w_ranges,
+        "window_count": w_counts,
+        "window_slope": w_slopes,
+    })
 
     logger.info(
         f"Aligned {n_matched} samples, {n_missed} missed "
         f"(no sensor data within {max_gap})"
     )
 
-    if not results:
-        return pd.DataFrame()
-
-    return pd.DataFrame(results)
+    return result

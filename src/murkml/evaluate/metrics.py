@@ -187,16 +187,44 @@ def threshold_fractions(
     return results
 
 
+def duan_smearing_factor(
+    y_true_log: np.ndarray,
+    y_pred_log: np.ndarray,
+) -> float:
+    """Compute Duan's (1983) smearing estimate bias correction factor.
+
+    When predictions are made in log-space and back-transformed via exp(),
+    the result estimates the conditional median, not the conditional mean.
+    For right-skewed distributions (like SSC), this systematically
+    underpredicts. The smearing factor corrects for this.
+
+    BCF = mean(exp(residuals)) where residuals = y_true_log - y_pred_log
+
+    Typical values are 1.05-1.30. Values above 2.0 suggest poor model fit
+    or heavy-tailed residuals.
+    """
+    residuals = np.asarray(y_true_log) - np.asarray(y_pred_log)
+    return float(np.mean(np.exp(residuals)))
+
+
 def native_space_metrics(
     y_true_log: np.ndarray,
     y_pred_log: np.ndarray,
+    smearing_factor: float = 1.0,
 ) -> dict:
-    """Back-transform log1p predictions and compute native-space R² and RMSE (mg/L)."""
+    """Back-transform log1p predictions and compute native-space R² and RMSE (mg/L).
+
+    If smearing_factor > 1.0, applies Duan's (1983) bias correction to
+    the back-transformed predictions. Pass the factor from
+    duan_smearing_factor() computed on training residuals.
+    """
     y_true_native = np.expm1(np.asarray(y_true_log))
-    y_pred_native = np.expm1(np.asarray(y_pred_log))
+    y_pred_native = np.expm1(np.asarray(y_pred_log)) * smearing_factor
     return {
         "r2_native": r_squared(y_true_native, y_pred_native),
         "rmse_native_mgL": rmse(y_true_native, y_pred_native),
+        "pbias_native": percent_bias(y_true_native, y_pred_native),
+        "smearing_factor": smearing_factor,
     }
 
 

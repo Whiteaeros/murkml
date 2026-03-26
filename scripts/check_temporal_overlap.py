@@ -12,9 +12,13 @@ from __future__ import annotations
 
 import logging
 import os
+import sys
 from pathlib import Path
 
 import pandas as pd
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
+from murkml.provenance import start_run, log_step, log_file, end_run
 
 logging.basicConfig(
     level=logging.INFO,
@@ -121,8 +125,11 @@ def parse_discrete_timestamps(df: pd.DataFrame) -> pd.Series:
 
 
 def main():
+    start_run("check_temporal_overlap")
+
     # Get all assembled sites
     assembled = pd.read_parquet(DATA_DIR / "processed" / "turbidity_ssc_paired.parquet")
+    log_file(DATA_DIR / "processed" / "turbidity_ssc_paired.parquet", role="input")
     sites = sorted(assembled["site_id"].unique())
     logger.info(f"Checking temporal overlap for {len(sites)} sites, {len(PARAMS)} parameters")
 
@@ -189,6 +196,9 @@ def main():
     df = pd.DataFrame(results)
     out_path = DATA_DIR / "temporal_overlap_audit.parquet"
     df.to_parquet(out_path, index=False)
+    log_file(out_path, role="output")
+    log_step("overlap_audit_complete", n_sites=len(sites), n_params=len(PARAMS),
+             n_results=len(results))
     logger.info(f"\nSaved: {out_path}")
 
     # Summary per parameter
@@ -235,6 +245,8 @@ def main():
     for threshold in [1, 2, 3, 4]:
         n_sites = sum(1 for v in site_param_counts.values() if v >= threshold)
         logger.info(f"  Sites with ≥{threshold} new params (≥20 pairable): {n_sites}")
+
+    end_run()
 
 
 if __name__ == "__main__":

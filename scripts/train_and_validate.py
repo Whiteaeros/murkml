@@ -26,6 +26,7 @@ from murkml.data.attributes import prune_gagesii, build_feature_tiers
 from murkml.data.features import engineer_features
 from murkml.data.qc import filter_continuous
 from murkml.evaluate.metrics import kge, r_squared, rmse
+from murkml.provenance import start_run, log_step, log_file, end_run
 
 logging.basicConfig(
     level=logging.INFO,
@@ -224,6 +225,7 @@ def assemble_validation_tp(site_id: str) -> pd.DataFrame:
 
 def main():
     warnings.filterwarnings("ignore")
+    start_run("train_and_validate")
     from catboost import CatBoostRegressor, Pool
 
     # =========================================================
@@ -235,6 +237,7 @@ def main():
 
     # Load training data
     basic_attrs = pd.read_parquet(DATA_DIR / "site_attributes.parquet")
+    log_file(DATA_DIR / "site_attributes.parquet", role="input")
     gagesii_path = DATA_DIR / "site_attributes_gagesii.parquet"
     gagesii_attrs = None
     if gagesii_path.exists():
@@ -520,8 +523,18 @@ def main():
                            f"{ols_str} n={row['n_samples']}")
 
         logger.info(f"\nSaved: {out_path}")
+        log_file(out_path, role="output")
+        for param in ["ssc", "total_phosphorus"]:
+            subset = results_df[results_df["param"] == param]
+            if len(subset) > 0:
+                log_step(f"validate_{param}",
+                         n_sites=len(subset),
+                         median_r2=round(float(subset["catboost_r2_log"].median()), 4),
+                         median_kge=round(float(subset["catboost_kge_log"].median()), 4))
     else:
         logger.warning("No validation results produced!")
+
+    end_run()
 
 
 if __name__ == "__main__":

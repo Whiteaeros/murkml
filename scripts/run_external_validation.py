@@ -28,6 +28,7 @@ from murkml.data.discrete import load_discrete_param
 from murkml.data.features import engineer_features
 from murkml.data.qc import filter_continuous
 from murkml.evaluate.metrics import kge, r_squared, rmse
+from murkml.provenance import start_run, log_step, log_file, end_run
 
 logging.basicConfig(
     level=logging.INFO,
@@ -123,16 +124,17 @@ def assemble_validation_site(site_id: str, param_name: str, value_col: str) -> p
         cont_clean["time"] = pd.to_datetime(cont_clean["time"], utc=True)
         cont_clean = cont_clean.sort_values("time").reset_index(drop=True)
 
-        instant_values = []
-        for _, row in aligned.iterrows():
-            anchor_time = row["sample_time"]
-            time_diffs = (cont_clean["time"] - anchor_time).abs()
-            min_idx = time_diffs.idxmin()
-            if time_diffs.iloc[min_idx] <= pd.Timedelta(minutes=15):
-                instant_values.append(cont_clean["value"].iloc[min_idx])
-            else:
-                instant_values.append(np.nan)
-        aligned[f"{pname}_instant"] = instant_values
+        sample_df = aligned[["sample_time"]].copy().reset_index(drop=True)
+        sample_df["sample_time"] = pd.to_datetime(sample_df["sample_time"], utc=True)
+        cont_clean["time"] = pd.to_datetime(cont_clean["time"], utc=True)
+        merged = pd.merge_asof(
+            sample_df.rename(columns={"sample_time": "_t"}),
+            cont_clean.rename(columns={"time": "_t", "value": "_v"}),
+            on="_t",
+            direction="nearest",
+            tolerance=pd.Timedelta(minutes=15),
+        )
+        aligned[f"{pname}_instant"] = merged["_v"].values
 
     aligned["site_id"] = site_id
     return aligned
@@ -140,6 +142,7 @@ def assemble_validation_site(site_id: str, param_name: str, value_col: str) -> p
 
 def main():
     warnings.filterwarnings("ignore")
+    start_run("external_validation")
 
     # Load saved models
     models = {}
@@ -153,6 +156,8 @@ def main():
             with open(meta_path, "rb") as f:
                 meta = pickle.load(f)
             models[param] = {"model": model, "meta": meta}
+            log_file(model_path, role="input")
+            log_file(meta_path, role="input")
             logger.info(f"Loaded {param} model: {meta['n_sites']} training sites, "
                        f"{meta['n_train']} samples, {len(meta['feature_cols'])} features")
 
@@ -187,6 +192,7 @@ def main():
     logger.info(f"\nViable validation sites (have turbidity): {len(viable)}")
 
     all_results = []
+    all_predictions = []
 
     for param_name, param_cfg in [("ssc", "ssc"), ("total_phosphorus", "total_phosphorus")]:
         if param_name not in models:
@@ -255,6 +261,19 @@ def main():
             cb_kge = kge(y_true_log, y_pred_log)
             cb_rmse = rmse(y_true_log, y_pred_log)
 
+            # Collect per-sample predictions
+            sample_preds = pd.DataFrame({
+                "site_id": site_id,
+                "param": param_name,
+                "sample_time": assembled["sample_time"].values,
+                "lab_value": assembled["lab_value"].values,
+                "y_true_log": y_true_log,
+                "y_pred_log": y_pred_log,
+                "turbidity_instant": assembled["turbidity_instant"].values,
+                "discharge_instant": assembled.get("discharge_instant", np.nan),
+            })
+            all_predictions.append(sample_preds)
+
             # Per-site OLS (log-log with turbidity)
             ols_r2 = np.nan
             if "turbidity_instant" in assembled.columns:
@@ -271,6 +290,10 @@ def main():
 
             logger.info(f"    n={len(assembled)}, CatBoost R²={cb_r2:.3f}, "
                        f"KGE={cb_kge:.3f}, OLS R²={ols_r2:.3f}")
+
+            log_step("validate_site", site_id=site_id, param=param_name,
+                     n_samples=len(assembled), catboost_r2=round(cb_r2, 4),
+                     catboost_kge=round(cb_kge, 4), ols_r2=round(ols_r2, 4) if not np.isnan(ols_r2) else None)
 
             all_results.append({
                 "site_id": site_id,
@@ -308,6 +331,15 @@ def main():
                            f"OLS={row['per_site_ols_r2_log']:.3f} [{winner}] n={row['n_samples']}")
 
         logger.info(f"\nSaved: data/results/external_validation.parquet")
+
+    if all_predictions:
+        pred_df = pd.concat(all_predictions, ignore_index=True)
+        pred_path = DATA_DIR / "results" / "external_validation_predictions.parquet"
+        pred_df.to_parquet(pred_path, index=False)
+        log_file(pred_path, role="output")
+        logger.info(f"Saved per-sample predictions: {pred_path} ({len(pred_df)} rows)")
+
+    end_run()
 
 
 if __name__ == "__main__":

@@ -14,8 +14,12 @@ import os
 import zipfile
 from pathlib import Path
 
+import sys
 import pandas as pd
 import requests
+
+sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+from murkml.provenance import start_run, log_step, log_file, end_run
 
 logging.basicConfig(
     level=logging.INFO,
@@ -207,6 +211,8 @@ def match_to_sites(gagesii: pd.DataFrame, site_list: list[str]) -> pd.DataFrame:
 
 
 def main():
+    start_run("download_gagesii")
+
     # Download and extract
     zip_path = download_zip()
     extract_dir = extract_zip(zip_path)
@@ -249,6 +255,8 @@ def main():
         logger.info(f"Fixed HUC02 dtype: {gagesii['HUC02'].dtype}")
 
     gagesii.to_parquet(full_path, index=False)
+    log_file(full_path, role="output")
+    log_step("save_full_gagesii", n_sites=len(gagesii), n_cols=len(gagesii.columns))
     logger.info(f"Saved full GAGES-II: {full_path}")
 
     # Match to our 57 sites
@@ -268,6 +276,11 @@ def main():
         row = matched.iloc[0]
         for col in cols[:20]:
             logger.info(f"  {col}: {row[col]}")
+
+        log_file(matched_path, role="output")
+        log_step("match_to_sites", n_matched=len(matched), n_our_sites=len(our_sites))
+
+    end_run()
 
 
 if __name__ == "__main__":

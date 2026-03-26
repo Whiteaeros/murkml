@@ -33,6 +33,7 @@ from murkml.data.align import align_samples
 from murkml.data.discrete import load_discrete_param
 from murkml.data.features import engineer_features
 from murkml.data.qc import filter_continuous, filter_high_censoring
+from murkml.provenance import start_run, log_step, log_file, end_run
 
 logging.basicConfig(
     level=logging.INFO,
@@ -192,17 +193,17 @@ def align_site_param(
         cont_clean["time"] = pd.to_datetime(cont_clean["time"], utc=True)
         cont_clean = cont_clean.sort_values("time").reset_index(drop=True)
 
-        instant_values = []
-        for _, row in aligned.iterrows():
-            anchor_time = row["sample_time"]
-            time_diffs = (cont_clean["time"] - anchor_time).abs()
-            min_idx = time_diffs.idxmin()
-            if time_diffs.iloc[min_idx] <= pd.Timedelta(minutes=15):
-                instant_values.append(cont_clean["value"].iloc[min_idx])
-            else:
-                instant_values.append(np.nan)
-
-        aligned[f"{pname}_instant"] = instant_values
+        sample_df = aligned[["sample_time"]].copy().reset_index(drop=True)
+        sample_df["sample_time"] = pd.to_datetime(sample_df["sample_time"], utc=True)
+        cont_clean["time"] = pd.to_datetime(cont_clean["time"], utc=True)
+        merged = pd.merge_asof(
+            sample_df.rename(columns={"sample_time": "_t"}),
+            cont_clean.rename(columns={"time": "_t", "value": "_v"}),
+            on="_t",
+            direction="nearest",
+            tolerance=pd.Timedelta(minutes=15),
+        )
+        aligned[f"{pname}_instant"] = merged["_v"].values
 
     # Add is_nondetect flag
     aligned["is_nondetect"] = aligned["sample_time"].map(
@@ -275,6 +276,12 @@ def assemble_parameter(param_name: str, param_config: dict) -> pd.DataFrame:
     output_path = DATA_DIR / "processed" / f"{param_name}_paired.parquet"
     output_path.parent.mkdir(parents=True, exist_ok=True)
     dataset.to_parquet(output_path, index=False)
+    log_file(output_path, role="output")
+    log_step(f"assemble_{param_name}",
+             n_sites=int(dataset["site_id"].nunique()),
+             n_samples=len(dataset),
+             nondetect_pct=round(float(dataset["is_nondetect"].mean() * 100), 1),
+             dropped_high_censoring=dropped if dropped else [])
     logger.info(f"  Saved: {output_path}")
 
     return dataset
@@ -282,6 +289,7 @@ def assemble_parameter(param_name: str, param_config: dict) -> pd.DataFrame:
 
 def main():
     warnings.filterwarnings("ignore")
+    start_run("assemble_multi_param")
 
     parser = argparse.ArgumentParser(description="Assemble multi-parameter datasets")
     parser.add_argument("--param", type=str, default=None,
@@ -316,6 +324,8 @@ def main():
             f"{stats['samples']} samples, "
             f"{stats['nondetect_pct']:.1f}% non-detect"
         )
+
+    end_run()
 
 
 if __name__ == "__main__":

@@ -1,5 +1,15 @@
 # Site Expansion Plan
 
+## Current Status (2026-03-25)
+
+**Expansion is partially complete.** We reached **102 training sites** (up from 57), not the original target of ~137. The 102 sites span 12 watershed regimes and 19,611 SSC samples.
+
+**Key results at 102 sites:** SSC LOGO CV R²=0.80 (log), R²=0.61 (native-space mg/L). See `RESULTS_LOG.md` for full metrics.
+
+**Remaining work:**
+- External validation has only 11 holdout sites — need 20-30 for credible generalization claims (red team finding)
+- StreamCat migration will give all sites consistent watershed attributes (currently two inconsistent sources)
+
 ## Goal
 Expand from 57 to ~137 training sites across 12 watershed regimes.
 Validate on original 20 external sites (unchanged) + ~15-20 new holdout sites.
@@ -9,6 +19,7 @@ Validate on original 20 external sites (unchanged) + ~15-20 new holdout sites.
 - These include the v1 failure sites (IA loess, TX Gulf Coast, AZ arid, etc.)
 - New training sites fill the SAME regimes as the failures
 - Before/after comparison on the same failure sites proves the expansion worked
+- **Red team finding (2026-03-24):** 11 holdout sites is too few. Need 20-30 sites for external validation to be credible. Prioritize expanding holdout set.
 
 ## Training Expansion (~80 new sites)
 
@@ -45,7 +56,15 @@ TX(2), WA(2), PA(1), MN(2), NY(2), GA(2), IA(1), FL(1), WI(2), NE(1), AL(1), TN(
 6. Run on new holdout sites → broader generalization test
 
 ## Expected Outcome
-- SSC: LOGO CV should stay ~0.80 or improve
+- SSC: LOGO CV should stay ~0.80 or improve — **ACHIEVED at 102 sites (R²=0.80 log, 0.61 native)**
 - SSC external: Iowa, AZ, TX failures should improve significantly
-- TP: Should improve at GA, MN, CT failures if regime coverage helps
+- TP: Should improve at GA, MN, CT failures if regime coverage helps — **TP collapsed from 0.62 to -0.08 at 72 sites; regime-dependent, not fixable with more data alone**
 - TP dissolved-P failures (FL, CT): May still struggle — this is a feature limitation, not training size
+
+## Watershed Attribute Unification
+All 102 sites will migrate to **EPA StreamCat** for consistent attributes. Currently:
+- 58 sites: full GAGES-II (2006 vintage)
+- 37 sites: NLCD 2019 land cover only (no geology/soils/climate)
+- 7 sites: no watershed attributes
+
+StreamCat covers all NHDPlus catchments with 600+ attributes from a single framework.

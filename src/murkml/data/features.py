@@ -173,10 +173,22 @@ def add_cross_sensor_features(df: pd.DataFrame) -> pd.DataFrame:
         Q = df["discharge_instant"].replace(0, np.nan)
         df["turb_Q_ratio"] = df["turbidity_instant"] / Q
 
-    # DO departure from saturation
+    # DO departure from saturation (Benson & Krause 1984 polynomial)
     if "do_instant" in df.columns and "temp_instant" in df.columns:
-        # Simplified DO saturation as function of temperature (mg/L)
-        do_sat = 14.6 - 0.4 * df["temp_instant"]
+        T = df["temp_instant"].clip(0, 40)  # guard against extreme values
+        # Benson & Krause 1984 equation for DO saturation at 1 atm (mg/L)
+        # ln(C*) = -139.34411 + (1.575701e5/T) - (6.642308e7/T^2)
+        #        + (1.2438e10/T^3) - (8.621949e11/T^4)
+        # where T is in Kelvin
+        Tk = T + 273.15
+        ln_sat = (
+            -139.34411
+            + 1.575701e5 / Tk
+            - 6.642308e7 / Tk**2
+            + 1.243800e10 / Tk**3
+            - 8.621949e11 / Tk**4
+        )
+        do_sat = np.exp(ln_sat)
         df["DO_sat_departure"] = df["do_instant"] - do_sat
 
     # Conductance * turbidity interaction

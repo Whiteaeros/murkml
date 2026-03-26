@@ -58,9 +58,12 @@ Continuous data is chunked into 3-year windows because the API has row limits.
 **What it does to continuous sensor data:**
 - Keeps only USGS "Approved" data (drops Provisional)
 - Removes records flagged with bad qualifiers: Ice, Equipment malfunction (Eqp), Backwater (Bkw), Maintenance (Mnt), estimated (e)
-- Extends Ice exclusion by 48 hours after the flag ends (bottom ice releases trapped sediment when it melts — sensor reads are unreliable)
-- Extends Maintenance exclusion by 4 hours (freshly cleaned sensors have step discontinuities)
+- **Ice buffer (IMPLEMENTED 2026-03-24):** Extends Ice exclusion by 48 hours after the flag ends (bottom ice releases trapped sediment when it melts — sensor reads are unreliable)
+- **Maintenance buffer (IMPLEMENTED 2026-03-24):** Extends Maintenance exclusion by 4 hours (freshly cleaned sensors have step discontinuities)
 - Keeps Flood (Fld) flagged data — those are the storm events we care most about
+- **Raises `ValueError` on missing expected columns** instead of silently skipping (hardened 2026-03-24)
+
+**USGS qualifier format note (2026-03-24 fix):** The USGS API returns qualifier values as array-like strings, e.g., `"['ICE' 'EQUIP']"`, NOT as simple strings like `"Ice"`. The QC code now parses this format correctly. Prior to the fix, qualifier matching was silently failing — no Ice/Equip/Maint records were ever being excluded.
 
 **What it does to discrete lab samples:**
 - Drops samples with no timestamp (does NOT default to noon — that would create false alignment)
@@ -121,6 +124,7 @@ Each row = one lab sample matched to its sensor context. Columns include the lab
 **Features added:**
 - **Hydrograph position:** Rate of change in discharge and turbidity over 1hr, 6hr, 24hr windows — tells the model whether the river is on a rising limb, peak, or falling limb
 - **Cross-sensor ratios:** Turbidity/discharge ratio, turbidity/conductance ratio — these capture whether sediment is supply-limited or transport-limited
+- **DO saturation departure:** Uses Benson & Krause (1984) nonlinear polynomial for DO saturation as a function of temperature and pressure. **(Fixed 2026-03-24 — was using a broken linear approximation `14.6 - 0.4*T` with 27-65% error at common stream temperatures. Never use a linear DO saturation formula.)**
 - **Seasonality:** Sin/cos encoded day-of-year and hour-of-day — captures snowmelt timing, diurnal biological cycles
 - **Log transforms:** log1p of the target variable (SSC, TP, etc.) — water quality values are log-normally distributed
 
@@ -140,14 +144,23 @@ Each row = one lab sample matched to its sensor context. Columns include the lab
 - **Hydrology:** Base flow index, runoff ratio
 
 **Output:**
-- `data/site_attributes_gagesii_full.parquet` — all 9,067 sites, all ~270 attributes
-- `data/site_attributes_gagesii.parquet` — subset matched to our training sites
+- `data/site_attributes_gagesii_full.parquet` — all 9,067 sites, all ~270 raw attributes (column names like `FORESTNLCD06`, `GEOL_HUNT_DOM_CODE`)
+- `data/site_attributes_gagesii.parquet` — subset matched to our training sites, **already pruned** (column names like `forest_pct`, `geol_class`)
 
-**Why this matters:** A turbidity-to-SSC relationship depends on the watershed. Loess soils produce fine sediment that stays suspended at low turbidity. Rocky mountain streams produce coarse sediment that settles fast. Without these attributes, the model can't generalize across sites.
+**CRITICAL: Column name formats differ between these files.** The `_full` file has raw GAGES-II column names. The non-full file has already-pruned column names. `prune_gagesii()` expects raw names. **Do NOT call `prune_gagesii()` on `site_attributes_gagesii.parquet`** — it will silently destroy all data by looking for columns that don't exist and replacing them with zeros/NaN. (Bug discovered 2026-03-24.)
 
 **Matching:** GAGES-II uses plain station numbers (e.g., "01491000"). Our site IDs use "USGS-01491000". The script handles this conversion and zero-padding.
 
-**Sites not in GAGES-II:** Some newer or non-standard sites won't match. The `fill_attributes_nldi.py` script can pull basic attributes via the NLDI web service as a fallback.
+**Sites not in GAGES-II:** Some newer or non-standard sites won't match. The `fill_landcover_nlcd.py` script pulls NLCD 2019 land cover via pygeohydro as a fallback (37 sites filled this way).
+
+**Two-source-of-truth problem (identified 2026-03-24):** The current attribute setup has a structural flaw:
+- 58 sites have full GAGES-II data (geology, soils, climate, land cover — but 2006 vintage)
+- 37 sites have NLCD 2019 backfill — land cover ONLY (no geology, soils, or climate attributes)
+- 7 sites have no watershed attributes at all
+
+This means Tier C models train on inconsistent feature sets across sites. The 37 backfill sites have NaN/default values for most GAGES-II columns, confounding tier comparisons.
+
+**Planned fix: Migrate to EPA StreamCat.** StreamCat covers all NHDPlus catchments with 600+ attributes from a single consistent framework, regularly updated. This will give all 102 sites the same attribute set from one source. Requires COMID lookup via NLDI first.
 
 ---
 
@@ -177,7 +190,13 @@ Tier C is what we train the production model on. Tiers A and B exist to prove th
 
 **Early stopping:** 15% of training sites held out as an internal validation set to prevent overfitting (500 max iterations, stops if validation loss hasn't improved in 50 rounds).
 
-**Metrics:** R² (log-space), KGE (Kling-Gupta Efficiency), RMSE, percent bias
+**Ridge linear baseline (added 2026-03-24):** A Ridge regression model runs under the same LOGO CV framework for fair comparison against CatBoost. This addresses the red team finding that no linear baseline existed.
+
+**SHAP analysis (added 2026-03-24):** SHAP TreeExplainer is computed for Tier C models after final model save, identifying which features drive predictions and enabling interpretability analysis.
+
+**Native-space metrics (added 2026-03-24):** Duan's smearing factor is computed per LOGO fold from training residuals, then applied to back-transform log-space predictions to mg/L. Both log-space and native-space R², RMSE, and bias are reported. This is critical because log-space R²=0.80 corresponds to only R²=0.61 in native space.
+
+**Metrics:** R² (log-space AND native-space), KGE (Kling-Gupta Efficiency), RMSE (log + native), percent bias
 
 ---
 
@@ -228,10 +247,27 @@ data/
     ...
   gagesii/             <- GAGES-II raw files
   site_catalog.parquet
-  site_attributes.parquet
-  site_attributes_gagesii.parquet
-  site_attributes_gagesii_full.parquet
+  site_attributes.parquet            <- basic attrs (drainage area, elevation, HUC)
+  site_attributes_gagesii.parquet    <- PRUNED column names (forest_pct, geol_class, etc.)
+  site_attributes_gagesii_full.parquet <- RAW column names (FORESTNLCD06, GEOL_HUNT_DOM_CODE, etc.)
+  site_attributes_nlcd.parquet       <- NLCD 2019 backfill for non-GAGES-II sites
   temporal_overlap_audit.parquet
   expansion_candidates.parquet
   results/             <- model outputs
 ```
+
+---
+
+## Data Integrity Rules (added 2026-03-24)
+
+These rules exist because of a bug where `prune_gagesii()` was called on already-pruned data, silently destroying all GAGES-II attributes. The model trained on 25 columns of zeros/NaN without any error or warning.
+
+1. **Verify column names before calling transformation functions.** If a function expects raw GAGES-II names (`FORESTNLCD06`) but the input has pruned names (`forest_pct`), it will silently produce garbage. Check the first few column names before calling any pruning/transformation step.
+
+2. **Never trust default values from `_safe_col()` at scale.** If more than 50% of expected columns are missing, something is wrong — fail loudly instead of filling with defaults.
+
+3. **Spot-check intermediate data products.** After any transformation, verify that output columns contain real values (not all zeros, not all NaN, correct dtypes). A 5-row `head()` check would have caught the prune_gagesii bug.
+
+4. **Document column name formats in file names or metadata.** `site_attributes_gagesii.parquet` (pruned) and `site_attributes_gagesii_full.parquet` (raw) store the same sites with different column schemas. This must be obvious to any code that reads them.
+
+5. **All results must have a clear provenance chain:** raw data file → processing function → feature columns → model → metrics. If you can't trace a reported R² value back to the exact input data and code path that produced it, it's not publishable.
