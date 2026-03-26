@@ -73,6 +73,17 @@ def load_discrete(site_id: str) -> pd.DataFrame:
     df = pd.read_parquet(cache_file)
     n_original = len(df)
 
+    # Handle WQP batch format column names (different from per-site format)
+    col_renames = {
+        "ActivityStartDate": "Activity_StartDate",
+        "ActivityStartTime/Time": "Activity_StartTime",
+        "ActivityStartTime/TimeZoneCode": "Activity_StartTimeZone",
+        "ResultMeasureValue": "Result_Measure",
+        "ResultDetectionConditionText": "Result_ResultDetectionCondition",
+        "DetectionQuantitationLimitMeasure/MeasureValue": "DetectionQuantitationLimitMeasure_MeasureValue",
+    }
+    df = df.rename(columns={k: v for k, v in col_renames.items() if k in df.columns})
+
     # --- FIX 1+6: Timezone-aware datetime parsing ---
     if "Activity_StartDate" not in df.columns:
         return pd.DataFrame()

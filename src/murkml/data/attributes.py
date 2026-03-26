@@ -334,9 +334,12 @@ def build_feature_tiers(
             )
             # Okafor fix: guard HUC2 NaN before astype(str) to prevent "nan" literal
             if "huc2" in tier_b_data.columns:
+                # Replace "unknown" with NaN, then format numeric values as zero-padded strings
+                tier_b_data.loc[tier_b_data["huc2"] == "unknown", "huc2"] = pd.NA
                 mask = tier_b_data["huc2"].notna()
                 tier_b_data.loc[mask, "huc2"] = (
-                    tier_b_data.loc[mask, "huc2"].astype(int).astype(str).str.zfill(2)
+                    pd.to_numeric(tier_b_data.loc[mask, "huc2"], errors="coerce")
+                    .astype("Int64").astype(str).str.zfill(2)
                 )
 
             tiers["B_sensor_basic"] = {
@@ -352,13 +355,17 @@ def build_feature_tiers(
         tier_c_base = assembled_df[assembled_df["site_id"].isin(ws_sites)].copy()
 
         if basic_cols_to_add:
-            n_before = len(tier_c_base)
-            tier_c_base = tier_c_base.merge(
-                basic_attrs[["site_id"] + basic_cols_to_add],
-                on="site_id",
-                how="left",
-            )
-            _assert_merge_integrity(tier_c_base, n_before, "Tier C basic attrs")
+            # Drop basic cols that already exist in watershed_attrs to avoid _x/_y collision
+            ws_cols = set(watershed_attrs.columns) - {"site_id"}
+            safe_basic_cols = [c for c in basic_cols_to_add if c not in ws_cols]
+            if safe_basic_cols:
+                n_before = len(tier_c_base)
+                tier_c_base = tier_c_base.merge(
+                    basic_attrs[["site_id"] + safe_basic_cols],
+                    on="site_id",
+                    how="left",
+                )
+                _assert_merge_integrity(tier_c_base, n_before, "Tier C basic attrs")
 
         ws_feature_cols = [c for c in watershed_attrs.columns if c != "site_id"]
         n_before = len(tier_c_base)
@@ -368,17 +375,19 @@ def build_feature_tiers(
             check_cols=["forest_pct", "clay_pct", "precip_mean_mm"],
         )
 
-        # Okafor fix: guard HUC2 NaN
+        # Okafor fix: guard HUC2 NaN and "unknown" values
         if "huc2" in tier_c_data.columns:
+            tier_c_data.loc[tier_c_data["huc2"] == "unknown", "huc2"] = pd.NA
             mask = tier_c_data["huc2"].notna()
             tier_c_data.loc[mask, "huc2"] = (
-                tier_c_data.loc[mask, "huc2"].astype(int).astype(str).str.zfill(2)
+                pd.to_numeric(tier_c_data.loc[mask, "huc2"], errors="coerce")
+                .astype("Int64").astype(str).str.zfill(2)
             )
 
         tiers["C_sensor_basic_watershed"] = {
             "data": tier_c_data,
             "sites": sorted(tier_c_data["site_id"].unique()),
-            "feature_cols": sensor_cols + basic_cols_to_add + ws_feature_cols,
+            "feature_cols": sensor_cols + (safe_basic_cols if basic_cols_to_add else []) + ws_feature_cols,
             "description": f"Sensor + basic + watershed ({len(ws_sites)} sites)",
         }
 
