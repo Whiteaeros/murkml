@@ -1,24 +1,22 @@
 """Catchment attribute processing for murkml.
 
-Handles GAGES-II feature pruning, 3-tier ablation setup, and attribute merging.
+Handles watershed attribute loading, 3-tier ablation setup, and attribute merging.
 
-GAGES-II staleness note (2006-2011 vintage):
-    Time-sensitive (use with caution for recent data):
-        - NLCD land cover percentages (2006 vintage)
-        - Population density, road density
-        - Dam counts and storage (2009 vintage)
-        - Impervious surface percentages
-    Stable (geologically/climatically persistent):
-        - Elevation, slope, aspect, basin morphology
-        - Geology, soil properties (clay, sand, permeability)
-        - Climate normals (temp, precip averages)
-        - Baseflow index, stream density
-        - HUC codes, drainage area
+Supports two attribute sources:
+    StreamCat (preferred, 2019 vintage):
+        - 768+ sites, ~83 static features after dropping time-varying columns
+        - Already uses internal column names (forest_pct, clay_pct, etc.)
+        - Loaded via load_streamcat_attrs()
+
+    GAGES-II (legacy, 2006-2011 vintage):
+        - 58 sites, ~20 pruned features
+        - Loaded via prune_gagesii() (kept for backward compatibility)
 """
 
 from __future__ import annotations
 
 import logging
+import re
 from pathlib import Path
 
 import numpy as np
@@ -134,6 +132,55 @@ def _safe_col(df: pd.DataFrame, col: str, default):
     return pd.Series(default, index=df.index)
 
 
+def load_streamcat_attrs(data_dir: Path) -> pd.DataFrame:
+    """Load StreamCat watershed attributes, dropping time-varying and all-null columns.
+
+    StreamCat has ~159 columns total. After dropping all-null columns and
+    time-varying columns (those with a 4-digit year in the name), ~83 static
+    features remain.
+
+    CatBoost handles NaN natively, so missing values are NOT filled.
+
+    Args:
+        data_dir: Path to data/ directory containing site_attributes_streamcat.parquet.
+
+    Returns:
+        DataFrame with site_id + static feature columns.
+    """
+    path = Path(data_dir) / "site_attributes_streamcat.parquet"
+    df = pd.read_parquet(path)
+    n_cols_raw = len(df.columns)
+
+    # Drop columns that are entirely null
+    all_null_cols = [c for c in df.columns if df[c].isna().all()]
+    if all_null_cols:
+        logger.info(f"StreamCat: dropping {len(all_null_cols)} all-null columns: {all_null_cols}")
+        df = df.drop(columns=all_null_cols)
+
+    # Drop time-varying columns (contain a 4-digit year in the name)
+    year_pattern = re.compile(r"\d{4}")
+    time_varying_cols = [c for c in df.columns if c != "site_id" and year_pattern.search(c)]
+    if time_varying_cols:
+        logger.info(f"StreamCat: dropping {len(time_varying_cols)} time-varying columns")
+        df = df.drop(columns=time_varying_cols)
+
+    # Ensure geol_class is categorical (dtype=object) if present
+    if "geol_class" in df.columns:
+        df["geol_class"] = df["geol_class"].astype(object)
+
+    # Deduplicate by site_id — keep first occurrence per site
+    # (StreamCat parquet may have one row per site repeated across assembled samples)
+    if df["site_id"].duplicated().any():
+        df = df.drop_duplicates(subset=["site_id"], keep="first")
+
+    n_features = len(df.columns) - 1  # exclude site_id
+    logger.info(
+        f"StreamCat: {n_cols_raw} → {n_features} static features, "
+        f"{len(df)} sites"
+    )
+    return df
+
+
 def validate_gagesii_schema(df: pd.DataFrame, expected_format: str = "pruned") -> None:
     """Validate that a GAGES-II DataFrame has the expected column name format.
 
@@ -222,21 +269,20 @@ def get_gagesii_original_sites(data_dir: Path) -> set[str]:
 def build_feature_tiers(
     assembled_df: pd.DataFrame,
     basic_attrs: pd.DataFrame,
-    gagesii_attrs: pd.DataFrame | None = None,
-    nlcd_original_sites: set[str] | None = None,
+    watershed_attrs: pd.DataFrame | None = None,
 ) -> dict[str, dict]:
     """Build feature tiers for ablation study.
 
     Tier A (all sites): Sensor-only features
     Tier B (all sites): Sensor + basic attributes (drainage area, elevation, HUC)
-    Tier C (GAGES-II sites only): Sensor + basic + pruned GAGES-II
-    Tier C_gagesii_only: Tier C restricted to original GAGES-II sites (no NLCD backfill)
+    Tier C (watershed-attr sites): Sensor + basic + watershed attributes
+        (StreamCat or GAGES-II — both use site_id + feature columns)
 
     Args:
         assembled_df: Paired sensor+discrete dataset with site_id column.
         basic_attrs: Basic site attributes (drainage area, elevation, HUC) for all sites.
-        gagesii_attrs: Pruned GAGES-II attributes (from prune_gagesii). Optional.
-        nlcd_original_sites: Set of site_ids that are NOT NLCD backfill (from get_gagesii_original_sites).
+        watershed_attrs: Watershed attributes (from load_streamcat_attrs or prune_gagesii).
+            Must have site_id column + feature columns. Optional.
 
     Returns:
         Dict mapping tier name to {"data": DataFrame, "sites": list, "feature_cols": list}.
@@ -300,13 +346,10 @@ def build_feature_tiers(
                 "description": "Sensor + basic attributes (all sites)",
             }
 
-    # --- Tier C: Sensor + basic + GAGES-II ---
-    if gagesii_attrs is not None and not gagesii_attrs.empty:
-        # Validate schema before using GAGES-II attributes
-        validate_gagesii_schema(gagesii_attrs, expected_format="pruned")
-
-        gagesii_sites = set(gagesii_attrs["site_id"])
-        tier_c_base = assembled_df[assembled_df["site_id"].isin(gagesii_sites)].copy()
+    # --- Tier C: Sensor + basic + watershed attributes ---
+    if watershed_attrs is not None and not watershed_attrs.empty:
+        ws_sites = set(watershed_attrs["site_id"])
+        tier_c_base = assembled_df[assembled_df["site_id"].isin(ws_sites)].copy()
 
         if basic_cols_to_add:
             n_before = len(tier_c_base)
@@ -317,12 +360,12 @@ def build_feature_tiers(
             )
             _assert_merge_integrity(tier_c_base, n_before, "Tier C basic attrs")
 
-        gagesii_feature_cols = [c for c in gagesii_attrs.columns if c != "site_id"]
+        ws_feature_cols = [c for c in watershed_attrs.columns if c != "site_id"]
         n_before = len(tier_c_base)
-        tier_c_data = tier_c_base.merge(gagesii_attrs, on="site_id", how="left")
+        tier_c_data = tier_c_base.merge(watershed_attrs, on="site_id", how="left")
         _assert_merge_integrity(
-            tier_c_data, n_before, "Tier C GAGES-II",
-            check_cols=["forest_pct", "geol_class", "ecoregion"],
+            tier_c_data, n_before, "Tier C watershed",
+            check_cols=["forest_pct", "clay_pct", "precip_mean_mm"],
         )
 
         # Okafor fix: guard HUC2 NaN
@@ -332,38 +375,12 @@ def build_feature_tiers(
                 tier_c_data.loc[mask, "huc2"].astype(int).astype(str).str.zfill(2)
             )
 
-        tiers["C_sensor_basic_gagesii"] = {
+        tiers["C_sensor_basic_watershed"] = {
             "data": tier_c_data,
             "sites": sorted(tier_c_data["site_id"].unique()),
-            "feature_cols": sensor_cols + basic_cols_to_add + gagesii_feature_cols,
-            "description": f"Sensor + basic + GAGES-II ({len(gagesii_sites)} sites)",
+            "feature_cols": sensor_cols + basic_cols_to_add + ws_feature_cols,
+            "description": f"Sensor + basic + watershed ({len(ws_sites)} sites)",
         }
-
-        # Patel: Tier B-restricted to GAGES-II sites for unconfounded comparison with C
-        if basic_cols_to_add:
-            tier_b_restricted = tier_c_base.copy()  # already filtered to GAGES-II sites
-            if "huc2" in tier_b_restricted.columns:
-                mask = tier_b_restricted["huc2"].notna()
-                tier_b_restricted.loc[mask, "huc2"] = (
-                    tier_b_restricted.loc[mask, "huc2"].astype(int).astype(str).str.zfill(2)
-                )
-            tiers["B_restricted"] = {
-                "data": tier_b_restricted,
-                "sites": sorted(tier_b_restricted["site_id"].unique()),
-                "feature_cols": sensor_cols + basic_cols_to_add,
-                "description": f"Sensor + basic (restricted to {len(gagesii_sites)} GAGES-II sites)",
-            }
-
-    # --- Tier C_gagesii_only: exclude NLCD-backfilled sites ---
-    if gagesii_attrs is not None and nlcd_original_sites is not None:
-        tier_c_orig = tier_c_data[tier_c_data["site_id"].isin(nlcd_original_sites)].copy()
-        if not tier_c_orig.empty:
-            tiers["C_gagesii_only"] = {
-                "data": tier_c_orig,
-                "sites": sorted(tier_c_orig["site_id"].unique()),
-                "feature_cols": sensor_cols + basic_cols_to_add + gagesii_feature_cols,
-                "description": f"Sensor + basic + GAGES-II (original {len(nlcd_original_sites)} sites, no NLCD backfill)",
-            }
 
     # Summary
     for name, tier in tiers.items():

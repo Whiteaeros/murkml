@@ -2,7 +2,7 @@
 
 Runs CatBoost LOGO CV for each combination of:
 - Parameter: ssc, total_phosphorus, nitrate_nitrite, orthophosphate
-- Tier: A (sensor-only), B (sensor+basic), C (sensor+GAGES-II)
+- Tier: A (sensor-only), B (sensor+basic), C (sensor+StreamCat)
 
 Produces a comparison table showing how catchment attributes affect performance.
 
@@ -27,7 +27,7 @@ from sklearn.model_selection import LeaveOneGroupOut, GroupShuffleSplit
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
-from murkml.data.attributes import prune_gagesii, build_feature_tiers, get_gagesii_original_sites
+from murkml.data.attributes import build_feature_tiers, load_streamcat_attrs
 from murkml.evaluate.metrics import (
     kge, percent_bias, r_squared, rmse,
     duan_smearing_factor, native_space_metrics,
@@ -322,14 +322,12 @@ def run_tier(param_name: str, tier_name: str, tier_data: pd.DataFrame,
                 f"{len(tier_data)} samples, {len(numeric_available)} numeric + {len(cat_available)} categorical features")
 
     # Data integrity checks (added 2026-03-24 after prune_gagesii bug)
-    if "gagesii" in tier_name.lower() or "C_" in tier_name:
-        expected_cats = {"geol_class", "ecoregion", "reference_class", "huc2"}
+    if "watershed" in tier_name.lower() or "C_" in tier_name:
         found_cats = set(cat_available)
-        missing_cats = expected_cats - found_cats - {"huc2"}  # huc2 may be in basic, not gagesii
-        if missing_cats:
+        if not found_cats:
             logger.warning(
-                f"  INTEGRITY: Tier {tier_name} missing expected categoricals: {missing_cats}. "
-                f"Found: {found_cats}. Check that GAGES-II attributes were not destroyed."
+                f"  INTEGRITY: Tier {tier_name} has no categorical features. "
+                f"Check that watershed attributes were loaded correctly."
             )
     # Check for all-NaN numeric features
     all_nan_cols = [c for c in numeric_available if tier_data[c].isna().all()]
@@ -393,16 +391,14 @@ def main():
     # Load attributes
     basic_attrs = pd.read_parquet(DATA_DIR / "site_attributes.parquet")
     log_file(DATA_DIR / "site_attributes.parquet", role="input")
-    gagesii_path = DATA_DIR / "site_attributes_gagesii.parquet"
-    gagesii_attrs = None
-    if gagesii_path.exists():
-        gagesii_raw = pd.read_parquet(gagesii_path)
-        gagesii_attrs = prune_gagesii(gagesii_raw)
-        log_file(gagesii_path, role="input")
-
-    # Identify original GAGES-II sites (not NLCD backfill) for vintage confound test
-    original_gagesii_sites = get_gagesii_original_sites(DATA_DIR)
-    logger.info(f"Original GAGES-II sites: {len(original_gagesii_sites)}")
+    streamcat_path = DATA_DIR / "site_attributes_streamcat.parquet"
+    watershed_attrs = None
+    if streamcat_path.exists():
+        watershed_attrs = load_streamcat_attrs(DATA_DIR)
+        log_file(streamcat_path, role="input")
+        logger.info(f"StreamCat attributes: {len(watershed_attrs)} sites, {len(watershed_attrs.columns)-1} features")
+    else:
+        logger.warning("No StreamCat attributes found — Tier C will be skipped")
 
     # Select parameters
     params = {args.param: PARAM_CONFIG[args.param]} if args.param else PARAM_CONFIG
@@ -424,7 +420,7 @@ def main():
         target_col = cfg["target_col"]
 
         # Build tiers
-        tiers = build_feature_tiers(assembled, basic_attrs, gagesii_attrs, original_gagesii_sites)
+        tiers = build_feature_tiers(assembled, basic_attrs, watershed_attrs)
 
         for tier_name, tier_info in tiers.items():
             if args.tier and not tier_name.startswith(args.tier):
@@ -516,7 +512,7 @@ def main():
 
         assembled = pd.read_parquet(dataset_path)
         target_col = cfg["target_col"]
-        tiers = build_feature_tiers(assembled, basic_attrs, gagesii_attrs, original_gagesii_sites)
+        tiers = build_feature_tiers(assembled, basic_attrs, watershed_attrs)
 
         for tier_name, tier_info in tiers.items():
             if args.tier and not tier_name.startswith(args.tier):
@@ -634,12 +630,12 @@ def main():
                     f"  INTEGRITY: {len(nan_ranges)} feature(s) have NaN min/max in ranges: "
                     f"{nan_ranges[:5]}... Features may have been destroyed."
                 )
-            if "gagesii" in tier_name.lower() and not cat_values_seen:
+            if "watershed" in tier_name.lower() and not cat_values_seen:
                 logger.warning(
                     f"  INTEGRITY: Tier {tier_name} has no categorical values seen. "
-                    f"Expected geol_class, ecoregion, reference_class."
+                    f"Check that watershed attributes were loaded correctly."
                 )
-            if "gagesii" in tier_name.lower() and not sites_per_ecoregion:
+            if "watershed" in tier_name.lower() and not sites_per_ecoregion:
                 logger.warning(
                     f"  INTEGRITY: Tier {tier_name} has empty sites_per_ecoregion. "
                     f"Ecoregion data may not have been loaded."
@@ -658,8 +654,8 @@ def main():
                      n_trees=model.tree_count_, n_sites=meta["n_sites"],
                      n_cat_cols=len(cat_cols))
 
-            # SHAP analysis for Tier C models (where GAGES-II features are)
-            if "C_" in tier_name or "gagesii" in tier_name.lower():
+            # SHAP analysis for Tier C models (where watershed features are)
+            if "C_" in tier_name or "watershed" in tier_name.lower():
                 try:
                     import shap
                     logger.info(f"  Computing SHAP values for {param_name}/{tier_name}...")

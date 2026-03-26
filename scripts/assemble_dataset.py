@@ -305,19 +305,33 @@ def main():
 
     start_run("assemble_ssc")
 
-    # Load site catalog
-    catalog = pd.read_parquet(DATA_DIR / "site_catalog.parquet")
-    log_file(DATA_DIR / "site_catalog.parquet", role="input")
-    logger.info(f"Site catalog: {len(catalog)} sites")
+    # Load qualified site list (preferred) or fall back to site catalog
+    qualified_path = DATA_DIR / "qualified_sites.parquet"
+    catalog_path = DATA_DIR / "site_catalog.parquet"
+    if qualified_path.exists():
+        catalog = pd.read_parquet(qualified_path)
+        log_file(qualified_path, role="input")
+        logger.info(f"Qualified sites: {len(catalog)} sites")
+    elif catalog_path.exists():
+        catalog = pd.read_parquet(catalog_path)
+        log_file(catalog_path, role="input")
+        logger.info(f"Site catalog (legacy): {len(catalog)} sites")
+    else:
+        logger.error("No site list found (qualified_sites.parquet or site_catalog.parquet)")
+        sys.exit(1)
 
-    # Check which sites have downloaded data
+    # Check which qualified sites have downloaded discrete + continuous data
     disc_dir = DATA_DIR / "discrete"
+    cont_dir = DATA_DIR / "continuous"
+    qualified_ids = set(catalog["site_id"].tolist())
+
     available_sites = []
     if disc_dir.exists():
         for f in disc_dir.glob("*_ssc.parquet"):
             site_id = f.stem.replace("_ssc", "").replace("_", "-")
-            available_sites.append(site_id)
-    logger.info(f"Sites with downloaded data: {len(available_sites)}")
+            if site_id in qualified_ids:
+                available_sites.append(site_id)
+    logger.info(f"Qualified sites with discrete data: {len(available_sites)} / {len(qualified_ids)}")
 
     # Process each site
     all_aligned = []
@@ -361,7 +375,8 @@ def main():
     logger.info(f"Dataset assembled: {output_path}")
     logger.info(f"Total samples: {len(dataset)}")
     logger.info(f"Sites: {dataset['site_id'].nunique()}")
-    logger.info(f"States: {catalog[catalog['site_id'].isin(dataset['site_id'].unique())]['state'].unique()}")
+    if "state" in catalog.columns:
+        logger.info(f"States: {catalog[catalog['site_id'].isin(dataset['site_id'].unique())]['state'].unique()}")
     logger.info(f"SSC range: {dataset['lab_value'].min():.0f} - {dataset['lab_value'].max():.0f} mg/L")
     logger.info(f"Columns: {list(dataset.columns)}")
 

@@ -3,15 +3,14 @@
 Uses dataretrieval.nwis.get_iv() for continuous data and
 dataretrieval.wqp.get_results() for discrete samples.
 
-Multi-site requests are 100x faster than per-site API calls:
-- 50 sites × 6 params × 1 year = ~75 seconds (one API call)
-- Same via per-site API = ~300 calls, rate-limited, hours
+Reads qualified_sites.parquet (413 sites) and only downloads
+params/years that actually exist per site.
 
 Usage:
-    python scripts/download_batch.py
-    python scripts/download_batch.py --batch-size 30 --start-year 2010
-    python scripts/download_batch.py --discrete-only
     python scripts/download_batch.py --continuous-only
+    python scripts/download_batch.py --continuous-only --batch-size 50
+    python scripts/download_batch.py --discrete-only
+    python scripts/download_batch.py --dry-run
 """
 
 from __future__ import annotations
@@ -51,105 +50,172 @@ DISCRETE_PCODE_NAMES = {
 }
 
 
-def download_continuous_batch(
-    site_numbers: list[str],
-    start_year: int,
-    end_year: int,
+def _build_smart_batches(
+    sites_df: pd.DataFrame,
     batch_size: int = 30,
-    years_per_call: int = 3,
+    years_per_call: int = 2,
+) -> list[dict]:
+    """Sort sites by start year, batch them, use each batch's actual year range.
+
+    Sorting by start year clusters sites with similar ranges naturally.
+    Each batch uses the union (min start, max end) of its sites' ranges.
+    This avoids tiny-group fragmentation while still skipping years no site needs.
+    """
+    df = sites_df.sort_values("download_start_year").reset_index(drop=True)
+
+    batches = []
+    for i in range(0, len(df), batch_size):
+        batch_df = df.iloc[i:i + batch_size]
+        site_numbers = [s.replace("USGS-", "") for s in batch_df["site_id"].tolist()]
+
+        # Union of year ranges for this batch
+        yr_start = int(batch_df["download_start_year"].min())
+        yr_end = int(batch_df["download_end_year"].max())
+
+        # Build year chunks
+        year_chunks = []
+        y = yr_start
+        while y < yr_end:
+            y_end = min(y + years_per_call, yr_end)
+            year_chunks.append((y, y_end))
+            y = y_end
+
+        batches.append({
+            "site_numbers": site_numbers,
+            "year_chunks": year_chunks,
+            "yr_range": f"{yr_start}-{yr_end}",
+        })
+
+    return batches
+
+
+def download_continuous_smart(
+    sites_df: pd.DataFrame,
+    batch_size: int = 30,
+    years_per_call: int = 2,
+    call_timeout: int = 300,
+    dry_run: bool = False,
 ):
-    """Download continuous IV data in multi-site batches.
+    """Download continuous IV data using smart year-range batching.
+
+    Only downloads years within each site's active range.
+    Output goes to data/continuous_batch_v2/.
 
     Args:
-        site_numbers: USGS site numbers (without 'USGS-' prefix)
-        start_year: First year to download
-        end_year: Last year to download
-        batch_size: Sites per API call (30-50 works well)
-        years_per_call: Years per time chunk (3 is safe)
+        sites_df: qualified_sites.parquet DataFrame
+        batch_size: Sites per API call (30 default, test 50)
+        years_per_call: Years per time chunk (2 to avoid timeout on dense periods)
+        call_timeout: Max seconds per API call before retry
+        dry_run: If True, just print plan without downloading
     """
     import dataretrieval.nwis as nwis
+    from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeout
 
-    cache_dir = DATA_DIR / "continuous_batch"
+    cache_dir = DATA_DIR / "continuous_batch_v2"
     cache_dir.mkdir(parents=True, exist_ok=True)
 
-    # Split sites into batches
-    batches = [site_numbers[i:i + batch_size]
-               for i in range(0, len(site_numbers), batch_size)]
+    batches = _build_smart_batches(sites_df, batch_size, years_per_call)
 
-    # Split years into chunks
-    year_ranges = []
-    y = start_year
-    while y < end_year:
-        y_end = min(y + years_per_call, end_year)
-        year_ranges.append((y, y_end))
-        y = y_end
+    # Count total API calls
+    total_calls = sum(len(b["year_chunks"]) for b in batches)
+    blind_calls = len(batches) * 7  # 2006-2026 = 7 chunks of 3yr
 
-    total_calls = len(batches) * len(year_ranges)
-    logger.info(f"Continuous download: {len(site_numbers)} sites in {len(batches)} batches, "
-                f"{len(year_ranges)} year chunks = {total_calls} API calls")
+    logger.info(f"Smart download plan:")
+    logger.info(f"  {len(sites_df)} sites in {len(batches)} batches")
+    logger.info(f"  {total_calls} API calls (vs {blind_calls} if all 2006-2026)")
+    logger.info(f"  Batch size: {batch_size}, {years_per_call}yr chunks")
+
+    for i, b in enumerate(batches):
+        logger.info(f"  Batch {i+1}: {len(b['site_numbers'])} sites, "
+                    f"{b['yr_range']} ({len(b['year_chunks'])} chunks)")
+
+    if dry_run:
+        est_minutes = total_calls * 35 / 60
+        logger.info(f"\nDRY RUN: Would make {total_calls} calls, ~{est_minutes:.0f} min")
+        return 0
 
     call_count = 0
     total_rows = 0
+    call_times = []
 
-    for batch_idx, batch in enumerate(batches):
-        batch_start = time.time()
-        batch_rows = 0
+    for group_idx, group in enumerate(batches):
+        site_numbers = group["site_numbers"]
+        year_chunks = group["year_chunks"]
 
-        for yr_start, yr_end in year_ranges:
-            cache_file = cache_dir / f"batch_{batch_idx:04d}_{yr_start}_{yr_end}.parquet"
+        logger.info(f"\n--- Batch {group_idx+1}/{len(batches)}: "
+                    f"{len(site_numbers)} sites, {group['yr_range']} ---")
+
+        for yr_start, yr_end in year_chunks:
+            cache_file = cache_dir / f"v2_grp{group_idx:03d}_{yr_start}_{yr_end}.parquet"
 
             if cache_file.exists():
                 existing = pd.read_parquet(cache_file)
-                batch_rows += len(existing)
+                total_rows += len(existing)
                 call_count += 1
                 continue
 
             call_count += 1
-            logger.info(f"  [{call_count}/{total_calls}] Batch {batch_idx+1}/{len(batches)}, "
-                        f"{yr_start}-{yr_end} ({len(batch)} sites)")
 
+            # ETA based on rolling average
+            if call_times:
+                avg_time = sum(call_times[-10:]) / len(call_times[-10:])
+                remaining = (total_calls - call_count) * avg_time
+                eta_str = f", ETA {remaining/60:.0f}min"
+            else:
+                eta_str = ""
+
+            logger.info(f"  [{call_count}/{total_calls}] {yr_start}-{yr_end} "
+                        f"({len(site_numbers)} sites{eta_str})")
+
+            call_start = time.time()
             for attempt in range(3):
                 try:
-                    df, _ = nwis.get_iv(
-                        sites=batch,
-                        parameterCd=CONTINUOUS_PARAMS,
-                        start=f"{yr_start}-01-01",
-                        end=f"{yr_end}-01-01",
-                    )
+                    # Use thread-based timeout to prevent infinite hangs
+                    # dataretrieval doesn't support request timeouts natively
+                    with ThreadPoolExecutor(max_workers=1) as executor:
+                        future = executor.submit(
+                            nwis.get_iv,
+                            sites=site_numbers,
+                            parameterCd=CONTINUOUS_PARAMS,
+                            start=f"{yr_start}-01-01",
+                            end=f"{yr_end}-01-01",
+                        )
+                        df, _ = future.result(timeout=call_timeout)
 
                     if df is not None and len(df) > 0:
-                        # Reset multi-index to columns for parquet storage
                         df = df.reset_index()
                         df.to_parquet(cache_file, index=False)
-                        batch_rows += len(df)
-                        logger.info(f"    {len(df)} rows")
+                        total_rows += len(df)
+                        logger.info(f"    {len(df):,} rows")
                     else:
-                        # Save empty marker
                         pd.DataFrame().to_parquet(cache_file)
                         logger.info(f"    0 rows")
                     break
 
+                except FuturesTimeout:
+                    logger.warning(f"    Timeout ({call_timeout}s) on attempt {attempt+1}/3, retrying...")
+                    time.sleep(10)
                 except Exception as e:
-                    if "429" in str(e) or "rate" in str(e).lower():
+                    err_str = str(e).lower()
+                    err_type = type(e).__name__
+                    if "429" in str(e) or "rate" in err_str:
                         wait = 2 ** attempt * 30
                         logger.warning(f"    Rate limited, waiting {wait}s")
                         time.sleep(wait)
                     elif attempt < 2:
-                        logger.warning(f"    Error: {e}, retrying...")
+                        logger.warning(f"    Error ({err_type}): {e}, retrying...")
                         time.sleep(5)
                     else:
-                        logger.error(f"    FAILED after 3 attempts: {e}")
+                        logger.error(f"    FAILED after 3 attempts ({err_type}): {e}")
                         break
 
-            # Brief pause between calls to be respectful
+            call_times.append(time.time() - call_start)
             time.sleep(2)
 
-        batch_elapsed = time.time() - batch_start
-        total_rows += batch_rows
-        logger.info(f"  Batch {batch_idx+1} done: {batch_rows} rows in {batch_elapsed:.0f}s "
-                    f"(total: {total_rows:,} rows)")
+        logger.info(f"  Batch {group_idx+1} done (total: {total_rows:,} rows)")
 
-    logger.info(f"\nContinuous download complete: {total_rows:,} total rows")
+    logger.info(f"\nSmart download complete: {total_rows:,} total rows, "
+                f"{call_count} calls in {sum(call_times)/60:.1f}min")
     return total_rows
 
 
@@ -247,7 +313,7 @@ def _find_primary_column(columns: list[str], pcode: str) -> tuple[str | None, st
     return None, None
 
 
-def merge_continuous_batches():
+def merge_continuous_batches(use_v2: bool = True):
     """Merge batch parquet files into per-site cache files.
 
     Converts from batch format to the per-site format expected by
@@ -256,14 +322,19 @@ def merge_continuous_batches():
     Handles duplicate sensor columns by picking the primary sensor
     (plain parameter code column) or the first alternate.
     """
-    batch_dir = DATA_DIR / "continuous_batch"
+    if use_v2:
+        batch_dir = DATA_DIR / "continuous_batch_v2"
+        glob_pattern = "v2_*.parquet"
+    else:
+        batch_dir = DATA_DIR / "continuous_batch"
+        glob_pattern = "batch_*.parquet"
     cont_dir = DATA_DIR / "continuous"
 
     if not batch_dir.exists():
-        logger.warning("No batch directory found")
+        logger.warning(f"No batch directory found: {batch_dir}")
         return
 
-    batch_files = sorted(batch_dir.glob("batch_*.parquet"))
+    batch_files = sorted(batch_dir.glob(glob_pattern))
     logger.info(f"Merging {len(batch_files)} batch files into per-site cache...")
 
     total_sites = set()
@@ -332,10 +403,12 @@ def merge_continuous_batches():
                     param_data["approval_status"] = "Unknown"
                     param_data["qualifier"] = None
 
-                param_data["datetime"] = pd.to_datetime(param_data["datetime"])
-                param_data["year"] = param_data["datetime"].dt.year
+                # Rename to 'time' for compatibility with assemble pipeline
+                param_data = param_data.rename(columns={"datetime": "time"})
+                param_data["time"] = pd.to_datetime(param_data["time"])
+                param_data["year"] = param_data["time"].dt.year
 
-                for year, year_df in param_data.groupby("year"):
+                for year, year_df in param_data.groupby("year", observed=True):
                     year_end = year + 1
                     cache_file = param_dir / f"{year}_{year_end}.parquet"
                     if not cache_file.exists():
@@ -455,40 +528,39 @@ def main():
                         help="Sites per API call for continuous (default 30)")
     parser.add_argument("--discrete-batch-size", type=int, default=100,
                         help="Sites per WQP call for discrete (default 100)")
-    parser.add_argument("--start-year", type=int, default=2006,
-                        help="Start year for continuous data")
-    parser.add_argument("--end-year", type=int, default=2026,
-                        help="End year for continuous data")
     parser.add_argument("--continuous-only", action="store_true")
     parser.add_argument("--discrete-only", action="store_true")
     parser.add_argument("--skip-merge", action="store_true",
                         help="Skip merging batches into per-site files")
+    parser.add_argument("--dry-run", action="store_true",
+                        help="Print download plan without making API calls")
+    parser.add_argument("--use-old-batches", action="store_true",
+                        help="Merge from old continuous_batch/ instead of v2")
     args = parser.parse_args()
 
-    # Load discovered sites
-    sites_path = DATA_DIR / "all_discovered_sites.parquet"
+    # Load QUALIFIED sites (not all discovered)
+    sites_path = DATA_DIR / "qualified_sites.parquet"
     if not sites_path.exists():
-        logger.error(f"No discovered sites at {sites_path}. Run discovery first.")
+        logger.error(f"No qualified sites at {sites_path}. Run qualify_sites.py first.")
         return
 
     sites_df = pd.read_parquet(sites_path)
-    site_ids = sites_df["site_id"].tolist()  # USGS-XXXXXXXX format
-    site_numbers = [s.replace("USGS-", "") for s in site_ids]
+    site_ids = sites_df["site_id"].tolist()
 
-    logger.info(f"Sites: {len(site_ids)}")
-    log_step("start", n_sites=len(site_ids), start_year=args.start_year,
-             end_year=args.end_year)
+    logger.info(f"Qualified sites: {len(site_ids)}")
+    logger.info(f"Year ranges: {sites_df['download_start_year'].min()}-"
+                f"{sites_df['download_end_year'].max()}")
+    log_step("start", n_sites=len(site_ids))
 
-    # Download continuous
+    # Download continuous (smart: per-site year ranges)
     if not args.discrete_only:
         logger.info(f"\n{'='*60}")
-        logger.info("CONTINUOUS DATA (nwis.get_iv batch)")
+        logger.info("CONTINUOUS DATA — SMART DOWNLOAD (nwis.get_iv batch)")
         logger.info(f"{'='*60}")
-        n_cont = download_continuous_batch(
-            site_numbers,
-            start_year=args.start_year,
-            end_year=args.end_year,
+        n_cont = download_continuous_smart(
+            sites_df,
             batch_size=args.batch_size,
+            dry_run=args.dry_run,
         )
         log_step("continuous_complete", total_rows=n_cont)
 
@@ -504,12 +576,12 @@ def main():
         log_step("discrete_complete", total_rows=n_disc)
 
     # Merge into per-site format
-    if not args.skip_merge:
+    if not args.skip_merge and not args.dry_run:
         logger.info(f"\n{'='*60}")
         logger.info("MERGING BATCHES INTO PER-SITE FILES")
         logger.info(f"{'='*60}")
         if not args.discrete_only:
-            merge_continuous_batches()
+            merge_continuous_batches(use_v2=not args.use_old_batches)
         if not args.continuous_only:
             merge_discrete_batches()
 
