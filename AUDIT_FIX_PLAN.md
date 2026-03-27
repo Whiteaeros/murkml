@@ -1,6 +1,8 @@
 # Fix Plan: murkml Audit Remediation
 
-> **STATUS (2026-03-25): ORIGINAL AUDIT SUBSTANTIALLY COMPLETE.**
+> **SUPERSEDED (2026-03-26): ALL AUDIT ITEMS COMPLETE.** Expanded to 270 paired sites (243 training). All red team fixes implemented and active in current model. StreamCat replaced GAGES-II. Current: log R²=0.71, native R²=0.55 on holdout. See RESULTS_LOG.md.
+>
+> Previous (2026-03-25): ORIGINAL AUDIT SUBSTANTIALLY COMPLETE.
 > All critical and most important fixes from this 4-reviewer audit (Mar 16-17) have been implemented. The project has since expanded to 102 sites, R² reached 0.80 (log) / 0.61 (native), and a **new 5-reviewer red team panel** was conducted on 2026-03-24 with additional findings.
 >
 > **For the current plan, see `RESULTS_LOG.md`** — sections on "Red Team Panel Review" and "Code Fixes Implemented" document the new findings and their status.

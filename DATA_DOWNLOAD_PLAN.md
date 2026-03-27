@@ -1,6 +1,8 @@
 # Data Download Plan — Multi-Parameter + Catchment Attributes
 
-> **STATUS (2026-03-25): LARGELY COMPLETE.**
+> **SUPERSEDED (2026-03-26): ALL DOWNLOADS COMPLETE.** 413 qualified sites. Continuous: 168 batch files, 171M rows, 1.4 GB. Discrete: 94K samples. StreamCat: 370 sites. GridMET weather: 861 sites. GAGES-II replaced by StreamCat. See CHANGELOG.md.
+>
+> Previous status (2026-03-25): LARGELY COMPLETE.
 > Multi-parameter discrete data has been downloaded for all parameters (SSC, TP, nitrate, orthoP) across the expanded 102-site network. GAGES-II and NLCD attributes have been downloaded and merged. TDS was deprioritized. See actual results below.
 >
 > **What was achieved vs planned:**

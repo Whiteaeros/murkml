@@ -1,6 +1,8 @@
 # Site Expansion Plan
 
-## Current Status (2026-03-25)
+> **SUPERSEDED (2026-03-26):** Expansion COMPLETE. 860 discovered → 413 qualified → 270 paired. StreamCat replaced GAGES-II. See RESULTS_LOG.md and CHANGELOG.md.
+
+## Previous Status (2026-03-25)
 
 **Expansion is partially complete.** We reached **102 training sites** (up from 57), not the original target of ~137. The 102 sites span 12 watershed regimes and 19,611 SSC samples.
 
