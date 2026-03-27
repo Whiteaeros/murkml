@@ -36,6 +36,21 @@ The `dataretrieval` package's `nwis` module is DEPRECATED. Always use the `water
 - **DO saturation: MUST use Benson & Krause (1984) nonlinear polynomial.** NEVER use a linear approximation like `14.6 - 0.4*T` — this has 27-65% error at common stream temperatures (5-25C). The broken linear formula was in the code for months before discovery. This is a physics equation, not something CatBoost can compensate for in feature engineering.
 - **USGS QC qualifier format:** The API returns qualifiers as array-like strings, e.g., `"['ICE' 'EQUIP']"`, NOT simple strings like `"Ice"`. Any code parsing qualifiers must handle this format or it will silently match nothing. The bug went undetected because no error is raised — the filter just excludes zero records.
 
+## Documentation Map
+
+Keep these updated when making significant changes:
+
+| File | What it covers | Update when... |
+|------|---------------|----------------|
+| `CLAUDE.md` | Project rules, API notes, current state | Any architectural change, new data rules, current model numbers change |
+| `RESULTS_LOG.md` | All model results with numbers | Any new training run or evaluation |
+| `CHANGELOG.md` | History of changes by date | Any significant feature, fix, or data change |
+| `EXPANSION_PLAN.md` | Site expansion history (SUPERSEDED) | Reference only — expansion complete |
+| `DATA_DOWNLOAD_PLAN.md` | Download history (SUPERSEDED) | Reference only — downloads complete |
+| `AUDIT_FIX_PLAN.md` | Audit remediation (SUPERSEDED) | Reference only — all fixes applied |
+| `PIPELINE.md` | Data pipeline flow | Pipeline architecture changes |
+| `PRODUCT_VISION.md` | Commercial product vision | Vision/strategy changes |
+
 ## Testing
 
 ```bash
@@ -53,19 +68,15 @@ A bug where `prune_gagesii()` was called on already-pruned data silently destroy
 
 1. **Before reporting ANY model results**, verify the training data actually contains expected values (not all zeros/NaN). Spot-check with `df.describe()` or `df.head()`.
 
-2. **Never call `prune_gagesii()` on `site_attributes_gagesii.parquet`** — that file already has pruned column names. `prune_gagesii()` expects raw GAGES-II column names (e.g., `FORESTNLCD06`). Call it on `site_attributes_gagesii_full.parquet` instead, or skip it if data is already pruned.
+2. **GAGES-II is legacy — use StreamCat.** `prune_gagesii()` and GAGES-II files still exist for backward compatibility but are NOT used in current training. `load_streamcat_attrs()` in `attributes.py` is the current attribute loader. If you see GAGES-II references in old code, they're dead paths.
 
 3. **Check column name format before any transformation.** If a function uses `_safe_col()` with hardcoded column names, verify those names exist in the input. If >50% of expected columns are missing, fail — don't fill with defaults.
 
 4. **All results need a provenance chain:** raw data → processing step → features → model → metrics. Every parquet file should have a clear owner (which script creates it, which script reads it).
 
-5. **Two GAGES-II files exist with different schemas:**
-   - `site_attributes_gagesii_full.parquet` — RAW column names (`FORESTNLCD06`, `GEOL_HUNT_DOM_CODE`), ~270 columns
-   - `site_attributes_gagesii.parquet` — PRUNED column names (`forest_pct`, `geol_class`), ~26 columns
+5. **Categorical columns (`geol_class`, `huc2`) must be dtype `object` (string) when passed to CatBoost.** If they become float64 (e.g., from NaN fill), they won't be detected as categoricals. StreamCat's `geol_class` is derived from dominant lithology. `huc2` comes from NLDI supplementary. Both handled by `load_streamcat_attrs()` and `build_feature_tiers()`.
 
-   Code that reads these must know which format to expect.
-
-6. **Categorical columns (`geol_class`, `ecoregion`, `reference_class`, `huc2`) must be dtype `object` (string) when passed to CatBoost.** If they become float64 (e.g., from NaN fill), they won't be detected as categoricals and will be treated as numeric garbage. Always verify dtype after merges.
+6. **huc2 "unknown" values must be converted to NaN** before any int conversion. 102 sites have huc2="unknown" from lost NLDI checkpoints. `build_feature_tiers()` handles this, but any new code touching huc2 must be aware.
 
 7. **QC filtering must be validated by checking exclusion counts.** If a QC filter excludes zero records (e.g., no Ice flags matched), investigate — it likely means the qualifier format doesn't match. The USGS array string format `"['ICE' 'EQUIP']"` caused a silent total failure of QC filtering.
 
