@@ -27,7 +27,42 @@ Reference for paper writing. Captures key results, expert panel findings, and de
 
 ---
 
-## Current Best Results (102 sites, 12 regimes, bug fixed + retrained 2026-03-24)
+## Current Best Results (243 sites, StreamCat, expanded dataset, retrained 2026-03-26)
+
+**SSC LOGO CV — 243 training sites, 92 StreamCat features, CatBoost with Ordered boosting:**
+
+| Tier | R²(log) | KGE(log) | R²(native) | RMSE(mg/L) | Bias% | Native slope |
+|------|---------|----------|-----------|------------|-------|-------------|
+| A_sensor_only (270 sites) | 0.677 | 0.760 | 0.064 | 175 | +38% | 0.227 |
+| B_sensor_basic (270 sites) | 0.683 | 0.771 | 0.207 | 152 | +25% | 0.241 |
+| C_sensor_basic_watershed (243 sites) | **0.710** | **0.775** | **0.363** | **111** | **+14%** | 0.187 |
+
+Tier differences significant (Wilcoxon p<0.01 for native R² and RMSE). StreamCat helps native metrics but not log-space.
+
+**Holdout evaluation (57 truly unseen sites, final model):**
+- Native R²=0.552, slope=0.650, KGE=0.443
+- Much better than LOGO CV — final model trained on all 243 sites generalizes well
+
+**Site-adaptive calibration effort curve (57 holdout sites, 50 MC trials):**
+
+| N cal | R²(native) random | R²(native) temporal | Slope random |
+|-------|-------------------|--------------------|--------------|
+| 0 | 0.552 | 0.552 | 0.650 |
+| 5 | 0.474 | 0.353 | 0.781 |
+| 10 | 0.595 | 0.474 | 0.786 |
+| 20 | 0.646 | 0.524 | 0.803 |
+
+**Head-to-head vs USGS OLS (N=10, 46 holdout sites):** Our method wins 30, USGS wins 16. Agriculture_pct predicts where USGS wins (rho=-0.48, p=0.001).
+
+**Prediction intervals:** 95% coverage=96.1%, 90% coverage=91.7%. Well-calibrated.
+
+**Error analysis:** sand_pct strongest negative correlate (rho=-0.54). Worst sites are urban (80-89% developed). Best regions: HUC 08 (Gulf Coast), HUC 10 (Missouri).
+
+**SHAP top features:** turbidity_max_1hr (0.53), turbidity_mean_1hr (0.41), turbidity_instant (0.16), discharge_slope_2hr (0.06), soil_organic_matter (0.03).
+
+---
+
+## Previous Results (102 sites, GAGES-II, 2026-03-24) — SUPERSEDED
 
 **SSC LOGO CV — log-space metrics (median across folds):**
 

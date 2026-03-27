@@ -7,7 +7,8 @@
 ## Architecture
 
 - `src/murkml/data/` — Data acquisition (USGS NWIS API via `dataretrieval`), QC filtering, temporal alignment, feature engineering
-- `src/murkml/models/` — ML models (CatBoost baseline, later LSTM)
+- `src/murkml/models/` — ML models (CatBoost regressor)
+- `scripts/` — Training (train_tiered.py), assembly, site adaptation, error analysis, comparison scripts
 - `src/murkml/evaluate/` — Metrics (R², RMSE, KGE, SHAP) and visualization
 - `notebooks/` — Jupyter notebooks for exploration and demos
 - `tests/` — pytest test suite
@@ -29,8 +30,8 @@ The `dataretrieval` package's `nwis` module is DEPRECATED. Always use the `water
 
 - Use SSC (param 80154) only, NOT TSS (00530) — different methods, 25-50% divergence
 - Use turbidity FNU (param 63680) only, NOT NTU (00076) — diverge above 400 units
-- Do NOT use raw lat/lon as model features — causes leakage in leave-one-site-out CV
-- Target variable: `log1p(SSC)` — handles zeros, back-transform with Duan's smearing estimator
+- Lat/lon: currently NOT used as features but under consideration. Previous note about leakage is debatable — lat/lon encode spatial climate gradients, not site identity.
+- Target variable: `log1p(SSC)` — handles zeros, back-transform with Duan's smearing estimator (or Snowdon BCF for non-log transforms)
 - All timestamps stored as UTC
 - **DO saturation: MUST use Benson & Krause (1984) nonlinear polynomial.** NEVER use a linear approximation like `14.6 - 0.4*T` — this has 27-65% error at common stream temperatures (5-25C). The broken linear formula was in the code for months before discovery. This is a physics equation, not something CatBoost can compensate for in feature engineering.
 - **USGS QC qualifier format:** The API returns qualifiers as array-like strings, e.g., `"['ICE' 'EQUIP']"`, NOT simple strings like `"Ice"`. Any code parsing qualifiers must handle this format or it will silently match nothing. The bug went undetected because no error is raised — the filter just excludes zero records.
@@ -70,4 +71,10 @@ A bug where `prune_gagesii()` was called on already-pruned data silently destroy
 
 8. **Report metrics in both log-space and native-space (mg/L).** Log-space R²=0.80 corresponds to native-space R²=0.61. Reporting only log-space metrics overstates practical accuracy. Use Duan's smearing factor (computed from TRAINING residuals per fold, never test) for back-transformation.
 
-9. **Two sources of watershed attributes currently exist** (GAGES-II 2006 for 58 sites, NLCD 2019 for 37 sites). The 37 backfill sites only have land cover, NOT geology/soils/climate. 7 sites have no attributes. Migration to StreamCat is planned to unify all sites.
+9. **Watershed attributes now use StreamCat** (replaced GAGES-II + NLCD). 370/413 qualified sites covered (43 uncoverable AK/HI). 69 static features after dropping time-varying and all-null columns. Loaded via `load_streamcat_attrs()` in `attributes.py`.
+
+10. **Current model state (2026-03-26):** 243 training sites, 92 features (Tier C), log R²=0.71 LOGO CV, holdout native R²=0.55. Site-adaptive calibration with N=10 local samples gets slope=0.79. Beats USGS OLS on 30/46 holdout sites. Prediction intervals well-calibrated (90% coverage=91.7%).
+
+11. **GridMET weather data downloaded but NOT YET integrated as features.** 861 sites, daily precip+temp 2006-2025, at `data/weather/USGS_{site_no}/daily_weather.parquet`. Planned: antecedent precip features (24h, 48h, 7d, 30d rolling sums).
+
+12. **Scripts created this session:** site_adaptation.py, prediction_intervals.py, error_analysis.py, significance_tests.py, compare_vs_usgs.py, download_resilient.py, fill_missing_streamcat.py. All committed to git.
