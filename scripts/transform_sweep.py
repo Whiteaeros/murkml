@@ -95,7 +95,8 @@ def run_experiment(
     boxcox_lambda: float | None = None,
     no_monotone: bool = False,
     config_json: dict | None = None,
-    timeout: int = 300,
+    weight_scheme: str | None = None,
+    timeout: int = 600,
 ) -> dict | None:
     """Run a single GKF5 experiment and return parsed metrics."""
     drop_features = load_drop_features()
@@ -120,11 +121,14 @@ def run_experiment(
         cmd.append("--no-monotone")
     if config_json:
         cmd.extend(["--config-json", json.dumps(config_json)])
+    if weight_scheme:
+        cmd.extend(["--weight-scheme", weight_scheme])
 
     logger.info(f"\n{'='*60}")
     logger.info(f"EXPERIMENT: {label}")
     logger.info(f"  transform={transform}, lambda={boxcox_lambda}, "
-                f"monotone={'OFF' if no_monotone else 'ON'}")
+                f"monotone={'OFF' if no_monotone else 'ON'}, "
+                f"weights={weight_scheme or 'none'}")
     if config_json:
         logger.info(f"  HP overrides: {config_json}")
     logger.info(f"{'='*60}")
@@ -147,6 +151,7 @@ def run_experiment(
         metrics["transform"] = transform
         metrics["boxcox_lambda"] = boxcox_lambda
         metrics["monotone"] = not no_monotone
+        metrics["weight_scheme"] = weight_scheme
         return metrics
 
     except subprocess.TimeoutExpired:
@@ -302,6 +307,54 @@ def run_phase2(results: list[dict]) -> list[dict]:
     return results
 
 
+def run_phase3_raw(results: list[dict]) -> list[dict]:
+    """Phase 3: Raw SSC (no transform) with various weight schemes.
+
+    Training on raw SSC naturally emphasizes extreme events (high-SSC storms),
+    which is where traditional models fail and our competitive advantage lies.
+    """
+    df = pd.DataFrame(results)
+    done_labels = set(df["label"].values)
+
+    raw_experiments = [
+        # (label, transform, lambda, no_monotone, config, weight_scheme)
+        # Spectrum from maximum extreme emphasis to maximum baseflow emphasis:
+        # linear weights = SSC itself as weight (MAXIMUM extreme emphasis)
+        ("15_raw_linear_weights", "none", None, False, None, "linear"),
+        # no weights = RMSE naturally overweights extremes
+        ("16_raw_noWeights", "none", None, False, None, None),
+        # sqrt weights = mild dampening of extremes
+        ("17_raw_sqrt_weights", "none", None, False, None, "sqrt"),
+        # log weights = moderate dampening of extremes
+        ("18_raw_log_weights", "none", None, False, None, "log"),
+        # no-monotone variants
+        ("19_raw_noWeights_noMono", "none", None, True, None, None),
+        ("20_raw_sqrt_weights_noMono", "none", None, True, None, "sqrt"),
+        # HP set B on best raw config (decided after above)
+        ("21_raw_noWeights_hpB", "none", None, False,
+         {"depth": 8, "learning_rate": 0.03, "l2_leaf_reg": 5}, None),
+    ]
+
+    for label, transform, lmbda, no_mono, config, weights in raw_experiments:
+        if label in done_labels:
+            logger.info(f"Skipping {label} (already done)")
+            continue
+
+        metrics = run_experiment(
+            label=label,
+            transform=transform,
+            boxcox_lambda=lmbda,
+            no_monotone=no_mono,
+            config_json=config,
+            weight_scheme=weights,
+        )
+        if metrics:
+            results.append(metrics)
+            save_results(results)
+
+    return results
+
+
 def check_alpha_gate(results: list[dict]):
     """Check alpha diagnostic gate and recommend next step."""
     df = pd.DataFrame(results)
@@ -333,8 +386,8 @@ def check_alpha_gate(results: list[dict]):
 def main():
     import argparse
     parser = argparse.ArgumentParser(description="Transform & constraint ablation sweep")
-    parser.add_argument("--phase", type=str, default="1", choices=["1", "2", "all"],
-                        help="Which phase to run (default: 1)")
+    parser.add_argument("--phase", type=str, default="1", choices=["1", "2", "3", "all"],
+                        help="Which phase to run: 1 (transforms), 2 (HP sets), 3 (raw SSC), all")
     args = parser.parse_args()
 
     logger.info("Transform & Constraint Ablation Sweep")
@@ -356,6 +409,17 @@ def main():
             return
 
         results = run_phase2(results)
+        df = save_results(results)
+        print_results_table(df)
+
+    if args.phase in ("3", "all"):
+        if RESULTS_PATH.exists():
+            existing = pd.read_parquet(RESULTS_PATH)
+            results = existing.to_dict("records")
+        else:
+            results = []
+
+        results = run_phase3_raw(results)
         df = save_results(results)
         print_results_table(df)
 

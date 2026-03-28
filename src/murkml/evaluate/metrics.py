@@ -275,10 +275,13 @@ def native_space_metrics(
     elif transform == "sqrt":
         y_true_native = np.square(y_true_arr)
         y_pred_native = np.square(y_pred_arr) * smearing_factor
+    elif transform == "none":
+        y_true_native = y_true_arr
+        y_pred_native = y_pred_arr * smearing_factor
     else:
         raise ValueError(
             f"Unknown transform {transform!r}. "
-            "Expected 'log1p', 'boxcox', or 'sqrt'."
+            "Expected 'log1p', 'boxcox', 'sqrt', or 'none'."
         )
 
     # Clip to non-negative (concentrations cannot be negative)

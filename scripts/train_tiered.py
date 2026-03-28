@@ -835,8 +835,8 @@ def main():
     parser.add_argument("--tier", type=str, default=None, choices=["A", "B", "C"])
     parser.add_argument(
         "--transform", type=str, default="log1p",
-        choices=["log1p", "boxcox", "sqrt"],
-        help="Target transform (default: log1p)",
+        choices=["log1p", "boxcox", "sqrt", "none"],
+        help="Target transform: log1p, boxcox, sqrt, or none (raw SSC)",
     )
     parser.add_argument(
         "--n-jobs", type=int, default=6,
@@ -974,6 +974,10 @@ def main():
         elif transform_type == "sqrt":
             assembled[target_col] = np.sqrt(assembled["lab_value"])
             global_lmbda = 0.5
+        elif transform_type == "none":
+            assembled[target_col] = assembled["lab_value"].values
+            global_lmbda = None
+            logger.info("Transform: NONE (raw SSC values)")
 
         # Log sample weight scheme if requested
         if args.weight_scheme is not None:
