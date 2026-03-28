@@ -77,8 +77,10 @@ def generate_holdout_predictions(model, meta):
     ws_attrs = load_streamcat_attrs(DATA_DIR)
     basic_attrs = pd.read_parquet(DATA_DIR / "site_attributes.parquet")
 
+    # Merge all basic attrs that the model expects (includes lat/lon added in Batch A)
+    basic_cols_available = [c for c in basic_attrs.columns if c != "site_id"]
     holdout_data = holdout_data.merge(
-        basic_attrs[["site_id", "altitude_ft", "drainage_area_km2", "huc2"]].drop_duplicates("site_id"),
+        basic_attrs[["site_id"] + basic_cols_available].drop_duplicates("site_id"),
         on="site_id", how="left",
     )
     # Drop basic cols that overlap with StreamCat before merging

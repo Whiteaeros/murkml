@@ -187,6 +187,34 @@ def threshold_fractions(
     return results
 
 
+def safe_inv_boxcox1p(y, lmbda, clip_max=1e8):
+    """Inverse Box-Cox(1+x) with domain safety.
+
+    scipy.special.inv_boxcox1p silently returns NaN when y*lmbda + 1 <= 0.
+    This wrapper clamps those values.
+    """
+    from scipy.special import inv_boxcox1p as _inv_boxcox1p
+
+    y = np.asarray(y, dtype=float)
+    if lmbda == 0:
+        return np.expm1(y)  # log1p inverse
+    # Clamp to avoid domain error: y*lmbda + 1 must be > 0
+    min_y = (-1 / lmbda) + 1e-10 if lmbda > 0 else -np.inf
+    y_safe = np.maximum(y, min_y)
+    result = _inv_boxcox1p(y_safe, lmbda)
+    return np.clip(result, 0, clip_max)
+
+
+def snowdon_bcf(y_true_native, y_pred_native_uncorrected):
+    """Snowdon (1991) ratio-based bias correction factor.
+
+    CF = mean(observed) / mean(predicted_uncorrected)
+    Works for any transform. Simpler than Duan's nonparametric smearing
+    for non-log transforms.
+    """
+    return float(np.mean(y_true_native) / np.mean(y_pred_native_uncorrected))
+
+
 def duan_smearing_factor(
     y_true_log: np.ndarray,
     y_pred_log: np.ndarray,
@@ -202,6 +230,9 @@ def duan_smearing_factor(
 
     Typical values are 1.05-1.30. Values above 2.0 suggest poor model fit
     or heavy-tailed residuals.
+
+    Note: This is specific to log transforms. For Box-Cox or other power
+    transforms, use ``snowdon_bcf()`` instead.
     """
     residuals = np.asarray(y_true_log) - np.asarray(y_pred_log)
     return float(np.mean(np.exp(residuals)))
@@ -211,21 +242,76 @@ def native_space_metrics(
     y_true_log: np.ndarray,
     y_pred_log: np.ndarray,
     smearing_factor: float = 1.0,
+    transform: str = "log1p",
+    lmbda: float | None = None,
 ) -> dict:
-    """Back-transform log1p predictions and compute native-space R² and RMSE (mg/L).
+    """Back-transform predictions and compute native-space R² and RMSE (mg/L).
 
-    If smearing_factor > 1.0, applies Duan's (1983) bias correction to
-    the back-transformed predictions. Pass the factor from
-    duan_smearing_factor() computed on training residuals.
+    Parameters
+    ----------
+    y_true_log, y_pred_log : array-like
+        True and predicted values in transformed space.
+    smearing_factor : float
+        Multiplicative bias correction applied after back-transform.
+        For log1p use ``duan_smearing_factor()``; for boxcox/sqrt use
+        ``snowdon_bcf()`` on uncorrected native predictions.
+    transform : str
+        Back-transform to apply. One of ``"log1p"`` (default),
+        ``"boxcox"``, or ``"sqrt"``.
+    lmbda : float or None
+        Box-Cox lambda. Required when ``transform="boxcox"``.
     """
-    y_true_native = np.expm1(np.asarray(y_true_log))
-    y_pred_native = np.expm1(np.asarray(y_pred_log)) * smearing_factor
+    y_true_arr = np.asarray(y_true_log, dtype=float)
+    y_pred_arr = np.asarray(y_pred_log, dtype=float)
+
+    if transform == "log1p":
+        y_true_native = np.expm1(y_true_arr)
+        y_pred_native = np.expm1(y_pred_arr) * smearing_factor
+    elif transform == "boxcox":
+        if lmbda is None:
+            raise ValueError("lmbda is required when transform='boxcox'")
+        y_true_native = safe_inv_boxcox1p(y_true_arr, lmbda)
+        y_pred_native = safe_inv_boxcox1p(y_pred_arr, lmbda) * smearing_factor
+    elif transform == "sqrt":
+        y_true_native = np.square(y_true_arr)
+        y_pred_native = np.square(y_pred_arr) * smearing_factor
+    else:
+        raise ValueError(
+            f"Unknown transform {transform!r}. "
+            "Expected 'log1p', 'boxcox', or 'sqrt'."
+        )
+
+    # Clip to non-negative (concentrations cannot be negative)
+    y_true_native = np.clip(y_true_native, 0, None)
+    y_pred_native = np.clip(y_pred_native, 0, None)
+
     return {
         "r2_native": r_squared(y_true_native, y_pred_native),
         "rmse_native_mgL": rmse(y_true_native, y_pred_native),
         "pbias_native": percent_bias(y_true_native, y_pred_native),
         "smearing_factor": smearing_factor,
+        "transform": transform,
     }
+
+
+def fit_slope_correction(y_true_log, y_pred_log):
+    """Fit linear correction in log space: y_true ≈ a * y_pred + b.
+
+    In native space this corresponds to a power-law recalibration.
+    Fit on out-of-fold predictions to avoid information leakage.
+
+    Returns (slope, intercept) for: y_corrected = slope * y_pred + intercept
+    """
+    from scipy.stats import linregress
+    y_true_log = np.asarray(y_true_log)
+    y_pred_log = np.asarray(y_pred_log)
+    slope, intercept, _, _, _ = linregress(y_pred_log, y_true_log)
+    return float(slope), float(intercept)
+
+
+def apply_slope_correction(y_pred_log, slope, intercept):
+    """Apply log-space linear correction."""
+    return np.asarray(y_pred_log) * slope + intercept
 
 
 def compute_all_metrics(

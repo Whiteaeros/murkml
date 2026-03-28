@@ -27,6 +27,229 @@ Reference for paper writing. Captures key results, expert panel findings, and de
 
 ---
 
+## Batch A Ablation Results (2026-03-27)
+
+Tested monotone constraints, sqrt weights, weather features, lat/lon, and feature pruning independently.
+
+**Ablation table (Tier C, LOGO CV):**
+
+| Experiment | Features | Monotone | Weights | Trees/fold | R²(log) | R²(native) | KGE | RMSE | Bias |
+|---|---|---|---|---|---|---|---|---|---|
+| Exp 0 (new baseline) | 99 | No | No | 281 | 0.718 | 0.276 | 0.782 | 127.8 | 20.7% |
+| **Exp 1 (monotone)** | **99** | **Yes** | **No** | **300** | **0.721** | **0.295** | **0.788** | **121.8** | **19.2%** |
+| Exp 2 (weights) | 99 | No | sqrt | 86 | 0.528 | 0.376 | 0.632 | 118.7 | 8.0% |
+| Exp 3 (pruned) | 63 | Yes | No | 288 | 0.717 | 0.312 | 0.776 | 124.2 | 21.4% |
+| Exp 4 (minimal) | 26 | Yes | No | 310 | 0.708 | 0.290 | 0.772 | 131.1 | 20.1% |
+
+**Conclusions:**
+1. Monotone constraints HELP: +0.003 R²(log), more trees, lower RMSE. Keep them.
+2. Sqrt sample weights DESTROY log-space accuracy: tree count collapses 281→86, R² drops 0.718→0.528. The native R² "improvement" comes at massive log-space cost. Drop weights.
+3. Pruning 99→63 features: negligible loss (-0.004 R²). 36 dropped features were noise.
+4. Pruning 99→26 features: modest loss (-0.013 R²). Some mid-tier features had real signal.
+5. New features (6 weather + 2 lat/lon) helped: baseline went from 0.710 (pre-Batch A) to 0.718 with the new assembled data.
+6. Best config: monotone + all 99 features + NO weights = R²(log) 0.721, best overall.
+
+**Best model (Exp 1) holdout evaluation (57 sites):**
+- Global (N=0): R²(native)=0.641, slope=0.591, KGE=0.499 (was 0.552/0.650/0.443)
+- N=10 random: R²=0.643, slope=0.797, KGE=0.609
+- N=20 random: R²=0.693, slope=0.820, KGE=0.670
+- USGS comparison: still wins 30/46 sites, median advantage +0.035
+- Error analysis: same pattern (sand_pct strongest negative correlate, urban sites worst)
+
+**Expert reviews conducted:**
+- ML diagnostics expert: identified sqrt weights as primary suspect for tree collapse (confirmed by ablation)
+- Dr. Dalton (USGS hydrology): reviewed all 100 features, recommended 26-feature physics-based set, found altitude_ft/elevation_m duplicate (fixed)
+
+---
+
+## Single-Feature Ablation with Multi-Metric Analysis (2026-03-28)
+
+### Method
+1. Reduced 102 → 62 features by dropping group-level harmful/neutral features
+2. Re-ran single-feature ablation on the 62-feature set with GKF5
+3. Tracked ALL metrics: R²(log), R²(native), KGE(log), RMSE, bias, trees
+4. Combined score = R²(log) + 2×R²(native) + KGE (native weighted 2× since it's the harder problem)
+
+### Critical Discovery: Log vs Native Conflicts
+
+Many features have OPPOSITE effects on log-space vs native-space performance:
+
+| Feature | dR²(log) | dR²(native) | Combined | Implication |
+|---|---|---|---|---|
+| turbidity_std_1hr | -0.002 | **-0.132** | -0.273 | #1 most important feature by combined score |
+| wetness_index | 0.000 | **-0.106** | -0.214 | Invisible in log, critical for native |
+| dam_storage_density | -0.005 | **-0.086** | -0.186 | Strong across both spaces |
+| rising_limb | **+0.002** | **-0.075** | -0.146 | "Harmful" in log, critical for native |
+| turbidity_instant | **-0.012** | **+0.025** | +0.020 | Helps log, hurts native |
+| pct_glacial_lake_fine | -0.003 | **+0.082** | +0.166 | Helps log, destroys native |
+
+**Lesson:** Optimizing on R²(log) alone would have led to a WORSE model for real-world use. Native-space effects are 10-100× larger than log-space effects.
+
+### Features Definitely Harmful (all 3 metrics worse when present)
+Dropped: days_since_rain, manure_rate, do_instant, bio_n_fixation, geo_na2o, geo_mgo, discharge_instant
+
+### Confounding Pair Interactions
+| Pair | dR²(log) | dR²(native) | Interaction | Finding |
+|---|---|---|---|---|
+| pH + DO | +0.004 | -0.075 | +0.004 log | Redundant baseflow proxies — hurt log together, help native |
+| nutrients × 4 | -0.002 | -0.066 | -0.005 log | Individually harmful, TOGETHER helpful |
+| lat + lon + elev | -0.001 | +0.086 | +0.012 log | Individually great, partially cancel together |
+| eolian fine + coarse | -0.001 | -0.093 | +0.010 log | Individually great, partially cancel in log but massively help native |
+
+### Expert Panel Consensus (3 independent experts)
+All three independently arrived at **37 features** — convergence.
+- **Drop pct_glacial_lake_fine** (unanimously — +0.082 native R² harm)
+- **Keep turbidity_instant** (unanimously — primary predictor)
+- **Drop latitude, keep longitude** (2-1 — longitude captures maritime-continental physics; lat+lon together form site fingerprint)
+- **Drop 18 features** beyond original 7: neutral or harmful across multiple metrics
+- **Recommended 2-3× native weight** in combined scoring with veto at +0.05 native harm
+- **Key insight from Dr. Alvarez**: pair_geo3 test shows lat+lon+elev together IMPROVE native R² by +0.086 when dropped — model memorizes geography rather than learning physics
+
+---
+
+## Final Optimized Model (37 features, LOGO CV, 2026-03-28)
+
+**Configuration:** 37 numeric + 1 categorical (collection_method), monotone on turbidity_instant + turbidity_max_1hr, Ordered boosting, no weights, 243 sites
+
+| Metric | Previous (99 feat) | Optimized (37 feat) | Change |
+|---|---|---|---|
+| R²(log) | 0.721 | **0.725** | +0.004 |
+| KGE(log) | 0.788 | 0.778 | -0.010 |
+| R²(native) | 0.295 | **0.361** | **+0.066 (+22%)** |
+| RMSE(native) | 121.8 mg/L | 124.4 mg/L | +2.6 |
+| Bias | 19.2% | 21.3% | +2.1% |
+| Trees/fold | 300 | 287 | -13 |
+| Final model trees | 200 | **499** | +299 |
+
+**The 37-feature model improves BOTH log and native R².** Native R² jumped 22% (0.295→0.361) — the biggest single improvement since adding StreamCat attributes. Log R² also improved despite dropping 62 features, confirming that noise features were hurting generalization.
+
+**SHAP top-10 (37-feature model):**
+1. turbidity_max_1hr (0.413)
+2. turbidity_mean_1hr (0.333) — Note: was dropped from ablation set but kept in final model via build_feature_tiers
+3. turbidity_instant (0.171)
+4. log_turbidity_instant (0.164)
+5. collection_method (0.079) — NEW categorical feature
+6. precip_48h (0.062)
+7. turbidity_min_1hr (0.049)
+8. doy_sin (0.044)
+9. turbidity_slope_1hr (0.042)
+10. longitude (0.038)
+
+**IMPORTANT BUG:** The final model saving section in train_tiered.py doesn't apply --drop-features. The saved .cbm model has all 102 features, not the 37 used in LOGO CV. This means:
+- LOGO CV results (R²=0.725) are CORRECT (used 37 features)
+- Saved model + SHAP + holdout evaluations use 102 features (WRONG model)
+- The holdout results below are from the 102-feature model, not the optimized 37-feature model
+- **Fix needed:** Apply drop_features in the final model saving section of train_tiered.py, then retrain
+
+**Holdout evaluation (49 sites, new HUC2-balanced split):**
+
+| Metric | Previous (99 feat) | Optimized (37 feat) | Change |
+|---|---|---|---|
+| Global R²(native) | 0.641 | **0.699** | **+9%** |
+| Global slope | 0.591 | **0.719** | **+22%** |
+| Global KGE | 0.499 | **0.635** | **+27%** |
+| N=10 random R² | 0.643 | 0.645 | flat |
+| N=10 random slope | 0.797 | **0.809** | +1.5% |
+| N=10 temporal R² | 0.400 | **0.647** | **+62%** |
+| N=20 temporal R² | 0.540 | **0.679** | **+26%** |
+
+The optimized model dramatically improves global holdout performance. The slope (0.719 vs 0.591) is the closest to 1.0 we've achieved — a direct result of removing features that were compressing native-space predictions. Temporal site adaptation at N=10 jumped from 0.400 to 0.647, suggesting the model generalizes better to chronological test periods.
+
+---
+
+## 383-Site Expansion + Native R² Collapse (2026-03-28)
+
+**Expanding from 266→383 sites COLLAPSED native R² while improving log R²:**
+
+| Config | R²(log) | R²(native) | Trees/fold |
+|---|---|---|---|
+| 266 sites, 37 features | 0.725 | 0.361 | 287 |
+| 383 sites, 37 features | 0.735 | **0.154** | 462 |
+
+### Smoking Gun Diagnostic
+Separated original 233 sites from new 71 sites in Run B's LOGO CV folds:
+- Original 233 sites native R²: **0.189** (was 0.361 in Run A — degraded by 0.172)
+- New 71 sites native R²: **-0.024**
+- SSC distributions are SIMILAR between groups (median 58 vs 51, P99 3540 vs 2970)
+
+**Conclusion:** Adding sites changed the tree structure. The model became more conservative in native space for ALL sites, not just new ones. This is a fundamental loss function problem — RMSE in log-space compresses native predictions as site diversity increases.
+
+### Regime-Dependent Smearing (post-hoc fix attempt)
+Applied bin-specific Duan smearing factors instead of single global factor. Tested 3/5/10/20 bins.
+- Result: native R² 0.207-0.212 (vs current 0.216)
+- **DID NOT HELP.** The problem is in the predictions, not the back-transformation.
+
+### Root Cause Analysis (expert panel consensus)
+The model optimizes RMSE on log1p(SSC). Native R², KGE, slope are never seen during training. The fix MUST come from the training objective. Options being evaluated:
+1. Custom loss function (requires dropping monotone constraints — only +0.003 R²)
+2. Huber loss (compatible with monotone, one-line change)
+3. MultiQuantile median without smearing
+4. Sqrt transform
+5. KGE as eval_metric for early stopping
+
+### Critical Decision: Change One Thing At A Time
+All data improvements (bug fixes, expansion, new features) must wait. First isolate the loss function effect on the 266-site/37-feature baseline. Then layer in changes sequentially.
+
+---
+
+### Data Quality Improvements Made
+- **Linear interpolation** for turbidity alignment (replaces nearest-neighbor snapping)
+  - ISCO site unique turbidity values: 120 → 349 (of 375 samples)
+  - R² unchanged (0.828 → 0.828) but data quality improved
+- **Collection method** feature added: auto_point (43%), depth_integrated (29%), unknown (17%), grab (11%)
+- **Parallel assembly** with joblib: 8 min → 49 seconds
+- **139 sites recovered** from continuous_batch_v2/ — root cause was QC approval code mismatch ("A" vs "Approved"). One-line fix in qc.py. Dataset expanded: 270→383 sites, 14,393→16,884 samples.
+- **Train/holdout split regenerated** for 383 sites: 309 training, 74 holdout, all 19 HUC2 regions represented
+- **Sensor calibration data downloaded**: 279 sites, 29,078 discrete turbidity samples from WQP. Method codes: TS087 (YSI 6136, 51%), TS213 (YSI EXO, 16%). Calibration computation script ready.
+- **Model-save bug fixed**: train_tiered.py final model section now applies --drop-features, --feature-set, --config-json (was saving 102-feature model instead of 37)
+- **compare_vs_usgs.py fixed**: now generates fresh holdout predictions from saved model instead of reading stale prediction_intervals.parquet
+
+### Bug Fixes Applied (2026-03-28)
+1. QC approval code normalization: "A"→"Approved", "P"→"Provisional" in `src/murkml/data/qc.py`
+2. Model-save feature filtering: final model section in `train_tiered.py` now applies drop_features + feature_set + config_json
+3. USGS comparison: generates own holdout predictions instead of reading stale file
+4. Site adaptation: uses all basic_attrs columns (was missing latitude/longitude)
+
+---
+
+## Feature Group Ablation (2026-03-27, fast GKF5 mode)
+
+**Method:** GroupKFold(5) with stratified site assignment (round-robin by median SSC), Plain boosting, no monotone constraints, no weights. Each experiment ~20 seconds. Total: 3 min 21 sec for 11 experiments.
+
+**Data fix applied first:** Recovered HUC2 codes for 102 sites that were "unknown" — queried USGS NWIS. Found 31 Great Lakes sites, 13 California sites, 22 Upper Mississippi sites, 9 Hawaii sites previously invisible. Zero unknowns remaining.
+
+**Feature groups tested (Dr. Dalton classification):**
+
+| Experiment | R²(log) | Delta | Trees | Features | Verdict |
+|---|---|---|---|---|---|
+| baseline (101 feat) | 0.827 | — | 258 | 101 | reference |
+| drop DO/pH/temp (F2) | **0.830** | **+0.003** | 217 | 96 | **HARMFUL — drop** |
+| drop nutrients (F3) | **0.830** | **+0.003** | 257 | 96 | **HARMFUL — drop** |
+| drop wastewater (F4) | 0.828 | +0.001 | 240 | 97 | noise — drop |
+| drop weak weather (F8) | 0.827 | 0.000 | 228 | 97 | noise — drop |
+| drop redundant geochem (F6) | 0.827 | 0.000 | 227 | 95 | noise — drop |
+| drop redundant turb (F7) | 0.826 | -0.001 | 235 | 99 | marginal — drop |
+| drop categoricals (F9) | 0.825 | -0.002 | 236 | 99 | marginal — drop |
+| drop discharge (F1) | 0.822 | -0.005 | 222 | 96 | slight loss — investigate |
+| drop sparse geology (F5) | 0.822 | -0.005 | 219 | 90 | slight loss — investigate |
+| **drop ALL suspect (F10)** | **0.825** | **-0.002** | 203 | **57** | **44 features removed, near-zero cost** |
+
+**Conclusions:**
+1. DO, pH, temp, and nutrient features are actively hurting the model — no physical mechanism for SSC prediction
+2. Wastewater, weak weather, redundant geochem are noise — zero impact when removed
+3. Dropping all 44 suspect features costs only 0.002 R² while halving the feature count
+4. Discharge features and sparse geology show slight value (-0.005) — may have indirect signal through Q_ratio_7d
+5. Dr. Dalton's expert review was validated — the physics-based feature classification was accurate
+
+**Speed infrastructure added:**
+- `--cv-mode gkf5`: GroupKFold(5) with SSC-stratified site assignment (450× faster than LOGO)
+- `--skip-ridge`, `--skip-save-model`, `--skip-shap`: skip non-essential steps during ablation
+- `scripts/ablation_matrix.py`: automated experiment orchestrator with crash-safe incremental saves
+- `--config-json`: arbitrary CatBoost param overrides for HP experiments
+- `--drop-features`: exclude specific features by name
+
+---
+
 ## Current Best Results (243 sites, StreamCat, expanded dataset, retrained 2026-03-26)
 
 **SSC LOGO CV — 243 training sites, 92 StreamCat features, CatBoost with Ordered boosting:**

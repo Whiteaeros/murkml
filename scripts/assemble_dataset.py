@@ -157,6 +157,33 @@ def load_discrete(site_id: str) -> pd.DataFrame:
             df.loc[non_detect_mask, "is_nondetect"] = True
             logger.info(f"  {n_nondetect} non-detects → DL/2 substitution")
 
+    # --- Collection method classification (before filtering so it carries through) ---
+    equip_col = None
+    for candidate in ["SampleCollectionEquipmentName", "SampleCollectionEquipment"]:
+        if candidate in df.columns:
+            equip_col = candidate
+            break
+
+    def _classify_equipment(equip_str):
+        if not isinstance(equip_str, str):
+            return "unknown"
+        e = equip_str.lower()
+        if "automatic" in e or "peristaltic" in e or "submersible" in e:
+            return "auto_point"
+        if any(k in e for k in ["dh-", "dh ", "d-7", "d-9", "p-6", "us d", "us p",
+                                 "equal width", "equal discharge", "multiple vertical",
+                                 "bag sampler"]):
+            return "depth_integrated"
+        if any(k in e for k in ["grab", "open-mouth", "van dorn", "kemmerer",
+                                 "weighted-bottle", "weighted bottle"]):
+            return "grab"
+        return "unknown"
+
+    if equip_col is not None:
+        df["collection_method"] = df[equip_col].apply(_classify_equipment)
+    else:
+        df["collection_method"] = "unknown"
+
     # --- Filter to valid rows ---
     valid = df.dropna(subset=["datetime", "ssc_value"]).copy()
     valid = valid[valid["ssc_value"] >= 0]  # Fix 11: keep SSC=0 (log1p handles it)
@@ -176,7 +203,7 @@ def load_discrete(site_id: str) -> pd.DataFrame:
                 f"({n_original - n_final} dropped: {n_null_time} null time, "
                 f"{n_bad_tz} bad tz, {n_dupes} dupes)")
 
-    return valid[["datetime", "ssc_value", "is_nondetect"]]
+    return valid[["datetime", "ssc_value", "is_nondetect", "collection_method"]]
 
 
 _CONTINUOUS_COLS = ["time", "value", "approval_status", "qualifier"]
@@ -200,6 +227,8 @@ def load_continuous(site_id: str, param_code: str) -> pd.DataFrame:
         return pd.DataFrame()
 
     df = pd.concat(chunks, ignore_index=True)
+    # Ensure all timestamps are tz-aware UTC (gap-fill files may differ from originals)
+    df["time"] = pd.to_datetime(df["time"], utc=True)
     df = df.drop_duplicates(subset=["time"]).sort_values("time").reset_index(drop=True)
     return df
 
@@ -236,8 +265,11 @@ def align_site(site_id: str) -> pd.DataFrame:
     turb_clean = turb_filtered[["time", "value"]].copy()
     turb_clean.columns = ["datetime", "value"]
 
-    # Keep is_nondetect for later, align on datetime + ssc_value
-    nondetect_flags = discrete.set_index("datetime")["is_nondetect"]
+    # Keep is_nondetect and collection_method for later
+    # Use merge_asof after alignment to map back by timestamp
+    discrete_meta = discrete[["datetime", "is_nondetect", "collection_method"]].copy()
+    discrete_meta["datetime"] = pd.to_datetime(discrete_meta["datetime"], utc=True)
+    discrete_meta = discrete_meta.sort_values("datetime").drop_duplicates("datetime", keep="first")
 
     disc_clean = discrete[["datetime", "ssc_value"]].copy()
     disc_clean.columns = ["datetime", "value"]
@@ -279,29 +311,37 @@ def align_site(site_id: str) -> pd.DataFrame:
             aligned[f"{pname}_instant"] = np.nan
             continue
 
-        # Match each aligned sample to nearest continuous reading
+        # Interpolate each aligned sample between flanking continuous readings
         # Fix 12: Anchor to turbidity match time, not grab sample time
         # Fix 6: Use ±15 min window (consistent with primary alignment)
         cont_clean = cont_filtered[["time", "value"]].copy().reset_index(drop=True)
         cont_clean["time"] = pd.to_datetime(cont_clean["time"], utc=True)
         cont_clean = cont_clean.sort_values("time").reset_index(drop=True)
 
-        sample_df = aligned[["sample_time"]].copy().reset_index(drop=True)
-        sample_df["sample_time"] = pd.to_datetime(sample_df["sample_time"], utc=True)
-        cont_clean["time"] = pd.to_datetime(cont_clean["time"], utc=True)
-        merged = pd.merge_asof(
-            sample_df.rename(columns={"sample_time": "_t"}),
-            cont_clean.rename(columns={"time": "_t", "value": "_v"}),
-            on="_t",
-            direction="nearest",
-            tolerance=pd.Timedelta(minutes=15),
-        )
-        aligned[f"{pname}_instant"] = merged["_v"].values
+        from murkml.data.align import _interpolate_at_times
+        c_times = cont_clean["time"].values
+        c_vals = cont_clean["value"].astype(float).values
+        s_times = pd.to_datetime(aligned["sample_time"], utc=True).values
+        max_gap_ns = pd.Timedelta(minutes=15).value
 
-    # Add is_nondetect flag (Fix 11)
-    aligned["is_nondetect"] = aligned["sample_time"].map(
-        lambda t: nondetect_flags.get(t, False) if t in nondetect_flags.index else False
+        interp_vals, _, _ = _interpolate_at_times(c_times, c_vals, s_times, max_gap_ns)
+        aligned[f"{pname}_instant"] = interp_vals
+
+    # Add is_nondetect and collection_method via merge on timestamp
+    aligned["sample_time"] = pd.to_datetime(aligned["sample_time"], utc=True)
+    aligned = pd.merge_asof(
+        aligned.sort_values("sample_time"),
+        discrete_meta.rename(columns={"datetime": "sample_time"}),
+        on="sample_time",
+        direction="nearest",
+        tolerance=pd.Timedelta(seconds=1),
     )
+    if "is_nondetect" not in aligned.columns:
+        aligned["is_nondetect"] = False
+    if "collection_method" not in aligned.columns:
+        aligned["collection_method"] = "unknown"
+    aligned["is_nondetect"] = aligned["is_nondetect"].fillna(False)
+    aligned["collection_method"] = aligned["collection_method"].fillna("unknown")
 
     # Add site ID
     aligned["site_id"] = site_id
@@ -344,25 +384,185 @@ def main():
                 available_sites.append(site_id)
     logger.info(f"Qualified sites with discrete data: {len(available_sites)} / {len(qualified_ids)}")
 
-    # Process each site
-    all_aligned = []
-    for site_id in available_sites:
+    # Process each site in parallel with progress logging
+    import time as _time
+    from joblib import Parallel, delayed
+
+    def _safe_align(site_id, idx, total):
+        t0 = _time.time()
         try:
-            aligned = align_site(site_id)
-            if not aligned.empty:
-                all_aligned.append(aligned)
-                log_step("align_site", site_id=site_id, rows_out=len(aligned))
+            result = align_site(site_id)
+            elapsed = _time.time() - t0
+            if elapsed > 30:
+                logger.warning(f"  SLOW: {site_id} took {elapsed:.1f}s")
+            return result
         except Exception as e:
-            logger.error(f"  Error processing {site_id}: {e}")
-            log_step("align_site", site_id=site_id, error=str(e))
-            continue
+            logger.error(f"  FAILED: {site_id}: {e}")
+            import traceback
+            traceback.print_exc()
+            return pd.DataFrame()
+
+    n_total = len(available_sites)
+    logger.info(f"Assembling {n_total} sites with 8 parallel workers...")
+
+    results = Parallel(n_jobs=8, backend="loky", verbose=10)(
+        delayed(_safe_align)(sid, i, n_total) for i, sid in enumerate(available_sites)
+    )
+    all_aligned = [r for r in results if not r.empty]
+    logger.info(f"Assembly complete: {len(all_aligned)}/{n_total} sites produced paired data")
+    for r in all_aligned:
+        log_step("align_site", site_id=r["site_id"].iloc[0], rows_out=len(r))
 
     if not all_aligned:
         logger.error("No aligned data produced!")
         sys.exit(1)
 
-    # Combine all sites
+    # Combine all sites (Tier 1: continuous turbidity pairs)
     dataset = pd.concat(all_aligned, ignore_index=True)
+    dataset["turb_source"] = "continuous"
+    n_continuous = len(dataset)
+    logger.info(f"Tier 1 (continuous turbidity): {n_continuous} samples")
+
+    # --- Tier 2/3: Add discrete turbidity pairs (SSC + portable turbidity, no continuous) ---
+    disc_turb_dir = DATA_DIR / "discrete"
+    USGS_TZ_OFFSETS_LOCAL = {
+        "EST": -5, "EDT": -4, "CST": -6, "CDT": -5,
+        "MST": -7, "MDT": -6, "PST": -8, "PDT": -7,
+        "AKST": -9, "AKDT": -8, "HST": -10, "AST": -4,
+        "UTC": 0, "GMT": 0,
+    }
+
+    discrete_pairs = []
+    existing_pairs = set()
+    # Build lookup of (site_id, sample_time) already in dataset
+    # Use int64 nanoseconds for reliable comparison (avoids T-vs-space string format bug)
+    for _, row in dataset.iterrows():
+        t_ns = int(pd.Timestamp(row["sample_time"]).value) if pd.notna(row["sample_time"]) else 0
+        existing_pairs.add((row["site_id"], t_ns))
+
+    for site_id in available_sites:
+        site_u = site_id.replace("-", "_")
+        turb_file = disc_turb_dir / f"{site_u}_turbidity.parquet"
+
+        if not turb_file.exists():
+            continue
+
+        turb = pd.read_parquet(turb_file)
+        if turb.empty or "datetime" not in turb.columns or "turbidity_value" not in turb.columns:
+            continue
+
+        # Use load_discrete() for proper non-detect handling + collection_method (Bug B + C fix)
+        ssc_parsed = load_discrete(site_id)
+        if ssc_parsed.empty:
+            continue
+
+        turb["datetime"] = pd.to_datetime(turb["datetime"], utc=True)
+        turb_times = turb["datetime"].values
+        turb_vals = turb["turbidity_value"].values.astype(float)
+
+        # Match SSC to discrete turbidity within ±60 min
+        tolerance_ns = pd.Timedelta(minutes=60).value
+        for _, ssc_row in ssc_parsed.iterrows():
+            t = ssc_row["datetime"]
+            t_ns = int(pd.Timestamp(t).value) if pd.notna(t) else 0
+            key = (site_id, t_ns)
+            if key in existing_pairs:
+                continue  # Already paired with continuous data
+
+            t_np = np.datetime64(t)
+            diffs = np.abs((turb_times - t_np).astype(np.int64))
+            if len(diffs) == 0:
+                continue
+            min_idx = diffs.argmin()
+            if diffs[min_idx] <= tolerance_ns:
+                pair = {
+                    "sample_time": t,
+                    "lab_value": float(ssc_row["ssc_value"]),
+                    "turbidity_instant": float(turb_vals[min_idx]),
+                    "match_gap_seconds": float(diffs[min_idx] / 1e9),
+                    "site_id": site_id,
+                    "is_nondetect": bool(ssc_row["is_nondetect"]),
+                    "collection_method": str(ssc_row.get("collection_method", "unknown")),
+                    "turb_source": "discrete",
+                    # Window features are NaN for discrete-only pairs
+                    "turbidity_mean_1hr": np.nan,
+                    "turbidity_max_1hr": np.nan,
+                    "turbidity_min_1hr": np.nan,
+                    "turbidity_std_1hr": np.nan,
+                    "turbidity_range_1hr": np.nan,
+                    "turbidity_slope_1hr": np.nan,
+                    "window_count": 0,
+                }
+                discrete_pairs.append(pair)
+                existing_pairs.add(key)
+
+    if discrete_pairs:
+        disc_df = pd.DataFrame(discrete_pairs)
+        logger.info(f"Tier 2/3 (discrete turbidity): {len(disc_df)} samples from {disc_df['site_id'].nunique()} sites")
+        dataset = pd.concat([dataset, disc_df], ignore_index=True)
+    else:
+        logger.info("Tier 2/3: No discrete turbidity pairs found")
+
+    logger.info(f"Combined: {len(dataset)} total samples ({n_continuous} continuous + {len(discrete_pairs)} discrete)")
+
+    # --- Add sensor calibration features ---
+    cal_path = DATA_DIR / "processed" / "sensor_calibration.parquet"
+    cal_summary_path = DATA_DIR / "processed" / "sensor_calibration_summary.parquet"
+
+    if cal_path.exists() and cal_summary_path.exists():
+        cal = pd.read_parquet(cal_path)
+        cal_summary = pd.read_parquet(cal_summary_path)
+        logger.info(f"Sensor calibration: {len(cal)} pairs from {cal['site_id'].nunique()} sites")
+
+        # For each sample, compute: sensor_offset (median of last 3 visits), days_since_cleaning, sensor_family
+        dataset["sensor_offset"] = np.nan
+        dataset["days_since_last_visit"] = np.nan
+        dataset["sensor_family"] = "unknown"
+
+        for site_id in dataset["site_id"].unique():
+            site_cal = cal[cal["site_id"] == site_id].sort_values("visit_time")
+            if site_cal.empty:
+                continue
+
+            site_mask = dataset["site_id"] == site_id
+            site_data = dataset.loc[site_mask]
+            cal_times = site_cal["visit_time"].values
+            cal_offsets = site_cal["offset"].values
+            cal_families = site_cal["sensor_family"].values
+
+            for idx, row in site_data.iterrows():
+                t = pd.Timestamp(row["sample_time"])
+                if pd.isna(t):
+                    continue
+
+                t_np = np.datetime64(t)
+
+                # Find calibration visits before this sample
+                before_mask = cal_times <= t_np
+
+                # For discrete-source rows, exclude the current visit to avoid self-reference (Bug D fix)
+                if row.get("turb_source") == "discrete":
+                    # Exclude visits within 5 min of this sample (same field visit)
+                    not_self = np.abs((cal_times - t_np).astype(np.int64)) > 300_000_000_000  # 5 min in ns
+                    before_mask = before_mask & not_self
+
+                if before_mask.sum() > 0:
+                    # Use MOST RECENT offset, not median (Dr. Medina: cleaning resets corrupt median)
+                    dataset.at[idx, "sensor_offset"] = float(cal_offsets[before_mask][-1])
+
+                    last_visit = cal_times[before_mask][-1]
+                    days = (t_np - last_visit) / np.timedelta64(1, "D")
+                    dataset.at[idx, "days_since_last_visit"] = float(days)
+
+                    dataset.at[idx, "sensor_family"] = str(cal_families[before_mask][-1])
+
+        n_with_cal = dataset["sensor_offset"].notna().sum()
+        logger.info(f"Sensor calibration features applied: {n_with_cal}/{len(dataset)} samples have calibration data")
+    else:
+        dataset["sensor_offset"] = np.nan
+        dataset["days_since_last_visit"] = np.nan
+        dataset["sensor_family"] = "unknown"
+        logger.info("No sensor calibration data found — features set to NaN/unknown")
 
     # Add log-transformed target
     dataset["ssc_log1p"] = np.log1p(dataset["lab_value"])

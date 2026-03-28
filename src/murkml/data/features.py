@@ -214,11 +214,129 @@ def add_seasonality(df: pd.DataFrame, time_col: str = "sample_time") -> pd.DataF
     return df
 
 
+def add_weather_features(
+    df: pd.DataFrame,
+    site_col: str = "site_id",
+    time_col: str = "sample_time",
+    weather_dir: str | None = None,
+) -> pd.DataFrame:
+    """Add antecedent precipitation and temperature features from GridMET daily data.
+
+    For each sample, computes rolling precipitation sums and temperature at sample time
+    by matching to the site's daily weather record.
+
+    Features added:
+    - precip_24h: cumulative precip in prior 24 hours (1 day)
+    - precip_48h: cumulative precip in prior 48 hours (2 days)
+    - precip_7d: cumulative precip in prior 7 days
+    - precip_30d: cumulative precip in prior 30 days
+    - days_since_rain: days since last precip > 1mm
+    - temp_at_sample: daily mean temp on sample day (snowmelt proxy)
+
+    Data source: data/weather/USGS_{site_no}/daily_weather.parquet
+    Format: date (datetime64), precip_mm (float32), tmax_c, tmin_c, tmean_c (float32)
+    """
+    from pathlib import Path
+
+    df = df.copy()
+
+    if weather_dir is None:
+        weather_dir = Path(__file__).parent.parent.parent.parent / "data" / "weather"
+    else:
+        weather_dir = Path(weather_dir)
+
+    if not weather_dir.exists():
+        logger.warning(f"Weather directory not found: {weather_dir} — skipping weather features")
+        for col in ["precip_24h", "precip_48h", "precip_7d", "precip_30d",
+                     "days_since_rain", "temp_at_sample"]:
+            df[col] = np.nan
+        return df
+
+    # Initialize columns
+    for col in ["precip_24h", "precip_48h", "precip_7d", "precip_30d",
+                 "days_since_rain", "temp_at_sample"]:
+        df[col] = np.nan
+
+    n_sites_with_weather = 0
+    n_sites_without = 0
+
+    for site_id in df[site_col].unique():
+        site_mask = df[site_col] == site_id
+        # Convert site_id format: USGS-01036390 → USGS_01036390
+        site_dir_name = site_id.replace("-", "_")
+        weather_file = weather_dir / site_dir_name / "daily_weather.parquet"
+
+        if not weather_file.exists():
+            n_sites_without += 1
+            continue
+
+        weather = pd.read_parquet(weather_file)
+        if weather.empty or "precip_mm" not in weather.columns:
+            n_sites_without += 1
+            continue
+
+        n_sites_with_weather += 1
+
+        # Ensure date column is datetime and sorted
+        weather["date"] = pd.to_datetime(weather["date"])
+        weather = weather.sort_values("date").reset_index(drop=True)
+
+        # Precompute rolling sums on the daily weather data
+        # ALL windows use .shift(1) to be strictly antecedent (prior days only)
+        # This avoids temporal leakage from same-day precipitation
+        weather["precip_1d"] = weather["precip_mm"].shift(1)  # yesterday's precip
+        weather["precip_2d"] = weather["precip_mm"].shift(1).rolling(2, min_periods=1).sum()  # prior 2 days
+        weather["precip_7d_roll"] = weather["precip_mm"].shift(1).rolling(7, min_periods=1).sum()  # prior 7 days
+        weather["precip_30d_roll"] = weather["precip_mm"].shift(1).rolling(30, min_periods=1).sum()  # prior 30 days
+
+        # Days since rain (>1mm threshold)
+        rain_days = weather["precip_mm"] > 1.0
+        # For each row, find how many days since last rain
+        days_since = pd.Series(np.nan, index=weather.index)
+        last_rain_idx = -1
+        for i in range(len(weather)):
+            if rain_days.iloc[i]:
+                last_rain_idx = i
+                days_since.iloc[i] = 0
+            elif last_rain_idx >= 0:
+                days_since.iloc[i] = i - last_rain_idx
+        weather["days_since_rain_val"] = days_since
+
+        # Build a date-indexed lookup for fast matching
+        weather_indexed = weather.set_index("date")
+
+        # Match each sample to its weather date
+        # Strip timezone from sample times to match tz-naive weather dates
+        site_times = pd.to_datetime(df.loc[site_mask, time_col])
+        sample_dates = site_times.dt.tz_localize(None).dt.normalize()  # strip tz + time, keep date only
+
+        for col_src, col_dst in [
+            ("precip_1d", "precip_24h"),
+            ("precip_2d", "precip_48h"),
+            ("precip_7d_roll", "precip_7d"),
+            ("precip_30d_roll", "precip_30d"),
+            ("days_since_rain_val", "days_since_rain"),
+            ("tmean_c", "temp_at_sample"),
+        ]:
+            if col_src not in weather_indexed.columns:
+                continue
+            # Use reindex to match sample dates to weather dates
+            matched = weather_indexed[col_src].reindex(sample_dates.values)
+            df.loc[site_mask, col_dst] = matched.values
+
+    logger.info(
+        f"Weather features: {n_sites_with_weather} sites matched, "
+        f"{n_sites_without} sites without weather data"
+    )
+
+    return df
+
+
 def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
     """Apply all feature engineering steps.
 
     This is the main entry point for feature engineering.
-    Applies in order: hydrograph+antecedent (from continuous), cross-sensor, seasonality.
+    Applies in order: hydrograph+antecedent (from continuous), cross-sensor, seasonality, weather.
 
     Fix 3+5: Hydrograph and antecedent features now computed from continuous
     discharge record, not from diff() on sporadic grab samples.
@@ -226,6 +344,25 @@ def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
     df = add_hydrograph_features(df)  # Now includes antecedent features
     df = add_cross_sensor_features(df)
     df = add_seasonality(df)
+    df = add_weather_features(df)
+
+    # Log-transformed features (power-law relationships are linear in log space)
+    if "turbidity_instant" in df.columns:
+        df["log_turbidity_instant"] = np.log1p(df["turbidity_instant"].clip(lower=0))
+
+    # Sensor range flags
+    if "turbidity_instant" in df.columns:
+        df["turb_saturated"] = (df["turbidity_instant"] > 3000).astype(float)
+        df["turb_below_detection"] = (df["turbidity_instant"] <= 0.5).astype(float)
+
+    # Engineered interaction features (validated by Dr. Harrington + equation validator)
+    # First flush: antecedent dryness × current precipitation
+    # NaN stays NaN (don't fillna(0) — that conflates "no data" with "just rained")
+    if "days_since_rain" in df.columns and "precip_24h" in df.columns:
+        df["flush_intensity"] = np.log1p(df["days_since_rain"]) * np.log1p(df["precip_24h"])
+
+    # Note: clay_sand_ratio computed in build_feature_tiers() since clay_pct/sand_pct
+    # come from StreamCat attributes, not from the sensor data
 
     # Remove old garbage features if they somehow exist
     for col in ["dQ_dt"]:

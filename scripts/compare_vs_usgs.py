@@ -21,6 +21,10 @@ DATA_DIR = PROJECT_ROOT / "data"
 def main():
     from murkml.data.attributes import load_streamcat_attrs
 
+    # Import holdout prediction generation from site_adaptation
+    sys.path.insert(0, str(PROJECT_ROOT / "scripts"))
+    from site_adaptation import load_model_and_meta, generate_holdout_predictions
+
     paired = pd.read_parquet(DATA_DIR / "processed" / "turbidity_ssc_paired.parquet")
     split = pd.read_parquet(DATA_DIR / "train_holdout_split.parquet")
     holdout_ids = set(split[split["role"] == "holdout"]["site_id"])
@@ -28,7 +32,19 @@ def main():
     holdout = holdout.dropna(subset=["turbidity_instant", "lab_value"])
     holdout = holdout[(holdout["turbidity_instant"] > 0) & (holdout["lab_value"] > 0)]
 
-    pred = pd.read_parquet(DATA_DIR / "results" / "prediction_intervals.parquet")
+    # Generate fresh holdout predictions from the saved model
+    model, meta = load_model_and_meta()
+    pred = generate_holdout_predictions(model, meta)
+
+    # Merge predictions into holdout so rows are perfectly aligned
+    # (holdout is already filtered for positive turbidity/lab_value and no NaN)
+    holdout = holdout.merge(
+        pred[["site_id", "sample_time", "y_pred_log", "y_true_log", "y_true_native", "y_pred_native"]],
+        on=["site_id", "sample_time"],
+        how="inner",
+    )
+    holdout = holdout.dropna(subset=["y_pred_log", "y_true_log"])
+
     ws = load_streamcat_attrs(DATA_DIR)
     basic = pd.read_parquet(DATA_DIR / "site_attributes.parquet")
 
@@ -40,10 +56,9 @@ def main():
 
     for site_id in sorted(holdout["site_id"].unique()):
         site_paired = holdout[holdout["site_id"] == site_id].reset_index(drop=True)
-        site_pred = pred[pred["site_id"] == site_id].reset_index(drop=True)
         n = len(site_paired)
 
-        if N >= n - 2 or n < 12 or len(site_pred) != n:
+        if N >= n - 2 or n < 12:
             continue
 
         usgs_r2s, ours_r2s = [], []
@@ -82,17 +97,17 @@ def main():
 
             # --- Our method ---
             try:
-                cal_o = site_pred.iloc[cal_idx]
-                test_o = site_pred.iloc[test_idx]
+                cal_o = site_paired.iloc[cal_idx]
+                test_o = site_paired.iloc[test_idx]
                 a_o, b_o, _, _, _ = linregress(cal_o["y_pred_log"].values, cal_o["y_true_log"].values)
                 a_o = np.clip(a_o, 0.1, 10.0)
                 corr_log = a_o * test_o["y_pred_log"].values + b_o
                 ssc_ours = np.clip(np.expm1(corr_log), 0, None)
                 cal_corr = np.clip(np.expm1(a_o * cal_o["y_pred_log"].values + b_o), 1e-6, None)
-                bcf = np.clip(np.mean(cal_o["y_true_native_mgL"].values) / np.mean(cal_corr), 0.1, 10.0)
+                bcf = np.clip(np.mean(cal_o["y_true_native"].values) / np.mean(cal_corr), 0.1, 10.0)
                 ssc_ours *= bcf
 
-                ssc_true_o = test_o["y_true_native_mgL"].values
+                ssc_true_o = test_o["y_true_native"].values
                 ss_res = np.sum((ssc_true_o - ssc_ours) ** 2)
                 ss_tot = np.sum((ssc_true_o - np.mean(ssc_true_o)) ** 2)
                 r2_o = 1 - ss_res / ss_tot if ss_tot > 0 else np.nan

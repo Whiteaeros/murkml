@@ -322,7 +322,7 @@ def build_feature_tiers(
     basic_cols_to_add = []
     if basic_attrs is not None:
         # Select useful basic columns
-        for col in ["drainage_area_km2", "altitude_ft", "huc2"]:
+        for col in ["drainage_area_km2", "huc2", "latitude", "longitude"]:
             if col in basic_attrs.columns:
                 basic_cols_to_add.append(col)
 
@@ -332,6 +332,9 @@ def build_feature_tiers(
                 on="site_id",
                 how="left",
             )
+            # Add log(drainage_area) — power-law scaling across 6 orders of magnitude
+            if "drainage_area_km2" in tier_b_data.columns:
+                tier_b_data["log_drainage_area"] = np.log1p(tier_b_data["drainage_area_km2"].clip(lower=0))
             # Okafor fix: guard HUC2 NaN before astype(str) to prevent "nan" literal
             if "huc2" in tier_b_data.columns:
                 # Replace "unknown" with NaN, then format numeric values as zero-padded strings
@@ -342,10 +345,15 @@ def build_feature_tiers(
                     .astype("Int64").astype(str).str.zfill(2)
                 )
 
+            # Derived columns (not in basic_attrs, computed here)
+            derived_basic = []
+            if "log_drainage_area" in tier_b_data.columns:
+                derived_basic.append("log_drainage_area")
+
             tiers["B_sensor_basic"] = {
                 "data": tier_b_data,
                 "sites": sorted(tier_b_data["site_id"].unique()),
-                "feature_cols": sensor_cols + basic_cols_to_add,
+                "feature_cols": sensor_cols + basic_cols_to_add + derived_basic,
                 "description": "Sensor + basic attributes (all sites)",
             }
 
@@ -384,10 +392,15 @@ def build_feature_tiers(
                 .astype("Int64").astype(str).str.zfill(2)
             )
 
+        # Add log(drainage_area) derived column to Tier C
+        if "drainage_area_km2" in tier_c_data.columns:
+            tier_c_data["log_drainage_area"] = np.log1p(tier_c_data["drainage_area_km2"].clip(lower=0))
+        derived_c = ["log_drainage_area"] if "log_drainage_area" in tier_c_data.columns else []
+
         tiers["C_sensor_basic_watershed"] = {
             "data": tier_c_data,
             "sites": sorted(tier_c_data["site_id"].unique()),
-            "feature_cols": sensor_cols + (safe_basic_cols if basic_cols_to_add else []) + ws_feature_cols,
+            "feature_cols": sensor_cols + (safe_basic_cols if basic_cols_to_add else []) + ws_feature_cols + derived_c,
             "description": f"Sensor + basic + watershed ({len(ws_sites)} sites)",
         }
 

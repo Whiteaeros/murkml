@@ -72,7 +72,23 @@ def filter_continuous(
         return df, stats
 
     # Step 1: Keep only Approved data
+    # Normalize USGS abbreviation codes from batch downloads:
+    #   "A" -> "Approved", "P" -> "Provisional"
+    # Also handle compound codes like "A, R", "A, >", "A, <" (approved + remark)
     if approval_col in df.columns:
+        _APPROVAL_MAP = {"A": "Approved", "P": "Provisional"}
+        raw_vals = df[approval_col].astype(str).str.strip()
+        # Map single-letter codes; for compound codes like "A, R", use first letter
+        mapped = raw_vals.map(_APPROVAL_MAP)
+        # For compound codes not in map, try first character
+        unmapped = mapped.isna() & raw_vals.notna()
+        if unmapped.any():
+            first_char = raw_vals[unmapped].str.split(",").str[0].str.strip()
+            mapped[unmapped] = first_char.map(_APPROVAL_MAP)
+        # Only replace values that were actually mapped (preserve "Approved"/"Provisional" as-is)
+        already_full = raw_vals.isin({"Approved", "Provisional"})
+        df.loc[~already_full, approval_col] = mapped[~already_full].fillna(raw_vals[~already_full])
+
         mask_approved = df[approval_col] == "Approved"
         stats["n_not_approved"] = int((~mask_approved).sum())
         stats["approval_filter_applied"] = True

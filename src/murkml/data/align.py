@@ -21,6 +21,71 @@ PRIMARY_WINDOW = pd.Timedelta(minutes=15)
 FEATURE_WINDOW = pd.Timedelta(hours=1)
 
 
+def _interpolate_at_times(
+    cont_t: np.ndarray, cont_v: np.ndarray,
+    sample_t: np.ndarray, max_gap_ns: int,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Vectorized linear interpolation of continuous values at sample times.
+
+    For each sample time, finds flanking continuous readings and interpolates.
+    Falls back to nearest if only one side within tolerance. NaN if neither.
+
+    Returns (values, gap_seconds, matched_mask).
+    """
+    n = len(sample_t)
+
+    # Find indices of flanking readings for all samples at once
+    idx_after = np.searchsorted(cont_t, sample_t, side="left")
+    idx_before = idx_after - 1
+
+    # Clip to valid range for safe indexing
+    idx_before_safe = np.clip(idx_before, 0, len(cont_t) - 1)
+    idx_after_safe = np.clip(idx_after, 0, len(cont_t) - 1)
+
+    # Compute time gaps (in nanoseconds) to flanking readings
+    gap_before = np.abs((cont_t[idx_before_safe] - sample_t).astype(np.int64))
+    gap_after = np.abs((cont_t[idx_after_safe] - sample_t).astype(np.int64))
+
+    # Mark which sides are valid (within tolerance AND within array bounds)
+    has_before = (idx_before >= 0) & (gap_before <= max_gap_ns)
+    has_after = (idx_after < len(cont_t)) & (gap_after <= max_gap_ns)
+
+    # Get flanking values
+    v_before = cont_v[idx_before_safe]
+    v_after = cont_v[idx_after_safe]
+    t_before = cont_t[idx_before_safe]
+    t_after = cont_t[idx_after_safe]
+
+    # Compute interpolation fraction
+    span = (t_after - t_before).astype(np.float64)
+    elapsed = (sample_t - t_before).astype(np.float64)
+    # Avoid division by zero
+    safe_span = np.where(span > 0, span, 1.0)
+    frac = elapsed / safe_span
+    frac = np.clip(frac, 0.0, 1.0)
+
+    # Interpolated values
+    interp = v_before + (v_after - v_before) * frac
+
+    # Build result: prefer interpolation, fall back to single side
+    both = has_before & has_after
+    only_before = has_before & ~has_after
+    only_after = ~has_before & has_after
+    neither = ~has_before & ~has_after
+
+    values = np.where(both, interp,
+             np.where(only_before, v_before,
+             np.where(only_after, v_after, np.nan)))
+
+    gaps = np.where(both, np.maximum(gap_before, gap_after) / 1e9,
+           np.where(only_before, gap_before / 1e9,
+           np.where(only_after, gap_after / 1e9, np.nan)))
+
+    matched = ~neither
+
+    return values, gaps, matched
+
+
 def align_samples(
     continuous: pd.DataFrame,
     discrete: pd.DataFrame,
@@ -67,19 +132,21 @@ def align_samples(
     continuous = continuous.sort_values(continuous_time_col).reset_index(drop=True)
     discrete = discrete.sort_values(discrete_time_col).reset_index(drop=True)
 
-    # --- Primary match: nearest continuous reading within ±max_gap ---
-    merged = pd.merge_asof(
-        discrete.rename(columns={discrete_time_col: "_sample_time", discrete_value_col: "_lab_value"}),
-        continuous.rename(columns={continuous_time_col: "_cont_time", continuous_value_col: "_cont_value"}),
-        left_on="_sample_time",
-        right_on="_cont_time",
-        direction="nearest",
-        tolerance=max_gap,
+    # --- Primary match: linear interpolation between flanking readings ---
+    # Vectorized: uses searchsorted + numpy array ops instead of Python loop.
+    cont_t = continuous[continuous_time_col].values  # sorted datetime64[ns]
+    cont_v = continuous[continuous_value_col].values
+    sample_t = discrete[discrete_time_col].values
+    max_gap_ns = max_gap.value  # nanoseconds
+
+    interp_values, interp_gaps, interp_matched = _interpolate_at_times(
+        cont_t, cont_v, sample_t, max_gap_ns
     )
 
-    # Drop unmatched samples
-    matched = merged[merged["_cont_time"].notna()].copy()
-    n_matched = len(matched)
+    # Build matched DataFrame
+    disc_lab = discrete[discrete_value_col].values
+    matched_mask = interp_matched
+    n_matched = matched_mask.sum()
     n_missed = len(discrete) - n_matched
 
     if n_matched == 0:
@@ -89,14 +156,16 @@ def align_samples(
         )
         return pd.DataFrame()
 
-    matched["match_gap_seconds"] = (
-        (matched["_sample_time"] - matched["_cont_time"]).abs().dt.total_seconds()
-    )
+    # Filter to matched only
+    m_sample_times = sample_t[matched_mask]
+    m_lab_values = disc_lab[matched_mask]
+    m_interp_values = interp_values[matched_mask]
+    m_gaps = interp_gaps[matched_mask]
 
     # --- Window features: ±1hr stats using searchsorted ---
-    cont_times = continuous[continuous_time_col].values  # sorted numpy datetime64
-    cont_values = continuous[continuous_value_col].values
-    sample_times = matched["_sample_time"].values
+    cont_times = cont_t  # already sorted numpy datetime64
+    cont_values = cont_v
+    sample_times = m_sample_times
 
     fw_ns = FEATURE_WINDOW.value  # nanoseconds
     lo_indices = np.searchsorted(cont_times, sample_times - fw_ns, side="left")
@@ -136,10 +205,10 @@ def align_samples(
             w_slopes[i] = np.nan
 
     result = pd.DataFrame({
-        "sample_time": matched["_sample_time"].values,
-        "lab_value": matched["_lab_value"].values,
-        "sensor_instant": matched["_cont_value"].values,
-        "match_gap_seconds": matched["match_gap_seconds"].values,
+        "sample_time": m_sample_times,
+        "lab_value": m_lab_values,
+        "sensor_instant": m_interp_values,
+        "match_gap_seconds": m_gaps,
         "window_mean": w_means,
         "window_min": w_mins,
         "window_max": w_maxs,
