@@ -625,8 +625,55 @@ Previous entry said "DO NOT ENFORCE" based on Rivera audit. Updated based on emp
 - **With Box-Cox 0.2:** monotone constraints are beneficial (prevents overfitting without excessive compression)
 - **Recommendation:** ENFORCE monotone when using Box-Cox lambda ≤ 0.3; SKIP monotone with log1p
 
+### Phase 4 Results: Fine Lambda + KGE Eval_Metric (2026-03-28 afternoon)
+
+**Fine lambda sweep (monotone ON):**
+
+| Lambda | R²(native) | Alpha | RMSE | Trees |
+|---|---|---|---|---|
+| 0.15 | 0.228 | 0.858 | 860 | 494 |
+| 0.18 | 0.240 | 0.845 | 852 | 490 |
+| **0.20** | **0.241** | **0.840** | **852** | **497** |
+| 0.22 | 0.224 | 0.847 | 862 | 484 |
+| 0.25 | 0.228 | 0.848 | 862 | 495 |
+
+**Optimum confirmed at lambda=0.18-0.20.** The peak is flat — 0.18 and 0.20 are within noise.
+
+**KGE eval_metric results:**
+
+| Config | R²(native) | Alpha | Trees |
+|---|---|---|---|
+| boxcox_0.2 + RMSE eval (baseline) | 0.241 | 0.840 | 497 |
+| boxcox_0.2 + KGE eval | 0.241 | 0.842 | 426 |
+| log1p + KGE eval | 0.219 | 0.872 | 444 |
+| boxcox_0.2 + KGE eval + no-mono | 0.185 | 0.850 | 451 |
+
+**KGE eval_metric is a wash.** Same R² and alpha, just fewer trees (426 vs 497 = earlier stopping). The alpha compression is NOT caused by overfitting (early stopping doesn't fix it) — it's structural to the RMSE loss function, which always rewards predictions closer to the mean.
+
+**Raw SSC results (all failed):**
+- All 7 raw SSC experiments: R²(native) ≤ 0.046, bias 25-168%
+- Target transform is structurally necessary for gradient boosting on SSC
+
+### Conclusions from Full 24-Experiment Sweep
+
+**Confirmed winner: Box-Cox lambda=0.2 + monotone ON + RMSE loss**
+- R²(native) = 0.241, KGE alpha = 0.84, RMSE = 852 mg/L
+- BCF = 1.35 (stable, much better than log1p's 1.71)
+
+**Alpha=0.84 is structural, not fixable by:**
+- ~~Transform choice~~ (Box-Cox helped from 0.87→0.84 but in wrong direction)
+- ~~KGE early stopping~~ (identical result)
+- ~~Dropping monotone~~ (makes alpha worse on Box-Cox)
+
+**To improve alpha further, need:**
+- SpreadAwareMSE custom loss (penalizes variance compression directly)
+- Or: native-space R²/KGE as the actual training objective (requires custom CatBoost objective with per-sample gradients)
+- Or: accept alpha=0.84 and post-hoc calibrate extreme event predictions
+
 ### Next Steps
-1. Fine lambda sweep around 0.2 (cheap, confirms optimum)
-2. KGE eval_metric implementation for early stopping
+1. ~~Fine lambda sweep around 0.2~~ ✓ (confirmed 0.18-0.20 optimum)
+2. ~~KGE eval_metric~~ ✓ (no improvement — alpha is structural)
 3. Investigate 396-site vs 266-site R²(native) gap
 4. HP sweep on winning transform (depth, learning rate)
+5. SpreadAwareMSE custom loss (if alpha improvement is prioritized)
+6. SHAP stability check on Box-Cox 0.2 vs log1p
