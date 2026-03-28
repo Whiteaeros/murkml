@@ -673,7 +673,50 @@ Previous entry said "DO NOT ENFORCE" based on Rivera audit. Updated based on emp
 ### Next Steps
 1. ~~Fine lambda sweep around 0.2~~ ✓ (confirmed 0.18-0.20 optimum)
 2. ~~KGE eval_metric~~ ✓ (no improvement — alpha is structural)
-3. Investigate 396-site vs 266-site R²(native) gap
-4. HP sweep on winning transform (depth, learning rate)
-5. SpreadAwareMSE custom loss (if alpha improvement is prioritized)
-6. SHAP stability check on Box-Cox 0.2 vs log1p
+3. ~~Two-stage architecture~~ ✗ (watershed features can't predict slopes, R²=-0.21)
+4. Site adaptation curve with Box-Cox 0.2 model (training now)
+5. Collection method × turbidity interaction features
+6. HP sweep on winning transform
+
+---
+
+## Diagnostic Findings (2026-03-28 afternoon)
+
+### Per-Site Turbidity-SSC Relationship
+- **Median per-site R² = 0.782** (63% of sites > 0.70)
+- The relationship IS strong within sites — the cross-site model loses ~0.50 R² from site heterogeneity
+- Log-log slope variation: mean=0.92, std=0.22 (23% CV)
+- 27 sites (8%) with R² < 0.30 (unusual particle size, biological turbidity, or glacial flour)
+
+### Two-Stage Architecture: Watershed Features Cannot Predict Slopes
+Attempted to predict per-site turbidity-SSC slopes from 72 watershed features using GBR:
+- **CV R² = -0.21** for predicting slope
+- **CV R² = -0.32** for predicting intercept
+- Top features: latitude, soil_rock_depth, runoff_mean, geo_sio2, wetland_pct
+- **Conclusion:** The site-to-site slope variation is NOT explained by watershed features we have. The two-stage approach recommended by the expert panel won't work without better site characterization data (e.g., particle size distribution, sensor model).
+
+### Collection Method: Major Source of Unexplained Variance
+At the same 312 multi-method sites:
+- **auto_point:** median SSC=132, mean SSC=439, slope=0.813, R²=0.579
+- **depth_integrated:** median SSC=32, mean SSC=208, slope=0.973, R²=0.824
+- Auto_point has **4x higher median SSC** at the same turbidity — vertical concentration gradient
+- The model treats these as the same measurement, but they're physically different processes
+- Depth-integrated has much better per-method R² (0.824 vs 0.579)
+
+### Expert Panel Assessment (Vasquez, Okafor, Kim — 2026-03-28)
+
+**Consensus:**
+1. R²(native)=0.24 cross-site is not useful for point predictions but works for ranking/screening
+2. **Site adaptation IS the product** — 5-10 calibration samples should achieve R²=0.70-0.85
+3. Slope variation (23% CV) is the fundamental constraint — physics limit, not model failure
+4. All three recommended hierarchical/two-stage architecture (tested: doesn't work without better features)
+5. Collection method handling is the most tractable improvement path
+
+**Realistic ceiling:**
+- Cross-site R²(native): 0.35-0.45 with best possible features/architecture
+- Site-adapted R²(native) with 10 samples: 0.65-0.80
+- Site-adapted R²(native) with 30 samples: 0.80-0.90
+
+**Recommended metrics (in addition to R²):**
+- Median absolute percentage error (MAPE) — robust to extreme events
+- Fraction of predictions within factor-of-2 — practical interpretability
