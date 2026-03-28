@@ -519,6 +519,7 @@ def train_catboost_logo_quick(
     quantile_mode: bool = False,
     cb_overrides: dict | None = None,
     cv_mode: str = "logo",
+    fixed_lambda: bool = False,
 ) -> tuple[dict, pd.DataFrame, pd.DataFrame]:
     """Run CatBoost CV with joblib parallelization.
 
@@ -623,6 +624,8 @@ def train_catboost_logo_quick(
     summary = {
         "r2_log": metrics_df["r2_log"].median(),
         "kge_log": metrics_df["kge_log"].median(),
+        "kge_alpha": metrics_df["kge_alpha"].median() if "kge_alpha" in metrics_df.columns else None,
+        "kge_beta": metrics_df["kge_beta"].median() if "kge_beta" in metrics_df.columns else None,
         "r2_native": metrics_df["r2_native"].median(),
         "rmse_native_mgL": metrics_df["rmse_native_mgL"].median(),
         "pbias_native": metrics_df["pbias_native"].median(),
@@ -755,6 +758,7 @@ def run_tier(param_name: str, tier_name: str, tier_data: pd.DataFrame,
         quantile_mode=quantile_mode,
         cb_overrides=cb_overrides,
         cv_mode=cv_mode,
+        fixed_lambda=fixed_lambda,
     )
 
     # Quantile interval coverage stats
@@ -1010,7 +1014,8 @@ def main():
             )
             all_results.append(result)
             logger.info(
-                f"    R²(log)={result['r2_log']:.3f}  KGE(log)={result['kge_log']:.3f}  |  "
+                f"    R²(log)={result['r2_log']:.3f}  KGE(log)={result['kge_log']:.3f}  "
+                f"alpha={result.get('kge_alpha', float('nan')):.3f}  |  "
                 f"R²(mg/L)={result.get('r2_native', float('nan')):.3f}  "
                 f"RMSE(mg/L)={result.get('rmse_native_mgL', float('nan')):.1f}  "
                 f"Bias={result.get('pbias_native', float('nan')):.1f}%  "
