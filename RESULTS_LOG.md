@@ -549,4 +549,84 @@ Retrain with all fixes is the next step. Results will change.
 | SC-TDS proportionality | TDS = k × SC, k=0.55-0.75 | Hem 1985 | Empirical-universal |
 | TP ≥ orthophosphate | TP ≥ ortho-P | Mass balance | Thermodynamic |
 | DO ≤ ~130% saturation | Soft cap | Empirical | Conditional |
-| Turbidity-SSC monotonicity | DO NOT ENFORCE | Rivera audit | Breaks across sites |
+| Turbidity-SSC monotonicity | ENFORCE with Box-Cox; skip with log1p | Sweep results 2026-03-28 | Transform-dependent |
+
+---
+
+## Transform & Constraint Ablation Sweep (2026-03-28)
+
+### Context
+The model optimizes RMSE on transformed SSC values. Native-space R² and KGE — the metrics practitioners actually care about — are never seen during training. This sweep tests which transform + constraint combination produces the best native-space performance.
+
+**Dataset:** 396 sites, 35,209 samples, 37 features
+**CV:** GroupKFold(5) stratified by median SSC (~20-170 sec per experiment)
+**Baseline comparison:** Previous 266-site LOGO-CV had R²(native)=0.361, but GKF5 and LOGO are not directly comparable.
+
+### Full Results Table (sorted by R²_native)
+
+| # | Label | Transform | Lambda | Mono | Weights | R²(log) | R²(native) | KGE | Alpha | RMSE | Bias% | BCF | Trees |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 6 | boxcox_0.2 | boxcox | 0.2 | ON | - | 0.774 | **0.241** | 0.793 | 0.840 | 852 | -8.5 | 1.351 | 497 |
+| 7 | boxcox_0.3 | boxcox | 0.3 | ON | - | 0.727 | **0.238** | 0.766 | 0.838 | 856 | -6.7 | 1.292 | 500 |
+| 2 | log1p_noMono | log1p | - | OFF | - | 0.803 | **0.236** | 0.838 | 0.875 | 890 | -5.7 | 1.463 | 291 |
+| 5 | boxcox_0.1 | boxcox | 0.1 | ON | - | 0.795 | 0.219 | 0.812 | 0.866 | 864 | -9.9 | 1.448 | 471 |
+| 1 | baseline_log1p | log1p | - | ON | - | 0.797 | 0.217 | 0.825 | 0.867 | 901 | -3.9 | 1.711 | 358 |
+| 8 | boxcox_0.5 | boxcox | 0.5 | ON | - | 0.610 | 0.213 | 0.674 | 0.777 | 875 | -3.6 | 1.250 | 281 |
+| 9 | sqrt | sqrt | - | ON | - | 0.596 | 0.213 | 0.685 | 0.784 | 875 | -1.9 | 1.237 | 447 |
+| 3 | boxcox_auto | boxcox | auto | ON | - | 0.789 | 0.195 | 0.823 | 0.868 | 896 | -7.4 | 1.675 | 293 |
+| 10 | boxcox_0.2_noMono | boxcox | 0.2 | OFF | - | 0.767 | 0.181 | 0.803 | 0.850 | 885 | -7.0 | 1.296 | 367 |
+| 4 | boxcox_auto_noMono | boxcox | auto | OFF | - | 0.801 | 0.177 | 0.842 | 0.882 | 907 | -11.9 | 1.414 | 362 |
+| 16 | raw_noWeights | none | - | ON | - | 0.226 | 0.012 | 0.259 | 0.491 | 1140 | 111 | 2.285 | 182 |
+| 15 | raw_linear | none | - | ON | linear | -5.283 | 0.004 | -7.017 | 0.365 | 962 | 25 | 0.140 | 17 |
+| 19 | raw_noMono | none | - | OFF | - | 0.245 | -0.004 | 0.256 | 0.505 | 1125 | 132 | 2.168 | 321 |
+| 18 | raw_log_wt | none | - | ON | log | 0.217 | -0.023 | 0.252 | 0.557 | 1211 | 101 | 2.023 | 252 |
+| 17 | raw_sqrt_wt | none | - | ON | sqrt | -0.036 | -0.294 | -0.238 | 0.555 | 1154 | 168 | 1.311 | 110 |
+| 20 | raw_sqrt_noMono | none | - | OFF | sqrt | -0.036 | -0.384 | -0.301 | 0.551 | 1137 | 159 | 1.168 | 91 |
+
+### Key Findings
+
+**1. Winner: Box-Cox lambda=0.2, monotone ON**
+- Best native R² (0.241), reasonable BCF (1.351), decent tree count (497)
+- Top 3 configs are within 0.005 R² of each other (statistical noise at 5 folds)
+- BCF of 1.35 is far more stable than log1p's 1.71 — less reliance on smearing correction
+
+**2. Monotone × Transform interaction (most important finding)**
+- Log1p: monotone ON=0.217, OFF=0.236 → monotone HURTS (+0.019)
+- BoxCox 0.2: monotone ON=0.241, OFF=0.181 → monotone HELPS (+0.060)
+- Explanation: log1p already over-compresses, making monotone redundant/harmful. Box-Cox 0.2 retains enough nonlinearity that monotone prevents overfitting to noise.
+
+**3. MLE auto-lambda is suboptimal**
+- Auto (MLE) R²=0.195 vs manual lambda=0.2 R²=0.241
+- MLE optimizes for normality of residuals, not prediction accuracy after back-transformation
+- MLE likely picks lambda near 0 (approaching log), explaining why BCF=1.675 matches log1p
+
+**4. Raw SSC is definitively ruled out**
+- ALL raw experiments: R²(native) ≤ 0.012, bias 25-168%
+- Linear weights collapsed to 17 trees (model only learned extreme events)
+- Sqrt weights produced negative R² (worse than predicting the mean)
+- Some form of target transform is structurally necessary for gradient boosting on SSC
+
+**5. Alpha compression remains (0.84)**
+- Winner's alpha=0.84 means predictions underestimate variability by 16%
+- This hurts extreme event prediction — the primary use case
+- Falls in the "try KGE eval_metric" zone (0.85-0.92 gate from expert consensus)
+
+### Expert Panel Assessment (Dr. Santos, 2026-03-28)
+
+- Top 3 configs are a statistical dead heat; pick winner on secondary criteria (BCF stability)
+- The R²(native)=0.24 ceiling on 396 sites is concerning — verify by running boxcox_0.2 on original 266 sites to distinguish data vs CV effect
+- KGE eval_metric worth pursuing for alpha improvement
+- Recommended next: fine lambda sweep {0.15, 0.18, 0.20, 0.22, 0.25} then KGE eval_metric
+
+### Reconciliation: Monotone Constraints
+
+Previous entry said "DO NOT ENFORCE" based on Rivera audit. Updated based on empirical results:
+- **With log1p transform:** monotone constraints are harmful (over-constrains an already compressed space)
+- **With Box-Cox 0.2:** monotone constraints are beneficial (prevents overfitting without excessive compression)
+- **Recommendation:** ENFORCE monotone when using Box-Cox lambda ≤ 0.3; SKIP monotone with log1p
+
+### Next Steps
+1. Fine lambda sweep around 0.2 (cheap, confirms optimum)
+2. KGE eval_metric implementation for early stopping
+3. Investigate 396-site vs 266-site R²(native) gap
+4. HP sweep on winning transform (depth, learning rate)
