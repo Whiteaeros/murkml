@@ -2,11 +2,44 @@
 
 Includes standard metrics (R2, RMSE) and hydrology-specific metrics
 (KGE, load bias, storm-period RMSE, prediction interval coverage).
+Also includes CatBoost-compatible custom eval metrics for native-space KGE.
 """
 
 from __future__ import annotations
 
 import numpy as np
+
+
+# ---------------------------------------------------------------------------
+# CatBoost custom eval_metric for KGE-based early stopping
+# ---------------------------------------------------------------------------
+
+class KGEMetric:
+    """CatBoost eval_metric computing KGE in transformed space.
+
+    Higher KGE is better (max optimal). Used for early stopping so the model
+    stops when KGE stops improving, not when RMSE stops improving.
+
+    Usage:
+        model = CatBoostRegressor(eval_metric=KGEMetric(), ...)
+    """
+
+    def is_max_optimal(self):
+        return True
+
+    def evaluate(self, approxes, target, weight=None):
+        preds = np.array(approxes[0])
+        trues = np.array(target)
+        if len(preds) < 5:
+            return 0.0, 1.0
+        r = np.corrcoef(trues, preds)[0, 1] if np.std(trues) > 1e-10 else 0.0
+        alpha = np.std(preds) / max(np.std(trues), 1e-10)
+        beta = np.mean(preds) / max(np.mean(trues), 1e-10)
+        kge_val = 1 - np.sqrt((r - 1) ** 2 + (alpha - 1) ** 2 + (beta - 1) ** 2)
+        return float(kge_val), 1.0
+
+    def get_final_error(self, error, weight):
+        return error
 
 
 def r_squared(y_true: np.ndarray, y_pred: np.ndarray) -> float:

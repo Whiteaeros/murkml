@@ -337,6 +337,7 @@ def _train_one_fold(
     quantile_mode: bool = False,
     cb_overrides: dict | None = None,
     fixed_lambda: bool = False,
+    kge_eval: bool = False,
 ) -> tuple[dict | None, list[dict]]:
     """Train and evaluate a single LOGO fold. Returns (fold_metric, sample_records)."""
     from catboost import CatBoostRegressor, Pool
@@ -404,6 +405,9 @@ def _train_one_fold(
         cb_params["monotone_constraints"] = monotone_constraints
     if quantile_mode:
         cb_params["loss_function"] = "MultiQuantile:alpha=0.05,0.1,0.25,0.5,0.75,0.9,0.95"
+    if kge_eval:
+        from murkml.evaluate.metrics import KGEMetric
+        cb_params["eval_metric"] = KGEMetric()
     if cb_overrides:
         cb_params.update(cb_overrides)
 
@@ -520,6 +524,7 @@ def train_catboost_logo_quick(
     cb_overrides: dict | None = None,
     cv_mode: str = "logo",
     fixed_lambda: bool = False,
+    kge_eval: bool = False,
 ) -> tuple[dict, pd.DataFrame, pd.DataFrame]:
     """Run CatBoost CV with joblib parallelization.
 
@@ -586,6 +591,7 @@ def train_catboost_logo_quick(
             quantile_mode=quantile_mode,
             cb_overrides=cb_overrides,
             fixed_lambda=fixed_lambda,
+            kge_eval=kge_eval,
         )
         for fold_idx, (train_idx, test_idx) in enumerate(splits)
     )
@@ -651,7 +657,8 @@ def run_tier(param_name: str, tier_name: str, tier_data: pd.DataFrame,
              drop_features: set | None = None,
              label: str | None = None,
              skip_ridge: bool = False,
-             cv_mode: str = "logo") -> dict:
+             cv_mode: str = "logo",
+             kge_eval: bool = False) -> dict:
     """Run one parameter × tier combination."""
     # Map target to standard name
     if target_col != "ssc_log1p" and target_col in tier_data.columns:
@@ -759,6 +766,7 @@ def run_tier(param_name: str, tier_name: str, tier_data: pd.DataFrame,
         cb_overrides=cb_overrides,
         cv_mode=cv_mode,
         fixed_lambda=fixed_lambda,
+        kge_eval=kge_eval,
     )
 
     # Quantile interval coverage stats
@@ -897,6 +905,10 @@ def main():
         "--boxcox-lambda", type=float, default=None,
         help="Manual Box-Cox lambda (skips MLE estimation). Use with --transform boxcox.",
     )
+    parser.add_argument(
+        "--kge-eval", action="store_true",
+        help="Use KGE as eval_metric for early stopping instead of RMSE",
+    )
     args = parser.parse_args()
 
     transform_type = args.transform
@@ -1015,6 +1027,7 @@ def main():
                 label=args.label,
                 skip_ridge=args.skip_ridge,
                 cv_mode=args.cv_mode,
+                kge_eval=args.kge_eval,
             )
             all_results.append(result)
             logger.info(

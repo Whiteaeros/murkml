@@ -96,6 +96,7 @@ def run_experiment(
     no_monotone: bool = False,
     config_json: dict | None = None,
     weight_scheme: str | None = None,
+    kge_eval: bool = False,
     timeout: int = 600,
 ) -> dict | None:
     """Run a single GKF5 experiment and return parsed metrics."""
@@ -123,6 +124,8 @@ def run_experiment(
         cmd.extend(["--config-json", json.dumps(config_json)])
     if weight_scheme:
         cmd.extend(["--weight-scheme", weight_scheme])
+    if kge_eval:
+        cmd.append("--kge-eval")
 
     logger.info(f"\n{'='*60}")
     logger.info(f"EXPERIMENT: {label}")
@@ -355,6 +358,46 @@ def run_phase3_raw(results: list[dict]) -> list[dict]:
     return results
 
 
+def run_phase4_kge_and_fine_lambda(results: list[dict]) -> list[dict]:
+    """Phase 4: Fine lambda sweep + KGE eval_metric experiments."""
+    df = pd.DataFrame(results)
+    done_labels = set(df["label"].values)
+
+    phase4_experiments = [
+        # Fine lambda sweep around 0.2
+        ("22_boxcox_0.15", "boxcox", 0.15, False, None, None, False),
+        ("23_boxcox_0.18", "boxcox", 0.18, False, None, None, False),
+        ("24_boxcox_0.22", "boxcox", 0.22, False, None, None, False),
+        ("25_boxcox_0.25", "boxcox", 0.25, False, None, None, False),
+        # KGE eval_metric on Box-Cox 0.2 (the key experiment)
+        ("26_boxcox_0.2_kgeEval", "boxcox", 0.2, False, None, None, True),
+        # KGE eval_metric on log1p for comparison
+        ("27_log1p_kgeEval", "log1p", None, False, None, None, True),
+        # KGE eval_metric + no monotone (full freedom)
+        ("28_boxcox_0.2_kgeEval_noMono", "boxcox", 0.2, True, None, None, True),
+    ]
+
+    for label, transform, lmbda, no_mono, config, weights, kge in phase4_experiments:
+        if label in done_labels:
+            logger.info(f"Skipping {label} (already done)")
+            continue
+
+        metrics = run_experiment(
+            label=label,
+            transform=transform,
+            boxcox_lambda=lmbda,
+            no_monotone=no_mono,
+            config_json=config,
+            weight_scheme=weights,
+            kge_eval=kge,
+        )
+        if metrics:
+            results.append(metrics)
+            save_results(results)
+
+    return results
+
+
 def check_alpha_gate(results: list[dict]):
     """Check alpha diagnostic gate and recommend next step."""
     df = pd.DataFrame(results)
@@ -386,8 +429,8 @@ def check_alpha_gate(results: list[dict]):
 def main():
     import argparse
     parser = argparse.ArgumentParser(description="Transform & constraint ablation sweep")
-    parser.add_argument("--phase", type=str, default="1", choices=["1", "2", "3", "all"],
-                        help="Which phase to run: 1 (transforms), 2 (HP sets), 3 (raw SSC), all")
+    parser.add_argument("--phase", type=str, default="1", choices=["1", "2", "3", "4", "all"],
+                        help="Which phase to run: 1 (transforms), 2 (HP sets), 3 (raw SSC), 4 (fine lambda + KGE), all")
     args = parser.parse_args()
 
     logger.info("Transform & Constraint Ablation Sweep")
@@ -420,6 +463,17 @@ def main():
             results = []
 
         results = run_phase3_raw(results)
+        df = save_results(results)
+        print_results_table(df)
+
+    if args.phase in ("4", "all"):
+        if RESULTS_PATH.exists():
+            existing = pd.read_parquet(RESULTS_PATH)
+            results = existing.to_dict("records")
+        else:
+            results = []
+
+        results = run_phase4_kge_and_fine_lambda(results)
         df = save_results(results)
         print_results_table(df)
 
