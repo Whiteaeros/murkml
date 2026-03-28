@@ -30,6 +30,8 @@ from scipy.stats import linregress
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
+from murkml.evaluate.metrics import safe_inv_boxcox1p
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s %(levelname)s %(message)s",
@@ -38,6 +40,35 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 DATA_DIR = PROJECT_ROOT / "data"
+
+
+def _forward_transform(y_native, transform_type, lmbda):
+    """Transform native SSC values to model space."""
+    if transform_type == "log1p" or transform_type is None:
+        return np.log1p(y_native)
+    elif transform_type == "boxcox":
+        from scipy.special import boxcox1p
+        return boxcox1p(y_native, lmbda)
+    elif transform_type == "sqrt":
+        return np.sqrt(y_native)
+    elif transform_type == "none":
+        return y_native.copy()
+    else:
+        return np.log1p(y_native)
+
+
+def _inverse_transform(y_transformed, transform_type, lmbda):
+    """Back-transform from model space to native SSC."""
+    if transform_type == "log1p" or transform_type is None:
+        return np.expm1(y_transformed)
+    elif transform_type == "boxcox":
+        return safe_inv_boxcox1p(y_transformed, lmbda)
+    elif transform_type == "sqrt":
+        return np.square(y_transformed)
+    elif transform_type == "none":
+        return y_transformed.copy()
+    else:
+        return np.expm1(y_transformed)
 
 
 def load_model_and_meta():
@@ -123,14 +154,18 @@ def generate_holdout_predictions(model, meta):
     pool = Pool(X, cat_features=cat_indices)
     y_pred_log = model.predict(pool)
 
-    # Build output
+    # Build output — transform-aware
+    transform_type = meta.get("transform_type", "log1p")
+    lmbda = meta.get("transform_lmbda")
+    native_vals = holdout_data["lab_value"].values
+
     result = pd.DataFrame({
         "site_id": holdout_data["site_id"].values,
         "sample_time": holdout_data["sample_time"].values if "sample_time" in holdout_data.columns else np.nan,
-        "y_true_log": np.log1p(holdout_data["lab_value"].values),
+        "y_true_log": _forward_transform(native_vals, transform_type, lmbda),
         "y_pred_log": y_pred_log,
-        "y_true_native": holdout_data["lab_value"].values,
-        "y_pred_native": np.expm1(y_pred_log),
+        "y_true_native": native_vals,
+        "y_pred_native": np.clip(_inverse_transform(y_pred_log, transform_type, lmbda), 0, None),
     })
 
     logger.info(f"Generated {len(result)} predictions for {result['site_id'].nunique()} holdout sites")
@@ -165,15 +200,29 @@ def compute_site_metrics(y_true_native, y_pred_native):
     beta = np.mean(y_pred_native) / np.mean(y_true_native) if np.mean(y_true_native) > 0 else np.nan
     kge = 1 - np.sqrt((r_corr - 1)**2 + (alpha - 1)**2 + (beta - 1)**2) if not np.isnan(r_corr) else np.nan
 
+    # Median absolute percentage error (robust to outliers)
+    nonzero = y_true_native > 0
+    if nonzero.sum() > 0:
+        ape = np.abs(y_pred_native[nonzero] - y_true_native[nonzero]) / y_true_native[nonzero]
+        mape = float(np.median(ape) * 100)
+        # Fraction of predictions within factor of 2
+        ratio = y_pred_native[nonzero] / y_true_native[nonzero]
+        f2 = float(np.mean((ratio >= 0.5) & (ratio <= 2.0)))
+    else:
+        mape = np.nan
+        f2 = np.nan
+
     return {
         "r2_native": float(r2),
         "native_slope": float(slope),
         "rmse_native": float(rmse),
         "kge_native": float(kge),
+        "mape_pct": mape,
+        "frac_within_2x": f2,
     }
 
 
-def _fit_and_evaluate(cal, test, site_id, N, trial):
+def _fit_and_evaluate(cal, test, site_id, N, trial, transform_type="log1p", lmbda=None):
     """Fit log-space correction on cal set, evaluate on test set, return result dict."""
     if N == 1:
         a = 1.0
@@ -188,11 +237,11 @@ def _fit_and_evaluate(cal, test, site_id, N, trial):
             a, b = 1.0, 0.0
 
     corrected_log = a * test["y_pred_log"].values + b
-    corrected_native = np.expm1(corrected_log)
+    corrected_native = _inverse_transform(corrected_log, transform_type, lmbda)
     corrected_native = np.clip(corrected_native, 0, None)
 
     # Snowdon BCF
-    cal_corrected_native = np.expm1(a * cal["y_pred_log"].values + b)
+    cal_corrected_native = _inverse_transform(a * cal["y_pred_log"].values + b, transform_type, lmbda)
     cal_corrected_native = np.clip(cal_corrected_native, 1e-6, None)
     cal_true_mean = np.mean(cal["y_true_native"].values)
     cal_pred_mean = np.mean(cal_corrected_native)
@@ -214,7 +263,8 @@ def _fit_and_evaluate(cal, test, site_id, N, trial):
     }
 
 
-def run_adaptation_experiment(predictions, n_trials=50, temporal=False):
+def run_adaptation_experiment(predictions, n_trials=50, temporal=False,
+                              transform_type="log1p", lmbda=None):
     """Run the site-adaptive correction experiment.
 
     Parameters
@@ -223,6 +273,10 @@ def run_adaptation_experiment(predictions, n_trials=50, temporal=False):
         If True, use temporal ordering (first N chronologically) instead of
         random Monte Carlo splits. Only 1 trial per N since the split is
         deterministic.
+    transform_type : str
+        Target transform used by the model ('log1p', 'boxcox', 'sqrt', 'none').
+    lmbda : float or None
+        Box-Cox lambda value (required for boxcox transform).
     """
     N_VALUES = [0, 1, 2, 3, 5, 10, 20]
     rng = np.random.default_rng(42)
@@ -277,7 +331,8 @@ def run_adaptation_experiment(predictions, n_trials=50, temporal=False):
                 # Deterministic: first N samples for cal, rest for test
                 cal = site_data.iloc[:N]
                 test = site_data.iloc[N:]
-                row = _fit_and_evaluate(cal, test, site_id, N, trial=0)
+                row = _fit_and_evaluate(cal, test, site_id, N, trial=0,
+                                       transform_type=transform_type, lmbda=lmbda)
                 row["split_type"] = split_label
                 results.append(row)
             else:
@@ -286,7 +341,8 @@ def run_adaptation_experiment(predictions, n_trials=50, temporal=False):
                     test_idx = np.setdiff1d(np.arange(n_samples), cal_idx)
                     cal = site_data.iloc[cal_idx]
                     test = site_data.iloc[test_idx]
-                    row = _fit_and_evaluate(cal, test, site_id, N, trial)
+                    row = _fit_and_evaluate(cal, test, site_id, N, trial,
+                                           transform_type=transform_type, lmbda=lmbda)
                     row["split_type"] = split_label
                     results.append(row)
 
@@ -368,15 +424,24 @@ def main():
     results_dir = DATA_DIR / "results"
     results_dir.mkdir(parents=True, exist_ok=True)
 
+    # Extract transform info from model metadata
+    transform_type = meta.get("transform_type", "log1p")
+    lmbda = meta.get("transform_lmbda")
+    logger.info(f"Transform: {transform_type}, lambda: {lmbda}")
+
     # Always run random splits
-    results_random = run_adaptation_experiment(predictions, n_trials=args.n_trials, temporal=False)
+    results_random = run_adaptation_experiment(
+        predictions, n_trials=args.n_trials, temporal=False,
+        transform_type=transform_type, lmbda=lmbda)
     summary_random = summarize_results(results_random)
 
     _print_effort_curve(summary_random, "RANDOM SPLIT")
 
     if args.temporal:
         # Also run temporal splits
-        results_temporal = run_adaptation_experiment(predictions, n_trials=args.n_trials, temporal=True)
+        results_temporal = run_adaptation_experiment(
+            predictions, n_trials=args.n_trials, temporal=True,
+            transform_type=transform_type, lmbda=lmbda)
 
         if not results_temporal.empty:
             summary_temporal = summarize_results(results_temporal)
