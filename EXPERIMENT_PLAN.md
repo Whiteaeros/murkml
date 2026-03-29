@@ -91,8 +91,20 @@ Understand what's driving per-site performance variation and find the best model
 
 **Success criteria:** If B3 improves holdout R² by >0.03, site selection matters. If B1 and B3 give similar results, the selection method doesn't matter much.
 
-**Status:** NOT STARTED
-**Result:** _pending_
+**Status:** COMPLETE
+**Result:**
+- B3 threshold determined: SSC std < 81 mg/L (Q1 upper bound)
+- Q1 (low var, std 1-81): median R²=-0.611 — these sites are genuinely bad
+- Q2 (std 82-205): median R²=0.270
+- Q3 (std 208-480): median R²=0.452 — best performance tier
+- Q4 (std 488-12797): median R²=0.382
+- B1 (no catastrophic): pooled R²=0.312 (+0.101 vs baseline) but median site R²=0.273 (-0.017)
+- B2 (no negative): pooled R²=0.282 but median site R²=0.128 — WORSE. Aggressive pruning hurts.
+- B3 (no low-var): pooled R²=0.324 (+0.113 vs baseline) but median site R²=0.236 (-0.054)
+- **Key finding:** Removing bad sites improves POOLED R² (fewer terrible predictions dragging it down) but HURTS median per-site R² (fewer training sites = less generalization)
+- Excluding sites helps the aggregate number but doesn't help the model learn better
+- **Conclusion:** Site exclusion is cosmetic — it makes the headline number look better but the model isn't actually better at predicting individual sites
+- Date: 2026-03-29
 
 ---
 
@@ -231,6 +243,9 @@ After each experiment: update this file with results, commit to git.
 | A5 | auto+grab | 0.295 | 0.121 | Worst per-site | 2026-03-29 |
 | A6 | depth+grab | 0.203 | 0.377 | Best MAPE (45.8%), best within-2x (65.5%) | 2026-03-29 |
 | A7 | known only | 0.279 | 0.318 | Excluding unknown doesn't help | 2026-03-29 |
+| B1 | no catastrophic | 0.312 | 0.273 | Pooled better, per-site slightly worse | 2026-03-29 |
+| B2 | no negative | 0.282 | 0.128 | Too aggressive — per-site much worse | 2026-03-29 |
+| B3 | no low-var | 0.324 | 0.236 | Best pooled, but per-site worse | 2026-03-29 |
 
 ---
 
