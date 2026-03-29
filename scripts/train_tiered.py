@@ -1127,7 +1127,12 @@ def main():
             from scipy.stats import boxcox_normmax
             from scipy.special import boxcox1p
             raw_y = assembled["lab_value"].values
-            final_lmbda = float(boxcox_normmax(raw_y + 1, method="mle"))
+            if args.boxcox_lambda is not None:
+                final_lmbda = args.boxcox_lambda
+                logger.info(f"Final model Box-Cox lambda (manual): {final_lmbda:.4f}")
+            else:
+                final_lmbda = float(boxcox_normmax(raw_y + 1, method="mle"))
+                logger.info(f"Final model Box-Cox lambda (MLE): {final_lmbda:.4f}")
             assembled[target_col] = boxcox1p(raw_y, final_lmbda)
         elif transform_type == "sqrt":
             assembled[target_col] = np.sqrt(assembled["lab_value"])
