@@ -203,6 +203,8 @@ On identical pipeline (site_adaptation.py): v4 wins 0.472 vs MERF 0.417. MERF lo
 | D-rand-200 (5 seeds) | — | 0.191±0.071 | 0.316±0.025 | — | — | Pooled improving | 2026-03-29 |
 | D-rand-250 (5 seeds) | — | 0.275±0.064 | 0.305±0.021 | — | — | Best random per-site | 2026-03-29 |
 | C-flow (analysis) | — | — | — | — | — | Not a flow problem; MAPE best at storms | 2026-03-29 |
+| #5-bimodal-slope | — | — | — | — | — | Unimodal (dip p=0.98, BIC favors 1-comp). Mean=0.93, std=0.21. HUC2 weakly associated (chi2 p=0.0006) but no continuous attr correlates. | 2026-03-28 |
+| #6-residual-norm | — | — | — | — | — | NOT normal: skew=2.0, kurtosis=13.8, 2% beyond 3-std (7x normal). Right-skewed + heavy-tailed. Need Student-t or skew-normal prior, not Gaussian. | 2026-03-28 |
 
 ---
 
