@@ -323,7 +323,7 @@ Queried all 396 sites via NWIS IV JSON API `methodDescription` field for pCode 6
 | #4-unknown-methods | — | — | — | — | — | 218/231 unknown sites resolved via WQP. 26/30 catastrophic unknowns fixable. 13 truly unresolvable. Most are depth_integrated. | 2026-03-29 |
 | #8-error-dist | — | — | — | — | — | Median abs error 29 mg/L, median pct error 64%. Heteroscedastic: best at 500-5000 mg/L (42% pct err). Extreme events underpredicted. | 2026-03-29 |
 | #10-catastrophic | — | — | — | — | — | Only 7/51 genuinely wrong. 17 are low-signal (small range, small errors). 27 mixed. R² misleading for flat sites. | 2026-03-29 |
-| #3-sgmc-lithology | — | — | — | — | — | SGMC bedrock lithology DOES predict turb-SSC slope (Kruskal-Wallis p=0.0024). Metamorphic rocks (gneiss, schist, amphibolite) produce higher slopes (~1.05-1.13); carbonate/chemical sedimentary produce lower slopes (~0.76-0.87). 8 categories significant at p<0.05. Best: metamorphic undiff rho=+0.165 p=0.004; coarse-detrital rho=-0.148 p=0.010. Effect sizes modest (rho 0.12-0.17). | 2026-03-29 |
+| #3-sgmc-lithology (point) | — | — | — | — | — | Point-based: SGMC bedrock lithology DOES predict turb-SSC slope (Kruskal-Wallis p=0.0024). Metamorphic rocks (gneiss, schist, amphibolite) produce higher slopes (~1.05-1.13); carbonate/chemical sedimentary produce lower slopes (~0.76-0.87). 8 categories significant at p<0.05. Best: metamorphic undiff rho=+0.165 p=0.004; coarse-detrital rho=-0.148 p=0.010. Effect sizes modest (rho 0.12-0.17). | 2026-03-29 |
 | D-rand-100 (15 seeds) | — | 0.245±0.081 | 0.264±0.035 | — | — | Extended from 5→15 seeds for anchor analysis | 2026-03-28 |
 | **v7-anchor50** | — | **0.367** | 0.207 | — | — | **50 anchor sites beat random-100 mean (0.245) and all-287 (0.266) on med-site R²** | 2026-03-28 |
 
@@ -396,7 +396,7 @@ Pooled R² is lower (0.207 vs 0.319) because fewer sites = fewer samples = less 
 - Script: `scripts/anchor_site_identification.py`
 | #11-anchors | — | — | — | — | — | 50 anchor sites beat all-287 on per-site R² (0.367 vs 0.266, +38%). Anchor selection works. 36 strong anchors, 37 noise sites. | 2026-03-29 |
 | v7-anchor50 | — | 0.367 | 0.207 | — | — | 50 curated anchor sites. Best per-site R² of any model. Pooled lower (fewer sites). | 2026-03-29 |
-| #3-sgmc-lithology | — | — | — | — | — | SGMC lithology predicts slope (KW p=0.0024). Metamorphic=high slope (1.05-1.13), carbonate=low (0.71-0.87). Point-based, not watershed-averaged yet. | 2026-03-29 |
+| #3-sgmc-lithology | — | — | — | — | — | Watershed-overlay (355 sites, 28 lith categories). 5 significant (p<0.05): metamorphic_undiff rho=+0.172 (higher slope), metamorphic_amphibolite rho=+0.174, sedimentary_carbonate rho=-0.150 (lower slope), sed_chemical rho=-0.138, sed_clastic rho=-0.131. Effect sizes modest. | 2026-03-28 |
 | OLS-comparison | — | — | — | — | — | OLS never beats CatBoost+Bayesian at ANY N. OLS plateaus at ~0.39 (N=50). CatBoost hits 0.51 (N=20). No crossover point. | 2026-03-29 |
 | Bayesian-adapt-k30 | 0.512 (N=20) | — | — | — | — | Best holdout R² ever. Monotonic curve (almost). N=2: 0.486 vs old -0.012. Student-t prior, k=30. | 2026-03-29 |
 | OLS-extended-N50 | — | — | — | — | — | OLS drops from 0.407 (N=20) to 0.372 (N=50) — overfits seasonal patterns. CatBoost stays ~0.44. Gap widens with more samples. | 2026-03-29 |
