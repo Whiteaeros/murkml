@@ -319,3 +319,7 @@ Queried all 396 sites via NWIS IV JSON API `methodDescription` field for pCode 6
 2. **Instrument model is NOT available as a clean NWIS field** — must be scraped from free-text methodDescription, which is inconsistent (blank for 63% of sites).
 3. **Instrument model does NOT significantly affect the SSC-turbidity relationship** in this dataset. The within-instrument variability is larger than the between-instrument difference.
 4. **No action needed for the model** — adding instrument_model as a feature would cover only 21% of sites and shows no signal. The existing sensor_family feature (YSI 6-series, EXO, etc.) already captures what's available.
+| #9-instruments | — | — | — | — | — | No instrument effect (p=0.18). turb_source SHAP=0.008 not 0.000. Only 21% sites have identifiable instrument model. No action needed. | 2026-03-29 |
+| #4-unknown-methods | — | — | — | — | — | 218/231 unknown sites resolved via WQP. 26/30 catastrophic unknowns fixable. 13 truly unresolvable. Most are depth_integrated. | 2026-03-29 |
+| #8-error-dist | — | — | — | — | — | Median abs error 29 mg/L, median pct error 64%. Heteroscedastic: best at 500-5000 mg/L (42% pct err). Extreme events underpredicted. | 2026-03-29 |
+| #10-catastrophic | — | — | — | — | — | Only 7/51 genuinely wrong. 17 are low-signal (small range, small errors). 27 mixed. R² misleading for flat sites. | 2026-03-29 |
