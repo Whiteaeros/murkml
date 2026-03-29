@@ -279,3 +279,43 @@ These sites have near-constant SSC. A 3–41 mg/L average error is operationally
 2. **Highly skewed SSC:** Most have SSC skew >1.0 (heavy right tail). The model predicts near the median but misses the extremes.
 3. **Unusual turbidity-SSC ratios:** USGS-07048600 has turb/SSC ratio of 2.74 (turbidity much higher than SSC), while USGS-06893820 and USGS-05406479 have ratios of 0.47 (SSC much higher than turbidity). These abnormal ratios suggest site-specific sediment properties the global model can't capture.
 4. **Last two (11336685, 11336680) are tiny-n sites** (5–6 samples) in Sacramento Delta with small SSC range but errors >2x the range — too few samples for reliable assessment.
+
+---
+
+## Task 9: Instrument Model Differences Within FNU (pCode 63680)
+
+### turb_source Feature Analysis
+
+**turb_source is NOT zero-SHAP.** Actual mean |SHAP| = 0.008 (rank 29 of 44). Low but nonzero.
+
+- **Values:** "continuous" (25,789 samples, 73%) and "discrete" (9,420 samples, 27%)
+- **169 sites** are 100% continuous; **227 sites** have both continuous and discrete turbidity measurements
+- turb_source varies WITHIN sites (not just between), so CatBoost CAN split on it
+- **SSC/turbidity ratio differs:** continuous median 1.91, discrete median 1.68 — discrete turbidity has systematically lower SSC-per-FNU
+- **Confounded with collection_method:** turb_source and collection_method are correlated (discrete turbidity often paired with depth-integrated sampling). collection_method (SHAP=0.113, rank 4) likely absorbs most of the signal turb_source could provide.
+
+### Instrument Identification from NWIS
+
+Queried all 396 sites via NWIS IV JSON API `methodDescription` field for pCode 63680:
+
+- **148 sites (37%)** have some text in method description
+- **84 sites (21%)** have identifiable instrument models
+- **248 sites (63%)** have blank method descriptions — instrument unknown
+
+| Instrument | Sites | Median log-log slope | IQR | Median R² |
+|---|---|---|---|---|
+| FTS DTS-12 | 15 | 0.947 | 0.840–1.024 | 0.684 |
+| YSI EXO | 16 | 0.919 | 0.684–1.074 | 0.804 |
+| YSI 6136 | 13 | 0.883 | 0.786–1.079 | 0.754 |
+| YSI 6-series | 7 | 0.659 | 0.656–0.708 | 0.639 |
+| YSI (other) | 6 | 0.652 | 0.534–0.927 | 0.558 |
+| Observator NEP5000 | 2 | 0.953 | — | 0.793 |
+
+**No statistically significant difference between instruments** (Kruskal-Wallis H=6.33, p=0.18; ANOVA F=1.49, p=0.22). The YSI 6-series group has a noticeably lower slope (0.659) but with only 7 sites, cannot reject chance.
+
+### Conclusions
+
+1. **turb_source is correctly coded and not broken** — it varies across 227 of 396 sites and CatBoost sees it. Its low SHAP is because collection_method captures the same signal better.
+2. **Instrument model is NOT available as a clean NWIS field** — must be scraped from free-text methodDescription, which is inconsistent (blank for 63% of sites).
+3. **Instrument model does NOT significantly affect the SSC-turbidity relationship** in this dataset. The within-instrument variability is larger than the between-instrument difference.
+4. **No action needed for the model** — adding instrument_model as a feature would cover only 21% of sites and shows no signal. The existing sensor_family feature (YSI 6-series, EXO, etc.) already captures what's available.
