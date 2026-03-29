@@ -1,0 +1,232 @@
+site_id,resolved_method,confidence,known_categories,n_unknown_samples,is_catastrophic
+USGS-01036390,depth_integrated,high,{'depth_integrated': 4},13,False
+USGS-01111230,depth_integrated,low_mixed,"{'auto_point': 2, 'depth_integrated': 5, 'grab': 1}",6,False
+USGS-01311875,,unresolvable,{},47,True
+USGS-01362330,depth_integrated,high,{'depth_integrated': 1},48,False
+USGS-01362350,depth_integrated,high,{'depth_integrated': 1},31,False
+USGS-01362356,depth_integrated,high,{'depth_integrated': 1},32,False
+USGS-01362357,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 2}",31,False
+USGS-01362370,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 3, 'grab': 1}",36,False
+USGS-01362487,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 3}",4,False
+USGS-01363556,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 6, 'grab': 1}",7,False
+USGS-01372043,depth_integrated,low_mixed,"{'auto_point': 2, 'depth_integrated': 7, 'grab': 2}",12,True
+USGS-01408500,depth_integrated,low_mixed,"{'depth_integrated': 4, 'grab': 1}",71,False
+USGS-01463500,depth_integrated,high,{'depth_integrated': 11},3,False
+USGS-01473169,auto_point,low_mixed,"{'auto_point': 1, 'depth_integrated': 1}",32,False
+USGS-01478185,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 2}",13,True
+USGS-01478220,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 2}",4,False
+USGS-01478245,auto_point,low_mixed,"{'auto_point': 1, 'depth_integrated': 1}",61,False
+USGS-01479820,auto_point,high,{'auto_point': 1},42,False
+USGS-01480617,auto_point,low_mixed,"{'auto_point': 1, 'depth_integrated': 1}",27,False
+USGS-01480870,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 4, 'grab': 1}",30,False
+USGS-01493112,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 7, 'grab': 2}",5,False
+USGS-01573660,depth_integrated,high,{'depth_integrated': 2},1,False
+USGS-01573695,depth_integrated,low_mixed,"{'depth_integrated': 2, 'grab': 1}",21,True
+USGS-01573710,depth_integrated,low_mixed,"{'depth_integrated': 2, 'grab': 1}",23,True
+USGS-01574000,depth_integrated,high,{'depth_integrated': 4},19,False
+USGS-01575598,depth_integrated,high,{'depth_integrated': 5},45,False
+USGS-01575900,depth_integrated,high,{'depth_integrated': 2},16,False
+USGS-01576000,depth_integrated,high,{'depth_integrated': 2},3,False
+USGS-01576003,,unresolvable,{},15,False
+USGS-01576007,depth_integrated,high,{'depth_integrated': 2},5,False
+USGS-01576045,depth_integrated,high,{'depth_integrated': 2},3,False
+USGS-01576516,,unresolvable,{},13,False
+USGS-015765185,,unresolvable,{},17,False
+USGS-015765195,depth_integrated,low_mixed,"{'depth_integrated': 2, 'grab': 1}",17,False
+USGS-01576980,depth_integrated,high,{'depth_integrated': 1},10,True
+USGS-01577500,depth_integrated,high,{'depth_integrated': 5},32,False
+USGS-01581752,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 5, 'grab': 2}",1,False
+USGS-01589000,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 3}",317,False
+USGS-01589290,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 3}",8,False
+USGS-01645704,auto_point,low_mixed,"{'auto_point': 1, 'depth_integrated': 1, 'grab': 1}",6,False
+USGS-01646000,depth_integrated,low_mixed,"{'depth_integrated': 3, 'grab': 2}",1,False
+USGS-01649190,depth_integrated,low_mixed,"{'auto_point': 2, 'depth_integrated': 4, 'grab': 1}",22,False
+USGS-01651000,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 3, 'grab': 1}",2,False
+USGS-01651730,auto_point,high,{'auto_point': 1},1,False
+USGS-01654500,auto_point,low_mixed,"{'auto_point': 1, 'grab': 1}",13,False
+USGS-01656903,auto_point,low_mixed,"{'auto_point': 1, 'depth_integrated': 1, 'grab': 1}",5,False
+USGS-01658000,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 6, 'grab': 1}",91,False
+USGS-01668000,depth_integrated,low_mixed,"{'depth_integrated': 7, 'grab': 1}",1,False
+USGS-0166818623,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 2, 'grab': 1}",9,False
+USGS-0166818985,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 2, 'grab': 1}",7,False
+USGS-02054750,depth_integrated,high,{'depth_integrated': 7},18,False
+USGS-02055080,depth_integrated,high,{'depth_integrated': 7},8,False
+USGS-0205551460,auto_point,low_mixed,"{'auto_point': 2, 'depth_integrated': 1, 'grab': 1}",3,False
+USGS-0205551614,depth_integrated,low_mixed,"{'depth_integrated': 3, 'grab': 1}",1,False
+USGS-02203655,depth_integrated,low_mixed,"{'auto_point': 2, 'depth_integrated': 3, 'grab': 2}",13,False
+USGS-02203700,depth_integrated,low_mixed,"{'auto_point': 2, 'depth_integrated': 3, 'grab': 2}",9,False
+USGS-02203960,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 4, 'grab': 1}",1,False
+USGS-02205865,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 2, 'grab': 2}",1,False
+USGS-02207120,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 5, 'grab': 1}",1,False
+USGS-02207185,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 6, 'grab': 2}",5,False
+USGS-02207385,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 5, 'grab': 2}",1,False
+USGS-02207400,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 2, 'grab': 2}",1,False
+USGS-02208150,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 5, 'grab': 2}",2,False
+USGS-02217274,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 5, 'grab': 2}",2,False
+USGS-02334480,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 4, 'grab': 2}",1,False
+USGS-02334885,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 3, 'grab': 2}",1,False
+USGS-02335350,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 4, 'grab': 2}",5,False
+USGS-02336030,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 4, 'grab': 2}",7,False
+USGS-02336120,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 4, 'grab': 2}",11,False
+USGS-02336240,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 2, 'grab': 2}",3,False
+USGS-02336300,depth_integrated,low_mixed,"{'auto_point': 2, 'depth_integrated': 6, 'grab': 2}",10,False
+USGS-02336360,depth_integrated,low_mixed,"{'auto_point': 2, 'depth_integrated': 3, 'grab': 2}",9,False
+USGS-02336526,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 3, 'grab': 2}",7,False
+USGS-02336728,depth_integrated,low_mixed,"{'auto_point': 2, 'depth_integrated': 3, 'grab': 1}",5,False
+USGS-03216070,depth_integrated,high,{'depth_integrated': 3},3,False
+USGS-03302060,depth_integrated,low_mixed,"{'depth_integrated': 3, 'grab': 1}",3,False
+USGS-03353415,depth_integrated,low_mixed,"{'depth_integrated': 6, 'grab': 1}",3,False
+USGS-03353420,depth_integrated,low_mixed,"{'depth_integrated': 8, 'grab': 1}",2,False
+USGS-03432100,auto_point,low_mixed,"{'auto_point': 1, 'depth_integrated': 1, 'grab': 1}",125,False
+USGS-034324715,auto_point,high,{'auto_point': 1},27,False
+USGS-03432472,auto_point,low_mixed,"{'auto_point': 1, 'depth_integrated': 1, 'grab': 1}",18,False
+USGS-03432504,auto_point,low_mixed,"{'auto_point': 1, 'depth_integrated': 1, 'grab': 1}",127,False
+USGS-034325065,auto_point,low_mixed,"{'auto_point': 1, 'depth_integrated': 1, 'grab': 1}",91,False
+USGS-03432516,auto_point,low_mixed,"{'auto_point': 1, 'depth_integrated': 1, 'grab': 1}",174,False
+USGS-03432522,auto_point,low_mixed,"{'auto_point': 1, 'grab': 1}",8,False
+USGS-03433637,auto_point,low_mixed,"{'auto_point': 1, 'depth_integrated': 1, 'grab': 1}",90,False
+USGS-034336392,auto_point,low_mixed,"{'auto_point': 1, 'grab': 1}",204,False
+USGS-03601630,auto_point,low_mixed,"{'auto_point': 1, 'depth_integrated': 1, 'grab': 1}",21,False
+USGS-03612600,depth_integrated,low_mixed,"{'depth_integrated': 2, 'grab': 1}",2,False
+USGS-04024000,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 3, 'grab': 2}",1,False
+USGS-04026005,,unresolvable,{},13,True
+USGS-040851385,,unresolvable,{},274,False
+USGS-04085427,depth_integrated,high,{'depth_integrated': 4},161,False
+USGS-04087119,depth_integrated,low_mixed,"{'depth_integrated': 3, 'grab': 1}",8,False
+USGS-04087170,auto_point,low_mixed,"{'auto_point': 1, 'depth_integrated': 1, 'grab': 1}",387,False
+USGS-04095090,auto_point,high,{'auto_point': 1},45,True
+USGS-04101500,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 7}",3,False
+USGS-04108660,depth_integrated,low_mixed,"{'auto_point': 2, 'depth_integrated': 3, 'grab': 1}",1,True
+USGS-04142000,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 5, 'grab': 1}",2,False
+USGS-04144032,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 2, 'grab': 1}",11,False
+USGS-04157005,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 2, 'grab': 1}",2,False
+USGS-04161820,depth_integrated,low_mixed,"{'depth_integrated': 8, 'grab': 2}",17,False
+USGS-04165500,depth_integrated,low_mixed,"{'auto_point': 2, 'depth_integrated': 7, 'grab': 1}",3,False
+USGS-04166500,depth_integrated,low_mixed,"{'auto_point': 2, 'depth_integrated': 4, 'grab': 1}",7,False
+USGS-04168400,depth_integrated,low_mixed,"{'auto_point': 2, 'depth_integrated': 4, 'grab': 1}",14,False
+USGS-04176500,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 8}",3,False
+USGS-04193490,auto_point,low_mixed,"{'auto_point': 1, 'grab': 1}",1,False
+USGS-04195500,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 3}",11,True
+USGS-04199000,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 6, 'grab': 2}",5,False
+USGS-04199500,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 6, 'grab': 1}",3,False
+USGS-04212100,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 5, 'grab': 2}",2,False
+USGS-04213500,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 11, 'grab': 1}",100,False
+USGS-04219768,depth_integrated,low_mixed,"{'depth_integrated': 5, 'grab': 1}",4,False
+USGS-04231600,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 7}",134,False
+USGS-04249000,depth_integrated,high,{'depth_integrated': 10},80,True
+USGS-05406457,,unresolvable,{},112,False
+USGS-05406479,,unresolvable,{},20,True
+USGS-05406497,,unresolvable,{},18,False
+USGS-05406500,depth_integrated,high,{'depth_integrated': 1},111,False
+USGS-05447500,depth_integrated,low_mixed,"{'depth_integrated': 3, 'grab': 2}",17,False
+USGS-05517500,depth_integrated,high,{'depth_integrated': 8},1,False
+USGS-05537980,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 2, 'grab': 2}",1,False
+USGS-05567500,depth_integrated,low_mixed,"{'depth_integrated': 1, 'grab': 1}",7,False
+USGS-05576100,depth_integrated,low_mixed,"{'depth_integrated': 2, 'grab': 1}",4,False
+USGS-05576195,depth_integrated,low_mixed,"{'depth_integrated': 2, 'grab': 1}",1,False
+USGS-05586300,depth_integrated,low_mixed,"{'depth_integrated': 8, 'grab': 3}",7,False
+USGS-05595000,depth_integrated,low_mixed,"{'depth_integrated': 3, 'grab': 2}",11,False
+USGS-05599490,depth_integrated,low_mixed,"{'depth_integrated': 4, 'grab': 2}",5,False
+USGS-06076590,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 2}",2,False
+USGS-06192980,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 2}",2,False
+USGS-06436760,depth_integrated,high,{'depth_integrated': 2},40,False
+USGS-06887000,depth_integrated,high,{'depth_integrated': 7},6,True
+USGS-06892513,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 6, 'grab': 1}",14,False
+USGS-06893390,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 6, 'grab': 1}",3,False
+USGS-06893620,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 2, 'grab': 2}",45,False
+USGS-06893820,auto_point,low_mixed,"{'auto_point': 1, 'grab': 1}",52,True
+USGS-06893830,auto_point,low_mixed,"{'auto_point': 1, 'grab': 1}",50,True
+USGS-06893890,auto_point,low_mixed,"{'auto_point': 1, 'grab': 1}",47,False
+USGS-06893970,auto_point,low_mixed,"{'auto_point': 1, 'grab': 1}",53,False
+USGS-06894000,auto_point,low_mixed,"{'auto_point': 1, 'grab': 1}",58,False
+USGS-06900050,depth_integrated,low_mixed,"{'depth_integrated': 8, 'grab': 2}",12,False
+USGS-06901500,depth_integrated,low_mixed,"{'depth_integrated': 8, 'grab': 2}",1,False
+USGS-07018500,depth_integrated,high,{'depth_integrated': 3},1,False
+USGS-07030392,depth_integrated,low_mixed,"{'depth_integrated': 5, 'grab': 1}",52,True
+USGS-07048495,depth_integrated,low_mixed,"{'depth_integrated': 3, 'grab': 1}",3,False
+USGS-07048550,depth_integrated,low_mixed,"{'depth_integrated': 7, 'grab': 1}",10,False
+USGS-07048600,depth_integrated,low_mixed,"{'depth_integrated': 7, 'grab': 1}",1,True
+USGS-07049050,depth_integrated,low_mixed,"{'depth_integrated': 2, 'grab': 1}",1,False
+USGS-07055814,auto_point,low_mixed,"{'auto_point': 1, 'depth_integrated': 1, 'grab': 1}",2,False
+USGS-07075250,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 5, 'grab': 1}",4,False
+USGS-07075270,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 7, 'grab': 1}",5,False
+USGS-07179750,depth_integrated,low_mixed,"{'depth_integrated': 9, 'grab': 1}",11,False
+USGS-07182390,depth_integrated,low_mixed,"{'depth_integrated': 11, 'grab': 1}",11,False
+USGS-07183500,depth_integrated,low_mixed,"{'depth_integrated': 13, 'grab': 1}",6,False
+USGS-071912213,depth_integrated,low_mixed,"{'depth_integrated': 11, 'grab': 1}",30,False
+USGS-07191222,depth_integrated,low_mixed,"{'depth_integrated': 10, 'grab': 1}",18,False
+USGS-071948095,depth_integrated,low_mixed,"{'depth_integrated': 2, 'grab': 1}",2,True
+USGS-07194933,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 3, 'grab': 2}",1,False
+USGS-07195500,depth_integrated,low_mixed,"{'depth_integrated': 9, 'grab': 1}",43,False
+USGS-07263296,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 5, 'grab': 2}",3,True
+USGS-07263878,depth_integrated,low_mixed,"{'depth_integrated': 1, 'grab': 1}",4,False
+USGS-0728875070,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 2, 'grab': 1}",1,True
+USGS-07355860,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 2, 'grab': 1}",4,False
+USGS-07355870,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 2, 'grab': 1}",4,False
+USGS-07364122,grab,high,{'grab': 1},4,False
+USGS-07374525,depth_integrated,high,{'depth_integrated': 4},1,False
+USGS-07381600,depth_integrated,high,{'depth_integrated': 6},1,True
+USGS-08070200,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 6, 'grab': 1}",1,False
+USGS-08188500,depth_integrated,low_mixed,"{'depth_integrated': 5, 'grab': 1}",1,False
+USGS-08211200,depth_integrated,low_mixed,"{'depth_integrated': 4, 'grab': 1}",1,False
+USGS-08317400,depth_integrated,high,{'depth_integrated': 6},2,False
+USGS-08380500,depth_integrated,high,{'depth_integrated': 1},13,False
+USGS-09132095,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 5}",410,False
+USGS-09327000,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 2}",1,False
+USGS-09363500,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 5, 'grab': 1}",35,False
+USGS-11185185,auto_point,low_mixed,"{'auto_point': 1, 'depth_integrated': 1, 'grab': 1}",13,True
+USGS-11313315,depth_integrated,low_mixed,"{'depth_integrated': 1, 'grab': 1}",2,False
+USGS-11313460,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 2, 'grab': 1}",1,False
+USGS-11336680,depth_integrated,low_mixed,"{'depth_integrated': 2, 'grab': 2}",5,True
+USGS-11336685,depth_integrated,low_mixed,"{'depth_integrated': 3, 'grab': 1}",5,True
+USGS-11336790,depth_integrated,low_mixed,"{'depth_integrated': 2, 'grab': 2}",12,True
+USGS-11337190,depth_integrated,low_mixed,"{'depth_integrated': 2, 'grab': 1}",2,False
+USGS-11425500,,unresolvable,{},2,False
+USGS-11447903,depth_integrated,low_mixed,"{'depth_integrated': 1, 'grab': 1}",7,False
+USGS-11447905,grab,high,{'grab': 1},1,False
+USGS-11448750,grab,low_mixed,"{'auto_point': 1, 'grab': 2}",3,False
+USGS-11452600,depth_integrated,low_mixed,"{'depth_integrated': 9, 'grab': 1}",31,False
+USGS-11455143,depth_integrated,high,{'depth_integrated': 3},1,False
+USGS-11455165,depth_integrated,low_mixed,"{'depth_integrated': 2, 'grab': 1}",8,False
+USGS-11455167,depth_integrated,low_mixed,"{'depth_integrated': 4, 'grab': 1}",2,False
+USGS-11455280,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 2, 'grab': 1}",7,True
+USGS-11455335,depth_integrated,low_mixed,"{'depth_integrated': 1, 'grab': 1}",10,True
+USGS-11455350,grab,low_mixed,"{'auto_point': 1, 'depth_integrated': 1, 'grab': 2}",13,True
+USGS-11455478,depth_integrated,low_mixed,"{'depth_integrated': 1, 'grab': 1}",1,False
+USGS-11504115,depth_integrated,low_mixed,"{'depth_integrated': 3, 'grab': 1}",3,False
+USGS-11509500,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 3, 'grab': 1}",1,False
+USGS-12037400,depth_integrated,high,{'depth_integrated': 4},1,False
+USGS-12113390,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 7}",8,False
+USGS-12166300,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 4}",1,False
+USGS-12170300,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 3}",2,False
+USGS-12187500,depth_integrated,low_mixed,"{'depth_integrated': 3, 'grab': 1}",2,False
+USGS-12213100,depth_integrated,high,{'depth_integrated': 5},2,False
+USGS-12214350,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 3, 'grab': 1}",40,False
+USGS-12214500,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 2}",21,False
+USGS-12323700,depth_integrated,low_mixed,"{'depth_integrated': 2, 'grab': 2}",2,True
+USGS-12323720,depth_integrated,low_mixed,"{'depth_integrated': 2, 'grab': 2}",1,False
+USGS-12324400,depth_integrated,low_mixed,"{'depth_integrated': 5, 'grab': 1}",11,False
+USGS-12510500,depth_integrated,high,{'depth_integrated': 10},1,False
+USGS-14151000,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 3, 'grab': 1}",8,False
+USGS-14179000,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 4, 'grab': 1}",176,False
+USGS-14180300,,unresolvable,{},186,False
+USGS-14181500,,unresolvable,{},20,True
+USGS-14181900,,unresolvable,{},9,False
+USGS-14182500,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 2, 'grab': 1}",24,False
+USGS-14246900,depth_integrated,high,{'depth_integrated': 7},15,False
+USGS-14301500,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 2}",7,False
+USGS-14302480,depth_integrated,high,{'depth_integrated': 4},8,False
+USGS-15008000,depth_integrated,high,{'depth_integrated': 5},6,False
+USGS-15015595,depth_integrated,high,{'depth_integrated': 6},11,False
+USGS-15024800,depth_integrated,high,{'depth_integrated': 5},12,False
+USGS-15041200,depth_integrated,low_mixed,"{'depth_integrated': 6, 'grab': 1}",19,False
+USGS-15129120,depth_integrated,low_mixed,"{'depth_integrated': 3, 'grab': 1}",9,False
+USGS-15209700,depth_integrated,high,{'depth_integrated': 3},18,False
+USGS-250813081040000,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 3}",3,False
+USGS-250921081054200,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 3}",2,False
+USGS-342804118011501,auto_point,high,{'auto_point': 2},8,False
+USGS-375350097262800,depth_integrated,low_mixed,"{'depth_integrated': 3, 'grab': 3}",2,False
+USGS-384115121402501,depth_integrated,low_mixed,"{'auto_point': 2, 'depth_integrated': 3, 'grab': 2}",2,False
+USGS-385553107243301,depth_integrated,low_mixed,"{'auto_point': 1, 'depth_integrated': 5}",477,False
+USGS-404038124131801,grab,high,{'grab': 1},29,False
+USGS-405219124085601,grab,high,{'grab': 1},28,False

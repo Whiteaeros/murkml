@@ -1,0 +1,6057 @@
+{
+  "USGS-01036390": {
+    "equipment": [
+      "Unknown",
+      "Sampler, US DH-76",
+      "Sampler, US D-49",
+      "Sampler, US D-74",
+      "Other",
+      "US D-77 TM"
+    ],
+    "method_name": [
+      "USGS",
+      "Equal width increment (ewi)",
+      "Single vertical, depth integrated",
+      "Weighted bottle"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "SO4 WAS COLOR CORRECTED",
+      "K UPDATED 7-18 DUE TO MISPOUR",
+      "CU UPDATE DUE TO ERROR"
+    ],
+    "n_records": 191
+  },
+  "USGS-01111230": {
+    "equipment": [
+      "Unknown",
+      "Weighted-bottle sampler",
+      "US WBH-96 weighted-bottle sampler",
+      "Sampler, point, automatic",
+      "US DH-95 Teflon bottle",
+      "Grab sample",
+      "US DH-59 TM",
+      "Peristaltic pump",
+      "US DH-81"
+    ],
+    "method_name": [
+      "USGS",
+      "Equal width increment (ewi)",
+      "Multiple verticals",
+      "Point sample",
+      "Equal discharge increment (edi)",
+      "Composite - Multiple point samples",
+      "Weighted bottle",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity",
+      "Grab sample  (dip)"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "PHENOL VALUE VER'D",
+      "RR ROE=111",
+      "No Comment"
+    ],
+    "n_records": 336
+  },
+  "USGS-01311875": {
+    "equipment": [
+      "Unknown"
+    ],
+    "method_name": [
+      "USGS"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [],
+    "n_records": 188
+  },
+  "USGS-01362330": {
+    "equipment": [
+      "Unknown",
+      "US DH-81"
+    ],
+    "method_name": [
+      "USGS",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "01400214"
+    ],
+    "n_records": 67
+  },
+  "USGS-01362350": {
+    "equipment": [
+      "Unknown",
+      "US DH-81"
+    ],
+    "method_name": [
+      "USGS",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "01400220",
+      "some sample lost in shipping",
+      "STATION NUMBER ON BOTTLE: 42060074172301"
+    ],
+    "n_records": 83
+  },
+  "USGS-01362356": {
+    "equipment": [
+      "Unknown",
+      "US DH-81"
+    ],
+    "method_name": [
+      "USGS",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "01201822",
+      "01400226"
+    ],
+    "n_records": 80
+  },
+  "USGS-01362357": {
+    "equipment": [
+      "Unknown",
+      "US DH-81",
+      "Sampler, point, automatic",
+      "US DH-81 with Teflon cap and nozzle"
+    ],
+    "method_name": [
+      "USGS",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity",
+      "Point sample",
+      "Equal width increment (ewi)"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate",
+      "Sample-Composite Without Parents"
+    ],
+    "comments": [
+      "A-2450191 3118 and 2331 in one FCC bottle",
+      "01400002",
+      "01400005"
+    ],
+    "n_records": 570
+  },
+  "USGS-01362370": {
+    "equipment": [
+      "Sampler, point, automatic",
+      "Grab sample",
+      "Unknown",
+      "US DH-81",
+      "US DH-81 with Teflon cap and nozzle",
+      "US D-95 plastic bottle"
+    ],
+    "method_name": [
+      "SuspSed; Pumping - stream sample using a pumping mechanism",
+      "Grab sample  (dip)",
+      "USGS",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity",
+      "Point sample",
+      "Equal width increment (ewi)"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Sample-Composite Without Parents"
+    ],
+    "comments": [
+      "00800355",
+      "00800343",
+      "00702684"
+    ],
+    "n_records": 755
+  },
+  "USGS-01362487": {
+    "equipment": [
+      "Unknown",
+      "US DH-81",
+      "Sampler, point, automatic",
+      "US DH-81 with Teflon cap and nozzle",
+      "US D-95 plastic bottle"
+    ],
+    "method_name": [
+      "USGS",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity",
+      "Point sample",
+      "Equal width increment (ewi)"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate",
+      "Sample-Composite Without Parents"
+    ],
+    "comments": [
+      "01000246",
+      "00903002",
+      "01000139"
+    ],
+    "n_records": 702
+  },
+  "USGS-01363556": {
+    "equipment": [
+      "Sampler, point, automatic",
+      "Sampler, US DH-76",
+      "Grab sample",
+      "US DH-76 TM",
+      "Unknown",
+      "US DH-81 with Teflon cap and nozzle",
+      "US DH-81",
+      "US D-95 plastic bottle",
+      "US DH-95 plastic bottle"
+    ],
+    "method_name": [
+      "SuspSed; Pumping - stream sample using a pumping mechanism",
+      "Equal width increment (ewi)",
+      "Grab sample  (dip)",
+      "Equal discharge increment (edi)",
+      "USGS",
+      "Point sample",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Other"
+    ],
+    "comments": [
+      "Bottle says @12",
+      "Bottle says Vert 2 @ 31.5"
+    ],
+    "n_records": 515
+  },
+  "USGS-01372043": {
+    "equipment": [
+      "Unknown",
+      "US D-77 TM modified Teflon bag sampler",
+      "Sampler, frame-type, plastic bottle w/Teflon collaps. bag",
+      "Other",
+      "Sampler, US DH-76",
+      "US D-96-A1 Bag Sampler",
+      "Weighted-bottle sampler",
+      "US D-96 bag sampler",
+      NaN,
+      "Open-Mouth Bottle",
+      "Jet pump",
+      "Sampler, point, automatic",
+      "Grab sample",
+      "US DH-81 with Teflon cap and nozzle"
+    ],
+    "method_name": [
+      "USGS",
+      "Equal width increment (ewi)",
+      "Grab sample  (dip)",
+      "Other",
+      "Single vertical, depth integrated",
+      "Weighted bottle",
+      "Grab sample at water-supply tap",
+      "Point sample"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "BALANCES W LAB ALKALINITY",
+      "BALANCES W/ LAB ALKALINITY",
+      "Marist S. dock"
+    ],
+    "n_records": 1208
+  },
+  "USGS-01408500": {
+    "equipment": [
+      "Unknown",
+      "US DH-76 TM",
+      "Weighted-bottle sampler",
+      "US DH-81",
+      "US DH-81 with Teflon cap and nozzle",
+      "Open-Mouth Bottle"
+    ],
+    "method_name": [
+      "USGS",
+      "Equal discharge increment (edi)",
+      "Multiple verticals",
+      "Equal width increment (ewi)"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "BTLS CK'D OK;RR COND & PH;LAB VALUES",
+      "P-D VALUE UPDATED AS RESULT OF QC RE",
+      "BTLS OK"
+    ],
+    "n_records": 380
+  },
+  "USGS-01463500": {
+    "equipment": [
+      "Unknown",
+      "US DH-76 TM",
+      "US D-74 AL-TM",
+      "Weighted-bottle sampler",
+      "US D-95 Teflon bottle",
+      "US DH-95 Teflon bottle",
+      "US D-77 TM",
+      "US DH-81 with Teflon cap and nozzle",
+      "US WBH-96 weighted-bottle sampler",
+      "Mulitple samplers used",
+      "US DH-81",
+      "US DH-95 plastic bottle"
+    ],
+    "method_name": [
+      "USGS",
+      "Equal discharge increment (edi)",
+      "Multiple verticals",
+      "Equal width increment (ewi)",
+      "Single vertical, depth integrated",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "BALANCES W/NUT FRAC ADDED",
+      "ROE DUP'D",
+      "NH3 -D & -T RR  VALUES DUP'D"
+    ],
+    "n_records": 1546
+  },
+  "USGS-01473169": {
+    "equipment": [
+      "Sampler, point, automatic",
+      "Unknown",
+      "US DH-81"
+    ],
+    "method_name": [
+      "SuspSed; Pumping - stream sample using a pumping mechanism",
+      "USGS",
+      "Equal width increment (ewi)",
+      "Single vertical, depth integrated",
+      "Point sample",
+      "SuspSed; Box-single ver, depth-int, attached to structure"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "Processed by Olson in Exton Lab (USGSPADL), see analyzing entity code",
+      "Not in original SLAR"
+    ],
+    "n_records": 142
+  },
+  "USGS-01478185": {
+    "equipment": [
+      "Unknown",
+      "US DH-81",
+      "US DH-95 plastic bottle",
+      "Sampler, point, automatic"
+    ],
+    "method_name": [
+      "USGS",
+      "Equal width increment (ewi)",
+      "SuspSed; Pumping - stream sample using a pumping mechanism",
+      "SuspSed; Box-single ver, depth-int, attached to structure",
+      "Point sample"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "Bottle time = 1416"
+    ],
+    "n_records": 70
+  },
+  "USGS-01478220": {
+    "equipment": [
+      "Unknown",
+      "US DH-81",
+      "US DH-95 Teflon bottle",
+      "Sampler, point, automatic"
+    ],
+    "method_name": [
+      "USGS",
+      "Equal width increment (ewi)",
+      "SuspSed; Pumping - stream sample using a pumping mechanism",
+      "Point sample"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "Bottle time= 1246"
+    ],
+    "n_records": 72
+  },
+  "USGS-01478245": {
+    "equipment": [
+      "Unknown",
+      "US DH-81",
+      "Sampler, point, automatic"
+    ],
+    "method_name": [
+      "USGS",
+      "Equal width increment (ewi)",
+      "Single vertical, depth integrated",
+      "SuspSed; Pumping - stream sample using a pumping mechanism",
+      "SuspSed; Box-single ver, depth-int, attached to structure",
+      "Point sample"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "gravel in sands",
+      "bottle time 1555",
+      "heavy"
+    ],
+    "n_records": 177
+  },
+  "USGS-01479820": {
+    "equipment": [
+      "Unknown",
+      "Sampler, point, automatic"
+    ],
+    "method_name": [
+      "USGS",
+      "SuspSed; Pumping - stream sample using a pumping mechanism",
+      "Point sample",
+      "SuspSed; Box-single ver, depth-int, attached to structure"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [],
+    "n_records": 96
+  },
+  "USGS-01480617": {
+    "equipment": [
+      "Sampler, point, automatic",
+      "Unknown",
+      "US DH-81"
+    ],
+    "method_name": [
+      "SuspSed; Pumping - stream sample using a pumping mechanism",
+      "Equal width increment (ewi)",
+      "Single vertical, depth integrated",
+      "USGS",
+      "Point sample",
+      "SuspSed; Box-single ver, depth-int, attached to structure"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "Processed in Exton Lab published in SIR 2011 5109",
+      "01000804 - 160 FNU",
+      "01000806 - 58 FNU"
+    ],
+    "n_records": 141
+  },
+  "USGS-01480870": {
+    "equipment": [
+      "Sampler, point, automatic",
+      "Unknown",
+      "US DH-81",
+      "Open-Mouth Bottle",
+      "US WBH-96 weighted-bottle sampler",
+      "US DH-95 plastic bottle",
+      "US D-95 plastic bottle"
+    ],
+    "method_name": [
+      "Single vertical, depth integrated",
+      "SuspSed; Pumping - stream sample using a pumping mechanism",
+      "Equal width increment (ewi)",
+      "USGS",
+      "Grab sample  (dip)",
+      "Point sample",
+      "SuspSed; Box-single ver, depth-int, attached to structure"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "Processed in Exton Lab published in SIR 2011 5109",
+      "FNU 190",
+      "FNU 250"
+    ],
+    "n_records": 205
+  },
+  "USGS-01493112": {
+    "equipment": [
+      "Unknown",
+      "Other",
+      "US DH-81 with Teflon cap and nozzle",
+      "US D-95 Teflon bottle",
+      "Peristaltic pump",
+      "Weighted-bottle sampler",
+      "Grab sample",
+      "US DH-81",
+      "US D-95 plastic bottle",
+      "Open-Mouth Bottle",
+      "US DH-95 plastic bottle",
+      "US DH-95 Teflon bottle"
+    ],
+    "method_name": [
+      "USGS",
+      "Multiple verticals",
+      "Grab sample  (dip)",
+      "Equal width increment (ewi)",
+      "Point sample",
+      "Other",
+      "Weighted bottle",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity",
+      "Single vertical, depth integrated"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "BALANCES W/ LAB ALKALINITY",
+      "Btls OK;  balances w/ nutsbtls check",
+      "balances w/ nutrients."
+    ],
+    "n_records": 493
+  },
+  "USGS-01573660": {
+    "equipment": [
+      "US DH-81",
+      "US DH-95 plastic bottle",
+      "Unknown"
+    ],
+    "method_name": [
+      "Equal width increment (ewi)",
+      "USGS",
+      "Grab sample  (dip)"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [],
+    "n_records": 86
+  },
+  "USGS-01573695": {
+    "equipment": [
+      "Unknown",
+      "Weighted-bottle sampler",
+      "Grab sample",
+      "US DH-81"
+    ],
+    "method_name": [
+      "USGS",
+      "Multiple verticals",
+      "Single vertical, depth integrated",
+      "Equal width increment (ewi)"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "Pennsylvania DEP Site ID#: WQN 278",
+      "BOTTLE TIME 0815",
+      "Bottle says Sample Type = 9"
+    ],
+    "n_records": 152
+  },
+  "USGS-01573710": {
+    "equipment": [
+      "Unknown",
+      "Weighted-bottle sampler",
+      "Grab sample",
+      "US DH-81"
+    ],
+    "method_name": [
+      "USGS",
+      "Multiple verticals",
+      "Equal width increment (ewi)"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "Pennsylvania DEP Site ID#: WQN 269",
+      "Bottle Date: 04/16/2014"
+    ],
+    "n_records": 162
+  },
+  "USGS-01574000": {
+    "equipment": [
+      "Unknown",
+      "US DH-81 with Teflon cap and nozzle",
+      "US D-95 plastic bottle",
+      "US DH-81",
+      "US DH-95 plastic bottle"
+    ],
+    "method_name": [
+      "USGS",
+      "Equal width increment (ewi)"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Sample-Composite Without Parents",
+      "Not determined"
+    ],
+    "comments": [
+      "8681042",
+      "8681039",
+      "8681041"
+    ],
+    "n_records": 370
+  },
+  "USGS-01575598": {
+    "equipment": [
+      "Weighted-bottle sampler",
+      "Unknown",
+      "US DH-95 plastic bottle",
+      "US DH-95 Teflon bottle",
+      "US DH-81 with Teflon cap and nozzle",
+      "US D-95 plastic bottle"
+    ],
+    "method_name": [
+      "Multiple verticals",
+      "USGS",
+      "Equal width increment (ewi)",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "Pennsylvania DEP Site ID#: WQN 286",
+      "\"STATION NAME ON PAPERWORK AND BOTTLE: MUDDY CREEK AT CASTLE FIN, PA. STATION NUMBER ON BOTTLE: 01577500.\"",
+      "\"Paperwork Station Name: Muddy Creek at Castle Fin, PA; Bottle Station # and Name: 01577500 Muddy Creek at Castle Fin, PA\""
+    ],
+    "n_records": 187
+  },
+  "USGS-01575900": {
+    "equipment": [
+      "US DH-81",
+      "Unknown",
+      "US DH-95 plastic bottle"
+    ],
+    "method_name": [
+      "Equal width increment (ewi)",
+      "USGS"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [],
+    "n_records": 70
+  },
+  "USGS-01576000": {
+    "equipment": [
+      "Unknown",
+      "Other",
+      "US D-77 TM",
+      "US DH-95 plastic bottle"
+    ],
+    "method_name": [
+      "USGS",
+      "Equal width increment (ewi)"
+    ],
+    "activity_type": [
+      "Not determined",
+      "Sample-Routine",
+      "Sample-Composite Without Parents"
+    ],
+    "comments": [
+      "8682043",
+      "8682045",
+      "8682049"
+    ],
+    "n_records": 447
+  },
+  "USGS-01576003": {
+    "equipment": [
+      "Unknown"
+    ],
+    "method_name": [
+      "USGS"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "A-0740101 Please filter (LC4200) before analysis",
+      "A-1690047 Please filter (LC4200) before analysis",
+      "A-1060071 Please filter (LC4200) before analysis"
+    ],
+    "n_records": 34
+  },
+  "USGS-01576007": {
+    "equipment": [
+      "US DH-81",
+      "Unknown",
+      "US DH-95 plastic bottle"
+    ],
+    "method_name": [
+      "Equal width increment (ewi)",
+      "USGS"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "Water ~1cm below water line",
+      "Water ~0.5cm below water line"
+    ],
+    "n_records": 87
+  },
+  "USGS-01576045": {
+    "equipment": [
+      "US DH-81",
+      "Unknown",
+      "US DH-81 with Teflon cap and nozzle"
+    ],
+    "method_name": [
+      "Equal width increment (ewi)",
+      "USGS"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Sample-Composite Without Parents"
+    ],
+    "comments": [
+      "T",
+      "L-1060041 Station ID on FA is unreadable.",
+      "Did not notice organic matter in original sample, but after analysis,noticed apparent heavy fines in sand dish.  Rehydrated and reanalyzed, removed OM from both sands and fines and re-sieved sands.  Original 70331=85.4%, 80154=898mg/l.  Reanalyzed 70331=98.6%, 80154=747mg/l"
+    ],
+    "n_records": 107
+  },
+  "USGS-01576516": {
+    "equipment": [
+      "Unknown"
+    ],
+    "method_name": [
+      "USGS"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "A-3520151 Project 2476DTSXX (Legacy Sediment) Collected and processed on 12/13/2008, keep in fridge until shipped. L-3520151 X = Improper sample container for WCA",
+      "A-3520147 Project 2476DTSXX (Legacy Sediment) Collected and processed on 12/13/2008,Keep in fridge until shipped L-3520147 X = Improper sample container for WCA",
+      "A-3520135 Project 2476DTSXX (Legacy Sediment) Collected and processed on 12/13/2008,Keep in fridge until shipped. L-3520135 X = Improper sample container for WCA"
+    ],
+    "n_records": 217
+  },
+  "USGS-015765185": {
+    "equipment": [
+      "Unknown"
+    ],
+    "method_name": [
+      "USGS"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "A-3520137 Project 2476DTSXX (Legacy Sediment) Collected and processed on 12/13/2",
+      "A-3520141 Project 2476DTSXX (Legacy Sediment) Collected and processed on 12/13/2",
+      "A-3370037 Project 2476DTSXX (Legacy Sediment) Collected and processed on 11/25,keep in fridge until shipped. L-3370037 X = Improper sample container for WCA & FCC in wrong btl's"
+    ],
+    "n_records": 203
+  },
+  "USGS-015765195": {
+    "equipment": [
+      "Unknown",
+      "Grab sample",
+      "US DH-81",
+      "Weighted-bottle sampler"
+    ],
+    "method_name": [
+      "USGS",
+      "Single vertical, depth integrated",
+      "Equal width increment (ewi)",
+      "Multiple verticals",
+      "Grab sample  (dip)"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "A-3180194 Project 2476DTSXX (Legacy Sediment) L-3180194 X = Improper sample container for WCA and FCC.",
+      "A-3050151 Project 2476DTSXX (Legacy Sediment) L-3050151 X = Improper sample cont",
+      "A-3520136 Project 2476DTSXX (Legacy Sediment) Collected and processed on 12/13/2008,Keep in fridge until shipped. L-3520136 X = Improper sample container for WCA"
+    ],
+    "n_records": 376
+  },
+  "USGS-01576980": {
+    "equipment": [
+      "Unknown",
+      "Weighted-bottle sampler"
+    ],
+    "method_name": [
+      "USGS",
+      "Multiple verticals"
+    ],
+    "activity_type": [
+      "Sample-Composite Without Parents",
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "L-1480171 Logged from problem cooler pending corrected ASR,improper sample container for WCA,paa   Sta ID on btls 01576005..  RU is extra btl, paa",
+      "A-1470099 TPCN. 35,45mL,39mL L-1470099 Updated SID from 01576005 and UC from MD per Langland.  KB 6/12/14",
+      "A-1420026 TPCN: 33,34,33mL L-1420026 X=extra RU recvd   Received May 21,2014"
+    ],
+    "n_records": 149
+  },
+  "USGS-01577500": {
+    "equipment": [
+      "Unknown",
+      "US DH-81 with Teflon cap and nozzle",
+      "US DH-81",
+      "US DH-95 plastic bottle",
+      "Weighted-bottle sampler",
+      "US D-95 plastic bottle"
+    ],
+    "method_name": [
+      "USGS",
+      "Equal width increment (ewi)",
+      "Multiple verticals",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "BALANCES WITH NUTRIENTS"
+    ],
+    "n_records": 208
+  },
+  "USGS-01581752": {
+    "equipment": [
+      "US DH-81",
+      "US DH-95 plastic bottle",
+      "Sampler, point, automatic",
+      "Other",
+      "Open-Mouth Bottle",
+      "US DH-95 Teflon bottle",
+      "US D-95 plastic bottle",
+      "Weighted-bottle sampler",
+      "Grab sample"
+    ],
+    "method_name": [
+      "Equal width increment (ewi)",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity",
+      "Point sample",
+      "Grab sample  (dip)",
+      "Multiple verticals"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "A-3470084 TPCN: 61mL, 94mL, 93mL",
+      "A-3220036 TPCN: 38mL, 31mL, 31mL L-3220036 Received November 15, 2013",
+      "A-2490228 TPCN: 82,91,81mL"
+    ],
+    "n_records": 469
+  },
+  "USGS-01589000": {
+    "equipment": [
+      "Unknown",
+      "Sampler, point, automatic",
+      "US DH-81",
+      "US DH-95 plastic bottle",
+      "US DH-81 with Teflon cap and nozzle"
+    ],
+    "method_name": [
+      "USGS",
+      "Point sample",
+      "SuspSed; Pumping - stream sample using a pumping mechanism",
+      "Equal width increment (ewi)",
+      "Single vertical, depth integrated"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "ISCO for C",
+      "ISCO Storm",
+      "EWI 2 bottles for CC"
+    ],
+    "n_records": 572
+  },
+  "USGS-01589290": {
+    "equipment": [
+      "US DH-81",
+      "Sampler, point, automatic",
+      "Unknown",
+      "US D-95 plastic bottle",
+      "US DH-81 with Teflon cap and nozzle"
+    ],
+    "method_name": [
+      "Equal width increment (ewi)",
+      "Point sample",
+      "Equal discharge increment (edi)",
+      "USGS",
+      "SuspSed; Pumping - stream sample using a pumping mechanism",
+      "Multiple verticals",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "Scots Level Branch at Rockdale, MD",
+      "possible water loss from shipping",
+      "plant debris in sands"
+    ],
+    "n_records": 1106
+  },
+  "USGS-01645704": {
+    "equipment": [
+      "Sampler, point, automatic",
+      "Grab sample",
+      "US DH-81",
+      "Unknown"
+    ],
+    "method_name": [
+      "SuspSed; Pumping - stream sample using a pumping mechanism",
+      "Grab sample  (dip)",
+      "Multiple verticals",
+      "Equal width increment (ewi)",
+      "USGS"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate",
+      "Quality Control Sample-Other",
+      "Quality Control Sample-Field Blank"
+    ],
+    "comments": [
+      "12",
+      "1",
+      "3"
+    ],
+    "n_records": 1013
+  },
+  "USGS-01646000": {
+    "equipment": [
+      "US DH-95 plastic bottle",
+      "US WBH-96 weighted-bottle sampler",
+      "US DH-95 Teflon bottle",
+      "Grab sample",
+      "Polar-organic continuous integrated sampler (POCIS) passive diffusion sampler"
+    ],
+    "method_name": [
+      "Equal width increment (ewi)",
+      "Multiple verticals",
+      "Grab sample  (dip)"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "A-1770019 Surface water. L-1770019 Received June 22, 2012",
+      "A-1770020 Surface water. L-1770020 Received June 22, 2012",
+      "A-1770015 Surface water. L-1770015 Received June 22, 2012"
+    ],
+    "n_records": 510
+  },
+  "USGS-01649190": {
+    "equipment": [
+      "Other",
+      "US DH-81 with Teflon cap and nozzle",
+      "Grab sample",
+      "Sampler, point, automatic",
+      "Peristaltic pump",
+      "Weighted-bottle sampler",
+      "US DH-81",
+      "US DH-95 plastic bottle",
+      "Unknown"
+    ],
+    "method_name": [
+      "Point sample",
+      "Multiple verticals",
+      "Equal width increment (ewi)",
+      "Grab sample  (dip)",
+      "Peristaltic pump",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity",
+      "Suction lift peristaltic pump",
+      "Single vertical, depth integrated",
+      "USGS"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate",
+      "Sample-Composite Without Parents",
+      "Quality Control Sample-Other"
+    ],
+    "comments": [
+      "L-0670118 X = Date samples = 3/5/08,all else matches..  ASR date corrected to match btls, WSC please verify, paa, 3/7/08",
+      "L-3020148 proj acct changed to 2427B4K17 per brenda,paa,10/29/08",
+      "L-3020154 proj acct changed to 2427B4K17 per brenda,paa,10/29/08"
+    ],
+    "n_records": 913
+  },
+  "USGS-01651000": {
+    "equipment": [
+      "Unknown",
+      "US DH-81 with Teflon cap and nozzle",
+      "US DH-95 Teflon bottle",
+      "Other",
+      "Grab sample",
+      "Weighted-bottle sampler",
+      "Sampler, point, automatic"
+    ],
+    "method_name": [
+      "USGS",
+      "Equal width increment (ewi)",
+      "Point sample",
+      "Grab sample  (dip)",
+      "Multiple verticals"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "L-0430069 field SC added per district, paa, 2/25/04",
+      "L-1050067 field SC of 299 added, paa, 4/14/04",
+      "L-1050063 field SC of 299 added, paa, 4/14/04"
+    ],
+    "n_records": 288
+  },
+  "USGS-01651730": {
+    "equipment": [
+      "Sampler, point, automatic",
+      "Unknown"
+    ],
+    "method_name": [
+      "Point sample",
+      "USGS"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "DATE ON BOTTLE: 12/07/16"
+    ],
+    "n_records": 154
+  },
+  "USGS-01654500": {
+    "equipment": [
+      "Grab sample",
+      "Sampler, point, automatic",
+      "Unknown"
+    ],
+    "method_name": [
+      "Grab sample  (dip)",
+      "SuspSed; Pumping - stream sample using a pumping mechanism",
+      "USGS"
+    ],
+    "activity_type": [
+      "Quality Control Sample-Field Replicate",
+      "Sample-Routine"
+    ],
+    "comments": [
+      "organics",
+      "TIME ON BOTTLE: 0200. USED BOTTLE ID \"11\" TO DETERMINE SAMPLE.",
+      "\"Sediment analysis only, no nutrient analysis.\""
+    ],
+    "n_records": 675
+  },
+  "USGS-01656903": {
+    "equipment": [
+      "Sampler, point, automatic",
+      "Grab sample",
+      "US DH-81",
+      "Unknown"
+    ],
+    "method_name": [
+      "SuspSed; Pumping - stream sample using a pumping mechanism",
+      "Grab sample  (dip)",
+      "Equal width increment (ewi)",
+      "Multiple verticals",
+      "USGS"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate",
+      "Quality Control Sample-Other"
+    ],
+    "comments": [
+      "6",
+      "18",
+      "22"
+    ],
+    "n_records": 1045
+  },
+  "USGS-01658000": {
+    "equipment": [
+      "Unknown",
+      "Other",
+      "Weighted-bottle sampler",
+      "US DH-81",
+      "US DH-81 with Teflon cap and nozzle",
+      "Grab sample",
+      "Sampler, point, automatic",
+      "US DH-95 plastic bottle",
+      "US D-95 plastic bottle",
+      "US DH-95 Teflon bottle"
+    ],
+    "method_name": [
+      "USGS",
+      "Other",
+      "Equal width increment (ewi)",
+      "Point sample",
+      "Grab sample  (dip)",
+      "Equal discharge increment (edi)",
+      "Multiple verticals",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "x=time on wca 1535",
+      "L-2940012 recvd 10-19-02",
+      "L-3170143 x= no fcc recvd *verified no FCC,district emailed,paa,11/14/02 **per district/majedi, delete FCC lc's, paa, 11/19/02"
+    ],
+    "n_records": 941
+  },
+  "USGS-01668000": {
+    "equipment": [
+      "Unknown",
+      "Other",
+      "Weighted-bottle sampler",
+      "Sampler, US D-74AL",
+      "US WBH-96 weighted-bottle sampler",
+      "US DH-95 plastic bottle",
+      "US DH-81",
+      "US D-95 plastic bottle",
+      "US DH-95 Teflon bottle",
+      "Grab sample"
+    ],
+    "method_name": [
+      "USGS",
+      "Equal discharge increment (edi)",
+      "Equal width increment (ewi)",
+      "Multiple verticals",
+      "Grab sample  (dip)",
+      "Other"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate",
+      "Quality Control Sample-Field Blank"
+    ],
+    "comments": [
+      "CN RR PO4,P-D;VALUES VER'D",
+      "IAL DATA",
+      "BALANCES W/NUTRIENTS"
+    ],
+    "n_records": 1005
+  },
+  "USGS-0166818623": {
+    "equipment": [
+      "Unknown",
+      "Grab sample",
+      "US DH-81",
+      "Sampler, point, automatic",
+      "US WBH-96 weighted-bottle sampler"
+    ],
+    "method_name": [
+      "USGS",
+      "Grab sample  (dip)",
+      "Equal width increment (ewi)",
+      "SuspSed; Pumping - stream sample using a pumping mechanism"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "A-2900129 Storm sample   Surface Water.",
+      "A-2260054 Surface water.",
+      "L-1630290 recvd warm 6/9, ok log per A. Crosby, paa, 6/12/14 Chilled containers received warm at 13.5  Degrees C"
+    ],
+    "n_records": 33
+  },
+  "USGS-0166818985": {
+    "equipment": [
+      "Unknown",
+      "Grab sample",
+      "US WBH-96 weighted-bottle sampler",
+      "US DH-81",
+      "Sampler, point, automatic"
+    ],
+    "method_name": [
+      "USGS",
+      "Grab sample  (dip)",
+      "Multiple verticals",
+      "Equal width increment (ewi)",
+      "SuspSed; Pumping - stream sample using a pumping mechanism"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "A-2900132 Storm Samples   Surface water.",
+      "A-1990042 Surface water.",
+      "A-1750048 Surface water. L-1750048 Received June 20, 2014"
+    ],
+    "n_records": 31
+  },
+  "USGS-02054750": {
+    "equipment": [
+      "US DH-95 plastic bottle",
+      "US WBH-96 weighted-bottle sampler",
+      "US DH-81",
+      "US D-96 bag sampler",
+      "Sampler, frame-type, plastic bottle",
+      "Other",
+      "US DH-95 Teflon bottle",
+      "Weighted-bottle sampler"
+    ],
+    "method_name": [
+      "Equal width increment (ewi)",
+      "Multiple verticals",
+      "Point sample",
+      "Weighted bottle"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "4",
+      "3",
+      "5"
+    ],
+    "n_records": 261
+  },
+  "USGS-02055080": {
+    "equipment": [
+      "US DH-95 plastic bottle",
+      "US WBH-96 weighted-bottle sampler",
+      "US DH-81",
+      "US D-96 bag sampler",
+      "Sampler, frame-type, plastic bottle",
+      "US DH-95 Teflon bottle",
+      "Weighted-bottle sampler"
+    ],
+    "method_name": [
+      "Equal width increment (ewi)",
+      "Multiple verticals",
+      "Point sample",
+      "Grab sample  (dip)",
+      "Weighted bottle"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "6",
+      "8",
+      "bottle says medium code WSQ, sample type 7"
+    ],
+    "n_records": 238
+  },
+  "USGS-0205551460": {
+    "equipment": [
+      "Sampler, point, automatic",
+      "US DH-81",
+      "Grab sample",
+      "Unknown",
+      "Peristaltic pump"
+    ],
+    "method_name": [
+      "SuspSed; Pumping - stream sample using a pumping mechanism",
+      "Multiple verticals",
+      "Grab sample  (dip)",
+      "Equal width increment (ewi)",
+      "USGS",
+      "Peristaltic pump",
+      "Other"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "STATION NUMBER ON BOTTLE: 020555140",
+      "Large Pebbles in sands",
+      "turbidity: 14.8/14.9"
+    ],
+    "n_records": 408
+  },
+  "USGS-0205551614": {
+    "equipment": [
+      "US WBH-96 weighted-bottle sampler",
+      "Grab sample",
+      "US DH-95 plastic bottle",
+      "Weighted-bottle sampler",
+      "Unknown"
+    ],
+    "method_name": [
+      "Multiple verticals",
+      "Grab sample  (dip)",
+      "Equal width increment (ewi)",
+      "USGS"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "turbidity: 1.18/1.13"
+    ],
+    "n_records": 157
+  },
+  "USGS-02203655": {
+    "equipment": [
+      "Sampler, point, automatic",
+      "Grab sample",
+      "Unknown",
+      "US DH-81",
+      "US DH-95 plastic bottle",
+      "Peristaltic pump",
+      "Weighted-bottle sampler",
+      "Open-Mouth Bottle"
+    ],
+    "method_name": [
+      "Point sample",
+      "Grab sample  (dip)",
+      "USGS",
+      "Equal width increment (ewi)",
+      "Multiple verticals",
+      "Weighted bottle",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity"
+    ],
+    "activity_type": [
+      "Sample-Composite Without Parents",
+      "Sample-Routine"
+    ],
+    "comments": [
+      "ISCO STORM SAMPLE",
+      "ISCO COMPOSITE - NO FIELD PARMS - IN SITU SONDE MALFUNCTION",
+      "No in situ field QW values available."
+    ],
+    "n_records": 370
+  },
+  "USGS-02203700": {
+    "equipment": [
+      "Sampler, point, automatic",
+      "US DH-81",
+      "Grab sample",
+      "Unknown",
+      "US DH-95 plastic bottle",
+      "Peristaltic pump",
+      "Open-Mouth Bottle",
+      "US DH-81 with Teflon cap and nozzle"
+    ],
+    "method_name": [
+      "Point sample",
+      "Equal width increment (ewi)",
+      "Grab sample  (dip)",
+      "USGS",
+      "Multiple verticals",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity"
+    ],
+    "activity_type": [
+      "Sample-Composite Without Parents",
+      "Sample-Routine"
+    ],
+    "comments": [
+      "ISCO COMPOSITE - TRIGGERED BY CSO RELEASE",
+      "ISCO COMPOSITE TRIGGERED BY CSO RELEASE",
+      "ROUTINE SAMPLE"
+    ],
+    "n_records": 232
+  },
+  "USGS-02203960": {
+    "equipment": [
+      "US DH-81 with Teflon cap and nozzle",
+      "US DH-81",
+      "Sampler, point, automatic",
+      "US DH-95 plastic bottle",
+      "Unknown",
+      "Grab sample",
+      "Weighted-bottle sampler"
+    ],
+    "method_name": [
+      "Equal width increment (ewi)",
+      "Point sample",
+      "Multiple verticals",
+      "USGS",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity",
+      "Grab sample  (dip)"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Sample-Composite Without Parents"
+    ],
+    "comments": [
+      "LabSampleID: 280-43492-2",
+      "LabSampleID: 280-38745-2",
+      "LabSampleID: 280-51276-5"
+    ],
+    "n_records": 150
+  },
+  "USGS-02205865": {
+    "equipment": [
+      "Sampler, point, automatic",
+      "US DH-95 plastic bottle",
+      "Unknown",
+      "Open-Mouth Bottle",
+      "US DH-81",
+      "Grab sample"
+    ],
+    "method_name": [
+      "Point sample",
+      "Equal width increment (ewi)",
+      "USGS",
+      "Multiple verticals",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity"
+    ],
+    "activity_type": [
+      "Sample-Composite Without Parents",
+      "Sample-Routine",
+      "Not determined"
+    ],
+    "comments": [
+      "LabSampleID: 280-3789-1",
+      "LabSampleID: 280-1596-1",
+      "LabSampleID: 280-9396-2"
+    ],
+    "n_records": 220
+  },
+  "USGS-02207120": {
+    "equipment": [
+      "Other",
+      "Sampler, point, automatic",
+      "US DH-81",
+      "Sampler, US DH-59",
+      "US DH-95 plastic bottle",
+      "Unknown",
+      "Open-Mouth Bottle",
+      "Weighted-bottle sampler",
+      "US D-95 plastic bottle"
+    ],
+    "method_name": [
+      "Point sample",
+      "Composite - Multiple point samples",
+      "Equal width increment (ewi)",
+      "Single vertical, depth integrated",
+      "USGS",
+      "Multiple verticals",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity",
+      "Weighted bottle"
+    ],
+    "activity_type": [
+      "Sample-Composite Without Parents",
+      "Sample-Routine"
+    ],
+    "comments": [
+      "OCALA LABID ID NUMBER:  200206413",
+      "OCALA LABID ID NUMBER:  200301963   ab.",
+      "OCALA LABID ID NUMBER:  200208256   ab."
+    ],
+    "n_records": 316
+  },
+  "USGS-02207185": {
+    "equipment": [
+      "US DH-81",
+      "Grab sample",
+      "Sampler, US DH-59",
+      "Unknown",
+      "Sampler, US DH-48",
+      NaN,
+      "Sampler, point, automatic",
+      "US DH-95 plastic bottle",
+      "Open-Mouth Bottle",
+      "Weighted-bottle sampler",
+      "US DH-81 with Teflon cap and nozzle"
+    ],
+    "method_name": [
+      "Equal width increment (ewi)",
+      "Multiple verticals",
+      "USGS",
+      "Single vertical, depth integrated",
+      "Composite - Multiple point samples",
+      "Point sample",
+      "Weighted bottle",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Sample-Composite Without Parents",
+      "Not determined"
+    ],
+    "comments": [
+      "OCALA LABID ID NUMBER:  200201114|",
+      "OCALA LABID ID NUMBER:  200109030",
+      "OCALA LABID ID NUMBER:  200200205"
+    ],
+    "n_records": 400
+  },
+  "USGS-02207385": {
+    "equipment": [
+      "Other",
+      "US DH-81",
+      "Sampler, point, automatic",
+      "Sampler, US DH-48",
+      "Unknown",
+      NaN,
+      "Weighted-bottle sampler",
+      "Grab sample",
+      "Open-Mouth Bottle",
+      "US D-95 plastic bottle",
+      "US DH-95 plastic bottle"
+    ],
+    "method_name": [
+      "Point sample",
+      "Equal width increment (ewi)",
+      "Composite - Multiple point samples",
+      "Single vertical, depth integrated",
+      "USGS",
+      "Weighted bottle",
+      "Multiple verticals",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity",
+      "Grab sample  (dip)"
+    ],
+    "activity_type": [
+      "Sample-Composite Without Parents",
+      "Sample-Routine"
+    ],
+    "comments": [
+      "OCALA LABID ID NUMBER:  200105020",
+      "OCALA LABID ID NUMBER:  200301906   ab.",
+      "OCALA LABID ID NUMBER:  200300418    MO USGS lab."
+    ],
+    "n_records": 314
+  },
+  "USGS-02207400": {
+    "equipment": [
+      "Other",
+      "US DH-81",
+      "Sampler, point, automatic",
+      "Sampler, US DH-48",
+      "Unknown",
+      NaN,
+      "Grab sample",
+      "Open-Mouth Bottle"
+    ],
+    "method_name": [
+      "Point sample",
+      "Equal width increment (ewi)",
+      "Composite - Multiple point samples",
+      "Multiple verticals",
+      "Single vertical, depth integrated",
+      "USGS",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity",
+      "Grab sample  (dip)"
+    ],
+    "activity_type": [
+      "Sample-Composite Without Parents",
+      "Sample-Routine",
+      "Not determined",
+      "Quality Control Sample-Field Blank"
+    ],
+    "comments": [
+      "OCALA LABID ID NUMBER:  200105003",
+      "OCALA LABID ID NUMBER:  200302050   ab.",
+      "OCALA LABID ID NUMBER:  200301775   Rolla, MO USGS lab."
+    ],
+    "n_records": 321
+  },
+  "USGS-02208150": {
+    "equipment": [
+      "Other",
+      "US DH-81",
+      "Sampler, point, automatic",
+      "Unknown",
+      "US DH-81 with Teflon cap and nozzle",
+      "US DH-95 plastic bottle",
+      "Weighted-bottle sampler",
+      "Grab sample",
+      "Open-Mouth Bottle",
+      "US D-95 plastic bottle"
+    ],
+    "method_name": [
+      "Point sample",
+      "Equal width increment (ewi)",
+      "Multiple verticals",
+      "Other",
+      "Composite - Multiple point samples",
+      "USGS",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity",
+      "Weighted bottle",
+      "Grab sample  (dip)"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Sample-Composite Without Parents"
+    ],
+    "comments": [
+      "OCALA LABID ID NUMBER:  200105019",
+      "OCALA LABID ID NUMBER:  200300017    Rolla, MO.",
+      "OCALA LABID ID NUMBER:  200301872   ab."
+    ],
+    "n_records": 291
+  },
+  "USGS-02217274": {
+    "equipment": [
+      "US DH-81",
+      "Other",
+      "Unknown",
+      "Sampler, US DH-59",
+      "Sampler, US DH-48",
+      "Grab sample",
+      NaN,
+      "Sampler, point, automatic",
+      "Open-Mouth Bottle",
+      "Weighted-bottle sampler",
+      "US DH-95 plastic bottle"
+    ],
+    "method_name": [
+      "Equal width increment (ewi)",
+      "Other",
+      "Multiple verticals",
+      "USGS",
+      "Single vertical, depth integrated",
+      "Composite - Multiple point samples",
+      "Point sample",
+      "Grab sample  (dip)",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity",
+      "Weighted bottle"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Sample-Composite Without Parents",
+      "Quality Control Sample-Field Replicate",
+      "Not determined"
+    ],
+    "comments": [
+      "OCALA LABID ID NUMBER:  200109035",
+      "OCALA LABID ID NUMBER:  200200152",
+      "OCALA LABID ID NUMBER:  200110249"
+    ],
+    "n_records": 387
+  },
+  "USGS-02334480": {
+    "equipment": [
+      "US DH-81",
+      "Unknown",
+      "Sampler, US DH-48",
+      "Sampler, US DH-59",
+      "US DH-95 plastic bottle",
+      "Grab sample",
+      "Sampler, point, automatic",
+      "Open-Mouth Bottle"
+    ],
+    "method_name": [
+      "Equal width increment (ewi)",
+      "USGS",
+      "Multiple verticals",
+      "Single vertical, depth integrated",
+      "Composite - Multiple point samples",
+      "Point sample",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity",
+      "Grab sample  (dip)"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Sample-Composite Without Parents"
+    ],
+    "comments": [
+      "OCALA LABID ID NUMBER:  200109031",
+      "OCALA LABID ID NUMBER:  200200358",
+      "OCALA LABID ID NUMBER:  200202799"
+    ],
+    "n_records": 388
+  },
+  "USGS-02334885": {
+    "equipment": [
+      "US DH-81 with Teflon cap and nozzle",
+      "Other",
+      "Sampler, point, automatic",
+      "US DH-81",
+      "Unknown",
+      "Sampler, US DH-59",
+      "Open-Mouth Bottle",
+      "Grab sample"
+    ],
+    "method_name": [
+      "Equal width increment (ewi)",
+      "Point sample",
+      "Composite - Multiple point samples",
+      "USGS",
+      "Single vertical, depth integrated",
+      "Grab sample  (dip)",
+      "Multiple verticals",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity",
+      "Multiple verticals, stations determined by EDI method, non-isokinetic velocity"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Sample-Composite Without Parents"
+    ],
+    "comments": [
+      "OCALA LABID ID NUMBER:  200104779",
+      "OCALA LABID ID NUMBER:  200301773   Rolla, MO USGS lab.",
+      "OCALA LABID ID NUMBER:  200301187   ed at Rolla, MO USGS la b."
+    ],
+    "n_records": 344
+  },
+  "USGS-02335350": {
+    "equipment": [
+      "US DH-81",
+      "Sampler, point, automatic",
+      "Other",
+      NaN,
+      "Sampler, US DH-59",
+      "Unknown",
+      "Open-Mouth Bottle",
+      "US DH-95 plastic bottle",
+      "Grab sample",
+      "US DH-81 with Teflon cap and nozzle"
+    ],
+    "method_name": [
+      "Multiple verticals",
+      "Composite - Multiple point samples",
+      "Point sample",
+      "Equal width increment (ewi)",
+      "Single vertical, depth integrated",
+      "USGS",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity",
+      "Grab sample  (dip)"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Sample-Composite Without Parents"
+    ],
+    "comments": [
+      "OCALA LABID ID NUMBER:  200208210   ab.",
+      "OCALA LABID ID NUMBER:  200301580   ed at Rolla, MO USGS la b.",
+      "OCALA LABID ID NUMBER:  200301188   ed at Rolla, MO USGS la b."
+    ],
+    "n_records": 308
+  },
+  "USGS-02336030": {
+    "equipment": [
+      "Other",
+      "Unknown",
+      "US DH-81",
+      "Grab sample",
+      "Sampler, US DH-48",
+      "Sampler, US DH-59",
+      NaN,
+      "US DH-95 plastic bottle",
+      "Sampler, point, automatic",
+      "Open-Mouth Bottle"
+    ],
+    "method_name": [
+      "Equal width increment (ewi)",
+      "Other",
+      "USGS",
+      "Grab sample  (dip)",
+      "Multiple verticals",
+      "Single vertical, depth integrated",
+      "Composite - Multiple point samples",
+      "Point sample",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity"
+    ],
+    "activity_type": [
+      "Sample-Composite Without Parents",
+      "Sample-Routine"
+    ],
+    "comments": [
+      "OCALA LABID ID NUMBER:  200110234",
+      "OCALA LABID ID NUMBER:  200200383",
+      "OCALA LABID ID NUMBER:  200200214"
+    ],
+    "n_records": 374
+  },
+  "USGS-02336120": {
+    "equipment": [
+      "Unknown",
+      "Sampler, point, automatic",
+      "US DH-81",
+      "Sampler, frame-type, plastic bottle",
+      "Grab sample",
+      "US DH-95 plastic bottle",
+      "US DH-81 with Teflon cap and nozzle",
+      "Open-Mouth Bottle"
+    ],
+    "method_name": [
+      "USGS",
+      "Point sample",
+      "Equal width increment (ewi)",
+      "Grab sample  (dip)",
+      "Multiple verticals",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Sample-Composite Without Parents",
+      "Not determined"
+    ],
+    "comments": [
+      "\"SC, pH, Turb = churn composite; H2O temp, DO = median insitu record @ collect times\"",
+      "ROUTINE SAMPLE",
+      "RAIN US IN BASIN PREV. EVENING"
+    ],
+    "n_records": 347
+  },
+  "USGS-02336240": {
+    "equipment": [
+      "Sampler, point, automatic",
+      "Unknown",
+      "Grab sample",
+      "US DH-81",
+      "US DH-95 plastic bottle",
+      "Open-Mouth Bottle"
+    ],
+    "method_name": [
+      "Point sample",
+      "USGS",
+      "Grab sample  (dip)",
+      "Equal width increment (ewi)",
+      "Multiple verticals",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity"
+    ],
+    "activity_type": [
+      "Sample-Composite Without Parents",
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "Field QW values from insitu record",
+      "ISCO COMPOSITE",
+      "ISCO COMPOSITE SAMPLE"
+    ],
+    "n_records": 263
+  },
+  "USGS-02336300": {
+    "equipment": [
+      "Unknown",
+      "Peristaltic pump",
+      "Weighted-bottle sampler",
+      "Sampler, US D-77",
+      "US DH-81 with Teflon cap and nozzle",
+      "Grab sample",
+      "Sampler, point, automatic",
+      "US DH-95 plastic bottle",
+      "US DH-81",
+      "Open-Mouth Bottle",
+      "US WBH-96 weighted-bottle sampler"
+    ],
+    "method_name": [
+      "USGS",
+      "Point sample",
+      "Equal width increment (ewi)",
+      "Grab sample  (dip)",
+      "Multiple verticals",
+      "Weighted bottle"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate",
+      "Sample-Composite Without Parents"
+    ],
+    "comments": [
+      "CATIONS DUP'ED",
+      "BOTTLES OK",
+      "BOTTLES OK; CATIONS RR AND DUPLICATE"
+    ],
+    "n_records": 473
+  },
+  "USGS-02336360": {
+    "equipment": [
+      "Sampler, point, automatic",
+      "Sampler, frame-type, plastic bottle",
+      "Weighted-bottle sampler",
+      "US DH-81",
+      "Unknown",
+      "Grab sample",
+      "Peristaltic pump",
+      "Open-Mouth Bottle"
+    ],
+    "method_name": [
+      "Point sample",
+      "Grab sample  (dip)",
+      "Equal width increment (ewi)",
+      "USGS",
+      "Multiple verticals",
+      "Weighted bottle"
+    ],
+    "activity_type": [
+      "Sample-Composite Without Parents",
+      "Sample-Routine"
+    ],
+    "comments": [
+      "Field QW values from insitu record",
+      "STORM SAMPLE",
+      "\"SC, pH, Turb = churn composite; H2O temp = median insitu record @ collect times, DO NA\""
+    ],
+    "n_records": 137
+  },
+  "USGS-02336526": {
+    "equipment": [
+      "Unknown",
+      "Sampler, point, automatic",
+      "US DH-81",
+      "Grab sample",
+      "US DH-81 with Teflon cap and nozzle",
+      "Weighted-bottle sampler",
+      "Open-Mouth Bottle"
+    ],
+    "method_name": [
+      "USGS",
+      "Point sample",
+      "Equal width increment (ewi)",
+      "Grab sample  (dip)",
+      "Single vertical, depth integrated",
+      "Multiple verticals",
+      "Weighted bottle",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Sample-Composite Without Parents",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "MINNOWS IN STREAM",
+      "\"ROUTINE SAMPLE;L-3020079 x= sch1433 taken from btl    *district/hartley verified addition of sch1433 correct, paa, 11/5/03\"",
+      "ROUTINE SAMPLE"
+    ],
+    "n_records": 185
+  },
+  "USGS-02336728": {
+    "equipment": [
+      "Unknown",
+      "Grab sample",
+      "US DH-81 with Teflon cap and nozzle",
+      "US DH-81",
+      "Sampler, point, automatic",
+      "US DH-95 plastic bottle",
+      "Peristaltic pump"
+    ],
+    "method_name": [
+      "USGS",
+      "Grab sample  (dip)",
+      "Equal width increment (ewi)",
+      "Point sample",
+      "Multiple verticals"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate",
+      "Sample-Composite Without Parents"
+    ],
+    "comments": [
+      "SEWAGE ODOR",
+      "A-0900052tpcn volume 63 ml",
+      "ROUTINE SAMPLE"
+    ],
+    "n_records": 77
+  },
+  "USGS-03216070": {
+    "equipment": [
+      "Unknown",
+      "US D-96 bag sampler",
+      "US D-96-A1 Bag Sampler",
+      "Weighted-bottle sampler"
+    ],
+    "method_name": [
+      "USGS",
+      "Equal discharge increment (edi)",
+      "Equal width increment (ewi)",
+      "Single vertical, depth integrated",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity",
+      "Multiple verticals"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "A-2680093 TPCN FILTERS=35,35,35",
+      "A-0120049 TPCN Volumes=30,30,30 L-0120049 FED EX LATE DELIVERY  Deleted proposal per Lott. 2/1/2016 mec",
+      "A-0900011 TPCN volumes= 30, 32, 30"
+    ],
+    "n_records": 162
+  },
+  "USGS-03302060": {
+    "equipment": [
+      "US D-96 bag sampler",
+      "US D-96-A1 Bag Sampler",
+      "Unknown",
+      "Grab sample",
+      "Weighted-bottle sampler"
+    ],
+    "method_name": [
+      "Equal discharge increment (edi)",
+      "Multiple verticals",
+      "USGS",
+      "Grab sample  (dip)",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity",
+      "Multiple verticals, stations determined by EDI method, non-isokinetic velocity",
+      "Composite - Multiple point samples"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [],
+    "n_records": 56
+  },
+  "USGS-03353415": {
+    "equipment": [
+      "US D-95 Teflon bottle",
+      "Grab sample",
+      "US DH-81 with Teflon cap and nozzle",
+      "Unknown",
+      "Weighted-bottle sampler",
+      "US DH-81",
+      "US DH-95 Teflon bottle",
+      "US DH-48 TM"
+    ],
+    "method_name": [
+      "Equal width increment (ewi)",
+      "Grab sample  (dip)",
+      "Multiple verticals",
+      "USGS",
+      "Weighted bottle"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "L-2780020 Deleted LC 3118 and added SCH 2711 per D. McCausland. JPC 10/5/18",
+      "L-0540013 Added field conductance and pH per Mccausland. 2/23/2018 mec",
+      "Bottle says 08/07/19"
+    ],
+    "n_records": 194
+  },
+  "USGS-03353420": {
+    "equipment": [
+      "US DH-81 with Teflon cap and nozzle",
+      "US D-95 Teflon bottle",
+      "Sampler, US DH-59",
+      "Sampler, US DH-76",
+      "US DH-81",
+      "US DH-95 Teflon bottle",
+      "Grab sample",
+      "US DH-48 TM",
+      "Weighted-bottle sampler",
+      "Unknown"
+    ],
+    "method_name": [
+      "Multiple verticals",
+      "Equal width increment (ewi)",
+      "Grab sample  (dip)",
+      "Weighted bottle",
+      "USGS"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "L-3500078 X=no label on bottles. Login as set.",
+      "L-0540014 Added field conductance and pH per Mccausland. 2/23/2018 mec"
+    ],
+    "n_records": 178
+  },
+  "USGS-03432100": {
+    "equipment": [
+      "Unknown",
+      "Sampler, US DH-48",
+      "Grab sample",
+      "Sampler, point, automatic"
+    ],
+    "method_name": [
+      "USGS",
+      "Single vertical, depth integrated",
+      "Grab sample  (dip)",
+      "Peristaltic pump",
+      "SuspSed; Pumping - stream sample using a pumping mechanism"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "open mouth",
+      "hand held",
+      "dh48"
+    ],
+    "n_records": 251
+  },
+  "USGS-034324715": {
+    "equipment": [
+      "Unknown",
+      "Sampler, point, automatic"
+    ],
+    "method_name": [
+      "USGS",
+      "SuspSed; Pumping - stream sample using a pumping mechanism",
+      "Peristaltic pump"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "FNU420",
+      "fnu61",
+      "fnu32"
+    ],
+    "n_records": 141
+  },
+  "USGS-03432472": {
+    "equipment": [
+      "Unknown",
+      "Sampler, point, automatic",
+      "Grab sample",
+      "Sampler, US DH-48"
+    ],
+    "method_name": [
+      "USGS",
+      "Peristaltic pump",
+      "Grab sample  (dip)",
+      "Equal width increment (ewi)",
+      "SuspSed; Pumping - stream sample using a pumping mechanism"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "Manual",
+      "FNU: 99",
+      "FNU: 24"
+    ],
+    "n_records": 282
+  },
+  "USGS-03432504": {
+    "equipment": [
+      "Unknown",
+      "Sampler, point, automatic",
+      "Grab sample",
+      "Sampler, US DH-48"
+    ],
+    "method_name": [
+      "USGS",
+      "Peristaltic pump",
+      "Grab sample  (dip)",
+      "Equal width increment (ewi)",
+      "SuspSed; Pumping - stream sample using a pumping mechanism"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "fnu51",
+      "fnu160",
+      "fnu120"
+    ],
+    "n_records": 304
+  },
+  "USGS-034325065": {
+    "equipment": [
+      "Unknown",
+      "Sampler, point, automatic",
+      "Grab sample",
+      "Sampler, US DH-48"
+    ],
+    "method_name": [
+      "USGS",
+      "Peristaltic pump",
+      "Grab sample  (dip)",
+      "Equal width increment (ewi)",
+      "SuspSed; Pumping - stream sample using a pumping mechanism"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "FNU: 23",
+      "7",
+      "15"
+    ],
+    "n_records": 338
+  },
+  "USGS-03432516": {
+    "equipment": [
+      "Unknown",
+      "Sampler, point, automatic",
+      "Sampler, US DH-48",
+      "Grab sample"
+    ],
+    "method_name": [
+      "USGS",
+      "Peristaltic pump",
+      "SuspSed; Pumping - stream sample using a pumping mechanism",
+      "Equal width increment (ewi)",
+      "Grab sample  (dip)"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "15",
+      "12",
+      "3 - FNU: 5.4"
+    ],
+    "n_records": 403
+  },
+  "USGS-03432522": {
+    "equipment": [
+      "Sampler, point, automatic",
+      "Unknown",
+      "Grab sample"
+    ],
+    "method_name": [
+      "SuspSed; Pumping - stream sample using a pumping mechanism",
+      "USGS",
+      "Peristaltic pump",
+      "Grab sample  (dip)"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "SAMPLE 5 - FNU: 7.1",
+      "fnu 79",
+      "fnu 26"
+    ],
+    "n_records": 288
+  },
+  "USGS-03433637": {
+    "equipment": [
+      "Unknown",
+      "Sampler, point, automatic",
+      "Other",
+      "Sampler, US DH-48",
+      "Grab sample"
+    ],
+    "method_name": [
+      "USGS",
+      "Peristaltic pump",
+      "Point sample",
+      "Grab sample  (dip)"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "fnu190",
+      "FNU: 140",
+      "FNU: 12"
+    ],
+    "n_records": 451
+  },
+  "USGS-034336392": {
+    "equipment": [
+      "Unknown",
+      "Sampler, point, automatic",
+      "Grab sample"
+    ],
+    "method_name": [
+      "USGS",
+      "Peristaltic pump",
+      "Grab sample  (dip)"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "manual",
+      "FNU: 9.3",
+      "FNU:59"
+    ],
+    "n_records": 268
+  },
+  "USGS-03601630": {
+    "equipment": [
+      "Sampler, point, automatic",
+      "Other",
+      "Sampler, US DH-48",
+      "Unknown",
+      "Grab sample"
+    ],
+    "method_name": [
+      "Peristaltic pump",
+      "Point sample",
+      "Single vertical, depth integrated",
+      "USGS",
+      "Grab sample  (dip)"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "storm 76",
+      "right",
+      "spike"
+    ],
+    "n_records": 438
+  },
+  "USGS-03612600": {
+    "equipment": [
+      "US D-96 bag sampler",
+      "Grab sample",
+      "Unknown",
+      "US D-96-A1 Bag Sampler"
+    ],
+    "method_name": [
+      "Equal discharge increment (edi)",
+      "Equal width increment (ewi)",
+      "Grab sample  (dip)",
+      "USGS",
+      "Multiple verticals"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "A-3040046 This is the environmental sample,no associated data. L-3040046 Changed Station ID and Name to current per A. Crain. JPC 6/6/16",
+      "A-3530040 This is the environmental sample, associated with it is a schedule 2711. L-3530040 X=sta ID on sample 03612500",
+      "L-2190233 X=time on TBY is 1400"
+    ],
+    "n_records": 255
+  },
+  "USGS-04024000": {
+    "equipment": [
+      "Unknown",
+      "Sampler, US D-74AL",
+      "Sampler, US D-49",
+      "Sampler, point, automatic",
+      "Weighted-bottle sampler",
+      "Grab sample",
+      "Van Dorn sampler"
+    ],
+    "method_name": [
+      "USGS",
+      "Equal discharge increment (edi)",
+      "Multiple verticals",
+      "Equal width increment (ewi)",
+      "Single vertical, depth integrated",
+      "Timed sampling interval",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity",
+      "Grab sample  (dip)",
+      "Weighted bottle",
+      "Point sample"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "ALK=54,CL=3.6,SO4=18",
+      "RR:CATIONS DUP'D",
+      "CATIONS & SC DUP'D"
+    ],
+    "n_records": 457
+  },
+  "USGS-04026005": {
+    "equipment": [
+      "Unknown"
+    ],
+    "method_name": [
+      "USGS"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "1"
+    ],
+    "n_records": 144
+  },
+  "USGS-040851385": {
+    "equipment": [
+      "Unknown"
+    ],
+    "method_name": [
+      "USGS"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "L-2280144 Updated UC from MI per Beeler.  KB 08/18/11",
+      "paper work says project number: GR11NA00E5AA",
+      "L-2280145 Updated UC from MI per Beeler.  KB 08/18/11"
+    ],
+    "n_records": 504
+  },
+  "USGS-04085427": {
+    "equipment": [
+      "Unknown",
+      "Sampler, US DH-75Q",
+      "Sampler, US D-77",
+      "US D-77 TM",
+      "US DH-81"
+    ],
+    "method_name": [
+      "USGS",
+      "Equal width increment (ewi)"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Sample-Composite Without Parents"
+    ],
+    "comments": [
+      "CATIONS RR",
+      "NH4-D,NO2+3-D,NO2-D,PO4-D UPDATED;DA",
+      "BOTTLES OK"
+    ],
+    "n_records": 672
+  },
+  "USGS-04087119": {
+    "equipment": [
+      "Unknown",
+      "US DH-81 with Teflon cap and nozzle",
+      "Grab sample",
+      "US DH-95 Teflon bottle",
+      "US D-95 Teflon bottle"
+    ],
+    "method_name": [
+      "USGS",
+      "Equal width increment (ewi)",
+      "Multiple verticals",
+      "Grab sample  (dip)"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "A-2220107 tpc filter 1 vol. filtered= 65 tpc filter 2 vol. filtered= 75 L-2220107 recvd 8-07-04",
+      "A-3020072 TPC Filter 1 vol. Filtered = 80;          TPC Filter 2 vol. Filtered = 90",
+      "A-2110083 tpc filter 1 vol filtered=81; tpc filter 2 vol filtered=113"
+    ],
+    "n_records": 284
+  },
+  "USGS-04087170": {
+    "equipment": [
+      "US WBH-96 weighted-bottle sampler",
+      "Kemmerer bottle",
+      "Sampler, point, automatic",
+      "Unknown",
+      "Other"
+    ],
+    "method_name": [
+      "Grab sample  (dip)",
+      "Multiple verticals",
+      "Single vertical, depth integrated",
+      "USGS",
+      "Point sample"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Sample-Composite Without Parents",
+      "Quality Control Sample-Other"
+    ],
+    "comments": [
+      "A-1340054 tpc filter 1 vol. filtered= 39 tpc filter 2 vol. filtered= 38 L-1340054 x= cooler received late (11:30am, 5/13/04) according to DOI contract with FedEX. File claim with FedEX.com for late delivery charges.",
+      "A-0700034 tpc filter 1 vol. filtered= 72 ml tpc filter 2 vol. filtered= 50 ml L-0700034 x= no time or date on wca or fcc",
+      "A-1010035 TPC Filter 1 vol. Filtered = 98    TPC Filter 2 vol. Filtered = 107 L-1010035 Received April 09,2005"
+    ],
+    "n_records": 722
+  },
+  "USGS-04095090": {
+    "equipment": [
+      "Sampler, point, automatic",
+      "Unknown"
+    ],
+    "method_name": [
+      "Point sample",
+      "USGS"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "L-2840012 Received October 08,2011..  \"future\" ASR date corrected to 20111007 per smpls and rest of smpl set, paa, 10/11/11  Received October 08, 2011",
+      "L-1360095 Received May 14, 2011  Low volume samples  Received May 14, 2011",
+      "L-1220017 Received April 30, 2011"
+    ],
+    "n_records": 83
+  },
+  "USGS-04101500": {
+    "equipment": [
+      "Unknown",
+      "Sampler, US D-74AL",
+      "Sampler, US D-77",
+      "US D-74 AL-TM",
+      "US D-95 Teflon bottle",
+      "Sampler, point, automatic",
+      "US DH-95 Teflon bottle",
+      "US DH-2 Bag Sampler",
+      "US DH-95 plastic bottle"
+    ],
+    "method_name": [
+      "USGS",
+      "Equal discharge increment (edi)",
+      "Equal width increment (ewi)",
+      "Point sample",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity",
+      "Grab sample  (dip)",
+      "Multiple verticals"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "RR: CATIONS + ANIONS DUP",
+      "NO2+NO3, DISS=2.6",
+      "VALUES UPDTED 4/13 AFTER PROB W/DATA"
+    ],
+    "n_records": 430
+  },
+  "USGS-04108660": {
+    "equipment": [
+      "US DH-95 Teflon bottle",
+      "Sampler, point, automatic",
+      "Grab sample",
+      "US DH-95 plastic bottle",
+      "Peristaltic pump",
+      "Unknown",
+      "US DH-81"
+    ],
+    "method_name": [
+      "Equal width increment (ewi)",
+      "Point sample",
+      "Grab sample  (dip)",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity",
+      "Peristaltic pump",
+      "Multiple verticals",
+      "USGS"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Sample-Composite Without Parents"
+    ],
+    "comments": [
+      "\"L-1190138 Updated account number to full account number for the project - GR11NA00E52AA00, 05/2/11 dld.\"",
+      "\"L-1380020 Received May 17, 2011\"",
+      "\"L-3490047 Received December 14, 2011\""
+    ],
+    "n_records": 189
+  },
+  "USGS-04142000": {
+    "equipment": [
+      "Unknown",
+      "Sampler, US DH-75P",
+      "Sampler, US DH-59",
+      "US DH-76 TM with Teflon gasket and nozzle",
+      "Sampler, point, automatic",
+      "Grab sample",
+      "US DH-95 Teflon bottle",
+      "US DH-95 plastic bottle"
+    ],
+    "method_name": [
+      "USGS",
+      "Equal width increment (ewi)",
+      "Equal discharge increment (edi)",
+      "Point sample",
+      "Grab sample  (dip)",
+      "Multiple verticals",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "RERUNS:CATIONS DUPLICATED",
+      "NO2+3-T&D RR &DUPD",
+      "\"L-3010124 deleted expired proposal per sullivan,paa,10/28/11\""
+    ],
+    "n_records": 557
+  },
+  "USGS-04144032": {
+    "equipment": [
+      "Grab sample",
+      "Unknown",
+      "US DH-81",
+      "Sampler, point, automatic",
+      "US DH-95 plastic bottle",
+      "Other"
+    ],
+    "method_name": [
+      "Point sample",
+      "USGS",
+      "Equal width increment (ewi)",
+      "Multiple verticals",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity",
+      "Grab sample  (dip)"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "1",
+      "4"
+    ],
+    "n_records": 706
+  },
+  "USGS-04157005": {
+    "equipment": [
+      "Sampler, point, automatic",
+      "US DH-95 Teflon bottle",
+      "Grab sample",
+      "US DH-95 plastic bottle",
+      "Unknown"
+    ],
+    "method_name": [
+      "Point sample",
+      "Equal width increment (ewi)",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity",
+      "Multiple verticals",
+      "Grab sample  (dip)",
+      "USGS"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "L-1530110 X = Recvd warm CHY Frozen containers received warm at 1.5   Degrees C..  ok log warm chlorophyll per sullivan and wydoski, paa, 6/1/12",
+      "L-2930095 X = Time on CHY = (inside) label is 0900 (outside) lablel is 1100 Frozen containers received warm at 1.1   Degrees C..  ok log warm GLRI chlorophyll per sullivan and DW, paa",
+      "L-1660136 X = Received warm GLRI, CHY Frozen containers received warm at 2.1   Degrees C..  ok log warm chlorophyll per sullivan and DW, paa, 6/15/12"
+    ],
+    "n_records": 225
+  },
+  "USGS-04161820": {
+    "equipment": [
+      "US D-77 TM",
+      "US DH-81 with Teflon cap and nozzle",
+      "Grab sample",
+      "Unknown",
+      "US DH-81",
+      "US D-95 Teflon bottle",
+      "US D-95 plastic bottle",
+      "Sampler, US D-77",
+      "Other",
+      "US DH-95 Teflon bottle",
+      "US DH-95 plastic bottle",
+      "Open-Mouth Bottle"
+    ],
+    "method_name": [
+      "Equal width increment (ewi)",
+      "Single vertical, depth integrated",
+      "USGS",
+      "Multiple verticals",
+      "Equal discharge increment (edi)",
+      "Grab sample  (dip)",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity",
+      "Point sample"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate",
+      "Unknown"
+    ],
+    "comments": [
+      "BALANCES W/LAB ALK",
+      "L-2840091 no ru's?, x=btls have 930 time",
+      "L-1490192 x=no ru,fu,fa sent or recieved"
+    ],
+    "n_records": 618
+  },
+  "USGS-04165500": {
+    "equipment": [
+      "Unknown",
+      "Sampler, US D-74AL",
+      "Sampler, US D-74",
+      "US D-77 TM",
+      "Sampler, point, automatic",
+      "US DH-95 Teflon bottle",
+      "US DH-81 with Teflon cap and nozzle",
+      "US DH-95 plastic bottle",
+      "US DH-81",
+      "Grab sample",
+      "Peristaltic pump"
+    ],
+    "method_name": [
+      "USGS",
+      "Equal discharge increment (edi)",
+      "Point sample",
+      "Equal width increment (ewi)",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity",
+      "Multiple verticals",
+      "Grab sample  (dip)"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "organic material- small stick or leaf",
+      "\"L-2130019 Received July 30, 2011\"",
+      "\"L-2690037 Received September 24, 2011\""
+    ],
+    "n_records": 651
+  },
+  "USGS-04166500": {
+    "equipment": [
+      "US DH-95 Teflon bottle",
+      "Sampler, point, automatic",
+      "US DH-81 with Teflon cap and nozzle",
+      "Grab sample",
+      "Peristaltic pump",
+      "US DH-81",
+      "US DH-95 plastic bottle",
+      "Unknown"
+    ],
+    "method_name": [
+      "Equal width increment (ewi)",
+      "Point sample",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity",
+      "Grab sample  (dip)",
+      "Multiple verticals",
+      "USGS"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Sample-Composite Without Parents"
+    ],
+    "comments": [
+      "L-1390018 Received May 18, 2011",
+      "L-1510018 Received May 28, 2011",
+      "L-3220194 Low vol FU"
+    ],
+    "n_records": 286
+  },
+  "USGS-04168400": {
+    "equipment": [
+      "US DH-81",
+      "US DH-95 Teflon bottle",
+      "Sampler, point, automatic",
+      "Peristaltic pump",
+      "US DH-81 with Teflon cap and nozzle",
+      "Grab sample",
+      "US DH-95 plastic bottle",
+      "Unknown"
+    ],
+    "method_name": [
+      "Equal width increment (ewi)",
+      "Point sample",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity",
+      "Multiple verticals",
+      "USGS",
+      "Grab sample  (dip)"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Sample-Composite Without Parents",
+      "Unknown"
+    ],
+    "comments": [
+      "L-2360046 Received August 21, 2015",
+      "L-1800011 X=date on btls is 6/26/15    Received June 27, 2015",
+      "L-2360044 Received August 21, 2015"
+    ],
+    "n_records": 92
+  },
+  "USGS-04176500": {
+    "equipment": [
+      "Unknown",
+      "Sampler, US D-74AL",
+      "Sampler, US DH-48",
+      "US DH-81",
+      "US DH-76 TM with Teflon gasket and nozzle",
+      "Sampler, US D-77",
+      "Sampler, point, automatic",
+      "US DH-81 with Teflon cap and nozzle",
+      "US DH-95 Teflon bottle",
+      "Other",
+      "US DH-95 plastic bottle"
+    ],
+    "method_name": [
+      "USGS",
+      "Equal discharge increment (edi)",
+      "Equal width increment (ewi)",
+      "Point sample",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity",
+      "Grab sample  (dip)",
+      "Multiple verticals"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Not determined"
+    ],
+    "comments": [
+      "ANIONS RR  VALUES DUP'ED  BALANCES W",
+      "NO2-D&T NH3-D&T PO4-D&T RR  VALUES D",
+      "BALANCES W/ LAB ALKALINITY"
+    ],
+    "n_records": 609
+  },
+  "USGS-04193490": {
+    "equipment": [
+      "Peristaltic pump",
+      "Unknown",
+      "Grab sample"
+    ],
+    "method_name": [
+      "Peristaltic pump",
+      "USGS",
+      "Grab sample  (dip)"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "L-1650111 X = Need more ice on top",
+      "\"L-3190003 WS medium code and smpl type 9 added per rest, WSC to verify, paa, 11/15/11\"",
+      "L-1650108 X = Need more ice on top"
+    ],
+    "n_records": 77
+  },
+  "USGS-04195500": {
+    "equipment": [
+      "Peristaltic pump",
+      "US DH-81",
+      "Unknown",
+      "US D-95 Teflon bottle",
+      "US DH-81 with Teflon cap and nozzle"
+    ],
+    "method_name": [
+      "Peristaltic pump",
+      "Equal width increment (ewi)",
+      "Multiple verticals",
+      "USGS",
+      "Point sample",
+      "Other",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "L-2630072 extra WCA and FCC recvd  email to Kevin",
+      "bottle time says 2318",
+      "L-3010022 deleted expired proposal per sullivan,paa,10/28/11"
+    ],
+    "n_records": 78
+  },
+  "USGS-04199000": {
+    "equipment": [
+      "Unknown",
+      "US DH-81",
+      "US DH-95 Teflon bottle",
+      "Peristaltic pump",
+      "Grab sample",
+      "US D-95 Teflon bottle",
+      "US DH-81 with Teflon cap and nozzle",
+      "US DH-95 plastic bottle",
+      "Open-Mouth Bottle",
+      "Weighted-bottle sampler"
+    ],
+    "method_name": [
+      "USGS",
+      "Equal width increment (ewi)",
+      "Peristaltic pump",
+      "Grab sample  (dip)",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity",
+      "Multiple verticals",
+      "Weighted bottle"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "BOTTLE NOTES GRAB",
+      "L-3070129 Chilled containers received warm at 6.9   Degrees C",
+      "\"L-0260012 WCA btl condition changed to improper preservation, JNV\""
+    ],
+    "n_records": 302
+  },
+  "USGS-04199500": {
+    "equipment": [
+      "Unknown",
+      "Peristaltic pump",
+      "Grab sample",
+      "US D-95 Teflon bottle",
+      "US DH-81 with Teflon cap and nozzle",
+      "US DH-81",
+      "US DH-95 plastic bottle",
+      "Weighted-bottle sampler",
+      "US DH-95 Teflon bottle"
+    ],
+    "method_name": [
+      "USGS",
+      "Peristaltic pump",
+      "Equal width increment (ewi)",
+      "Grab sample  (dip)",
+      "Point sample",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity",
+      "Multiple verticals",
+      "Weighted bottle"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "\"L-3550070 med code WS and smpl type 9 added per historical, WSC please verify, paa, 12/28/11\"",
+      "bottle date day 11/28/11",
+      "L-1580115 X = No GCC recvd"
+    ],
+    "n_records": 322
+  },
+  "USGS-04212100": {
+    "equipment": [
+      "Unknown",
+      "US DH-81",
+      "US DH-81 with Teflon cap and nozzle",
+      "US DH-95 Teflon bottle",
+      "US DH-95 plastic bottle",
+      "Peristaltic pump",
+      "Grab sample",
+      "Weighted-bottle sampler",
+      "Open-Mouth Bottle"
+    ],
+    "method_name": [
+      "USGS",
+      "Equal width increment (ewi)",
+      "Peristaltic pump",
+      "Grab sample  (dip)",
+      "Weighted bottle",
+      "Multiple verticals"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "L-3070131 Chilled containers received warm at 6.9   Degrees C",
+      "BOTTLE NOTES GRAB SAMPLE",
+      "L-0040008 Ice chips in WCA"
+    ],
+    "n_records": 209
+  },
+  "USGS-04213500": {
+    "equipment": [
+      "Unknown",
+      "Velocity integrated sample",
+      "Sampler, point, automatic",
+      "Sampler, US DH-59",
+      "Sampler, US DH-48",
+      "Sampler, US D-74",
+      "US DH-95 plastic bottle",
+      "US DH-81",
+      "Sampler, US D-74AL",
+      "Weighted-bottle sampler",
+      "Open-Mouth Bottle",
+      "US DH-2 Bag Sampler",
+      "US DH-81 with Teflon cap and nozzle",
+      "US DH-95 Teflon bottle"
+    ],
+    "method_name": [
+      "USGS",
+      "Equal width increment (ewi)",
+      "Point sample",
+      "Multiple verticals",
+      "Single vertical, depth integrated",
+      "Grab sample  (dip)"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate",
+      "Sample-Composite Without Parents",
+      "Quality Control Sample-Field Blank"
+    ],
+    "comments": [
+      "CA, MG, NA, K:RR",
+      "CN RR;ROE DO'D",
+      "D&T NO2+3 DUP'D"
+    ],
+    "n_records": 477
+  },
+  "USGS-04219768": {
+    "equipment": [
+      "US DH-81 with Teflon cap and nozzle",
+      "Sampler, US DH-48",
+      "US DH-81",
+      "Open-Mouth Bottle",
+      "Unknown",
+      "US DH-95 Teflon bottle",
+      "US DH-95 plastic bottle"
+    ],
+    "method_name": [
+      "Equal width increment (ewi)",
+      "Multiple verticals",
+      "USGS",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "L-3210035 Numerical result and or metadata revised; see NWQL Technical Memorandum 2022.01",
+      "L-2230066 X=no label on FCC, log in w/set",
+      "L-0160007 FED EX LATE DELIVERY  Received Jan 16, 2018"
+    ],
+    "n_records": 75
+  },
+  "USGS-04231600": {
+    "equipment": [
+      "Unknown",
+      "US DH-95 plastic bottle",
+      "US DH-95 Teflon bottle",
+      "Sampler, point, automatic",
+      "US D-95 Teflon bottle",
+      "Sampler, US DH-59",
+      "US DH-81",
+      "US DH-59 TM",
+      "US DH-81 with Teflon cap and nozzle"
+    ],
+    "method_name": [
+      "USGS",
+      "Equal width increment (ewi)",
+      "Point sample",
+      "Multiple verticals",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate",
+      "Sample-Composite Without Parents"
+    ],
+    "comments": [
+      "A-3010107 Run FCC bottle for Chloride lab code 1571, missing bottle FU L-3010107 FU not received, will submit FCC as FU when nutrients are completed, paa, 10/28/11",
+      "A-3540051 FCC includes bottle for chloride lab code 1571 L-3540051 FCC includes bottle for chloride lab code 1571   Logged from problem cooler per Dan, Improper sample container for FCC, will add FCC as FU at later date, paa, 12/20/11   Received December 10, 2011",
+      "A-1390149 125mL FU bottle for Chloride lab code 1571 L-1390149 X = Improper sample container for FU btl - 125mL"
+    ],
+    "n_records": 217
+  },
+  "USGS-04249000": {
+    "equipment": [
+      "Unknown",
+      "Velocity integrated sample",
+      "US D-74 AL-TM with Teflon gasket and nozzle",
+      "US DH-95 plastic bottle",
+      "US DH-95 Teflon bottle",
+      "US DH-81",
+      "Sampler, US P-61-A1",
+      "Sampler, US DH-59",
+      "US D-95 Teflon bottle",
+      "US DH-59 TM",
+      "US DH-81 with Teflon cap and nozzle"
+    ],
+    "method_name": [
+      "USGS",
+      "Equal width increment (ewi)",
+      "Grab sample  (dip)",
+      "Multiple verticals",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "NO2+3-D&T RR & DUP'D BTLS OK",
+      "L-1180162 Updated SID from 042490000 per M. Phillips.  KB 06/24/11  X = Improper sample container for FU 125mL",
+      "L-3130078 X = Improper sample container for FU - 125mL"
+    ],
+    "n_records": 351
+  },
+  "USGS-05406457": {
+    "equipment": [
+      "Unknown"
+    ],
+    "method_name": [
+      "USGS"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "0",
+      "BASEFLOW SAMPLES",
+      "STORM SAMPLES"
+    ],
+    "n_records": 214
+  },
+  "USGS-05406479": {
+    "equipment": [
+      "Unknown"
+    ],
+    "method_name": [
+      "USGS"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "0",
+      "STORM SAMPLES",
+      "BASEFLOW SAMPLES"
+    ],
+    "n_records": 52
+  },
+  "USGS-05406497": {
+    "equipment": [
+      "Unknown"
+    ],
+    "method_name": [
+      "USGS"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "0",
+      "BASEFLOW SAMPLES",
+      "STORM SAMPLES"
+    ],
+    "n_records": 54
+  },
+  "USGS-05406500": {
+    "equipment": [
+      "Unknown",
+      "US DH-81"
+    ],
+    "method_name": [
+      "USGS",
+      "Point sample",
+      "Equal width increment (ewi)",
+      "Grab sample  (dip)"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "L-2560006 recvd 9-12-02",
+      "Dave G low flow monitoring 2006",
+      "0"
+    ],
+    "n_records": 557
+  },
+  "USGS-05447500": {
+    "equipment": [
+      "Unknown",
+      "Open-Mouth Bottle",
+      "US D-95 Teflon bottle",
+      "US DH-2 Bag Sampler",
+      "Weighted-bottle sampler",
+      "Grab sample"
+    ],
+    "method_name": [
+      "USGS",
+      "Point sample",
+      "Multiple verticals",
+      "Equal width increment (ewi)",
+      "Weighted bottle",
+      "Grab sample  (dip)"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "L-3220076 Acid checked, btl says FCC, but is acidified. WCA btl cap cracked. JPC",
+      "Very fine sand.",
+      "L-3560069 X=improper sample container, WCA in 250mL clear cap bottle"
+    ],
+    "n_records": 212
+  },
+  "USGS-05517500": {
+    "equipment": [
+      "US D-95 plastic bottle",
+      "US D-95 Teflon bottle",
+      "Sampler, US DH-76",
+      "US DH-81",
+      "US DH-81 with Teflon cap and nozzle",
+      "US DH-59 TM",
+      "US DH-95 Teflon bottle",
+      "Unknown",
+      "US WBH-96 weighted-bottle sampler"
+    ],
+    "method_name": [
+      "Equal width increment (ewi)",
+      "USGS",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "L-2300023 Removed \"Warm\" comment that was entered by mistake. JPC 8/23/17",
+      "L-3330154 RECEIVED NOV 27 2019."
+    ],
+    "n_records": 172
+  },
+  "USGS-05537980": {
+    "equipment": [
+      "Unknown",
+      "Weighted-bottle sampler",
+      "US DH-2 Bag Sampler",
+      "Open-Mouth Bottle",
+      "Sampler, point, automatic",
+      "Grab sample"
+    ],
+    "method_name": [
+      "USGS",
+      "Point sample",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity",
+      "Single vertical, depth integrated",
+      "Grab sample  (dip)",
+      "Equal width increment (ewi)",
+      "Weighted bottle"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "L-1970021 Changed begin date from 2018 to 2019 per Terrio. 7/27/2019 mec",
+      "L-1150177 Cooler did not have Dry Ice placard.",
+      "L-1970020 Changed begin date from 2018 to 2019 per Terrio. 7/27/2019 mec"
+    ],
+    "n_records": 86
+  },
+  "USGS-05567500": {
+    "equipment": [
+      "Unknown",
+      "Weighted-bottle sampler",
+      "Open-Mouth Bottle"
+    ],
+    "method_name": [
+      "USGS",
+      "Equal width increment (ewi)",
+      "Point sample"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [],
+    "n_records": 18
+  },
+  "USGS-05576100": {
+    "equipment": [
+      "Weighted-bottle sampler",
+      "Unknown",
+      "Open-Mouth Bottle",
+      "US DH-2 Bag Sampler"
+    ],
+    "method_name": [
+      "Point sample",
+      "USGS",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity",
+      "Equal width increment (ewi)",
+      "Weighted bottle"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "A-0490048 Past 30-day hold time- please analyze",
+      "L-1760035 Received June 23, 2016",
+      "98-3 and 98-4 had same time and date.  Used bottle with MORE stickers as 98-3"
+    ],
+    "n_records": 105
+  },
+  "USGS-05576195": {
+    "equipment": [
+      "Weighted-bottle sampler",
+      "Unknown",
+      "Open-Mouth Bottle",
+      "US DH-2 Bag Sampler"
+    ],
+    "method_name": [
+      "Point sample",
+      "USGS",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity",
+      "Equal width increment (ewi)",
+      "Weighted bottle"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "92-3 and 92-4 had same time and date.  Used bottle with MORE stickers as 92-3",
+      "92-1 and 92-2 had same time and date.  Used bottle with MORE stickers as 92-1",
+      "L-1760033 Received June 23, 2016"
+    ],
+    "n_records": 100
+  },
+  "USGS-05586300": {
+    "equipment": [
+      "Sampler, US DH-59",
+      "Sampler, US DH-76",
+      "US DH-95 plastic bottle",
+      "Weighted-bottle sampler",
+      "Grab sample",
+      "Open-Mouth Bottle",
+      "US D-96 bag sampler",
+      "US D-99 Bag Sampler",
+      "Van Dorn sampler",
+      "US DH-2 Bag Sampler",
+      "Unknown",
+      "US DH-81",
+      "Other"
+    ],
+    "method_name": [
+      "SuspSed; Box-single ver, depth-int, attached to structure",
+      "Single vertical, depth integrated",
+      "Equal width increment (ewi)",
+      "Grab sample  (dip)",
+      "Equal discharge increment (edi)",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity",
+      "Point sample",
+      "USGS",
+      "Weighted bottle",
+      "Multiple verticals"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "Observer sample",
+      "old T-box (under bridge)",
+      "T-box 1(at new observer box sampler)"
+    ],
+    "n_records": 881
+  },
+  "USGS-05595000": {
+    "equipment": [
+      "Grab sample",
+      "US DH-2 Bag Sampler",
+      "Weighted-bottle sampler",
+      "Open-Mouth Bottle",
+      "Unknown",
+      "US DH-95 Teflon bottle"
+    ],
+    "method_name": [
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity",
+      "Point sample",
+      "Equal width increment (ewi)",
+      "USGS",
+      "Weighted bottle"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "L-0060015 X=station ID on samples is 05595000. Changed Station ID to current per P. Terrio. JPC 1/6/16",
+      "L-0060017 X=station ID and date on samples is 0559500. 2015/12/31. Changed Station ID to current per P. Terrio JPC 1/6/16 Changed date to 2015/12/31. 1/7/2016 mec",
+      "L-3570061 Changed Station ID to current per P. Terrio. JPC 1/6/16"
+    ],
+    "n_records": 140
+  },
+  "USGS-05599490": {
+    "equipment": [
+      "Grab sample",
+      "US DH-2 Bag Sampler",
+      "Weighted-bottle sampler",
+      "Unknown",
+      "Open-Mouth Bottle",
+      "US D-96-A1 Bag Sampler",
+      "US D-96 bag sampler"
+    ],
+    "method_name": [
+      "Point sample",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity",
+      "Equal width increment (ewi)",
+      "USGS",
+      "Single vertical, depth integrated",
+      "Weighted bottle"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "99-3 and 99-4 had same time and date.  Used bottle with LESS stickers as 99-4",
+      "L-3140038 Improper sample container; WCA in brown 125mL bottle",
+      "L-3140041 Improper sample container; WCA in brown 125mL bottle"
+    ],
+    "n_records": 139
+  },
+  "USGS-06076590": {
+    "equipment": [
+      "US DH-81",
+      "Sampler, point, automatic",
+      "Unknown",
+      "US DH-81 with Teflon cap and nozzle"
+    ],
+    "method_name": [
+      "Equal width increment (ewi)",
+      "Point sample",
+      "USGS"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate",
+      "Sample-Composite Without Parents"
+    ],
+    "comments": [],
+    "n_records": 63
+  },
+  "USGS-06192980": {
+    "equipment": [
+      "Sampler, point, automatic",
+      "US DH-81",
+      "Unknown",
+      "US DH-95 plastic bottle"
+    ],
+    "method_name": [
+      "Point sample",
+      "Equal width increment (ewi)",
+      "USGS"
+    ],
+    "activity_type": [
+      "Quality Control Sample-Field Replicate",
+      "Sample-Routine",
+      "Sample-Composite Without Parents"
+    ],
+    "comments": [],
+    "n_records": 34
+  },
+  "USGS-06436760": {
+    "equipment": [
+      "Unknown",
+      "US DH-48 TM",
+      "Sampler, US D-49"
+    ],
+    "method_name": [
+      "USGS",
+      "Single vertical, depth integrated",
+      "Point sample",
+      "Grab sample  (dip)",
+      "Equal width increment (ewi)"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "SedLOGIN generated set average for SD-2011-79",
+      "SedLOGIN generated set average for SD-2011-77",
+      "SedLOGIN generated set average for SD-2011-81"
+    ],
+    "n_records": 108
+  },
+  "USGS-06887000": {
+    "equipment": [
+      "Unknown",
+      "Sampler, US D-74",
+      "Other",
+      "Sampler, US D-74AL",
+      "US D-74 AL-TM",
+      "US DH-95 Teflon bottle",
+      "US D-96-A1 Bag Sampler",
+      "US D-95 Teflon bottle",
+      "US DH-2 Bag Sampler"
+    ],
+    "method_name": [
+      "USGS",
+      "Equal width increment (ewi)",
+      "Single vertical, depth integrated",
+      "Multiple verticals"
+    ],
+    "activity_type": [
+      "Not determined",
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "PB DIS LL UPD 6-11 DUE TO REPORT ERR",
+      "tech samples;too light for size",
+      "tech samples;too light for size;1 btl broke in shipping"
+    ],
+    "n_records": 382
+  },
+  "USGS-06892513": {
+    "equipment": [
+      "US DH-81",
+      "Grab sample",
+      "Weighted-bottle sampler",
+      "Sampler, point, automatic",
+      "Other",
+      "US D-95 Teflon bottle",
+      "US DH-95 Teflon bottle",
+      "US DH-81 with Teflon cap and nozzle",
+      "US D-95 plastic bottle",
+      "Unknown"
+    ],
+    "method_name": [
+      "Equal width increment (ewi)",
+      "Equal discharge increment (edi)",
+      "Other",
+      "Single vertical, depth integrated",
+      "Multiple verticals",
+      "Point sample",
+      "Suction lift peristaltic pump",
+      "Grab sample  (dip)",
+      "Suction pump",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity",
+      "USGS"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "L-2950015 lab codes not designated placed in add,ct *turbidity requested twice? LC50 is invalid, LC2187 also requested, paa, 10/22/02",
+      "L-3100025 proposal information corrected, proposal re-added, smpl re-committed, paa, 11/6/02",
+      "L-0500019 x= ru, wca, fcc, fa with no time on btl's. lab codes not designated placed in add, ct *LC50 no longer valid, replaced with LC2187, paa, 2/19/03"
+    ],
+    "n_records": 189
+  },
+  "USGS-06893390": {
+    "equipment": [
+      "Sampler, point, automatic",
+      "Weighted-bottle sampler",
+      "Grab sample",
+      "US D-95 Teflon bottle",
+      "US DH-81 with Teflon cap and nozzle",
+      "US DH-81",
+      "Other",
+      "US DH-95 Teflon bottle",
+      "US D-95 plastic bottle",
+      "Unknown"
+    ],
+    "method_name": [
+      "Single vertical, depth integrated",
+      "Grab sample  (dip)",
+      "Equal width increment (ewi)",
+      "Multiple verticals",
+      "Other",
+      "Point sample",
+      "Suction lift peristaltic pump",
+      "Suction pump",
+      "USGS"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "A-1120036 please filter sample before analyzing. L-1120036 LC4200 requested in district comments, not present on ASR. LC4200 Added. Sample received cloudy",
+      "L-1540152 electronic asr: had to add begin date and time, hydrologic condition, and hydrologic event, ct",
+      "L-2460089 x= no time on fu,fa,fcc"
+    ],
+    "n_records": 127
+  },
+  "USGS-06893620": {
+    "equipment": [
+      "Unknown",
+      "Sampler, point, automatic",
+      "US DH-81",
+      "US DH-81 with Teflon cap and nozzle",
+      "Open-Mouth Bottle",
+      "Grab sample"
+    ],
+    "method_name": [
+      "USGS",
+      "Composite - Multiple point samples",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity",
+      "Multiple verticals",
+      "Grab sample  (dip)",
+      "Timed sampling interval",
+      "Peristaltic pump",
+      "Point sample",
+      "Other"
+    ],
+    "activity_type": [
+      "Sample-Composite Without Parents",
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "\"A-2970125 Includes custom 8033 sample for Steve Zaugg. Result previously computed using incorrect enumeration method. Correct U.S. Geological Survey method as documented in USGS TWRI Book 9, Chap A7 used for recomputation. Original value for pcode 50569: 791550, original value for pcode 50468: 1345",
+      "\"A-2280071 Includes custom 8033 sample for Steve Zaugg. Result previously computed using incorrect enumeration method. Correct U.S. Geological Survey method as documented in USGS TWRI Book 9, Chap A7 used for recomputation. Original value for pcode 50569: 1935000, original value for pcode 50468: 671",
+      "\"A-0720026 Includes custom 8033 sample for Steve Zaugg  Not enough water to measure pH and SC L-0720026 Received March 11, 2006. Result previously computed using incorrect enumeration method. Correct U.S. Geological Survey method as documented in USGS TWRI Book 9, Chap A7 used for recomputation. Ori"
+    ],
+    "n_records": 201
+  },
+  "USGS-06893820": {
+    "equipment": [
+      "Unknown",
+      "Grab sample",
+      "Sampler, point, automatic"
+    ],
+    "method_name": [
+      "USGS",
+      "Grab sample  (dip)",
+      "Timed sampling interval",
+      "Point sample"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Sample-Composite Without Parents"
+    ],
+    "comments": [
+      "\"A-3630017 All acidified samples checked and found to be pH<2. Result previously computed using incorrect enumeration method. Correct U.S. Geological Survey method as documented in USGS TWRI Book 9, Chap A7 used for recomputation. Original value for pcode 50569: 21000, original value for pcode 50468",
+      "\"A-2030100 All acidified samples checked and found to be pH <2  Chlorophyll A,phytoplankton,filter Amount filtered = 400ml,Amount collected = 1L Approx. sample depth = 1ft,Light availability = low,Water transparency = slightly turid (20-25 NTU) L-2030100 added proposal # CL10031 to lims and ASR's",
+      "\"A-1120107 All acidified samples checked and found to be pH <2  Chlorophyll A,phytoplankton,filter Amount filtered = 700mL,Amount collected = 1L Approx. sample depth = 0.5ft,Light availability = good,Water transparency = slightly clear (<13NTU). Result previously computed using incorrect enumeration"
+    ],
+    "n_records": 151
+  },
+  "USGS-06893830": {
+    "equipment": [
+      "Unknown",
+      "Grab sample",
+      "Sampler, point, automatic"
+    ],
+    "method_name": [
+      "USGS",
+      "Grab sample  (dip)",
+      "Timed sampling interval",
+      "Peristaltic pump",
+      "Point sample"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Sample-Composite Without Parents"
+    ],
+    "comments": [
+      "\"A-2000221 NEW SITE, All acidified samples checked and found to be pH<2. Result previously computed using incorrect enumeration method. Correct U.S. Geological Survey method as documented in USGS TWRI Book 9, Chap A7 used for recomputation. Original value for pcode 50569: 14000, original value for p",
+      "\"A-3180136 All acidified samples checked and found to be pH<2. Result previously computed using incorrect enumeration method. Correct U.S. Geological Survey method as documented in USGS TWRI Book 9, Chap A7 used for recomputation. Original value for pcode 50569: 230000, original value for pcode 5046",
+      "\"A-0440084 All acidified samples checked and found to be pH<2.. Result previously computed using incorrect enumeration method. Correct U.S. Geological Survey method as documented in USGS TWRI Book 9, Chap A7 used for recomputation. Original value for pcode 50569: 500, original value for pcode 50468:"
+    ],
+    "n_records": 134
+  },
+  "USGS-06893890": {
+    "equipment": [
+      "Unknown",
+      "Grab sample",
+      "Sampler, point, automatic"
+    ],
+    "method_name": [
+      "USGS",
+      "Grab sample  (dip)",
+      "Timed sampling interval",
+      "Point sample"
+    ],
+    "activity_type": [
+      "Sample-Composite Without Parents",
+      "Sample-Routine"
+    ],
+    "comments": [
+      "\"A-2460220 All acidified samples checked and found to be pH<2. Result previously computed using incorrect enumeration method. Correct U.S. Geological Survey method as documented in USGS TWRI Book 9, Chap A7 used for recomputation. Original value for pcode 50569: 277000, original value for pcode 5046",
+      "\"A-1120110 All acidified samples checked and found to be pH <2  Chlorophyll A,phytoplankton,filter Amount filtered = 1L,Amount collected = 1L Approx. sample depth = 0.5ft,Light availability = low (cloudy),Water transparency = slightly clear (<7NTU). Result previously computed using incorrect enumera",
+      "\"A-0910012 Dry Ice   Chlorophyll A,phytoplankton,filter Amount filtered = 600mL,Amount collected = 1L Approx. sample depth = 0.5ft,Light availability = good,Water transparency = clear (<5 NTU)  All acidified samples checked and found to be pH <2 L-0910012 Dry Ice  Received March 6, 2010. Result prev"
+    ],
+    "n_records": 119
+  },
+  "USGS-06893970": {
+    "equipment": [
+      "Unknown",
+      "Sampler, point, automatic",
+      "Grab sample"
+    ],
+    "method_name": [
+      "USGS",
+      "Composite - Multiple point samples",
+      "Grab sample  (dip)",
+      "Timed sampling interval",
+      "Peristaltic pump",
+      "Point sample"
+    ],
+    "activity_type": [
+      "Sample-Composite Without Parents",
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "\"A-3040076 Includes custom 8033 sample for Steve Zaugg. Result previously computed using incorrect enumeration method. Correct U.S. Geological Survey method as documented in USGS TWRI Book 9, Chap A7 used for recomputation. Original value for pcode 50569: 1400000, original value for pcode 50468: 220",
+      "\"A-2510062 Includes custom 8033 sample for Steve Zaugg. Result previously computed using incorrect enumeration method. Correct U.S. Geological Survey method as documented in USGS TWRI Book 9, Chap A7 used for recomputation. Original value for pcode 50569: 63000, original value for pcode 50468: 510;",
+      "\"A-2910126 Includes custom 8033 sample for Steve Zaugg. Result previously computed using incorrect enumeration method. Correct U.S. Geological Survey method as documented in USGS TWRI Book 9, Chap A7 used for recomputation. Original value for pcode 50569: 767000, original value for pcode 50468: 1200"
+    ],
+    "n_records": 184
+  },
+  "USGS-06894000": {
+    "equipment": [
+      "Unknown",
+      "Sampler, point, automatic",
+      "Grab sample"
+    ],
+    "method_name": [
+      "USGS",
+      "Timed sampling interval",
+      "Grab sample  (dip)",
+      "Point sample"
+    ],
+    "activity_type": [
+      "Sample-Composite Without Parents",
+      "Sample-Routine"
+    ],
+    "comments": [
+      "A-2350087 Includes custom 8033 sample for Steve Zaugg",
+      "\"A-1220025 Includes custom 8033 sample for Steve Zaugg. Result previously computed using incorrect enumeration method. Correct U.S. Geological Survey method as documented in USGS TWRI Book 9, Chap A7 used for recomputation. Original value for pcode 50569: 7800, original value for pcode 50468: 700; u",
+      "\"A-3040075 Includes custom 8033 sample for Steve Zaugg. Result previously computed using incorrect enumeration method. Correct U.S. Geological Survey method as documented in USGS TWRI Book 9, Chap A7 used for recomputation. Original value for pcode 50569: 870000, original value for pcode 50468: 1100"
+    ],
+    "n_records": 185
+  },
+  "USGS-06900050": {
+    "equipment": [
+      "Unknown",
+      "US DH-81 with Teflon cap and nozzle",
+      "US D-95 Teflon bottle",
+      "US DH-95 plastic bottle",
+      "US DH-81",
+      "Open-Mouth Bottle",
+      "Grab sample",
+      "US DH-95 Teflon bottle",
+      "Weighted-bottle sampler",
+      "US WBH-96 weighted-bottle sampler",
+      "US DH-2 Bag Sampler",
+      "Other"
+    ],
+    "method_name": [
+      "USGS",
+      "Equal width increment (ewi)",
+      "Point sample",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity",
+      "Multiple verticals",
+      "Weighted bottle",
+      "Grab sample  (dip)",
+      "SuspSed;Single-stage,nozzle at fixed stage,passively fillng"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate",
+      "Sample-Composite Without Parents"
+    ],
+    "comments": [
+      "L-2950142 verified FCA not received,LC2332 deleted,paa,10/25/10",
+      "L-3260027 X = Date on samples reads 11/16/10   Received November 20, 2010",
+      "L-3540008 Received December 18, 2010   WCA condition changed to improper preservation, JNV"
+    ],
+    "n_records": 198
+  },
+  "USGS-06901500": {
+    "equipment": [
+      "Unknown",
+      "US DH-81 with Teflon cap and nozzle",
+      "US D-95 Teflon bottle",
+      "US DH-95 plastic bottle",
+      "Grab sample",
+      "Weighted-bottle sampler",
+      "US DH-81",
+      "Open-Mouth Bottle",
+      "US DH-95 Teflon bottle",
+      "US WBH-96 weighted-bottle sampler",
+      "US DH-2 Bag Sampler"
+    ],
+    "method_name": [
+      "USGS",
+      "Equal width increment (ewi)",
+      "Point sample",
+      "Multiple verticals",
+      "Grab sample  (dip)",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity",
+      "Weighted bottle"
+    ],
+    "activity_type": [
+      "Quality Control Sample-Field Replicate",
+      "Sample-Routine",
+      "Sample-Composite Without Parents"
+    ],
+    "comments": [
+      "L-2950138 verified FCA not received,LC2332 deleted,paa,10/25/10",
+      "L-3540010 Received December 18, 2010",
+      "L-3260030 Received November 20, 2010"
+    ],
+    "n_records": 236
+  },
+  "USGS-07018500": {
+    "equipment": [
+      "US DH-95 plastic bottle",
+      "Unknown",
+      "US DH-2 Bag Sampler",
+      "US DH-81"
+    ],
+    "method_name": [
+      "Equal width increment (ewi)",
+      "USGS"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "C",
+      "A",
+      "no tare weight"
+    ],
+    "n_records": 40
+  },
+  "USGS-07030392": {
+    "equipment": [
+      "Unknown",
+      "US D-77 TM",
+      "Weighted-bottle sampler",
+      "Other",
+      "Sampler, frame-type, Teflon bottle",
+      "US D-95 Teflon bottle",
+      "US DH-95 Teflon bottle",
+      "Grab sample"
+    ],
+    "method_name": [
+      "USGS",
+      "Equal width increment (ewi)",
+      "Single vertical, depth integrated"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate",
+      "Sample-Composite Without Parents"
+    ],
+    "comments": [
+      "A-2210169 blank assoc w/ sample @ 0700",
+      "L-1160114 lab codes not designated,placed in add",
+      "L-0730067 lab codes not designated placed in add"
+    ],
+    "n_records": 174
+  },
+  "USGS-07048495": {
+    "equipment": [
+      "US DH-95 plastic bottle",
+      "Unknown",
+      "Grab sample",
+      "US D-95 Teflon bottle",
+      "Weighted-bottle sampler"
+    ],
+    "method_name": [
+      "Equal width increment (ewi)",
+      "USGS",
+      "Grab sample  (dip)",
+      "Multiple verticals",
+      "Point sample"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "L-2100051 FED EX LATE DELIVERY",
+      "TARE WEIGHT NOT EASILY VISIBLE.",
+      "L-2360145 Deleted all requests and added Schedule 417 per Lasker. 8/24/2016 mec"
+    ],
+    "n_records": 58
+  },
+  "USGS-07048550": {
+    "equipment": [
+      "Other",
+      "US D-95 plastic bottle",
+      "US DH-95 plastic bottle",
+      "US DH-81",
+      "Grab sample",
+      "US D-95 Teflon bottle",
+      "US DH-95 Teflon bottle",
+      "Sampler, US DH-59",
+      "US DH-2 Bag Sampler",
+      "Unknown"
+    ],
+    "method_name": [
+      "Grab sample  (dip)",
+      "Equal width increment (ewi)",
+      "Multiple verticals",
+      "Single vertical, depth integrated",
+      "Bedload, single equal width increment (SEWI)",
+      "USGS"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Sample-Composite Without Parents"
+    ],
+    "comments": [
+      "OCALA LABID ID NUMBER:  200101138",
+      "OCALA LABID ID NUMBER:  200109080",
+      "OCALA LABID ID NUMBER:  200202654"
+    ],
+    "n_records": 435
+  },
+  "USGS-07048600": {
+    "equipment": [
+      "US DH-81",
+      "US D-77 TM",
+      "US DH-95 plastic bottle",
+      "Unknown",
+      "Other",
+      "US D-95 plastic bottle",
+      "Grab sample",
+      "US D-95 Teflon bottle",
+      "US D-96 bag sampler",
+      "US DH-95 Teflon bottle"
+    ],
+    "method_name": [
+      "Equal width increment (ewi)",
+      "Grab sample  (dip)",
+      "USGS",
+      "Multiple verticals",
+      "Other",
+      "Single vertical, depth integrated"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Sample-Composite Without Parents"
+    ],
+    "comments": [
+      "OCALA LABID ID NUMBER:    9922905",
+      "OCALA LABID ID NUMBER:  9921757",
+      "OCALA LABID ID NUMBER:    9922748"
+    ],
+    "n_records": 392
+  },
+  "USGS-07049050": {
+    "equipment": [
+      "Grab sample",
+      "US DH-95 plastic bottle",
+      "Unknown",
+      "US DH-95 Teflon bottle"
+    ],
+    "method_name": [
+      "Grab sample  (dip)",
+      "Equal width increment (ewi)",
+      "USGS",
+      "Multiple verticals"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "L-2630024 FED EX LATE DELIVERY Received September 17 2016",
+      "L-0740032 Changed Station I.D. from 07049000 to 07049050 per Barsotti. 3/16/2017 mec",
+      "L-0460021 X=no date or time on TBY and TOC"
+    ],
+    "n_records": 23
+  },
+  "USGS-07055814": {
+    "equipment": [
+      "Sampler, point, automatic",
+      "US DH-95 plastic bottle",
+      "Grab sample",
+      "Unknown"
+    ],
+    "method_name": [
+      "Suction lift peristaltic pump",
+      "Equal width increment (ewi)",
+      "Grab sample  (dip)",
+      "USGS",
+      "Point sample"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "L-0700057 FED EX LATE DELIVERY",
+      "No tare weights",
+      "no tare weight"
+    ],
+    "n_records": 22
+  },
+  "USGS-07075250": {
+    "equipment": [
+      "Sampler, US DH-59",
+      "Sampler, US DH-76",
+      "US DH-95 plastic bottle",
+      "Grab sample",
+      "US D-95 plastic bottle",
+      "Sampler, point, automatic",
+      "US DH-81",
+      "Unknown"
+    ],
+    "method_name": [
+      "Multiple verticals",
+      "Equal width increment (ewi)",
+      "Grab sample  (dip)",
+      "Suction lift peristaltic pump",
+      "USGS"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "rush sample--extra fee",
+      "Rush sample--extra fee",
+      "L-3640016 Received December 28, 2013"
+    ],
+    "n_records": 73
+  },
+  "USGS-07075270": {
+    "equipment": [
+      "Sampler, point, automatic",
+      "US DH-95 plastic bottle",
+      "Grab sample",
+      "Sampler, US DH-59",
+      "US D-95 plastic bottle",
+      "US D-96 bag sampler",
+      "Unknown",
+      "US DH-2 Bag Sampler",
+      "Weighted-bottle sampler",
+      "US DH-81"
+    ],
+    "method_name": [
+      "Suction lift peristaltic pump",
+      "Equal width increment (ewi)",
+      "Grab sample  (dip)",
+      "Single vertical, depth integrated",
+      "USGS",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity",
+      "Multiple verticals"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "RUSH SAMPLE--EXTRA FEES",
+      "L-3640009 Received December 28, 2013",
+      "L-1090111 Received April 18, 2013"
+    ],
+    "n_records": 135
+  },
+  "USGS-07179750": {
+    "equipment": [
+      "Other",
+      "Sampler, US DH-48",
+      "US D-95 Teflon bottle",
+      "US D-96 bag sampler",
+      "US DH-95 Teflon bottle",
+      "US DH-81 with Teflon cap and nozzle",
+      "US DH-81",
+      "US D-77 TM",
+      "US D-96-A1 Bag Sampler",
+      "Weighted-bottle sampler",
+      "Grab sample"
+    ],
+    "method_name": [
+      "Equal width increment (ewi)",
+      "Equal discharge increment (edi)",
+      "Single vertical, depth integrated",
+      "Multiple verticals",
+      "Weighted bottle",
+      "Grab sample  (dip)"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "Light organics in sand",
+      "Bottle 5 broken and empty on arrival.",
+      "bottles separated"
+    ],
+    "n_records": 214
+  },
+  "USGS-07182390": {
+    "equipment": [
+      "Unknown",
+      "Sampler, US DH-48",
+      "Other",
+      "US D-96 bag sampler",
+      "US DH-95 Teflon bottle",
+      "US D-95 Teflon bottle",
+      "US DH-81",
+      "US D-77 TM",
+      "US DH-95 plastic bottle",
+      "US DH-81 with Teflon cap and nozzle",
+      "Sampler, frame-type, plastic bottle w/Teflon collaps. bag",
+      "Grab sample",
+      "US D-96-A1 Bag Sampler",
+      "Weighted-bottle sampler"
+    ],
+    "method_name": [
+      "USGS",
+      "Equal width increment (ewi)",
+      "Equal discharge increment (edi)",
+      "Multiple verticals",
+      "Single vertical, depth integrated",
+      "Weighted bottle",
+      "Grab sample  (dip)",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity"
+    ],
+    "activity_type": [
+      "Not determined",
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [],
+    "n_records": 332
+  },
+  "USGS-07183500": {
+    "equipment": [
+      "Unknown",
+      "Sampler, US DH-48",
+      "US DH-76 TM with Teflon gasket and nozzle",
+      "US D-74 AL-TM with Teflon gasket and nozzle",
+      "US DH-81 with Teflon cap and nozzle",
+      "Other",
+      "Sampler, US D-74",
+      "US DH-48 TM with Teflon gasket and nozzle",
+      "Sampler, US D-74AL",
+      "US DH-95 plastic bottle",
+      "US DH-95 Teflon bottle",
+      "US D-96 bag sampler",
+      "US D-95 Teflon bottle",
+      "US D-96-A1 Bag Sampler",
+      "Weighted-bottle sampler",
+      "Grab sample"
+    ],
+    "method_name": [
+      "USGS",
+      "Equal width increment (ewi)",
+      "Equal discharge increment (edi)",
+      "Other",
+      "Single vertical, depth integrated",
+      "Weighted bottle",
+      "Multiple verticals",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity",
+      "Grab sample  (dip)"
+    ],
+    "activity_type": [
+      "Not determined",
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "HG VERIFIED",
+      "ORIG SAMPLE MIX-UP",
+      "RR NH4-D&T;VALUES DUP'D"
+    ],
+    "n_records": 417
+  },
+  "USGS-071912213": {
+    "equipment": [
+      "Weighted-bottle sampler",
+      "US DH-81",
+      "Sampler, US DH-59",
+      "US DH-59 TM",
+      "US DH-95 plastic bottle",
+      "US WBH-96 weighted-bottle sampler",
+      "Grab sample",
+      "Unknown",
+      "US D-95 plastic bottle",
+      "US DH-95 Teflon bottle",
+      "US D-95 Teflon bottle",
+      "US DH-81 with Teflon cap and nozzle",
+      "US DH-2 Bag Sampler"
+    ],
+    "method_name": [
+      "Equal width increment (ewi)",
+      "Multiple verticals",
+      "Grab sample  (dip)",
+      "USGS",
+      "Weighted bottle",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "staid on SLAR = 071912212"
+    ],
+    "n_records": 274
+  },
+  "USGS-07191222": {
+    "equipment": [
+      "Weighted-bottle sampler",
+      "Sampler, US DH-59",
+      "US DH-81",
+      "Unknown",
+      "US WBH-96 weighted-bottle sampler",
+      "US DH-59 TM",
+      "US DH-95 plastic bottle",
+      "Other",
+      "Grab sample",
+      "US D-95 Teflon bottle",
+      "US DH-95 Teflon bottle",
+      "US DH-81 with Teflon cap and nozzle",
+      "US D-95 plastic bottle"
+    ],
+    "method_name": [
+      "Equal width increment (ewi)",
+      "USGS",
+      "Multiple verticals",
+      "Single vertical, depth integrated",
+      "Grab sample  (dip)",
+      "Weighted bottle",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity"
+    ],
+    "activity_type": [
+      "Quality Control Sample-Field Replicate",
+      "Sample-Routine"
+    ],
+    "comments": [
+      "Small amount of organic material.",
+      "Used date given on bottle. SLAR had a date of 5/26/16",
+      "sample appeared to leak during shipping. No water line marked on bottle. Only 115 mL sample in bottle. Results may be biased by low volume of sample available for sample processing. Contacted jmlewis@usgs.gov 5/17/18. *sample appears to have leaked after shipment. No water line marked on bottle. Onl"
+    ],
+    "n_records": 263
+  },
+  "USGS-071948095": {
+    "equipment": [
+      "US DH-95 plastic bottle",
+      "Grab sample",
+      "Unknown",
+      "US DH-95 Teflon bottle"
+    ],
+    "method_name": [
+      "Equal width increment (ewi)",
+      "Grab sample  (dip)",
+      "USGS",
+      "Suction lift peristaltic pump"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "L-2100052 FED EX LATE DELIVERY",
+      "L-3240061 X=sta id on FCC is 07191880",
+      "L-3240059 X=sta id on FCC is 07194880"
+    ],
+    "n_records": 59
+  },
+  "USGS-07194933": {
+    "equipment": [
+      "Grab sample",
+      "US DH-81",
+      "US DH-95 plastic bottle",
+      "Sampler, point, automatic",
+      "US DH-81 with Teflon cap and nozzle",
+      "Unknown",
+      "Open-Mouth Bottle"
+    ],
+    "method_name": [
+      "Grab sample  (dip)",
+      "Equal width increment (ewi)",
+      "Suction lift peristaltic pump",
+      "USGS"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "L-3630003 X = Improper sample container for WCA and no station ID on sample,all else matches.   User Code KMH is invalid,  CH..  WSC emailed, paa, 12/29/09..  AR user code added per Kevin, paa, 12/29/09",
+      "L-2530054 X = Recvd warm, ok to log in per E.Beavers, PG, 9/10/10 Chilled containers received warm at 11.5  Degrees C",
+      "A-3320050 Shelley Todd's cell phone #: 501-553-1462 L-3320050 Received November 25, 2011"
+    ],
+    "n_records": 109
+  },
+  "USGS-07195500": {
+    "equipment": [
+      "Unknown",
+      "US DH-81",
+      "US DH-59 TM with Teflon gasket and nozzle",
+      "US DH-81 with Teflon cap and nozzle",
+      "Weighted-bottle sampler",
+      "US WBH-96 weighted-bottle sampler",
+      "US D-95 plastic bottle",
+      "US DH-95 plastic bottle",
+      "US DH-95 Teflon bottle",
+      "US D-95 Teflon bottle",
+      "Grab sample"
+    ],
+    "method_name": [
+      "USGS",
+      "Equal width increment (ewi)",
+      "Single vertical, depth integrated",
+      "Multiple verticals",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity",
+      "Point sample",
+      "Grab sample  (dip)",
+      "Weighted bottle"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Spike",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "BALANCES W/NUTRIENTS",
+      "BTLS OK; Cl & SO4 RR & DUP'ED",
+      "Btls OK; anions RR & Dup'ed"
+    ],
+    "n_records": 592
+  },
+  "USGS-07263296": {
+    "equipment": [
+      "Unknown",
+      "Other",
+      "US DH-95 plastic bottle",
+      "Weighted-bottle sampler",
+      "Grab sample",
+      "US DH-81",
+      "Sampler, US DH-59",
+      "Sampler, point, automatic",
+      "US D-95 plastic bottle",
+      "Open-Mouth Bottle"
+    ],
+    "method_name": [
+      "USGS",
+      "Single vertical, depth integrated",
+      "Equal width increment (ewi)",
+      "Multiple verticals",
+      "Grab sample  (dip)",
+      "Suction lift peristaltic pump",
+      "Other"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "RR CATIONS;VALUES DUP'D",
+      "L-3540146 Received December 19,2007",
+      "staid=07263296, sta. name=Maumelle R nr Wye on bottle and SLAR"
+    ],
+    "n_records": 201
+  },
+  "USGS-07263878": {
+    "equipment": [
+      "Unknown",
+      "Grab sample",
+      "US DH-81"
+    ],
+    "method_name": [
+      "USGS",
+      "Grab sample  (dip)",
+      "Equal width increment (ewi)",
+      "Multiple verticals"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "Changed time of sampling from 1300 to 1515 based on an email from jwallace rec'd 5/18/21.",
+      "*bottle station id recorded as 072638805 Bottle station id: 072638805."
+    ],
+    "n_records": 26
+  },
+  "USGS-0728875070": {
+    "equipment": [
+      "Sampler, US DH-48",
+      "Unknown",
+      "Sampler, US DH-59",
+      "Other",
+      "Grab sample",
+      "Sampler, point, automatic"
+    ],
+    "method_name": [
+      "Equal width increment (ewi)",
+      "USGS",
+      "Single vertical, depth integrated",
+      "Grab sample  (dip)",
+      "Point sample"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Blind"
+    ],
+    "comments": [
+      "A-2540026 attn: schedule 1325 & o,p ddt L-2540026 recvd 9-10-02 *per carbon/JK, delete sch2075 and add sch2632 and lc2613, paa, 9/20/02",
+      "29",
+      "33 1/3, 3/3"
+    ],
+    "n_records": 382
+  },
+  "USGS-07355860": {
+    "equipment": [
+      "Grab sample",
+      "Sampler, point, automatic",
+      "Unknown",
+      "US D-95 plastic bottle",
+      "US DH-95 plastic bottle"
+    ],
+    "method_name": [
+      "Grab sample  (dip)",
+      "Suction lift peristaltic pump",
+      "Equal width increment (ewi)",
+      "USGS",
+      "Bedload, single equal width increment (SEWI)",
+      "Multiple verticals",
+      "Suction pump"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "L-2110063 Received July 29, 2014",
+      "L-0480088 Received February 13, 2015",
+      "L-2230105 X=FCC has no date or time"
+    ],
+    "n_records": 112
+  },
+  "USGS-07355870": {
+    "equipment": [
+      "Grab sample",
+      "Sampler, point, automatic",
+      "Unknown",
+      "US DH-95 plastic bottle",
+      "US D-95 plastic bottle"
+    ],
+    "method_name": [
+      "Equal width increment (ewi)",
+      "Suction lift peristaltic pump",
+      "Grab sample  (dip)",
+      "USGS",
+      "Other",
+      "Multiple verticals",
+      "Suction pump"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Not determined"
+    ],
+    "comments": [
+      "L-2110062 Received July 29, 2014",
+      "L-1710085 Received June 19, 2014",
+      "No Tare weight"
+    ],
+    "n_records": 82
+  },
+  "USGS-07364122": {
+    "equipment": [
+      "Grab sample",
+      "Unknown"
+    ],
+    "method_name": [
+      "Grab sample  (dip)",
+      "USGS"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "L-0580010 FED EX LATE DELIVERY   Received February 26, 2015",
+      "L-0070018 FED EX LATE DELIVERY",
+      "very full sample"
+    ],
+    "n_records": 110
+  },
+  "USGS-07374525": {
+    "equipment": [
+      "US D-96 bag sampler",
+      "US D-99 Bag Sampler",
+      "Unknown",
+      "US D-96-A1 Bag Sampler",
+      "US P-6, 200 lb. Point-Integrating sampler, replaces P-63"
+    ],
+    "method_name": [
+      "Equal width increment (ewi)",
+      "USGS",
+      "Composite - Multiple point samples",
+      "Equal discharge increment (edi)"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "3 3L btls",
+      "A-2060078 30 mL TPCN",
+      "L-2410094 X = Date on CHY = 8/24/06"
+    ],
+    "n_records": 733
+  },
+  "USGS-07381600": {
+    "equipment": [
+      "Unknown",
+      "Other",
+      "Sampler, US P-63",
+      "US D-96 bag sampler",
+      "US D-99 Bag Sampler",
+      "US D-96-A1 Bag Sampler",
+      "Weighted-bottle sampler",
+      "US P-6, 200 lb. Point-Integrating sampler, replaces P-63"
+    ],
+    "method_name": [
+      "USGS",
+      "Composite - Multiple point samples",
+      "Equal discharge increment (edi)",
+      "Equal width increment (ewi)"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "Revised results. See SIR 2018-5147 for more information about this sample",
+      "See SIR 2018-5147 for more information about this sample",
+      "A-2200203 96-191 DENVER"
+    ],
+    "n_records": 2577
+  },
+  "USGS-08070200": {
+    "equipment": [
+      "Weighted-bottle sampler",
+      "Sampler, point, automatic",
+      "US DH-81 with Teflon cap and nozzle",
+      "US D-95 Teflon bottle",
+      "Grab sample",
+      "US DH-95 Teflon bottle",
+      "Unknown",
+      "US DH-81",
+      "US DH-2 Bag Sampler"
+    ],
+    "method_name": [
+      "Grab sample  (dip)",
+      "Point sample",
+      "Equal width increment (ewi)",
+      "Multiple verticals",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity",
+      "USGS",
+      "Equal discharge increment (edi)"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Sample-Composite Without Parents",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "L-3270006 Received Nov. 20,2004",
+      "A-3560025 Louisiana Late Sample account",
+      "MM-05687A"
+    ],
+    "n_records": 253
+  },
+  "USGS-08188500": {
+    "equipment": [
+      "Unknown",
+      "US DH-2 Bag Sampler",
+      "US DH-81",
+      "US DH-81 with Teflon cap and nozzle",
+      "US DH-95 Teflon bottle",
+      "US DH-95 plastic bottle",
+      "Open-Mouth Bottle"
+    ],
+    "method_name": [
+      "USGS",
+      "Equal width increment (ewi)",
+      "Multiple verticals"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "RR:PO4-D=1.7;P-D=4.02;P-T=.17",
+      "P-D,P-T VALUES VER'D;CN  RR",
+      "Bottle Time: 1230"
+    ],
+    "n_records": 460
+  },
+  "USGS-08211200": {
+    "equipment": [
+      "US DH-81 with Teflon cap and nozzle",
+      "US DH-95 Teflon bottle",
+      "US DH-2 Bag Sampler",
+      "US DH-81",
+      "Unknown",
+      "Open-Mouth Bottle"
+    ],
+    "method_name": [
+      "Equal width increment (ewi)",
+      "Multiple verticals",
+      "USGS"
+    ],
+    "activity_type": [
+      "Quality Control Sample-Field Replicate",
+      "Sample-Routine"
+    ],
+    "comments": [
+      "Too light for pipet; no aliquot taken.",
+      "Filtered sample. Low mass. No aliquot taken. Ran CSF.",
+      "Too light for pipet."
+    ],
+    "n_records": 55
+  },
+  "USGS-08317400": {
+    "equipment": [
+      "Unknown",
+      "US DH-81 with Teflon cap and nozzle",
+      "US D-77 TM",
+      "Other",
+      "US D-95 Teflon bottle",
+      "US DH-95 Teflon bottle",
+      "US DH-81",
+      "US DH-95 plastic bottle"
+    ],
+    "method_name": [
+      "USGS",
+      "Equal width increment (ewi)",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Not determined",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "A-1990220 collectors mcbreen & romero los almos project; attn: ann mullin | L-1990220 added sh 1644 per anderholm. jlh 7/25/00",
+      "these are Chain of Custody samples,p",
+      "L-3480043 Received Dec. 11, 2004"
+    ],
+    "n_records": 221
+  },
+  "USGS-08380500": {
+    "equipment": [
+      "Unknown",
+      "US DH-81"
+    ],
+    "method_name": [
+      "USGS",
+      "Multiple verticals",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity",
+      "Equal width increment (ewi)"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "Tare weight used is average of 3 \"identical\" bottles due to lab mix-up."
+    ],
+    "n_records": 80
+  },
+  "USGS-09132095": {
+    "equipment": [
+      "Unknown",
+      "US DH-81 with Teflon cap and nozzle",
+      "Sampler, US D-74",
+      "US DH-95 plastic bottle",
+      "US D-95 plastic bottle",
+      "US DH-81",
+      "Sampler, point, automatic"
+    ],
+    "method_name": [
+      "USGS",
+      "Equal width increment (ewi)",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity",
+      "SuspSed; Pumping - stream sample using a pumping mechanism"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "Heavy organic debris in sand.",
+      "Organic debris in sand.",
+      "Moderate organic debris in sand."
+    ],
+    "n_records": 1123
+  },
+  "USGS-09327000": {
+    "equipment": [
+      "Sampler, point, automatic",
+      "US DH-81",
+      "US DH-95 plastic bottle",
+      "Unknown"
+    ],
+    "method_name": [
+      "SuspSed; Pumping - stream sample using a pumping mechanism",
+      "Point sample",
+      "Equal discharge increment (edi)",
+      "Equal width increment (ewi)",
+      "USGS",
+      "Single vertical, depth integrated"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "heavier sample",
+      "Time changed on A 2/5 from 11:30 to 11:28 as per CW on  1-9-17 because of NWIS time conflict.",
+      "light sample"
+    ],
+    "n_records": 206
+  },
+  "USGS-09363500": {
+    "equipment": [
+      "Unknown",
+      "US DH-81 with Teflon cap and nozzle",
+      "US DH-48 TM with Teflon gasket and nozzle",
+      "US D-77 TM",
+      "US D-95 Teflon bottle",
+      "Sampler, point, automatic",
+      "US DH-81",
+      "Grab sample"
+    ],
+    "method_name": [
+      "USGS",
+      "Equal width increment (ewi)",
+      "Grab sample  (dip)",
+      "Point sample"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "FE BTM VERIFIED;RR:CA=76,MG=13,NA=27",
+      "FE,MN BTM VALUES VER'D",
+      "RR CL & SO4;VALUES DUP'D"
+    ],
+    "n_records": 509
+  },
+  "USGS-11185185": {
+    "equipment": [
+      "Unknown",
+      "Peristaltic pump",
+      "Van Dorn sampler",
+      "US D-96-A1 Bag Sampler"
+    ],
+    "method_name": [
+      "USGS",
+      "Peristaltic pump",
+      "Van Dorn sampler",
+      "Equal discharge increment (edi)",
+      "Point sample",
+      "Single vertical, depth integrated"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Unknown"
+    ],
+    "comments": [
+      "lower before td 29.0 sd 24.0 ft",
+      "Upper before td 23.5 sd 3.3 ft",
+      "mid channel td 50 sd 30 ft"
+    ],
+    "n_records": 561
+  },
+  "USGS-11313315": {
+    "equipment": [
+      "Unknown",
+      "Van Dorn sampler",
+      "US D-96-A1 Bag Sampler"
+    ],
+    "method_name": [
+      "USGS",
+      "Point sample",
+      "Multiple verticals, stations determined by EDI method, non-isokinetic velocity"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [],
+    "n_records": 76
+  },
+  "USGS-11313460": {
+    "equipment": [
+      "Unknown",
+      "Van Dorn sampler",
+      "US D-96-A1 Bag Sampler",
+      "Mulitple samplers used",
+      "Submersible centrifugal pump"
+    ],
+    "method_name": [
+      "USGS",
+      "Point sample",
+      "Equal discharge increment (edi)",
+      "Multiple verticals, stations determined by EDI method, non-isokinetic velocity"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "Lab error; sand fraction not separated for sample 3/5."
+    ],
+    "n_records": 130
+  },
+  "USGS-11336680": {
+    "equipment": [
+      "Unknown",
+      "Grab sample",
+      "US D-96-A1 Bag Sampler",
+      "Van Dorn sampler",
+      "Sampler, US D-74"
+    ],
+    "method_name": [
+      "USGS",
+      "Point sample",
+      "Equal discharge increment (edi)"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "Grab sample @ delta package",
+      "Delta Package Grab Sample",
+      "SedLOGIN generated set average for CA3-2013-1092"
+    ],
+    "n_records": 141
+  },
+  "USGS-11336685": {
+    "equipment": [
+      "Unknown",
+      "US D-96-A1 Bag Sampler",
+      "Van Dorn sampler",
+      "Sampler, US D-74",
+      "Mulitple samplers used"
+    ],
+    "method_name": [
+      "USGS",
+      "Equal width increment (ewi)",
+      "Equal discharge increment (edi)",
+      "Point sample"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "bottle 1 of 2 spilled during transport to lab",
+      "SedLOGIN generated set average for CA3-2012-4523",
+      "5 EDIs composited"
+    ],
+    "n_records": 141
+  },
+  "USGS-11336790": {
+    "equipment": [
+      "Unknown",
+      "US D-96-A1 Bag Sampler",
+      "Van Dorn sampler",
+      "Open-Mouth Bottle",
+      "Mulitple samplers used"
+    ],
+    "method_name": [
+      "USGS",
+      "Equal discharge increment (edi)",
+      "Point sample",
+      "Timed sampling interval"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "bottle says 1610  sheet says 1640 bottle says 1610  sheet says 1640",
+      "bottle says time 2:30 PST  sheet says 1430 bottle says time 2:30 PST  sheet says 1430",
+      "sample depth 5.0'"
+    ],
+    "n_records": 133
+  },
+  "USGS-11337190": {
+    "equipment": [
+      "Unknown",
+      "US D-96-A1 Bag Sampler",
+      "Van Dorn sampler",
+      "Mulitple samplers used"
+    ],
+    "method_name": [
+      "USGS",
+      "Equal discharge increment (edi)",
+      "Point sample",
+      "Multiple verticals, stations determined by EDI method, non-isokinetic velocity"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "SedLOGIN generated set average for CA3-2013-4",
+      "SedLOGIN generated set average for CA3-2013-265",
+      "SedLOGIN generated set average for CA3-2012-4639"
+    ],
+    "n_records": 209
+  },
+  "USGS-11425500": {
+    "equipment": [
+      "Unknown"
+    ],
+    "method_name": [
+      "USGS"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "BOTTLES OK; ANIONS RERUN--DUPLICATED",
+      "BOTTLES OK"
+    ],
+    "n_records": 78
+  },
+  "USGS-11447903": {
+    "equipment": [
+      "Unknown",
+      "US D-96-A1 Bag Sampler",
+      "Van Dorn sampler"
+    ],
+    "method_name": [
+      "USGS",
+      "Equal discharge increment (edi)",
+      "Point sample",
+      "Multiple verticals, stations determined by EDI method, non-isokinetic velocity",
+      "Van Dorn sampler"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "SedLOGIN generated set average for CA3-2012-2570",
+      "SedLOGIN generated set average for CA3-2013-11",
+      "Bottles say 3-19-12  SedLOGIN says 3-15-12"
+    ],
+    "n_records": 219
+  },
+  "USGS-11447905": {
+    "equipment": [
+      "Unknown",
+      "Van Dorn sampler"
+    ],
+    "method_name": [
+      "USGS",
+      "Point sample"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [],
+    "n_records": 15
+  },
+  "USGS-11448750": {
+    "equipment": [
+      "Open-Mouth Bottle",
+      "Sampler, point, automatic",
+      "Other",
+      "Grab sample"
+    ],
+    "method_name": [
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity",
+      "SuspSed; Pumping - stream sample using a pumping mechanism",
+      "Grab sample  (dip)",
+      "Multiple verticals"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "Estimated sample volume."
+    ],
+    "n_records": 40
+  },
+  "USGS-11452600": {
+    "equipment": [
+      "Unknown",
+      "Sampler, US DH-48",
+      "US DH-95 Teflon bottle",
+      "Sampler, US D-77",
+      "Open-Mouth Bottle",
+      "Sampler, US D-74",
+      "US D-95 Teflon bottle",
+      "Sampler, US D-49",
+      "Sampler, US DH-59",
+      "US DH-95 plastic bottle",
+      "Sampler, US D-74AL"
+    ],
+    "method_name": [
+      "USGS",
+      "Equal width increment (ewi)",
+      "Equal discharge increment (edi)",
+      "Multiple verticals",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity",
+      "SuspSed; Box-single ver, depth-int, attached to structure",
+      "Point sample"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "One of 5 samples in Set.",
+      "SedLOGIN generated set average for CA3-2011-262",
+      "\"L-3360004 med code WS per Liz,paa,12/2/10. Changed Station ID & Name to current per S. Rose. JPC 3/10/16\""
+    ],
+    "n_records": 3947
+  },
+  "USGS-11455143": {
+    "equipment": [
+      "Sampler, US D-74",
+      "US D-96-A1 Bag Sampler",
+      "Weighted-bottle sampler",
+      "Unknown"
+    ],
+    "method_name": [
+      "Equal discharge increment (edi)",
+      "Weighted bottle",
+      "USGS"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [],
+    "n_records": 20
+  },
+  "USGS-11455165": {
+    "equipment": [
+      "US D-96-A1 Bag Sampler",
+      "Unknown",
+      "Van Dorn sampler",
+      "Sampler, US D-74"
+    ],
+    "method_name": [
+      "Equal discharge increment (edi)",
+      "USGS",
+      "Point sample",
+      "Multiple verticals, stations determined by EDI method, non-isokinetic velocity"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "td 17.6 sd 13.6 ft",
+      "te 19.7  sd 15.7ft",
+      "after td 19.3 sd 15.3"
+    ],
+    "n_records": 186
+  },
+  "USGS-11455167": {
+    "equipment": [
+      "Sampler, US D-74",
+      "US D-96-A1 Bag Sampler",
+      "Van Dorn sampler",
+      "US D-74 AL-TM",
+      "Sampler, US D-74AL",
+      "Unknown"
+    ],
+    "method_name": [
+      "Equal discharge increment (edi)",
+      "Point sample",
+      "Equal width increment (ewi)",
+      "Van Dorn sampler",
+      "USGS"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "Bottle 1 of 4 reads 1147"
+    ],
+    "n_records": 34
+  },
+  "USGS-11455280": {
+    "equipment": [
+      "Unknown",
+      "US D-96-A1 Bag Sampler",
+      "Sampler, US D-74",
+      "Van Dorn sampler",
+      "Sampler, point, automatic"
+    ],
+    "method_name": [
+      "USGS",
+      "Equal discharge increment (edi)",
+      "Point sample",
+      "Timed sampling interval",
+      "Van Dorn sampler",
+      "Equal width increment (ewi)",
+      "Multiple verticals, stations determined by EDI method, non-isokinetic velocity"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "no time given",
+      "td 17.7 sd 13.5 ft",
+      "td 17.7 sd 13.7 ft"
+    ],
+    "n_records": 218
+  },
+  "USGS-11455335": {
+    "equipment": [
+      "Unknown",
+      "US D-96-A1 Bag Sampler",
+      "Van Dorn sampler"
+    ],
+    "method_name": [
+      "USGS",
+      "Equal discharge increment (edi)",
+      "Van Dorn sampler",
+      "Point sample",
+      "Multiple verticals, stations determined by EDI method, non-isokinetic velocity"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "td 6.5 sd 4.5 ft",
+      "after  td 8.1  sd 4.1 ft",
+      "td 7.4  sd 5.4 ft"
+    ],
+    "n_records": 183
+  },
+  "USGS-11455350": {
+    "equipment": [
+      "Unknown",
+      "Van Dorn sampler",
+      "US D-96-A1 Bag Sampler",
+      "Grab sample",
+      "Sampler, point, automatic"
+    ],
+    "method_name": [
+      "USGS",
+      "Point sample",
+      "Van Dorn sampler",
+      "Equal discharge increment (edi)",
+      "Timed sampling interval"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "after td 17.7 sd 13.7 ft",
+      "td 16.6 sd 12.6 ft",
+      "after td 17.5 sd 13.5 ft"
+    ],
+    "n_records": 172
+  },
+  "USGS-11455478": {
+    "equipment": [
+      "Unknown",
+      "US D-96 bag sampler",
+      "Van Dorn sampler"
+    ],
+    "method_name": [
+      "USGS",
+      "Equal discharge increment (edi)",
+      "Point sample",
+      "Van Dorn sampler"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "In a 1 liter bottle. 11455478, Decker Island, 12/11/12, 11:16, Station 2, TD: 20",
+      "In a 3 liter bottle. 11455478, Decker Island, 12/11/12, 15:32, Station 5, TD: 34",
+      "In a 3 liter bottle. 11455478, Decker Island, 12/5/12, Station 1, SD: 2', TD: 3'"
+    ],
+    "n_records": 89
+  },
+  "USGS-11504115": {
+    "equipment": [
+      "Unknown",
+      "Grab sample",
+      "US DH-95 plastic bottle",
+      "US DH-95 Teflon bottle",
+      "US DH-81"
+    ],
+    "method_name": [
+      "USGS",
+      "Grab sample  (dip)",
+      "Equal width increment (ewi)",
+      "Multiple verticals",
+      "Equal discharge increment (edi)"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "heavier",
+      "B-SET BROKEN IN SHIPMENT"
+    ],
+    "n_records": 524
+  },
+  "USGS-11509500": {
+    "equipment": [
+      "Grab sample",
+      "Sampler, point, automatic",
+      "Sampler, US D-74",
+      "US D-74 TM",
+      "US DH-76 TM with Teflon gasket and nozzle",
+      "Unknown"
+    ],
+    "method_name": [
+      "Grab sample  (dip)",
+      "SuspSed; Pumping - stream sample using a pumping mechanism",
+      "Other",
+      "Equal width increment (ewi)",
+      "Equal discharge increment (edi)",
+      "Point sample",
+      "USGS"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "Sample volume low. Possible leakage occurred in shipping."
+    ],
+    "n_records": 256
+  },
+  "USGS-12037400": {
+    "equipment": [
+      "Unknown",
+      "Sampler, US D-74",
+      "Sampler, US DH-59",
+      "US D-96-A1 Bag Sampler",
+      "US D-99 Bag Sampler"
+    ],
+    "method_name": [
+      "USGS",
+      "Equal width increment (ewi)",
+      "Single vertical, depth integrated"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Sample-Composite Without Parents"
+    ],
+    "comments": [
+      "bottle A-10 & B-10 low volume"
+    ],
+    "n_records": 148
+  },
+  "USGS-12113390": {
+    "equipment": [
+      "US D-77 TM",
+      "US D-95 Teflon bottle",
+      "US D-96-A1 Bag Sampler",
+      "US D-95 plastic bottle",
+      "US DH-95 plastic bottle",
+      "Sampler, point, automatic",
+      "Unknown",
+      "US D-96 bag sampler",
+      "US D-74 TM"
+    ],
+    "method_name": [
+      "Equal width increment (ewi)",
+      "Multiple verticals",
+      "Equal discharge increment (edi)",
+      "Composite - Multiple point samples",
+      "SuspSed; Pumping - stream sample using a pumping mechanism",
+      "USGS",
+      "Point sample"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate",
+      "Sample-Composite Without Parents"
+    ],
+    "comments": [
+      "ORTHO-P & DIS PHOS DUP'D",
+      "BALANCES W/ LAB ALKALINITY",
+      "A-2880160 duwam"
+    ],
+    "n_records": 1384
+  },
+  "USGS-12166300": {
+    "equipment": [
+      "Unknown",
+      "Sampler, US D-74",
+      "Sampler, point, automatic",
+      "US D-96 bag sampler",
+      "Sampler, US D-74AL",
+      "Sampler, US D-49"
+    ],
+    "method_name": [
+      "USGS",
+      "Equal discharge increment (edi)",
+      "SuspSed; Pumping - stream sample using a pumping mechanism",
+      "Equal width increment (ewi)",
+      "Single vertical, depth integrated",
+      "Grab sample  (dip)"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Not determined",
+      "Sample-Composite Without Parents"
+    ],
+    "comments": [
+      "ASAP",
+      "heavier sample",
+      "ALL REQUEST FULL SIZE"
+    ],
+    "n_records": 2139
+  },
+  "USGS-12170300": {
+    "equipment": [
+      "US D-96 bag sampler",
+      "Sampler, US D-74",
+      "Unknown",
+      "US D-96-A1 Bag Sampler",
+      "Sampler, point, automatic"
+    ],
+    "method_name": [
+      "Equal discharge increment (edi)",
+      "Equal width increment (ewi)",
+      "USGS",
+      "SuspSed; Pumping - stream sample using a pumping mechanism"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Sample-Composite Without Parents"
+    ],
+    "comments": [
+      "bag wt=9.3",
+      "bag wt=9.5",
+      "bag wt=8.9"
+    ],
+    "n_records": 277
+  },
+  "USGS-12187500": {
+    "equipment": [
+      "Sampler, US D-74",
+      "Grab sample",
+      "Sampler, US D-74AL",
+      "US D-99 Bag Sampler",
+      "Unknown"
+    ],
+    "method_name": [
+      "Equal width increment (ewi)",
+      "Single vertical, depth integrated",
+      "Grab sample  (dip)",
+      "Equal discharge increment (edi)",
+      "USGS"
+    ],
+    "activity_type": [
+      "Sample-Composite Without Parents",
+      "Sample-Routine"
+    ],
+    "comments": [
+      "bottle time 1315",
+      "low volumeA set avg deleted at field user request",
+      "very low volume"
+    ],
+    "n_records": 161
+  },
+  "USGS-12213100": {
+    "equipment": [
+      "US P-61",
+      "Sampler, US D-74",
+      "Sampler, US P-61-A1",
+      "Unknown",
+      "US D-96 bag sampler",
+      "US D-96-A1 Bag Sampler"
+    ],
+    "method_name": [
+      "Point sample",
+      "Equal discharge increment (edi)",
+      "Equal width increment (ewi)",
+      "Single vertical, depth integrated",
+      "USGS"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Sample-Composite Without Parents"
+    ],
+    "comments": [
+      "One of 4 samples in Set. These samples are 0.6 depths",
+      "One of 4 samples in Set. These samples are 0.8 depths",
+      "One of 5 samples in Set."
+    ],
+    "n_records": 219
+  },
+  "USGS-12214350": {
+    "equipment": [
+      "Sampler, point, automatic",
+      "Sampler, US DH-59",
+      "Unknown",
+      "Open-Mouth Bottle",
+      "Sampler, US DH-48",
+      "Sampler, US D-49"
+    ],
+    "method_name": [
+      "SuspSed; Pumping - stream sample using a pumping mechanism",
+      "Equal discharge increment (edi)",
+      "Point sample",
+      "Composite - Multiple point samples",
+      "USGS",
+      "Equal width increment (ewi)",
+      "Grab sample  (dip)",
+      "Single vertical, depth integrated",
+      "Multiple verticals"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Sample-Composite Without Parents",
+      "Quality Control Sample-Other"
+    ],
+    "comments": [
+      "PLEASE RETURN DRIED SAMPLE TO WAWSC ATTN: RICH SHEIBLEY SHEIBLEY@USGS.GOV 253-",
+      "PLEASE RETURN DRIED SAMPLE TO WAWSC ATTN: RICH SHEIBLEY  SHEIBLEY@USGS.GOV  253-",
+      "Please return sediment to WAWSC ATTN: Steve Cox"
+    ],
+    "n_records": 470
+  },
+  "USGS-12214500": {
+    "equipment": [
+      "Sampler, point, automatic",
+      "Unknown",
+      "Sampler, US DH-59",
+      "Sampler, US DH-48"
+    ],
+    "method_name": [
+      "SuspSed; Pumping - stream sample using a pumping mechanism",
+      "USGS",
+      "Equal width increment (ewi)",
+      "Composite - Multiple point samples",
+      "Single vertical, depth integrated",
+      "Equal discharge increment (edi)",
+      "Multiple verticals",
+      "Point sample"
+    ],
+    "activity_type": [
+      "Sample-Composite Without Parents",
+      "Sample-Routine",
+      "Quality Control Sample-Other"
+    ],
+    "comments": [
+      "bottle 19-21 have tags but are empty.",
+      "One of 3 samples in Set.",
+      "please send residue to Steve Cox WAWSC 934 Broadway Ave, Tacoma, WA 98402"
+    ],
+    "n_records": 328
+  },
+  "USGS-12323700": {
+    "equipment": [
+      "Grab sample",
+      "US DH-81",
+      "Other",
+      "Open-Mouth Bottle",
+      "US DH-81 with Teflon cap and nozzle",
+      "Unknown"
+    ],
+    "method_name": [
+      "Grab sample  (dip)",
+      "Equal width increment (ewi)",
+      "Single vertical, depth integrated",
+      "Multiple verticals",
+      "USGS"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "A-2530048 ATTENTION GLENDA BROWN--CLARK FORK PROJECT,MT",
+      "A-1560085 attention glenda brown- clark fork project,mt",
+      "A-0850014 attn: glenda brown- clark fork project,mt | L-0850014 date on bottles (20030314) different fromdate on ASR (20030317), paa, 4/15/03"
+    ],
+    "n_records": 338
+  },
+  "USGS-12323720": {
+    "equipment": [
+      "US DH-81",
+      "Grab sample",
+      "US DH-81 with Teflon cap and nozzle",
+      "Unknown",
+      "Open-Mouth Bottle"
+    ],
+    "method_name": [
+      "Equal width increment (ewi)",
+      "Single vertical, depth integrated",
+      "Multiple verticals",
+      "USGS",
+      "Grab sample  (dip)"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "A-1560086 attention glenda brown- clark fork project,mt",
+      "A-1270017 attn: glenda brown- clark fork project,mt",
+      "A-1000009 attn: glenda brown- clark fork project,mt"
+    ],
+    "n_records": 338
+  },
+  "USGS-12324400": {
+    "equipment": [
+      "US D-74 TM",
+      "US DH-81",
+      "US D-95 plastic bottle",
+      "Unknown",
+      "US DH-95 plastic bottle",
+      "US DH-81 with Teflon cap and nozzle",
+      "Grab sample"
+    ],
+    "method_name": [
+      "Equal discharge increment (edi)",
+      "Equal width increment (ewi)",
+      "USGS",
+      "Grab sample  (dip)",
+      "Multiple verticals"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "A-1810174 ATTENTION GARY COTTRELL - CLARK FORK PROJECT,MT",
+      "A-0900103 ATTENTION GARY COTTRELL - CLARK FORK PROJECT,MT",
+      "A-2390012 ATTENTION GARY COTTRELL-- CLARK FORK PROJECT,MT L-2390012 Received August 25, 2009"
+    ],
+    "n_records": 292
+  },
+  "USGS-12510500": {
+    "equipment": [
+      "Unknown",
+      "Sampler, US D-74AL",
+      "US D-77 TM",
+      "US DH-76 TM with Teflon gasket and nozzle",
+      "US DH-81 with Teflon cap and nozzle",
+      "US D-77 TM modified Teflon bag sampler",
+      "US D-95 Teflon bottle",
+      "Sampler, US DH-76",
+      "US DH-95 Teflon bottle",
+      "US DH-81",
+      "US DH-95 plastic bottle"
+    ],
+    "method_name": [
+      "USGS",
+      "Equal discharge increment (edi)",
+      "Equal width increment (ewi)",
+      "Multiple verticals"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Sample-Composite Without Parents",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "CATIONS RR",
+      "PHENOLS VERIFIED",
+      "DISS P RR=.18 TOT P RR=.12"
+    ],
+    "n_records": 1152
+  },
+  "USGS-14151000": {
+    "equipment": [
+      "Sampler, US D-74",
+      "Open-Mouth Bottle",
+      "Sampler, point, automatic",
+      "Sampler, US DH-76",
+      "Sampler, US DH-48",
+      "Unknown"
+    ],
+    "method_name": [
+      "Equal width increment (ewi)",
+      "Grab sample  (dip)",
+      "Point sample",
+      "Timed sampling interval",
+      "SuspSed; Pumping - stream sample using a pumping mechanism",
+      "USGS"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "SedLOGIN generated event average for OR-2013-136",
+      "SedLOGIN generated event average for OR-2013-105",
+      "SedLOGIN generated event average for OR-2013-140"
+    ],
+    "n_records": 569
+  },
+  "USGS-14179000": {
+    "equipment": [
+      "Unknown",
+      "Grab sample",
+      "Sampler, point, automatic",
+      "Sampler, US D-74",
+      "US D-95 plastic bottle",
+      "US DH-95 plastic bottle",
+      "US D-74 TM"
+    ],
+    "method_name": [
+      "USGS",
+      "Grab sample  (dip)",
+      "Timed sampling interval",
+      "SuspSed; Pumping - stream sample using a pumping mechanism",
+      "Equal width increment (ewi)"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Sample-Composite Without Parents"
+    ],
+    "comments": [
+      "Needs tare value."
+    ],
+    "n_records": 667
+  },
+  "USGS-14180300": {
+    "equipment": [
+      "Unknown"
+    ],
+    "method_name": [
+      "USGS"
+    ],
+    "activity_type": [
+      "Not determined",
+      "Sample-Routine"
+    ],
+    "comments": [],
+    "n_records": 494
+  },
+  "USGS-14181500": {
+    "equipment": [
+      "Unknown"
+    ],
+    "method_name": [
+      "USGS"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [],
+    "n_records": 241
+  },
+  "USGS-14181900": {
+    "equipment": [
+      "Unknown"
+    ],
+    "method_name": [
+      "USGS"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "turbidity =13 FNU"
+    ],
+    "n_records": 37
+  },
+  "USGS-14182500": {
+    "equipment": [
+      "Unknown",
+      "Grab sample",
+      "US D-95 Teflon bottle",
+      "Sampler, point, automatic",
+      "US DH-95 plastic bottle"
+    ],
+    "method_name": [
+      "USGS",
+      "Grab sample  (dip)",
+      "Equal width increment (ewi)",
+      "SuspSed; Pumping - stream sample using a pumping mechanism"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [],
+    "n_records": 440
+  },
+  "USGS-14246900": {
+    "equipment": [
+      "Unknown",
+      "Sampler, US P-61-A1",
+      "Sampler, US D-77",
+      "US P-61 TM",
+      "Sampler, frame-type, plastic bottle w/Teflon collaps. bag",
+      "US D-96-A1 Bag Sampler",
+      "US D-96 bag sampler",
+      "US P-61"
+    ],
+    "method_name": [
+      "USGS",
+      "Equal discharge increment (edi)",
+      "Equal width increment (ewi)",
+      "Multiple verticals"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "P-T UPDATED AS RESULT OF QC REPORT",
+      "BOTTLES OK",
+      "RU BOTTLE OK"
+    ],
+    "n_records": 805
+  },
+  "USGS-14301500": {
+    "equipment": [
+      "Unknown",
+      "Sampler, point, automatic",
+      "Sampler, US D-74",
+      "Sampler, US D-77"
+    ],
+    "method_name": [
+      "USGS",
+      "SuspSed; Pumping - stream sample using a pumping mechanism",
+      "Equal width increment (ewi)",
+      "Point sample"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "At start of EWI- 5th EWI this day",
+      "No bottle no. 8",
+      "After 1st Set B this day- no before/after 1st Set A auto sample as it overfilled"
+    ],
+    "n_records": 411
+  },
+  "USGS-14302480": {
+    "equipment": [
+      "Unknown",
+      "Sampler, US D-74",
+      "Sampler, US D-77",
+      "Sampler, US DH-59",
+      "Sampler, US DH-76"
+    ],
+    "method_name": [
+      "USGS",
+      "Equal width increment (ewi)"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "overfull",
+      "SedLOGIN generated event average for OR-2012-149",
+      "A"
+    ],
+    "n_records": 74
+  },
+  "USGS-15008000": {
+    "equipment": [
+      "Unknown",
+      "US DH-95 plastic bottle",
+      "US DH-81 with Teflon cap and nozzle",
+      "US DH-95 Teflon bottle",
+      "US D-95 plastic bottle",
+      "US DH-81"
+    ],
+    "method_name": [
+      "USGS",
+      "Equal discharge increment (edi)",
+      "Equal width increment (ewi)",
+      "Multiple verticals"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "L-0780050 FED EX LATE DELIVERY. RECEIVED MAR 18 2020.",
+      "Very light sands."
+    ],
+    "n_records": 152
+  },
+  "USGS-15015595": {
+    "equipment": [
+      "US D-95 plastic bottle",
+      "US DH-81",
+      "US DH-95 Teflon bottle",
+      "Unknown",
+      "US DH-95 plastic bottle",
+      "US D-95 Teflon bottle",
+      "US DH-81 with Teflon cap and nozzle"
+    ],
+    "method_name": [
+      "Equal width increment (ewi)",
+      "Equal discharge increment (edi)",
+      "USGS",
+      "Grab sample  (dip)"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "L-2890057 no user code or project account on asr, ct    *AK added as user code, district/swenson notified concerning missing project acct, paa, 10/17/03 *per district/solin, acct corrected to 905400130, paa, 10/17/03",
+      "L-2010313 Chilled containers received warm at 18    Degrees C",
+      "L-3460049 X=no time on TPCN; Improper sample contianer; FCC in 125mL nalgene botle"
+    ],
+    "n_records": 87
+  },
+  "USGS-15024800": {
+    "equipment": [
+      "Unknown",
+      "US P-61 TM",
+      "Other",
+      "US D-96 bag sampler",
+      "US D-95 Teflon bottle",
+      "US DH-95 plastic bottle",
+      "US DH-81 with Teflon cap and nozzle"
+    ],
+    "method_name": [
+      "USGS",
+      "Equal discharge increment (edi)",
+      "Point sample",
+      "Equal width increment (ewi)",
+      "Multiple verticals"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "RERUNS: CD,DIS = 40",
+      "RR ALK;VALUE DUP'D",
+      "RR ANIONS;VALUES DUP'D"
+    ],
+    "n_records": 493
+  },
+  "USGS-15041200": {
+    "equipment": [
+      "US DH-95 plastic bottle",
+      "US D-96 bag sampler",
+      "US D-95 plastic bottle",
+      "Unknown",
+      "US DH-95 Teflon bottle",
+      "US DH-2 Bag Sampler",
+      "Grab sample",
+      "US DH-81"
+    ],
+    "method_name": [
+      "Equal discharge increment (edi)",
+      "Equal width increment (ewi)",
+      "USGS",
+      "Multiple verticals"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "L-2060169 Need more ice   Extra RU received    WCA btl condition changed to improper preservation, JNV",
+      "L-1280115 Only 1 TBY received. X= No time on FA.",
+      "L-2130152 X = No Station ID Date or Time on DIC vials or TPCN foils. Please put in container counts on ASR. Change Record Number to 01900385 per Jamie Pierce. RAM bottle conditon changed to improper preservation, MN. Lab acidification lab code 3105 added, MN. RAM bottle preserved by J. Sussman on 8/"
+    ],
+    "n_records": 75
+  },
+  "USGS-15129120": {
+    "equipment": [
+      "Unknown",
+      "US D-96 bag sampler",
+      "US DH-95 plastic bottle",
+      "US D-95 plastic bottle",
+      "Grab sample"
+    ],
+    "method_name": [
+      "USGS",
+      "Equal discharge increment (edi)",
+      "Timed sampling interval",
+      "Grab sample  (dip)",
+      "Equal width increment (ewi)"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "L-2070214 All other samples were logged in. Logged DIC's for LC 2625. X= No Station ID, Date or Time on vials. Verified as DIC's per J. Goetz.",
+      "L-1510181 OK to login warm samples per J. Goetz. Chilled containers received warm at 9.5   Degrees C",
+      "L-2350285 X = No Date or Time on TPCN. X = TBY received."
+    ],
+    "n_records": 48
+  },
+  "USGS-15209700": {
+    "equipment": [
+      "US D-96 bag sampler",
+      "Sampler, US DH-59",
+      "US D-95 plastic bottle",
+      "Unknown"
+    ],
+    "method_name": [
+      "Equal discharge increment (edi)",
+      "SuspSed; Box-single ver, depth-int, attached to structure",
+      "Single vertical, depth integrated",
+      "USGS"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [],
+    "n_records": 244
+  },
+  "USGS-250813081040000": {
+    "equipment": [
+      "Sampler, point, automatic",
+      "US DH-81",
+      "Weighted-bottle sampler",
+      "Unknown",
+      "US DH-81 with Teflon cap and nozzle"
+    ],
+    "method_name": [
+      "Point sample",
+      "Equal width increment (ewi)",
+      "USGS"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "ECC 0902 I2",
+      "ECC 0902 G",
+      "ECC 0905 C"
+    ],
+    "n_records": 285
+  },
+  "USGS-250921081054200": {
+    "equipment": [
+      "Sampler, point, automatic",
+      "Unknown",
+      "Weighted-bottle sampler",
+      "US DH-81",
+      "US DH-95 plastic bottle"
+    ],
+    "method_name": [
+      "Point sample",
+      "USGS",
+      "Equal width increment (ewi)"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "HC 0922 C",
+      "HC 0903 C",
+      "HC 0900 C"
+    ],
+    "n_records": 238
+  },
+  "USGS-342804118011501": {
+    "equipment": [
+      "Unknown",
+      "Suction pump",
+      "Sampler, point, automatic"
+    ],
+    "method_name": [
+      "USGS",
+      "Point sample",
+      "SuspSed; Pumping - stream sample using a pumping mechanism"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [],
+    "n_records": 30
+  },
+  "USGS-375350097262800": {
+    "equipment": [
+      "Weighted-bottle sampler",
+      "Grab sample",
+      "US DH-81",
+      "US DH-81 with Teflon cap and nozzle",
+      "Other",
+      "Open-top bailer",
+      "Open-Mouth Bottle"
+    ],
+    "method_name": [
+      "Single vertical, depth integrated",
+      "Multiple verticals",
+      "Equal width increment (ewi)",
+      "Other"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "A-0970038 4 drops of HCL added to GCV L-0970038 Lab codes not indicated as add or delete, LC's added, JNV",
+      "L-0760100 Some lab codes not indicated as add or delete, LC's added, JNV",
+      "L-2280135 Some lab code not indicated as add or delete, LC's added, ACK"
+    ],
+    "n_records": 172
+  },
+  "USGS-384115121402501": {
+    "equipment": [
+      "Unknown",
+      "Open-Mouth Bottle",
+      "Sampler, US DH-59",
+      "Sampler, US DH-48",
+      "Sampler, point, automatic",
+      "Sampler, US D-74",
+      "Grab sample",
+      "Peristaltic pump"
+    ],
+    "method_name": [
+      "USGS",
+      "Single vertical, depth integrated",
+      "SuspSed; Box-single ver, depth-int, attached to structure",
+      "Grab sample  (dip)",
+      "SuspSed; Pumping - stream sample using a pumping mechanism",
+      "SuspSed;Partial Depth,depth integrated,part of single vert.",
+      "Point sample",
+      "Other"
+    ],
+    "activity_type": [
+      "Quality Control Sample-Field Replicate",
+      "Sample-Routine"
+    ],
+    "comments": [
+      "\"L-3550038 Received December 18, 2012..   sta id not yet assigned per ASR cmt from WSC,paa,12/27/12. Changed Station ID to current per S. Rose. JPC 7/28/16  X=no sta id on sample, improper sample container clear cap on FU..  verified 2012 ASR date same as on FU, GB 10-2-14\"",
+      "\"L-0030001 X=Time on sample 120..  volume filtered added to ASRs per smpls @ Login, ASR year 2013 corrected to 2012 per smpl, sta id not yet assigned, paa, 1/3/12    Updated SID from NON per Beaulieu.  KB 07/31/13  X = Time on sample 120   Station id not on sample..   per ASR cmt from WSC, sta id no",
+      "\"L-0030008 sta id not yet assigned, paa   Updated SID from NON per Beaulieu.  KB 07/31/13  X = Station id not on samples    FED EX LATE DELIVERY..  per ASR cmt from WSC, sta id not yet assigned, paa   Updated SID from NON per Beaulieu.  KB 07/31/13\""
+    ],
+    "n_records": 2926
+  },
+  "USGS-385553107243301": {
+    "equipment": [
+      "Unknown",
+      "US DH-81 with Teflon cap and nozzle",
+      "Sampler, US D-74",
+      "US D-95 plastic bottle",
+      "US DH-95 plastic bottle",
+      "US DH-81",
+      "Sampler, point, automatic"
+    ],
+    "method_name": [
+      "USGS",
+      "Equal width increment (ewi)",
+      "10 or more equal width verticals, equal non-iso transit rate limited by velocity",
+      "SuspSed; Pumping - stream sample using a pumping mechanism"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Unknown"
+    ],
+    "comments": [
+      "Organic debris in sand.",
+      "\"Water level 2\"\" below water line. gross wt. 570.4 before filling to line with DI.\"",
+      "Light organic debris in sand."
+    ],
+    "n_records": 1507
+  },
+  "USGS-404038124131801": {
+    "equipment": [
+      "Unknown",
+      "Van Dorn sampler"
+    ],
+    "method_name": [
+      "USGS",
+      "Van Dorn sampler"
+    ],
+    "activity_type": [
+      "Sample-Routine",
+      "Quality Control Sample-Field Replicate"
+    ],
+    "comments": [
+      "all cond. ms/cm  except the last one is um/cm",
+      "cond. on 1,2,4 ms/cm"
+    ],
+    "n_records": 136
+  },
+  "USGS-405219124085601": {
+    "equipment": [
+      "Unknown",
+      "Van Dorn sampler"
+    ],
+    "method_name": [
+      "USGS",
+      "Van Dorn sampler"
+    ],
+    "activity_type": [
+      "Sample-Routine"
+    ],
+    "comments": [
+      "all cond. in ms/cm"
+    ],
+    "n_records": 129
+  }
+}

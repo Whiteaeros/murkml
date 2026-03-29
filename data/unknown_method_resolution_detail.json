@@ -1,0 +1,7459 @@
+{
+  "USGS-01036390": {
+    "resolved_method": "depth_integrated",
+    "confidence": "high",
+    "known_categories": {
+      "depth_integrated": 4
+    },
+    "n_unknown_samples": 13,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Sampler, US DH-76",
+      "Sampler, US D-49",
+      "Sampler, US D-74",
+      "Other",
+      "US D-77 TM"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "Sampler, US DH-76",
+        "Sampler, US D-49",
+        "Sampler, US D-74",
+        "US D-77 TM"
+      ],
+      "unknown": [
+        "Unknown"
+      ],
+      "other": [
+        "Other"
+      ]
+    }
+  },
+  "USGS-01111230": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 2,
+      "depth_integrated": 5,
+      "grab": 1
+    },
+    "n_unknown_samples": 6,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Weighted-bottle sampler",
+      "US WBH-96 weighted-bottle sampler",
+      "Sampler, point, automatic",
+      "US DH-95 Teflon bottle",
+      "Grab sample",
+      "US DH-59 TM",
+      "Peristaltic pump",
+      "US DH-81"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic",
+        "Peristaltic pump"
+      ],
+      "depth_integrated": [
+        "Weighted-bottle sampler",
+        "US WBH-96 weighted-bottle sampler",
+        "US DH-95 Teflon bottle",
+        "US DH-59 TM",
+        "US DH-81"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-01311875": {
+    "resolved_method": null,
+    "confidence": "unresolvable",
+    "known_categories": {},
+    "n_unknown_samples": 47,
+    "is_catastrophic": true,
+    "equipment_found": [
+      "Unknown"
+    ],
+    "classified": {
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-01362330": {
+    "resolved_method": "depth_integrated",
+    "confidence": "high",
+    "known_categories": {
+      "depth_integrated": 1
+    },
+    "n_unknown_samples": 48,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "US DH-81"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US DH-81"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-01362350": {
+    "resolved_method": "depth_integrated",
+    "confidence": "high",
+    "known_categories": {
+      "depth_integrated": 1
+    },
+    "n_unknown_samples": 31,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "US DH-81"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US DH-81"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-01362356": {
+    "resolved_method": "depth_integrated",
+    "confidence": "high",
+    "known_categories": {
+      "depth_integrated": 1
+    },
+    "n_unknown_samples": 32,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "US DH-81"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US DH-81"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-01362357": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 2
+    },
+    "n_unknown_samples": 31,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "US DH-81",
+      "Sampler, point, automatic",
+      "US DH-81 with Teflon cap and nozzle"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US DH-81",
+        "US DH-81 with Teflon cap and nozzle"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-01362370": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 3,
+      "grab": 1
+    },
+    "n_unknown_samples": 36,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Sampler, point, automatic",
+      "Grab sample",
+      "Unknown",
+      "US DH-81",
+      "US DH-81 with Teflon cap and nozzle",
+      "US D-95 plastic bottle"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US DH-81",
+        "US DH-81 with Teflon cap and nozzle",
+        "US D-95 plastic bottle"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-01362487": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 3
+    },
+    "n_unknown_samples": 4,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "US DH-81",
+      "Sampler, point, automatic",
+      "US DH-81 with Teflon cap and nozzle",
+      "US D-95 plastic bottle"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US DH-81",
+        "US DH-81 with Teflon cap and nozzle",
+        "US D-95 plastic bottle"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-01363556": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 6,
+      "grab": 1
+    },
+    "n_unknown_samples": 7,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Sampler, point, automatic",
+      "Sampler, US DH-76",
+      "Grab sample",
+      "US DH-76 TM",
+      "Unknown",
+      "US DH-81 with Teflon cap and nozzle",
+      "US DH-81",
+      "US D-95 plastic bottle",
+      "US DH-95 plastic bottle"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "Sampler, US DH-76",
+        "US DH-76 TM",
+        "US DH-81 with Teflon cap and nozzle",
+        "US DH-81",
+        "US D-95 plastic bottle",
+        "US DH-95 plastic bottle"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-01372043": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 2,
+      "depth_integrated": 7,
+      "grab": 2
+    },
+    "n_unknown_samples": 12,
+    "is_catastrophic": true,
+    "equipment_found": [
+      "Unknown",
+      "US D-77 TM modified Teflon bag sampler",
+      "Sampler, frame-type, plastic bottle w/Teflon collaps. bag",
+      "Other",
+      "Sampler, US DH-76",
+      "US D-96-A1 Bag Sampler",
+      "Weighted-bottle sampler",
+      "US D-96 bag sampler",
+      NaN,
+      "Open-Mouth Bottle",
+      "Jet pump",
+      "Sampler, point, automatic",
+      "Grab sample",
+      "US DH-81 with Teflon cap and nozzle"
+    ],
+    "classified": {
+      "auto_point": [
+        "Jet pump",
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US D-77 TM modified Teflon bag sampler",
+        "Sampler, frame-type, plastic bottle w/Teflon collaps. bag",
+        "Sampler, US DH-76",
+        "US D-96-A1 Bag Sampler",
+        "Weighted-bottle sampler",
+        "US D-96 bag sampler",
+        "US DH-81 with Teflon cap and nozzle"
+      ],
+      "grab": [
+        "Open-Mouth Bottle",
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown",
+        NaN
+      ],
+      "other": [
+        "Other"
+      ]
+    }
+  },
+  "USGS-01408500": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 4,
+      "grab": 1
+    },
+    "n_unknown_samples": 71,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "US DH-76 TM",
+      "Weighted-bottle sampler",
+      "US DH-81",
+      "US DH-81 with Teflon cap and nozzle",
+      "Open-Mouth Bottle"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US DH-76 TM",
+        "Weighted-bottle sampler",
+        "US DH-81",
+        "US DH-81 with Teflon cap and nozzle"
+      ],
+      "grab": [
+        "Open-Mouth Bottle"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-01463500": {
+    "resolved_method": "depth_integrated",
+    "confidence": "high",
+    "known_categories": {
+      "depth_integrated": 11
+    },
+    "n_unknown_samples": 3,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "US DH-76 TM",
+      "US D-74 AL-TM",
+      "Weighted-bottle sampler",
+      "US D-95 Teflon bottle",
+      "US DH-95 Teflon bottle",
+      "US D-77 TM",
+      "US DH-81 with Teflon cap and nozzle",
+      "US WBH-96 weighted-bottle sampler",
+      "Mulitple samplers used",
+      "US DH-81",
+      "US DH-95 plastic bottle"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US DH-76 TM",
+        "US D-74 AL-TM",
+        "Weighted-bottle sampler",
+        "US D-95 Teflon bottle",
+        "US DH-95 Teflon bottle",
+        "US D-77 TM",
+        "US DH-81 with Teflon cap and nozzle",
+        "US WBH-96 weighted-bottle sampler",
+        "Mulitple samplers used",
+        "US DH-81",
+        "US DH-95 plastic bottle"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-01473169": {
+    "resolved_method": "auto_point",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 1
+    },
+    "n_unknown_samples": 32,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Sampler, point, automatic",
+      "Unknown",
+      "US DH-81"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US DH-81"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-01478185": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 2
+    },
+    "n_unknown_samples": 13,
+    "is_catastrophic": true,
+    "equipment_found": [
+      "Unknown",
+      "US DH-81",
+      "US DH-95 plastic bottle",
+      "Sampler, point, automatic"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US DH-81",
+        "US DH-95 plastic bottle"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-01478220": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 2
+    },
+    "n_unknown_samples": 4,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "US DH-81",
+      "US DH-95 Teflon bottle",
+      "Sampler, point, automatic"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US DH-81",
+        "US DH-95 Teflon bottle"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-01478245": {
+    "resolved_method": "auto_point",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 1
+    },
+    "n_unknown_samples": 61,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "US DH-81",
+      "Sampler, point, automatic"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US DH-81"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-01479820": {
+    "resolved_method": "auto_point",
+    "confidence": "high",
+    "known_categories": {
+      "auto_point": 1
+    },
+    "n_unknown_samples": 42,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Sampler, point, automatic"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-01480617": {
+    "resolved_method": "auto_point",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 1
+    },
+    "n_unknown_samples": 27,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Sampler, point, automatic",
+      "Unknown",
+      "US DH-81"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US DH-81"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-01480870": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 4,
+      "grab": 1
+    },
+    "n_unknown_samples": 30,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Sampler, point, automatic",
+      "Unknown",
+      "US DH-81",
+      "Open-Mouth Bottle",
+      "US WBH-96 weighted-bottle sampler",
+      "US DH-95 plastic bottle",
+      "US D-95 plastic bottle"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US DH-81",
+        "US WBH-96 weighted-bottle sampler",
+        "US DH-95 plastic bottle",
+        "US D-95 plastic bottle"
+      ],
+      "grab": [
+        "Open-Mouth Bottle"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-01493112": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 7,
+      "grab": 2
+    },
+    "n_unknown_samples": 5,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Other",
+      "US DH-81 with Teflon cap and nozzle",
+      "US D-95 Teflon bottle",
+      "Peristaltic pump",
+      "Weighted-bottle sampler",
+      "Grab sample",
+      "US DH-81",
+      "US D-95 plastic bottle",
+      "Open-Mouth Bottle",
+      "US DH-95 plastic bottle",
+      "US DH-95 Teflon bottle"
+    ],
+    "classified": {
+      "auto_point": [
+        "Peristaltic pump"
+      ],
+      "depth_integrated": [
+        "US DH-81 with Teflon cap and nozzle",
+        "US D-95 Teflon bottle",
+        "Weighted-bottle sampler",
+        "US DH-81",
+        "US D-95 plastic bottle",
+        "US DH-95 plastic bottle",
+        "US DH-95 Teflon bottle"
+      ],
+      "grab": [
+        "Grab sample",
+        "Open-Mouth Bottle"
+      ],
+      "unknown": [
+        "Unknown"
+      ],
+      "other": [
+        "Other"
+      ]
+    }
+  },
+  "USGS-01573660": {
+    "resolved_method": "depth_integrated",
+    "confidence": "high",
+    "known_categories": {
+      "depth_integrated": 2
+    },
+    "n_unknown_samples": 1,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "US DH-81",
+      "US DH-95 plastic bottle",
+      "Unknown"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US DH-81",
+        "US DH-95 plastic bottle"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-01573695": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 2,
+      "grab": 1
+    },
+    "n_unknown_samples": 21,
+    "is_catastrophic": true,
+    "equipment_found": [
+      "Unknown",
+      "Weighted-bottle sampler",
+      "Grab sample",
+      "US DH-81"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "Weighted-bottle sampler",
+        "US DH-81"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-01573710": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 2,
+      "grab": 1
+    },
+    "n_unknown_samples": 23,
+    "is_catastrophic": true,
+    "equipment_found": [
+      "Unknown",
+      "Weighted-bottle sampler",
+      "Grab sample",
+      "US DH-81"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "Weighted-bottle sampler",
+        "US DH-81"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-01574000": {
+    "resolved_method": "depth_integrated",
+    "confidence": "high",
+    "known_categories": {
+      "depth_integrated": 4
+    },
+    "n_unknown_samples": 19,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "US DH-81 with Teflon cap and nozzle",
+      "US D-95 plastic bottle",
+      "US DH-81",
+      "US DH-95 plastic bottle"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US DH-81 with Teflon cap and nozzle",
+        "US D-95 plastic bottle",
+        "US DH-81",
+        "US DH-95 plastic bottle"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-01575598": {
+    "resolved_method": "depth_integrated",
+    "confidence": "high",
+    "known_categories": {
+      "depth_integrated": 5
+    },
+    "n_unknown_samples": 45,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Weighted-bottle sampler",
+      "Unknown",
+      "US DH-95 plastic bottle",
+      "US DH-95 Teflon bottle",
+      "US DH-81 with Teflon cap and nozzle",
+      "US D-95 plastic bottle"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "Weighted-bottle sampler",
+        "US DH-95 plastic bottle",
+        "US DH-95 Teflon bottle",
+        "US DH-81 with Teflon cap and nozzle",
+        "US D-95 plastic bottle"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-01575900": {
+    "resolved_method": "depth_integrated",
+    "confidence": "high",
+    "known_categories": {
+      "depth_integrated": 2
+    },
+    "n_unknown_samples": 16,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "US DH-81",
+      "Unknown",
+      "US DH-95 plastic bottle"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US DH-81",
+        "US DH-95 plastic bottle"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-01576000": {
+    "resolved_method": "depth_integrated",
+    "confidence": "high",
+    "known_categories": {
+      "depth_integrated": 2
+    },
+    "n_unknown_samples": 3,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Other",
+      "US D-77 TM",
+      "US DH-95 plastic bottle"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US D-77 TM",
+        "US DH-95 plastic bottle"
+      ],
+      "unknown": [
+        "Unknown"
+      ],
+      "other": [
+        "Other"
+      ]
+    }
+  },
+  "USGS-01576003": {
+    "resolved_method": null,
+    "confidence": "unresolvable",
+    "known_categories": {},
+    "n_unknown_samples": 15,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown"
+    ],
+    "classified": {
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-01576007": {
+    "resolved_method": "depth_integrated",
+    "confidence": "high",
+    "known_categories": {
+      "depth_integrated": 2
+    },
+    "n_unknown_samples": 5,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "US DH-81",
+      "Unknown",
+      "US DH-95 plastic bottle"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US DH-81",
+        "US DH-95 plastic bottle"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-01576045": {
+    "resolved_method": "depth_integrated",
+    "confidence": "high",
+    "known_categories": {
+      "depth_integrated": 2
+    },
+    "n_unknown_samples": 3,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "US DH-81",
+      "Unknown",
+      "US DH-81 with Teflon cap and nozzle"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US DH-81",
+        "US DH-81 with Teflon cap and nozzle"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-01576516": {
+    "resolved_method": null,
+    "confidence": "unresolvable",
+    "known_categories": {},
+    "n_unknown_samples": 13,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown"
+    ],
+    "classified": {
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-015765185": {
+    "resolved_method": null,
+    "confidence": "unresolvable",
+    "known_categories": {},
+    "n_unknown_samples": 17,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown"
+    ],
+    "classified": {
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-015765195": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 2,
+      "grab": 1
+    },
+    "n_unknown_samples": 17,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Grab sample",
+      "US DH-81",
+      "Weighted-bottle sampler"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US DH-81",
+        "Weighted-bottle sampler"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-01576980": {
+    "resolved_method": "depth_integrated",
+    "confidence": "high",
+    "known_categories": {
+      "depth_integrated": 1
+    },
+    "n_unknown_samples": 10,
+    "is_catastrophic": true,
+    "equipment_found": [
+      "Unknown",
+      "Weighted-bottle sampler"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "Weighted-bottle sampler"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-01577500": {
+    "resolved_method": "depth_integrated",
+    "confidence": "high",
+    "known_categories": {
+      "depth_integrated": 5
+    },
+    "n_unknown_samples": 32,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "US DH-81 with Teflon cap and nozzle",
+      "US DH-81",
+      "US DH-95 plastic bottle",
+      "Weighted-bottle sampler",
+      "US D-95 plastic bottle"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US DH-81 with Teflon cap and nozzle",
+        "US DH-81",
+        "US DH-95 plastic bottle",
+        "Weighted-bottle sampler",
+        "US D-95 plastic bottle"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-01581752": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 5,
+      "grab": 2
+    },
+    "n_unknown_samples": 1,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "US DH-81",
+      "US DH-95 plastic bottle",
+      "Sampler, point, automatic",
+      "Other",
+      "Open-Mouth Bottle",
+      "US DH-95 Teflon bottle",
+      "US D-95 plastic bottle",
+      "Weighted-bottle sampler",
+      "Grab sample"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US DH-81",
+        "US DH-95 plastic bottle",
+        "US DH-95 Teflon bottle",
+        "US D-95 plastic bottle",
+        "Weighted-bottle sampler"
+      ],
+      "grab": [
+        "Open-Mouth Bottle",
+        "Grab sample"
+      ],
+      "other": [
+        "Other"
+      ]
+    }
+  },
+  "USGS-01589000": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 3
+    },
+    "n_unknown_samples": 317,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Sampler, point, automatic",
+      "US DH-81",
+      "US DH-95 plastic bottle",
+      "US DH-81 with Teflon cap and nozzle"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US DH-81",
+        "US DH-95 plastic bottle",
+        "US DH-81 with Teflon cap and nozzle"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-01589290": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 3
+    },
+    "n_unknown_samples": 8,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "US DH-81",
+      "Sampler, point, automatic",
+      "Unknown",
+      "US D-95 plastic bottle",
+      "US DH-81 with Teflon cap and nozzle"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US DH-81",
+        "US D-95 plastic bottle",
+        "US DH-81 with Teflon cap and nozzle"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-01645704": {
+    "resolved_method": "auto_point",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 1,
+      "grab": 1
+    },
+    "n_unknown_samples": 6,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Sampler, point, automatic",
+      "Grab sample",
+      "US DH-81",
+      "Unknown"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US DH-81"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-01646000": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 3,
+      "grab": 2
+    },
+    "n_unknown_samples": 1,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "US DH-95 plastic bottle",
+      "US WBH-96 weighted-bottle sampler",
+      "US DH-95 Teflon bottle",
+      "Grab sample",
+      "Polar-organic continuous integrated sampler (POCIS) passive diffusion sampler"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US DH-95 plastic bottle",
+        "US WBH-96 weighted-bottle sampler",
+        "US DH-95 Teflon bottle"
+      ],
+      "grab": [
+        "Grab sample",
+        "Polar-organic continuous integrated sampler (POCIS) passive diffusion sampler"
+      ]
+    }
+  },
+  "USGS-01649190": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 2,
+      "depth_integrated": 4,
+      "grab": 1
+    },
+    "n_unknown_samples": 22,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Other",
+      "US DH-81 with Teflon cap and nozzle",
+      "Grab sample",
+      "Sampler, point, automatic",
+      "Peristaltic pump",
+      "Weighted-bottle sampler",
+      "US DH-81",
+      "US DH-95 plastic bottle",
+      "Unknown"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic",
+        "Peristaltic pump"
+      ],
+      "depth_integrated": [
+        "US DH-81 with Teflon cap and nozzle",
+        "Weighted-bottle sampler",
+        "US DH-81",
+        "US DH-95 plastic bottle"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ],
+      "other": [
+        "Other"
+      ]
+    }
+  },
+  "USGS-01651000": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 3,
+      "grab": 1
+    },
+    "n_unknown_samples": 2,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "US DH-81 with Teflon cap and nozzle",
+      "US DH-95 Teflon bottle",
+      "Other",
+      "Grab sample",
+      "Weighted-bottle sampler",
+      "Sampler, point, automatic"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US DH-81 with Teflon cap and nozzle",
+        "US DH-95 Teflon bottle",
+        "Weighted-bottle sampler"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ],
+      "other": [
+        "Other"
+      ]
+    }
+  },
+  "USGS-01651730": {
+    "resolved_method": "auto_point",
+    "confidence": "high",
+    "known_categories": {
+      "auto_point": 1
+    },
+    "n_unknown_samples": 1,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Sampler, point, automatic",
+      "Unknown"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-01654500": {
+    "resolved_method": "auto_point",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "grab": 1
+    },
+    "n_unknown_samples": 13,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Grab sample",
+      "Sampler, point, automatic",
+      "Unknown"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-01656903": {
+    "resolved_method": "auto_point",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 1,
+      "grab": 1
+    },
+    "n_unknown_samples": 5,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Sampler, point, automatic",
+      "Grab sample",
+      "US DH-81",
+      "Unknown"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US DH-81"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-01658000": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 6,
+      "grab": 1
+    },
+    "n_unknown_samples": 91,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Other",
+      "Weighted-bottle sampler",
+      "US DH-81",
+      "US DH-81 with Teflon cap and nozzle",
+      "Grab sample",
+      "Sampler, point, automatic",
+      "US DH-95 plastic bottle",
+      "US D-95 plastic bottle",
+      "US DH-95 Teflon bottle"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "Weighted-bottle sampler",
+        "US DH-81",
+        "US DH-81 with Teflon cap and nozzle",
+        "US DH-95 plastic bottle",
+        "US D-95 plastic bottle",
+        "US DH-95 Teflon bottle"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ],
+      "other": [
+        "Other"
+      ]
+    }
+  },
+  "USGS-01668000": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 7,
+      "grab": 1
+    },
+    "n_unknown_samples": 1,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Other",
+      "Weighted-bottle sampler",
+      "Sampler, US D-74AL",
+      "US WBH-96 weighted-bottle sampler",
+      "US DH-95 plastic bottle",
+      "US DH-81",
+      "US D-95 plastic bottle",
+      "US DH-95 Teflon bottle",
+      "Grab sample"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "Weighted-bottle sampler",
+        "Sampler, US D-74AL",
+        "US WBH-96 weighted-bottle sampler",
+        "US DH-95 plastic bottle",
+        "US DH-81",
+        "US D-95 plastic bottle",
+        "US DH-95 Teflon bottle"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ],
+      "other": [
+        "Other"
+      ]
+    }
+  },
+  "USGS-0166818623": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 2,
+      "grab": 1
+    },
+    "n_unknown_samples": 9,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Grab sample",
+      "US DH-81",
+      "Sampler, point, automatic",
+      "US WBH-96 weighted-bottle sampler"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US DH-81",
+        "US WBH-96 weighted-bottle sampler"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-0166818985": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 2,
+      "grab": 1
+    },
+    "n_unknown_samples": 7,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Grab sample",
+      "US WBH-96 weighted-bottle sampler",
+      "US DH-81",
+      "Sampler, point, automatic"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US WBH-96 weighted-bottle sampler",
+        "US DH-81"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-02054750": {
+    "resolved_method": "depth_integrated",
+    "confidence": "high",
+    "known_categories": {
+      "depth_integrated": 7
+    },
+    "n_unknown_samples": 18,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "US DH-95 plastic bottle",
+      "US WBH-96 weighted-bottle sampler",
+      "US DH-81",
+      "US D-96 bag sampler",
+      "Sampler, frame-type, plastic bottle",
+      "Other",
+      "US DH-95 Teflon bottle",
+      "Weighted-bottle sampler"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US DH-95 plastic bottle",
+        "US WBH-96 weighted-bottle sampler",
+        "US DH-81",
+        "US D-96 bag sampler",
+        "Sampler, frame-type, plastic bottle",
+        "US DH-95 Teflon bottle",
+        "Weighted-bottle sampler"
+      ],
+      "other": [
+        "Other"
+      ]
+    }
+  },
+  "USGS-02055080": {
+    "resolved_method": "depth_integrated",
+    "confidence": "high",
+    "known_categories": {
+      "depth_integrated": 7
+    },
+    "n_unknown_samples": 8,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "US DH-95 plastic bottle",
+      "US WBH-96 weighted-bottle sampler",
+      "US DH-81",
+      "US D-96 bag sampler",
+      "Sampler, frame-type, plastic bottle",
+      "US DH-95 Teflon bottle",
+      "Weighted-bottle sampler"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US DH-95 plastic bottle",
+        "US WBH-96 weighted-bottle sampler",
+        "US DH-81",
+        "US D-96 bag sampler",
+        "Sampler, frame-type, plastic bottle",
+        "US DH-95 Teflon bottle",
+        "Weighted-bottle sampler"
+      ]
+    }
+  },
+  "USGS-0205551460": {
+    "resolved_method": "auto_point",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 2,
+      "depth_integrated": 1,
+      "grab": 1
+    },
+    "n_unknown_samples": 3,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Sampler, point, automatic",
+      "US DH-81",
+      "Grab sample",
+      "Unknown",
+      "Peristaltic pump"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic",
+        "Peristaltic pump"
+      ],
+      "depth_integrated": [
+        "US DH-81"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-0205551614": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 3,
+      "grab": 1
+    },
+    "n_unknown_samples": 1,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "US WBH-96 weighted-bottle sampler",
+      "Grab sample",
+      "US DH-95 plastic bottle",
+      "Weighted-bottle sampler",
+      "Unknown"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US WBH-96 weighted-bottle sampler",
+        "US DH-95 plastic bottle",
+        "Weighted-bottle sampler"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-02203655": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 2,
+      "depth_integrated": 3,
+      "grab": 2
+    },
+    "n_unknown_samples": 13,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Sampler, point, automatic",
+      "Grab sample",
+      "Unknown",
+      "US DH-81",
+      "US DH-95 plastic bottle",
+      "Peristaltic pump",
+      "Weighted-bottle sampler",
+      "Open-Mouth Bottle"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic",
+        "Peristaltic pump"
+      ],
+      "depth_integrated": [
+        "US DH-81",
+        "US DH-95 plastic bottle",
+        "Weighted-bottle sampler"
+      ],
+      "grab": [
+        "Grab sample",
+        "Open-Mouth Bottle"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-02203700": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 2,
+      "depth_integrated": 3,
+      "grab": 2
+    },
+    "n_unknown_samples": 9,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Sampler, point, automatic",
+      "US DH-81",
+      "Grab sample",
+      "Unknown",
+      "US DH-95 plastic bottle",
+      "Peristaltic pump",
+      "Open-Mouth Bottle",
+      "US DH-81 with Teflon cap and nozzle"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic",
+        "Peristaltic pump"
+      ],
+      "depth_integrated": [
+        "US DH-81",
+        "US DH-95 plastic bottle",
+        "US DH-81 with Teflon cap and nozzle"
+      ],
+      "grab": [
+        "Grab sample",
+        "Open-Mouth Bottle"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-02203960": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 4,
+      "grab": 1
+    },
+    "n_unknown_samples": 1,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "US DH-81 with Teflon cap and nozzle",
+      "US DH-81",
+      "Sampler, point, automatic",
+      "US DH-95 plastic bottle",
+      "Unknown",
+      "Grab sample",
+      "Weighted-bottle sampler"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US DH-81 with Teflon cap and nozzle",
+        "US DH-81",
+        "US DH-95 plastic bottle",
+        "Weighted-bottle sampler"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-02205865": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 2,
+      "grab": 2
+    },
+    "n_unknown_samples": 1,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Sampler, point, automatic",
+      "US DH-95 plastic bottle",
+      "Unknown",
+      "Open-Mouth Bottle",
+      "US DH-81",
+      "Grab sample"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US DH-95 plastic bottle",
+        "US DH-81"
+      ],
+      "grab": [
+        "Open-Mouth Bottle",
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-02207120": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 5,
+      "grab": 1
+    },
+    "n_unknown_samples": 1,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Other",
+      "Sampler, point, automatic",
+      "US DH-81",
+      "Sampler, US DH-59",
+      "US DH-95 plastic bottle",
+      "Unknown",
+      "Open-Mouth Bottle",
+      "Weighted-bottle sampler",
+      "US D-95 plastic bottle"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US DH-81",
+        "Sampler, US DH-59",
+        "US DH-95 plastic bottle",
+        "Weighted-bottle sampler",
+        "US D-95 plastic bottle"
+      ],
+      "grab": [
+        "Open-Mouth Bottle"
+      ],
+      "unknown": [
+        "Unknown"
+      ],
+      "other": [
+        "Other"
+      ]
+    }
+  },
+  "USGS-02207185": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 6,
+      "grab": 2
+    },
+    "n_unknown_samples": 5,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "US DH-81",
+      "Grab sample",
+      "Sampler, US DH-59",
+      "Unknown",
+      "Sampler, US DH-48",
+      NaN,
+      "Sampler, point, automatic",
+      "US DH-95 plastic bottle",
+      "Open-Mouth Bottle",
+      "Weighted-bottle sampler",
+      "US DH-81 with Teflon cap and nozzle"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US DH-81",
+        "Sampler, US DH-59",
+        "Sampler, US DH-48",
+        "US DH-95 plastic bottle",
+        "Weighted-bottle sampler",
+        "US DH-81 with Teflon cap and nozzle"
+      ],
+      "grab": [
+        "Grab sample",
+        "Open-Mouth Bottle"
+      ],
+      "unknown": [
+        "Unknown",
+        NaN
+      ]
+    }
+  },
+  "USGS-02207385": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 5,
+      "grab": 2
+    },
+    "n_unknown_samples": 1,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Other",
+      "US DH-81",
+      "Sampler, point, automatic",
+      "Sampler, US DH-48",
+      "Unknown",
+      NaN,
+      "Weighted-bottle sampler",
+      "Grab sample",
+      "Open-Mouth Bottle",
+      "US D-95 plastic bottle",
+      "US DH-95 plastic bottle"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US DH-81",
+        "Sampler, US DH-48",
+        "Weighted-bottle sampler",
+        "US D-95 plastic bottle",
+        "US DH-95 plastic bottle"
+      ],
+      "grab": [
+        "Grab sample",
+        "Open-Mouth Bottle"
+      ],
+      "unknown": [
+        "Unknown",
+        NaN
+      ],
+      "other": [
+        "Other"
+      ]
+    }
+  },
+  "USGS-02207400": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 2,
+      "grab": 2
+    },
+    "n_unknown_samples": 1,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Other",
+      "US DH-81",
+      "Sampler, point, automatic",
+      "Sampler, US DH-48",
+      "Unknown",
+      NaN,
+      "Grab sample",
+      "Open-Mouth Bottle"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US DH-81",
+        "Sampler, US DH-48"
+      ],
+      "grab": [
+        "Grab sample",
+        "Open-Mouth Bottle"
+      ],
+      "unknown": [
+        "Unknown",
+        NaN
+      ],
+      "other": [
+        "Other"
+      ]
+    }
+  },
+  "USGS-02208150": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 5,
+      "grab": 2
+    },
+    "n_unknown_samples": 2,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Other",
+      "US DH-81",
+      "Sampler, point, automatic",
+      "Unknown",
+      "US DH-81 with Teflon cap and nozzle",
+      "US DH-95 plastic bottle",
+      "Weighted-bottle sampler",
+      "Grab sample",
+      "Open-Mouth Bottle",
+      "US D-95 plastic bottle"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US DH-81",
+        "US DH-81 with Teflon cap and nozzle",
+        "US DH-95 plastic bottle",
+        "Weighted-bottle sampler",
+        "US D-95 plastic bottle"
+      ],
+      "grab": [
+        "Grab sample",
+        "Open-Mouth Bottle"
+      ],
+      "unknown": [
+        "Unknown"
+      ],
+      "other": [
+        "Other"
+      ]
+    }
+  },
+  "USGS-02217274": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 5,
+      "grab": 2
+    },
+    "n_unknown_samples": 2,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "US DH-81",
+      "Other",
+      "Unknown",
+      "Sampler, US DH-59",
+      "Sampler, US DH-48",
+      "Grab sample",
+      NaN,
+      "Sampler, point, automatic",
+      "Open-Mouth Bottle",
+      "Weighted-bottle sampler",
+      "US DH-95 plastic bottle"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US DH-81",
+        "Sampler, US DH-59",
+        "Sampler, US DH-48",
+        "Weighted-bottle sampler",
+        "US DH-95 plastic bottle"
+      ],
+      "grab": [
+        "Grab sample",
+        "Open-Mouth Bottle"
+      ],
+      "unknown": [
+        "Unknown",
+        NaN
+      ],
+      "other": [
+        "Other"
+      ]
+    }
+  },
+  "USGS-02334480": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 4,
+      "grab": 2
+    },
+    "n_unknown_samples": 1,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "US DH-81",
+      "Unknown",
+      "Sampler, US DH-48",
+      "Sampler, US DH-59",
+      "US DH-95 plastic bottle",
+      "Grab sample",
+      "Sampler, point, automatic",
+      "Open-Mouth Bottle"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US DH-81",
+        "Sampler, US DH-48",
+        "Sampler, US DH-59",
+        "US DH-95 plastic bottle"
+      ],
+      "grab": [
+        "Grab sample",
+        "Open-Mouth Bottle"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-02334885": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 3,
+      "grab": 2
+    },
+    "n_unknown_samples": 1,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "US DH-81 with Teflon cap and nozzle",
+      "Other",
+      "Sampler, point, automatic",
+      "US DH-81",
+      "Unknown",
+      "Sampler, US DH-59",
+      "Open-Mouth Bottle",
+      "Grab sample"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US DH-81 with Teflon cap and nozzle",
+        "US DH-81",
+        "Sampler, US DH-59"
+      ],
+      "grab": [
+        "Open-Mouth Bottle",
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ],
+      "other": [
+        "Other"
+      ]
+    }
+  },
+  "USGS-02335350": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 4,
+      "grab": 2
+    },
+    "n_unknown_samples": 5,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "US DH-81",
+      "Sampler, point, automatic",
+      "Other",
+      NaN,
+      "Sampler, US DH-59",
+      "Unknown",
+      "Open-Mouth Bottle",
+      "US DH-95 plastic bottle",
+      "Grab sample",
+      "US DH-81 with Teflon cap and nozzle"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US DH-81",
+        "Sampler, US DH-59",
+        "US DH-95 plastic bottle",
+        "US DH-81 with Teflon cap and nozzle"
+      ],
+      "grab": [
+        "Open-Mouth Bottle",
+        "Grab sample"
+      ],
+      "unknown": [
+        NaN,
+        "Unknown"
+      ],
+      "other": [
+        "Other"
+      ]
+    }
+  },
+  "USGS-02336030": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 4,
+      "grab": 2
+    },
+    "n_unknown_samples": 7,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Other",
+      "Unknown",
+      "US DH-81",
+      "Grab sample",
+      "Sampler, US DH-48",
+      "Sampler, US DH-59",
+      NaN,
+      "US DH-95 plastic bottle",
+      "Sampler, point, automatic",
+      "Open-Mouth Bottle"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US DH-81",
+        "Sampler, US DH-48",
+        "Sampler, US DH-59",
+        "US DH-95 plastic bottle"
+      ],
+      "grab": [
+        "Grab sample",
+        "Open-Mouth Bottle"
+      ],
+      "unknown": [
+        "Unknown",
+        NaN
+      ],
+      "other": [
+        "Other"
+      ]
+    }
+  },
+  "USGS-02336120": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 4,
+      "grab": 2
+    },
+    "n_unknown_samples": 11,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Sampler, point, automatic",
+      "US DH-81",
+      "Sampler, frame-type, plastic bottle",
+      "Grab sample",
+      "US DH-95 plastic bottle",
+      "US DH-81 with Teflon cap and nozzle",
+      "Open-Mouth Bottle"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US DH-81",
+        "Sampler, frame-type, plastic bottle",
+        "US DH-95 plastic bottle",
+        "US DH-81 with Teflon cap and nozzle"
+      ],
+      "grab": [
+        "Grab sample",
+        "Open-Mouth Bottle"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-02336240": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 2,
+      "grab": 2
+    },
+    "n_unknown_samples": 3,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Sampler, point, automatic",
+      "Unknown",
+      "Grab sample",
+      "US DH-81",
+      "US DH-95 plastic bottle",
+      "Open-Mouth Bottle"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US DH-81",
+        "US DH-95 plastic bottle"
+      ],
+      "grab": [
+        "Grab sample",
+        "Open-Mouth Bottle"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-02336300": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 2,
+      "depth_integrated": 6,
+      "grab": 2
+    },
+    "n_unknown_samples": 10,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Peristaltic pump",
+      "Weighted-bottle sampler",
+      "Sampler, US D-77",
+      "US DH-81 with Teflon cap and nozzle",
+      "Grab sample",
+      "Sampler, point, automatic",
+      "US DH-95 plastic bottle",
+      "US DH-81",
+      "Open-Mouth Bottle",
+      "US WBH-96 weighted-bottle sampler"
+    ],
+    "classified": {
+      "auto_point": [
+        "Peristaltic pump",
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "Weighted-bottle sampler",
+        "Sampler, US D-77",
+        "US DH-81 with Teflon cap and nozzle",
+        "US DH-95 plastic bottle",
+        "US DH-81",
+        "US WBH-96 weighted-bottle sampler"
+      ],
+      "grab": [
+        "Grab sample",
+        "Open-Mouth Bottle"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-02336360": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 2,
+      "depth_integrated": 3,
+      "grab": 2
+    },
+    "n_unknown_samples": 9,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Sampler, point, automatic",
+      "Sampler, frame-type, plastic bottle",
+      "Weighted-bottle sampler",
+      "US DH-81",
+      "Unknown",
+      "Grab sample",
+      "Peristaltic pump",
+      "Open-Mouth Bottle"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic",
+        "Peristaltic pump"
+      ],
+      "depth_integrated": [
+        "Sampler, frame-type, plastic bottle",
+        "Weighted-bottle sampler",
+        "US DH-81"
+      ],
+      "grab": [
+        "Grab sample",
+        "Open-Mouth Bottle"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-02336526": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 3,
+      "grab": 2
+    },
+    "n_unknown_samples": 7,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Sampler, point, automatic",
+      "US DH-81",
+      "Grab sample",
+      "US DH-81 with Teflon cap and nozzle",
+      "Weighted-bottle sampler",
+      "Open-Mouth Bottle"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US DH-81",
+        "US DH-81 with Teflon cap and nozzle",
+        "Weighted-bottle sampler"
+      ],
+      "grab": [
+        "Grab sample",
+        "Open-Mouth Bottle"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-02336728": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 2,
+      "depth_integrated": 3,
+      "grab": 1
+    },
+    "n_unknown_samples": 5,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Grab sample",
+      "US DH-81 with Teflon cap and nozzle",
+      "US DH-81",
+      "Sampler, point, automatic",
+      "US DH-95 plastic bottle",
+      "Peristaltic pump"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic",
+        "Peristaltic pump"
+      ],
+      "depth_integrated": [
+        "US DH-81 with Teflon cap and nozzle",
+        "US DH-81",
+        "US DH-95 plastic bottle"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-03216070": {
+    "resolved_method": "depth_integrated",
+    "confidence": "high",
+    "known_categories": {
+      "depth_integrated": 3
+    },
+    "n_unknown_samples": 3,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "US D-96 bag sampler",
+      "US D-96-A1 Bag Sampler",
+      "Weighted-bottle sampler"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US D-96 bag sampler",
+        "US D-96-A1 Bag Sampler",
+        "Weighted-bottle sampler"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-03302060": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 3,
+      "grab": 1
+    },
+    "n_unknown_samples": 3,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "US D-96 bag sampler",
+      "US D-96-A1 Bag Sampler",
+      "Unknown",
+      "Grab sample",
+      "Weighted-bottle sampler"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US D-96 bag sampler",
+        "US D-96-A1 Bag Sampler",
+        "Weighted-bottle sampler"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-03353415": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 6,
+      "grab": 1
+    },
+    "n_unknown_samples": 3,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "US D-95 Teflon bottle",
+      "Grab sample",
+      "US DH-81 with Teflon cap and nozzle",
+      "Unknown",
+      "Weighted-bottle sampler",
+      "US DH-81",
+      "US DH-95 Teflon bottle",
+      "US DH-48 TM"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US D-95 Teflon bottle",
+        "US DH-81 with Teflon cap and nozzle",
+        "Weighted-bottle sampler",
+        "US DH-81",
+        "US DH-95 Teflon bottle",
+        "US DH-48 TM"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-03353420": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 8,
+      "grab": 1
+    },
+    "n_unknown_samples": 2,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "US DH-81 with Teflon cap and nozzle",
+      "US D-95 Teflon bottle",
+      "Sampler, US DH-59",
+      "Sampler, US DH-76",
+      "US DH-81",
+      "US DH-95 Teflon bottle",
+      "Grab sample",
+      "US DH-48 TM",
+      "Weighted-bottle sampler",
+      "Unknown"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US DH-81 with Teflon cap and nozzle",
+        "US D-95 Teflon bottle",
+        "Sampler, US DH-59",
+        "Sampler, US DH-76",
+        "US DH-81",
+        "US DH-95 Teflon bottle",
+        "US DH-48 TM",
+        "Weighted-bottle sampler"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-03432100": {
+    "resolved_method": "auto_point",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 1,
+      "grab": 1
+    },
+    "n_unknown_samples": 125,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Sampler, US DH-48",
+      "Grab sample",
+      "Sampler, point, automatic"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "Sampler, US DH-48"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-034324715": {
+    "resolved_method": "auto_point",
+    "confidence": "high",
+    "known_categories": {
+      "auto_point": 1
+    },
+    "n_unknown_samples": 27,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Sampler, point, automatic"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-03432472": {
+    "resolved_method": "auto_point",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 1,
+      "grab": 1
+    },
+    "n_unknown_samples": 18,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Sampler, point, automatic",
+      "Grab sample",
+      "Sampler, US DH-48"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "Sampler, US DH-48"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-03432504": {
+    "resolved_method": "auto_point",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 1,
+      "grab": 1
+    },
+    "n_unknown_samples": 127,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Sampler, point, automatic",
+      "Grab sample",
+      "Sampler, US DH-48"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "Sampler, US DH-48"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-034325065": {
+    "resolved_method": "auto_point",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 1,
+      "grab": 1
+    },
+    "n_unknown_samples": 91,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Sampler, point, automatic",
+      "Grab sample",
+      "Sampler, US DH-48"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "Sampler, US DH-48"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-03432516": {
+    "resolved_method": "auto_point",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 1,
+      "grab": 1
+    },
+    "n_unknown_samples": 174,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Sampler, point, automatic",
+      "Sampler, US DH-48",
+      "Grab sample"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "Sampler, US DH-48"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-03432522": {
+    "resolved_method": "auto_point",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "grab": 1
+    },
+    "n_unknown_samples": 8,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Sampler, point, automatic",
+      "Unknown",
+      "Grab sample"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-03433637": {
+    "resolved_method": "auto_point",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 1,
+      "grab": 1
+    },
+    "n_unknown_samples": 90,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Sampler, point, automatic",
+      "Other",
+      "Sampler, US DH-48",
+      "Grab sample"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "Sampler, US DH-48"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ],
+      "other": [
+        "Other"
+      ]
+    }
+  },
+  "USGS-034336392": {
+    "resolved_method": "auto_point",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "grab": 1
+    },
+    "n_unknown_samples": 204,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Sampler, point, automatic",
+      "Grab sample"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-03601630": {
+    "resolved_method": "auto_point",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 1,
+      "grab": 1
+    },
+    "n_unknown_samples": 21,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Sampler, point, automatic",
+      "Other",
+      "Sampler, US DH-48",
+      "Unknown",
+      "Grab sample"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "Sampler, US DH-48"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ],
+      "other": [
+        "Other"
+      ]
+    }
+  },
+  "USGS-03612600": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 2,
+      "grab": 1
+    },
+    "n_unknown_samples": 2,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "US D-96 bag sampler",
+      "Grab sample",
+      "Unknown",
+      "US D-96-A1 Bag Sampler"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US D-96 bag sampler",
+        "US D-96-A1 Bag Sampler"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-04024000": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 3,
+      "grab": 2
+    },
+    "n_unknown_samples": 1,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Sampler, US D-74AL",
+      "Sampler, US D-49",
+      "Sampler, point, automatic",
+      "Weighted-bottle sampler",
+      "Grab sample",
+      "Van Dorn sampler"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "Sampler, US D-74AL",
+        "Sampler, US D-49",
+        "Weighted-bottle sampler"
+      ],
+      "grab": [
+        "Grab sample",
+        "Van Dorn sampler"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-04026005": {
+    "resolved_method": null,
+    "confidence": "unresolvable",
+    "known_categories": {},
+    "n_unknown_samples": 13,
+    "is_catastrophic": true,
+    "equipment_found": [
+      "Unknown"
+    ],
+    "classified": {
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-040851385": {
+    "resolved_method": null,
+    "confidence": "unresolvable",
+    "known_categories": {},
+    "n_unknown_samples": 274,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown"
+    ],
+    "classified": {
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-04085427": {
+    "resolved_method": "depth_integrated",
+    "confidence": "high",
+    "known_categories": {
+      "depth_integrated": 4
+    },
+    "n_unknown_samples": 161,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Sampler, US DH-75Q",
+      "Sampler, US D-77",
+      "US D-77 TM",
+      "US DH-81"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "Sampler, US DH-75Q",
+        "Sampler, US D-77",
+        "US D-77 TM",
+        "US DH-81"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-04087119": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 3,
+      "grab": 1
+    },
+    "n_unknown_samples": 8,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "US DH-81 with Teflon cap and nozzle",
+      "Grab sample",
+      "US DH-95 Teflon bottle",
+      "US D-95 Teflon bottle"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US DH-81 with Teflon cap and nozzle",
+        "US DH-95 Teflon bottle",
+        "US D-95 Teflon bottle"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-04087170": {
+    "resolved_method": "auto_point",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 1,
+      "grab": 1
+    },
+    "n_unknown_samples": 387,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "US WBH-96 weighted-bottle sampler",
+      "Kemmerer bottle",
+      "Sampler, point, automatic",
+      "Unknown",
+      "Other"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US WBH-96 weighted-bottle sampler"
+      ],
+      "grab": [
+        "Kemmerer bottle"
+      ],
+      "unknown": [
+        "Unknown"
+      ],
+      "other": [
+        "Other"
+      ]
+    }
+  },
+  "USGS-04095090": {
+    "resolved_method": "auto_point",
+    "confidence": "high",
+    "known_categories": {
+      "auto_point": 1
+    },
+    "n_unknown_samples": 45,
+    "is_catastrophic": true,
+    "equipment_found": [
+      "Sampler, point, automatic",
+      "Unknown"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-04101500": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 7
+    },
+    "n_unknown_samples": 3,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Sampler, US D-74AL",
+      "Sampler, US D-77",
+      "US D-74 AL-TM",
+      "US D-95 Teflon bottle",
+      "Sampler, point, automatic",
+      "US DH-95 Teflon bottle",
+      "US DH-2 Bag Sampler",
+      "US DH-95 plastic bottle"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "Sampler, US D-74AL",
+        "Sampler, US D-77",
+        "US D-74 AL-TM",
+        "US D-95 Teflon bottle",
+        "US DH-95 Teflon bottle",
+        "US DH-2 Bag Sampler",
+        "US DH-95 plastic bottle"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-04108660": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 2,
+      "depth_integrated": 3,
+      "grab": 1
+    },
+    "n_unknown_samples": 1,
+    "is_catastrophic": true,
+    "equipment_found": [
+      "US DH-95 Teflon bottle",
+      "Sampler, point, automatic",
+      "Grab sample",
+      "US DH-95 plastic bottle",
+      "Peristaltic pump",
+      "Unknown",
+      "US DH-81"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic",
+        "Peristaltic pump"
+      ],
+      "depth_integrated": [
+        "US DH-95 Teflon bottle",
+        "US DH-95 plastic bottle",
+        "US DH-81"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-04142000": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 5,
+      "grab": 1
+    },
+    "n_unknown_samples": 2,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Sampler, US DH-75P",
+      "Sampler, US DH-59",
+      "US DH-76 TM with Teflon gasket and nozzle",
+      "Sampler, point, automatic",
+      "Grab sample",
+      "US DH-95 Teflon bottle",
+      "US DH-95 plastic bottle"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "Sampler, US DH-75P",
+        "Sampler, US DH-59",
+        "US DH-76 TM with Teflon gasket and nozzle",
+        "US DH-95 Teflon bottle",
+        "US DH-95 plastic bottle"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-04144032": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 2,
+      "grab": 1
+    },
+    "n_unknown_samples": 11,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Grab sample",
+      "Unknown",
+      "US DH-81",
+      "Sampler, point, automatic",
+      "US DH-95 plastic bottle",
+      "Other"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US DH-81",
+        "US DH-95 plastic bottle"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ],
+      "other": [
+        "Other"
+      ]
+    }
+  },
+  "USGS-04157005": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 2,
+      "grab": 1
+    },
+    "n_unknown_samples": 2,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Sampler, point, automatic",
+      "US DH-95 Teflon bottle",
+      "Grab sample",
+      "US DH-95 plastic bottle",
+      "Unknown"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US DH-95 Teflon bottle",
+        "US DH-95 plastic bottle"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-04161820": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 8,
+      "grab": 2
+    },
+    "n_unknown_samples": 17,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "US D-77 TM",
+      "US DH-81 with Teflon cap and nozzle",
+      "Grab sample",
+      "Unknown",
+      "US DH-81",
+      "US D-95 Teflon bottle",
+      "US D-95 plastic bottle",
+      "Sampler, US D-77",
+      "Other",
+      "US DH-95 Teflon bottle",
+      "US DH-95 plastic bottle",
+      "Open-Mouth Bottle"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US D-77 TM",
+        "US DH-81 with Teflon cap and nozzle",
+        "US DH-81",
+        "US D-95 Teflon bottle",
+        "US D-95 plastic bottle",
+        "Sampler, US D-77",
+        "US DH-95 Teflon bottle",
+        "US DH-95 plastic bottle"
+      ],
+      "grab": [
+        "Grab sample",
+        "Open-Mouth Bottle"
+      ],
+      "unknown": [
+        "Unknown"
+      ],
+      "other": [
+        "Other"
+      ]
+    }
+  },
+  "USGS-04165500": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 2,
+      "depth_integrated": 7,
+      "grab": 1
+    },
+    "n_unknown_samples": 3,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Sampler, US D-74AL",
+      "Sampler, US D-74",
+      "US D-77 TM",
+      "Sampler, point, automatic",
+      "US DH-95 Teflon bottle",
+      "US DH-81 with Teflon cap and nozzle",
+      "US DH-95 plastic bottle",
+      "US DH-81",
+      "Grab sample",
+      "Peristaltic pump"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic",
+        "Peristaltic pump"
+      ],
+      "depth_integrated": [
+        "Sampler, US D-74AL",
+        "Sampler, US D-74",
+        "US D-77 TM",
+        "US DH-95 Teflon bottle",
+        "US DH-81 with Teflon cap and nozzle",
+        "US DH-95 plastic bottle",
+        "US DH-81"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-04166500": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 2,
+      "depth_integrated": 4,
+      "grab": 1
+    },
+    "n_unknown_samples": 7,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "US DH-95 Teflon bottle",
+      "Sampler, point, automatic",
+      "US DH-81 with Teflon cap and nozzle",
+      "Grab sample",
+      "Peristaltic pump",
+      "US DH-81",
+      "US DH-95 plastic bottle",
+      "Unknown"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic",
+        "Peristaltic pump"
+      ],
+      "depth_integrated": [
+        "US DH-95 Teflon bottle",
+        "US DH-81 with Teflon cap and nozzle",
+        "US DH-81",
+        "US DH-95 plastic bottle"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-04168400": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 2,
+      "depth_integrated": 4,
+      "grab": 1
+    },
+    "n_unknown_samples": 14,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "US DH-81",
+      "US DH-95 Teflon bottle",
+      "Sampler, point, automatic",
+      "Peristaltic pump",
+      "US DH-81 with Teflon cap and nozzle",
+      "Grab sample",
+      "US DH-95 plastic bottle",
+      "Unknown"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic",
+        "Peristaltic pump"
+      ],
+      "depth_integrated": [
+        "US DH-81",
+        "US DH-95 Teflon bottle",
+        "US DH-81 with Teflon cap and nozzle",
+        "US DH-95 plastic bottle"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-04176500": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 8
+    },
+    "n_unknown_samples": 3,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Sampler, US D-74AL",
+      "Sampler, US DH-48",
+      "US DH-81",
+      "US DH-76 TM with Teflon gasket and nozzle",
+      "Sampler, US D-77",
+      "Sampler, point, automatic",
+      "US DH-81 with Teflon cap and nozzle",
+      "US DH-95 Teflon bottle",
+      "Other",
+      "US DH-95 plastic bottle"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "Sampler, US D-74AL",
+        "Sampler, US DH-48",
+        "US DH-81",
+        "US DH-76 TM with Teflon gasket and nozzle",
+        "Sampler, US D-77",
+        "US DH-81 with Teflon cap and nozzle",
+        "US DH-95 Teflon bottle",
+        "US DH-95 plastic bottle"
+      ],
+      "unknown": [
+        "Unknown"
+      ],
+      "other": [
+        "Other"
+      ]
+    }
+  },
+  "USGS-04193490": {
+    "resolved_method": "auto_point",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "grab": 1
+    },
+    "n_unknown_samples": 1,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Peristaltic pump",
+      "Unknown",
+      "Grab sample"
+    ],
+    "classified": {
+      "auto_point": [
+        "Peristaltic pump"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-04195500": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 3
+    },
+    "n_unknown_samples": 11,
+    "is_catastrophic": true,
+    "equipment_found": [
+      "Peristaltic pump",
+      "US DH-81",
+      "Unknown",
+      "US D-95 Teflon bottle",
+      "US DH-81 with Teflon cap and nozzle"
+    ],
+    "classified": {
+      "auto_point": [
+        "Peristaltic pump"
+      ],
+      "depth_integrated": [
+        "US DH-81",
+        "US D-95 Teflon bottle",
+        "US DH-81 with Teflon cap and nozzle"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-04199000": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 6,
+      "grab": 2
+    },
+    "n_unknown_samples": 5,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "US DH-81",
+      "US DH-95 Teflon bottle",
+      "Peristaltic pump",
+      "Grab sample",
+      "US D-95 Teflon bottle",
+      "US DH-81 with Teflon cap and nozzle",
+      "US DH-95 plastic bottle",
+      "Open-Mouth Bottle",
+      "Weighted-bottle sampler"
+    ],
+    "classified": {
+      "auto_point": [
+        "Peristaltic pump"
+      ],
+      "depth_integrated": [
+        "US DH-81",
+        "US DH-95 Teflon bottle",
+        "US D-95 Teflon bottle",
+        "US DH-81 with Teflon cap and nozzle",
+        "US DH-95 plastic bottle",
+        "Weighted-bottle sampler"
+      ],
+      "grab": [
+        "Grab sample",
+        "Open-Mouth Bottle"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-04199500": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 6,
+      "grab": 1
+    },
+    "n_unknown_samples": 3,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Peristaltic pump",
+      "Grab sample",
+      "US D-95 Teflon bottle",
+      "US DH-81 with Teflon cap and nozzle",
+      "US DH-81",
+      "US DH-95 plastic bottle",
+      "Weighted-bottle sampler",
+      "US DH-95 Teflon bottle"
+    ],
+    "classified": {
+      "auto_point": [
+        "Peristaltic pump"
+      ],
+      "depth_integrated": [
+        "US D-95 Teflon bottle",
+        "US DH-81 with Teflon cap and nozzle",
+        "US DH-81",
+        "US DH-95 plastic bottle",
+        "Weighted-bottle sampler",
+        "US DH-95 Teflon bottle"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-04212100": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 5,
+      "grab": 2
+    },
+    "n_unknown_samples": 2,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "US DH-81",
+      "US DH-81 with Teflon cap and nozzle",
+      "US DH-95 Teflon bottle",
+      "US DH-95 plastic bottle",
+      "Peristaltic pump",
+      "Grab sample",
+      "Weighted-bottle sampler",
+      "Open-Mouth Bottle"
+    ],
+    "classified": {
+      "auto_point": [
+        "Peristaltic pump"
+      ],
+      "depth_integrated": [
+        "US DH-81",
+        "US DH-81 with Teflon cap and nozzle",
+        "US DH-95 Teflon bottle",
+        "US DH-95 plastic bottle",
+        "Weighted-bottle sampler"
+      ],
+      "grab": [
+        "Grab sample",
+        "Open-Mouth Bottle"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-04213500": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 11,
+      "grab": 1
+    },
+    "n_unknown_samples": 100,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Velocity integrated sample",
+      "Sampler, point, automatic",
+      "Sampler, US DH-59",
+      "Sampler, US DH-48",
+      "Sampler, US D-74",
+      "US DH-95 plastic bottle",
+      "US DH-81",
+      "Sampler, US D-74AL",
+      "Weighted-bottle sampler",
+      "Open-Mouth Bottle",
+      "US DH-2 Bag Sampler",
+      "US DH-81 with Teflon cap and nozzle",
+      "US DH-95 Teflon bottle"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "Velocity integrated sample",
+        "Sampler, US DH-59",
+        "Sampler, US DH-48",
+        "Sampler, US D-74",
+        "US DH-95 plastic bottle",
+        "US DH-81",
+        "Sampler, US D-74AL",
+        "Weighted-bottle sampler",
+        "US DH-2 Bag Sampler",
+        "US DH-81 with Teflon cap and nozzle",
+        "US DH-95 Teflon bottle"
+      ],
+      "grab": [
+        "Open-Mouth Bottle"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-04219768": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 5,
+      "grab": 1
+    },
+    "n_unknown_samples": 4,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "US DH-81 with Teflon cap and nozzle",
+      "Sampler, US DH-48",
+      "US DH-81",
+      "Open-Mouth Bottle",
+      "Unknown",
+      "US DH-95 Teflon bottle",
+      "US DH-95 plastic bottle"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US DH-81 with Teflon cap and nozzle",
+        "Sampler, US DH-48",
+        "US DH-81",
+        "US DH-95 Teflon bottle",
+        "US DH-95 plastic bottle"
+      ],
+      "grab": [
+        "Open-Mouth Bottle"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-04231600": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 7
+    },
+    "n_unknown_samples": 134,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "US DH-95 plastic bottle",
+      "US DH-95 Teflon bottle",
+      "Sampler, point, automatic",
+      "US D-95 Teflon bottle",
+      "Sampler, US DH-59",
+      "US DH-81",
+      "US DH-59 TM",
+      "US DH-81 with Teflon cap and nozzle"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US DH-95 plastic bottle",
+        "US DH-95 Teflon bottle",
+        "US D-95 Teflon bottle",
+        "Sampler, US DH-59",
+        "US DH-81",
+        "US DH-59 TM",
+        "US DH-81 with Teflon cap and nozzle"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-04249000": {
+    "resolved_method": "depth_integrated",
+    "confidence": "high",
+    "known_categories": {
+      "depth_integrated": 10
+    },
+    "n_unknown_samples": 80,
+    "is_catastrophic": true,
+    "equipment_found": [
+      "Unknown",
+      "Velocity integrated sample",
+      "US D-74 AL-TM with Teflon gasket and nozzle",
+      "US DH-95 plastic bottle",
+      "US DH-95 Teflon bottle",
+      "US DH-81",
+      "Sampler, US P-61-A1",
+      "Sampler, US DH-59",
+      "US D-95 Teflon bottle",
+      "US DH-59 TM",
+      "US DH-81 with Teflon cap and nozzle"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "Velocity integrated sample",
+        "US D-74 AL-TM with Teflon gasket and nozzle",
+        "US DH-95 plastic bottle",
+        "US DH-95 Teflon bottle",
+        "US DH-81",
+        "Sampler, US P-61-A1",
+        "Sampler, US DH-59",
+        "US D-95 Teflon bottle",
+        "US DH-59 TM",
+        "US DH-81 with Teflon cap and nozzle"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-05406457": {
+    "resolved_method": null,
+    "confidence": "unresolvable",
+    "known_categories": {},
+    "n_unknown_samples": 112,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown"
+    ],
+    "classified": {
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-05406479": {
+    "resolved_method": null,
+    "confidence": "unresolvable",
+    "known_categories": {},
+    "n_unknown_samples": 20,
+    "is_catastrophic": true,
+    "equipment_found": [
+      "Unknown"
+    ],
+    "classified": {
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-05406497": {
+    "resolved_method": null,
+    "confidence": "unresolvable",
+    "known_categories": {},
+    "n_unknown_samples": 18,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown"
+    ],
+    "classified": {
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-05406500": {
+    "resolved_method": "depth_integrated",
+    "confidence": "high",
+    "known_categories": {
+      "depth_integrated": 1
+    },
+    "n_unknown_samples": 111,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "US DH-81"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US DH-81"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-05447500": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 3,
+      "grab": 2
+    },
+    "n_unknown_samples": 17,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Open-Mouth Bottle",
+      "US D-95 Teflon bottle",
+      "US DH-2 Bag Sampler",
+      "Weighted-bottle sampler",
+      "Grab sample"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US D-95 Teflon bottle",
+        "US DH-2 Bag Sampler",
+        "Weighted-bottle sampler"
+      ],
+      "grab": [
+        "Open-Mouth Bottle",
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-05517500": {
+    "resolved_method": "depth_integrated",
+    "confidence": "high",
+    "known_categories": {
+      "depth_integrated": 8
+    },
+    "n_unknown_samples": 1,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "US D-95 plastic bottle",
+      "US D-95 Teflon bottle",
+      "Sampler, US DH-76",
+      "US DH-81",
+      "US DH-81 with Teflon cap and nozzle",
+      "US DH-59 TM",
+      "US DH-95 Teflon bottle",
+      "Unknown",
+      "US WBH-96 weighted-bottle sampler"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US D-95 plastic bottle",
+        "US D-95 Teflon bottle",
+        "Sampler, US DH-76",
+        "US DH-81",
+        "US DH-81 with Teflon cap and nozzle",
+        "US DH-59 TM",
+        "US DH-95 Teflon bottle",
+        "US WBH-96 weighted-bottle sampler"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-05537980": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 2,
+      "grab": 2
+    },
+    "n_unknown_samples": 1,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Weighted-bottle sampler",
+      "US DH-2 Bag Sampler",
+      "Open-Mouth Bottle",
+      "Sampler, point, automatic",
+      "Grab sample"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "Weighted-bottle sampler",
+        "US DH-2 Bag Sampler"
+      ],
+      "grab": [
+        "Open-Mouth Bottle",
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-05567500": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 1,
+      "grab": 1
+    },
+    "n_unknown_samples": 7,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Weighted-bottle sampler",
+      "Open-Mouth Bottle"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "Weighted-bottle sampler"
+      ],
+      "grab": [
+        "Open-Mouth Bottle"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-05576100": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 2,
+      "grab": 1
+    },
+    "n_unknown_samples": 4,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Weighted-bottle sampler",
+      "Unknown",
+      "Open-Mouth Bottle",
+      "US DH-2 Bag Sampler"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "Weighted-bottle sampler",
+        "US DH-2 Bag Sampler"
+      ],
+      "grab": [
+        "Open-Mouth Bottle"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-05576195": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 2,
+      "grab": 1
+    },
+    "n_unknown_samples": 1,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Weighted-bottle sampler",
+      "Unknown",
+      "Open-Mouth Bottle",
+      "US DH-2 Bag Sampler"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "Weighted-bottle sampler",
+        "US DH-2 Bag Sampler"
+      ],
+      "grab": [
+        "Open-Mouth Bottle"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-05586300": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 8,
+      "grab": 3
+    },
+    "n_unknown_samples": 7,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Sampler, US DH-59",
+      "Sampler, US DH-76",
+      "US DH-95 plastic bottle",
+      "Weighted-bottle sampler",
+      "Grab sample",
+      "Open-Mouth Bottle",
+      "US D-96 bag sampler",
+      "US D-99 Bag Sampler",
+      "Van Dorn sampler",
+      "US DH-2 Bag Sampler",
+      "Unknown",
+      "US DH-81",
+      "Other"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "Sampler, US DH-59",
+        "Sampler, US DH-76",
+        "US DH-95 plastic bottle",
+        "Weighted-bottle sampler",
+        "US D-96 bag sampler",
+        "US D-99 Bag Sampler",
+        "US DH-2 Bag Sampler",
+        "US DH-81"
+      ],
+      "grab": [
+        "Grab sample",
+        "Open-Mouth Bottle",
+        "Van Dorn sampler"
+      ],
+      "unknown": [
+        "Unknown"
+      ],
+      "other": [
+        "Other"
+      ]
+    }
+  },
+  "USGS-05595000": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 3,
+      "grab": 2
+    },
+    "n_unknown_samples": 11,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Grab sample",
+      "US DH-2 Bag Sampler",
+      "Weighted-bottle sampler",
+      "Open-Mouth Bottle",
+      "Unknown",
+      "US DH-95 Teflon bottle"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US DH-2 Bag Sampler",
+        "Weighted-bottle sampler",
+        "US DH-95 Teflon bottle"
+      ],
+      "grab": [
+        "Grab sample",
+        "Open-Mouth Bottle"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-05599490": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 4,
+      "grab": 2
+    },
+    "n_unknown_samples": 5,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Grab sample",
+      "US DH-2 Bag Sampler",
+      "Weighted-bottle sampler",
+      "Unknown",
+      "Open-Mouth Bottle",
+      "US D-96-A1 Bag Sampler",
+      "US D-96 bag sampler"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US DH-2 Bag Sampler",
+        "Weighted-bottle sampler",
+        "US D-96-A1 Bag Sampler",
+        "US D-96 bag sampler"
+      ],
+      "grab": [
+        "Grab sample",
+        "Open-Mouth Bottle"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-06076590": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 2
+    },
+    "n_unknown_samples": 2,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "US DH-81",
+      "Sampler, point, automatic",
+      "Unknown",
+      "US DH-81 with Teflon cap and nozzle"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US DH-81",
+        "US DH-81 with Teflon cap and nozzle"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-06192980": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 2
+    },
+    "n_unknown_samples": 2,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Sampler, point, automatic",
+      "US DH-81",
+      "Unknown",
+      "US DH-95 plastic bottle"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US DH-81",
+        "US DH-95 plastic bottle"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-06436760": {
+    "resolved_method": "depth_integrated",
+    "confidence": "high",
+    "known_categories": {
+      "depth_integrated": 2
+    },
+    "n_unknown_samples": 40,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "US DH-48 TM",
+      "Sampler, US D-49"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US DH-48 TM",
+        "Sampler, US D-49"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-06887000": {
+    "resolved_method": "depth_integrated",
+    "confidence": "high",
+    "known_categories": {
+      "depth_integrated": 7
+    },
+    "n_unknown_samples": 6,
+    "is_catastrophic": true,
+    "equipment_found": [
+      "Unknown",
+      "Sampler, US D-74",
+      "Other",
+      "Sampler, US D-74AL",
+      "US D-74 AL-TM",
+      "US DH-95 Teflon bottle",
+      "US D-96-A1 Bag Sampler",
+      "US D-95 Teflon bottle",
+      "US DH-2 Bag Sampler"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "Sampler, US D-74",
+        "Sampler, US D-74AL",
+        "US D-74 AL-TM",
+        "US DH-95 Teflon bottle",
+        "US D-96-A1 Bag Sampler",
+        "US D-95 Teflon bottle",
+        "US DH-2 Bag Sampler"
+      ],
+      "unknown": [
+        "Unknown"
+      ],
+      "other": [
+        "Other"
+      ]
+    }
+  },
+  "USGS-06892513": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 6,
+      "grab": 1
+    },
+    "n_unknown_samples": 14,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "US DH-81",
+      "Grab sample",
+      "Weighted-bottle sampler",
+      "Sampler, point, automatic",
+      "Other",
+      "US D-95 Teflon bottle",
+      "US DH-95 Teflon bottle",
+      "US DH-81 with Teflon cap and nozzle",
+      "US D-95 plastic bottle",
+      "Unknown"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US DH-81",
+        "Weighted-bottle sampler",
+        "US D-95 Teflon bottle",
+        "US DH-95 Teflon bottle",
+        "US DH-81 with Teflon cap and nozzle",
+        "US D-95 plastic bottle"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ],
+      "other": [
+        "Other"
+      ]
+    }
+  },
+  "USGS-06893390": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 6,
+      "grab": 1
+    },
+    "n_unknown_samples": 3,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Sampler, point, automatic",
+      "Weighted-bottle sampler",
+      "Grab sample",
+      "US D-95 Teflon bottle",
+      "US DH-81 with Teflon cap and nozzle",
+      "US DH-81",
+      "Other",
+      "US DH-95 Teflon bottle",
+      "US D-95 plastic bottle",
+      "Unknown"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "Weighted-bottle sampler",
+        "US D-95 Teflon bottle",
+        "US DH-81 with Teflon cap and nozzle",
+        "US DH-81",
+        "US DH-95 Teflon bottle",
+        "US D-95 plastic bottle"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ],
+      "other": [
+        "Other"
+      ]
+    }
+  },
+  "USGS-06893620": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 2,
+      "grab": 2
+    },
+    "n_unknown_samples": 45,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Sampler, point, automatic",
+      "US DH-81",
+      "US DH-81 with Teflon cap and nozzle",
+      "Open-Mouth Bottle",
+      "Grab sample"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US DH-81",
+        "US DH-81 with Teflon cap and nozzle"
+      ],
+      "grab": [
+        "Open-Mouth Bottle",
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-06893820": {
+    "resolved_method": "auto_point",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "grab": 1
+    },
+    "n_unknown_samples": 52,
+    "is_catastrophic": true,
+    "equipment_found": [
+      "Unknown",
+      "Grab sample",
+      "Sampler, point, automatic"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-06893830": {
+    "resolved_method": "auto_point",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "grab": 1
+    },
+    "n_unknown_samples": 50,
+    "is_catastrophic": true,
+    "equipment_found": [
+      "Unknown",
+      "Grab sample",
+      "Sampler, point, automatic"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-06893890": {
+    "resolved_method": "auto_point",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "grab": 1
+    },
+    "n_unknown_samples": 47,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Grab sample",
+      "Sampler, point, automatic"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-06893970": {
+    "resolved_method": "auto_point",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "grab": 1
+    },
+    "n_unknown_samples": 53,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Sampler, point, automatic",
+      "Grab sample"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-06894000": {
+    "resolved_method": "auto_point",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "grab": 1
+    },
+    "n_unknown_samples": 58,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Sampler, point, automatic",
+      "Grab sample"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-06900050": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 8,
+      "grab": 2
+    },
+    "n_unknown_samples": 12,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "US DH-81 with Teflon cap and nozzle",
+      "US D-95 Teflon bottle",
+      "US DH-95 plastic bottle",
+      "US DH-81",
+      "Open-Mouth Bottle",
+      "Grab sample",
+      "US DH-95 Teflon bottle",
+      "Weighted-bottle sampler",
+      "US WBH-96 weighted-bottle sampler",
+      "US DH-2 Bag Sampler",
+      "Other"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US DH-81 with Teflon cap and nozzle",
+        "US D-95 Teflon bottle",
+        "US DH-95 plastic bottle",
+        "US DH-81",
+        "US DH-95 Teflon bottle",
+        "Weighted-bottle sampler",
+        "US WBH-96 weighted-bottle sampler",
+        "US DH-2 Bag Sampler"
+      ],
+      "grab": [
+        "Open-Mouth Bottle",
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ],
+      "other": [
+        "Other"
+      ]
+    }
+  },
+  "USGS-06901500": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 8,
+      "grab": 2
+    },
+    "n_unknown_samples": 1,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "US DH-81 with Teflon cap and nozzle",
+      "US D-95 Teflon bottle",
+      "US DH-95 plastic bottle",
+      "Grab sample",
+      "Weighted-bottle sampler",
+      "US DH-81",
+      "Open-Mouth Bottle",
+      "US DH-95 Teflon bottle",
+      "US WBH-96 weighted-bottle sampler",
+      "US DH-2 Bag Sampler"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US DH-81 with Teflon cap and nozzle",
+        "US D-95 Teflon bottle",
+        "US DH-95 plastic bottle",
+        "Weighted-bottle sampler",
+        "US DH-81",
+        "US DH-95 Teflon bottle",
+        "US WBH-96 weighted-bottle sampler",
+        "US DH-2 Bag Sampler"
+      ],
+      "grab": [
+        "Grab sample",
+        "Open-Mouth Bottle"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-07018500": {
+    "resolved_method": "depth_integrated",
+    "confidence": "high",
+    "known_categories": {
+      "depth_integrated": 3
+    },
+    "n_unknown_samples": 1,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "US DH-95 plastic bottle",
+      "Unknown",
+      "US DH-2 Bag Sampler",
+      "US DH-81"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US DH-95 plastic bottle",
+        "US DH-2 Bag Sampler",
+        "US DH-81"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-07030392": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 5,
+      "grab": 1
+    },
+    "n_unknown_samples": 52,
+    "is_catastrophic": true,
+    "equipment_found": [
+      "Unknown",
+      "US D-77 TM",
+      "Weighted-bottle sampler",
+      "Other",
+      "Sampler, frame-type, Teflon bottle",
+      "US D-95 Teflon bottle",
+      "US DH-95 Teflon bottle",
+      "Grab sample"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US D-77 TM",
+        "Weighted-bottle sampler",
+        "Sampler, frame-type, Teflon bottle",
+        "US D-95 Teflon bottle",
+        "US DH-95 Teflon bottle"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ],
+      "other": [
+        "Other"
+      ]
+    }
+  },
+  "USGS-07048495": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 3,
+      "grab": 1
+    },
+    "n_unknown_samples": 3,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "US DH-95 plastic bottle",
+      "Unknown",
+      "Grab sample",
+      "US D-95 Teflon bottle",
+      "Weighted-bottle sampler"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US DH-95 plastic bottle",
+        "US D-95 Teflon bottle",
+        "Weighted-bottle sampler"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-07048550": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 7,
+      "grab": 1
+    },
+    "n_unknown_samples": 10,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Other",
+      "US D-95 plastic bottle",
+      "US DH-95 plastic bottle",
+      "US DH-81",
+      "Grab sample",
+      "US D-95 Teflon bottle",
+      "US DH-95 Teflon bottle",
+      "Sampler, US DH-59",
+      "US DH-2 Bag Sampler",
+      "Unknown"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US D-95 plastic bottle",
+        "US DH-95 plastic bottle",
+        "US DH-81",
+        "US D-95 Teflon bottle",
+        "US DH-95 Teflon bottle",
+        "Sampler, US DH-59",
+        "US DH-2 Bag Sampler"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ],
+      "other": [
+        "Other"
+      ]
+    }
+  },
+  "USGS-07048600": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 7,
+      "grab": 1
+    },
+    "n_unknown_samples": 1,
+    "is_catastrophic": true,
+    "equipment_found": [
+      "US DH-81",
+      "US D-77 TM",
+      "US DH-95 plastic bottle",
+      "Unknown",
+      "Other",
+      "US D-95 plastic bottle",
+      "Grab sample",
+      "US D-95 Teflon bottle",
+      "US D-96 bag sampler",
+      "US DH-95 Teflon bottle"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US DH-81",
+        "US D-77 TM",
+        "US DH-95 plastic bottle",
+        "US D-95 plastic bottle",
+        "US D-95 Teflon bottle",
+        "US D-96 bag sampler",
+        "US DH-95 Teflon bottle"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ],
+      "other": [
+        "Other"
+      ]
+    }
+  },
+  "USGS-07049050": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 2,
+      "grab": 1
+    },
+    "n_unknown_samples": 1,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Grab sample",
+      "US DH-95 plastic bottle",
+      "Unknown",
+      "US DH-95 Teflon bottle"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US DH-95 plastic bottle",
+        "US DH-95 Teflon bottle"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-07055814": {
+    "resolved_method": "auto_point",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 1,
+      "grab": 1
+    },
+    "n_unknown_samples": 2,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Sampler, point, automatic",
+      "US DH-95 plastic bottle",
+      "Grab sample",
+      "Unknown"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US DH-95 plastic bottle"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-07075250": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 5,
+      "grab": 1
+    },
+    "n_unknown_samples": 4,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Sampler, US DH-59",
+      "Sampler, US DH-76",
+      "US DH-95 plastic bottle",
+      "Grab sample",
+      "US D-95 plastic bottle",
+      "Sampler, point, automatic",
+      "US DH-81",
+      "Unknown"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "Sampler, US DH-59",
+        "Sampler, US DH-76",
+        "US DH-95 plastic bottle",
+        "US D-95 plastic bottle",
+        "US DH-81"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-07075270": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 7,
+      "grab": 1
+    },
+    "n_unknown_samples": 5,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Sampler, point, automatic",
+      "US DH-95 plastic bottle",
+      "Grab sample",
+      "Sampler, US DH-59",
+      "US D-95 plastic bottle",
+      "US D-96 bag sampler",
+      "Unknown",
+      "US DH-2 Bag Sampler",
+      "Weighted-bottle sampler",
+      "US DH-81"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US DH-95 plastic bottle",
+        "Sampler, US DH-59",
+        "US D-95 plastic bottle",
+        "US D-96 bag sampler",
+        "US DH-2 Bag Sampler",
+        "Weighted-bottle sampler",
+        "US DH-81"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-07179750": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 9,
+      "grab": 1
+    },
+    "n_unknown_samples": 11,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Other",
+      "Sampler, US DH-48",
+      "US D-95 Teflon bottle",
+      "US D-96 bag sampler",
+      "US DH-95 Teflon bottle",
+      "US DH-81 with Teflon cap and nozzle",
+      "US DH-81",
+      "US D-77 TM",
+      "US D-96-A1 Bag Sampler",
+      "Weighted-bottle sampler",
+      "Grab sample"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "Sampler, US DH-48",
+        "US D-95 Teflon bottle",
+        "US D-96 bag sampler",
+        "US DH-95 Teflon bottle",
+        "US DH-81 with Teflon cap and nozzle",
+        "US DH-81",
+        "US D-77 TM",
+        "US D-96-A1 Bag Sampler",
+        "Weighted-bottle sampler"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "other": [
+        "Other"
+      ]
+    }
+  },
+  "USGS-07182390": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 11,
+      "grab": 1
+    },
+    "n_unknown_samples": 11,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Sampler, US DH-48",
+      "Other",
+      "US D-96 bag sampler",
+      "US DH-95 Teflon bottle",
+      "US D-95 Teflon bottle",
+      "US DH-81",
+      "US D-77 TM",
+      "US DH-95 plastic bottle",
+      "US DH-81 with Teflon cap and nozzle",
+      "Sampler, frame-type, plastic bottle w/Teflon collaps. bag",
+      "Grab sample",
+      "US D-96-A1 Bag Sampler",
+      "Weighted-bottle sampler"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "Sampler, US DH-48",
+        "US D-96 bag sampler",
+        "US DH-95 Teflon bottle",
+        "US D-95 Teflon bottle",
+        "US DH-81",
+        "US D-77 TM",
+        "US DH-95 plastic bottle",
+        "US DH-81 with Teflon cap and nozzle",
+        "Sampler, frame-type, plastic bottle w/Teflon collaps. bag",
+        "US D-96-A1 Bag Sampler",
+        "Weighted-bottle sampler"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ],
+      "other": [
+        "Other"
+      ]
+    }
+  },
+  "USGS-07183500": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 13,
+      "grab": 1
+    },
+    "n_unknown_samples": 6,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Sampler, US DH-48",
+      "US DH-76 TM with Teflon gasket and nozzle",
+      "US D-74 AL-TM with Teflon gasket and nozzle",
+      "US DH-81 with Teflon cap and nozzle",
+      "Other",
+      "Sampler, US D-74",
+      "US DH-48 TM with Teflon gasket and nozzle",
+      "Sampler, US D-74AL",
+      "US DH-95 plastic bottle",
+      "US DH-95 Teflon bottle",
+      "US D-96 bag sampler",
+      "US D-95 Teflon bottle",
+      "US D-96-A1 Bag Sampler",
+      "Weighted-bottle sampler",
+      "Grab sample"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "Sampler, US DH-48",
+        "US DH-76 TM with Teflon gasket and nozzle",
+        "US D-74 AL-TM with Teflon gasket and nozzle",
+        "US DH-81 with Teflon cap and nozzle",
+        "Sampler, US D-74",
+        "US DH-48 TM with Teflon gasket and nozzle",
+        "Sampler, US D-74AL",
+        "US DH-95 plastic bottle",
+        "US DH-95 Teflon bottle",
+        "US D-96 bag sampler",
+        "US D-95 Teflon bottle",
+        "US D-96-A1 Bag Sampler",
+        "Weighted-bottle sampler"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ],
+      "other": [
+        "Other"
+      ]
+    }
+  },
+  "USGS-071912213": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 11,
+      "grab": 1
+    },
+    "n_unknown_samples": 30,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Weighted-bottle sampler",
+      "US DH-81",
+      "Sampler, US DH-59",
+      "US DH-59 TM",
+      "US DH-95 plastic bottle",
+      "US WBH-96 weighted-bottle sampler",
+      "Grab sample",
+      "Unknown",
+      "US D-95 plastic bottle",
+      "US DH-95 Teflon bottle",
+      "US D-95 Teflon bottle",
+      "US DH-81 with Teflon cap and nozzle",
+      "US DH-2 Bag Sampler"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "Weighted-bottle sampler",
+        "US DH-81",
+        "Sampler, US DH-59",
+        "US DH-59 TM",
+        "US DH-95 plastic bottle",
+        "US WBH-96 weighted-bottle sampler",
+        "US D-95 plastic bottle",
+        "US DH-95 Teflon bottle",
+        "US D-95 Teflon bottle",
+        "US DH-81 with Teflon cap and nozzle",
+        "US DH-2 Bag Sampler"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-07191222": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 10,
+      "grab": 1
+    },
+    "n_unknown_samples": 18,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Weighted-bottle sampler",
+      "Sampler, US DH-59",
+      "US DH-81",
+      "Unknown",
+      "US WBH-96 weighted-bottle sampler",
+      "US DH-59 TM",
+      "US DH-95 plastic bottle",
+      "Other",
+      "Grab sample",
+      "US D-95 Teflon bottle",
+      "US DH-95 Teflon bottle",
+      "US DH-81 with Teflon cap and nozzle",
+      "US D-95 plastic bottle"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "Weighted-bottle sampler",
+        "Sampler, US DH-59",
+        "US DH-81",
+        "US WBH-96 weighted-bottle sampler",
+        "US DH-59 TM",
+        "US DH-95 plastic bottle",
+        "US D-95 Teflon bottle",
+        "US DH-95 Teflon bottle",
+        "US DH-81 with Teflon cap and nozzle",
+        "US D-95 plastic bottle"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ],
+      "other": [
+        "Other"
+      ]
+    }
+  },
+  "USGS-071948095": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 2,
+      "grab": 1
+    },
+    "n_unknown_samples": 2,
+    "is_catastrophic": true,
+    "equipment_found": [
+      "US DH-95 plastic bottle",
+      "Grab sample",
+      "Unknown",
+      "US DH-95 Teflon bottle"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US DH-95 plastic bottle",
+        "US DH-95 Teflon bottle"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-07194933": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 3,
+      "grab": 2
+    },
+    "n_unknown_samples": 1,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Grab sample",
+      "US DH-81",
+      "US DH-95 plastic bottle",
+      "Sampler, point, automatic",
+      "US DH-81 with Teflon cap and nozzle",
+      "Unknown",
+      "Open-Mouth Bottle"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US DH-81",
+        "US DH-95 plastic bottle",
+        "US DH-81 with Teflon cap and nozzle"
+      ],
+      "grab": [
+        "Grab sample",
+        "Open-Mouth Bottle"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-07195500": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 9,
+      "grab": 1
+    },
+    "n_unknown_samples": 43,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "US DH-81",
+      "US DH-59 TM with Teflon gasket and nozzle",
+      "US DH-81 with Teflon cap and nozzle",
+      "Weighted-bottle sampler",
+      "US WBH-96 weighted-bottle sampler",
+      "US D-95 plastic bottle",
+      "US DH-95 plastic bottle",
+      "US DH-95 Teflon bottle",
+      "US D-95 Teflon bottle",
+      "Grab sample"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US DH-81",
+        "US DH-59 TM with Teflon gasket and nozzle",
+        "US DH-81 with Teflon cap and nozzle",
+        "Weighted-bottle sampler",
+        "US WBH-96 weighted-bottle sampler",
+        "US D-95 plastic bottle",
+        "US DH-95 plastic bottle",
+        "US DH-95 Teflon bottle",
+        "US D-95 Teflon bottle"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-07263296": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 5,
+      "grab": 2
+    },
+    "n_unknown_samples": 3,
+    "is_catastrophic": true,
+    "equipment_found": [
+      "Unknown",
+      "Other",
+      "US DH-95 plastic bottle",
+      "Weighted-bottle sampler",
+      "Grab sample",
+      "US DH-81",
+      "Sampler, US DH-59",
+      "Sampler, point, automatic",
+      "US D-95 plastic bottle",
+      "Open-Mouth Bottle"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US DH-95 plastic bottle",
+        "Weighted-bottle sampler",
+        "US DH-81",
+        "Sampler, US DH-59",
+        "US D-95 plastic bottle"
+      ],
+      "grab": [
+        "Grab sample",
+        "Open-Mouth Bottle"
+      ],
+      "unknown": [
+        "Unknown"
+      ],
+      "other": [
+        "Other"
+      ]
+    }
+  },
+  "USGS-07263878": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 1,
+      "grab": 1
+    },
+    "n_unknown_samples": 4,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Grab sample",
+      "US DH-81"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US DH-81"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-0728875070": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 2,
+      "grab": 1
+    },
+    "n_unknown_samples": 1,
+    "is_catastrophic": true,
+    "equipment_found": [
+      "Sampler, US DH-48",
+      "Unknown",
+      "Sampler, US DH-59",
+      "Other",
+      "Grab sample",
+      "Sampler, point, automatic"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "Sampler, US DH-48",
+        "Sampler, US DH-59"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ],
+      "other": [
+        "Other"
+      ]
+    }
+  },
+  "USGS-07355860": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 2,
+      "grab": 1
+    },
+    "n_unknown_samples": 4,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Grab sample",
+      "Sampler, point, automatic",
+      "Unknown",
+      "US D-95 plastic bottle",
+      "US DH-95 plastic bottle"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US D-95 plastic bottle",
+        "US DH-95 plastic bottle"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-07355870": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 2,
+      "grab": 1
+    },
+    "n_unknown_samples": 4,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Grab sample",
+      "Sampler, point, automatic",
+      "Unknown",
+      "US DH-95 plastic bottle",
+      "US D-95 plastic bottle"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US DH-95 plastic bottle",
+        "US D-95 plastic bottle"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-07364122": {
+    "resolved_method": "grab",
+    "confidence": "high",
+    "known_categories": {
+      "grab": 1
+    },
+    "n_unknown_samples": 4,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Grab sample",
+      "Unknown"
+    ],
+    "classified": {
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-07374525": {
+    "resolved_method": "depth_integrated",
+    "confidence": "high",
+    "known_categories": {
+      "depth_integrated": 4
+    },
+    "n_unknown_samples": 1,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "US D-96 bag sampler",
+      "US D-99 Bag Sampler",
+      "Unknown",
+      "US D-96-A1 Bag Sampler",
+      "US P-6, 200 lb. Point-Integrating sampler, replaces P-63"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US D-96 bag sampler",
+        "US D-99 Bag Sampler",
+        "US D-96-A1 Bag Sampler",
+        "US P-6, 200 lb. Point-Integrating sampler, replaces P-63"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-07381600": {
+    "resolved_method": "depth_integrated",
+    "confidence": "high",
+    "known_categories": {
+      "depth_integrated": 6
+    },
+    "n_unknown_samples": 1,
+    "is_catastrophic": true,
+    "equipment_found": [
+      "Unknown",
+      "Other",
+      "Sampler, US P-63",
+      "US D-96 bag sampler",
+      "US D-99 Bag Sampler",
+      "US D-96-A1 Bag Sampler",
+      "Weighted-bottle sampler",
+      "US P-6, 200 lb. Point-Integrating sampler, replaces P-63"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "Sampler, US P-63",
+        "US D-96 bag sampler",
+        "US D-99 Bag Sampler",
+        "US D-96-A1 Bag Sampler",
+        "Weighted-bottle sampler",
+        "US P-6, 200 lb. Point-Integrating sampler, replaces P-63"
+      ],
+      "unknown": [
+        "Unknown"
+      ],
+      "other": [
+        "Other"
+      ]
+    }
+  },
+  "USGS-08070200": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 6,
+      "grab": 1
+    },
+    "n_unknown_samples": 1,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Weighted-bottle sampler",
+      "Sampler, point, automatic",
+      "US DH-81 with Teflon cap and nozzle",
+      "US D-95 Teflon bottle",
+      "Grab sample",
+      "US DH-95 Teflon bottle",
+      "Unknown",
+      "US DH-81",
+      "US DH-2 Bag Sampler"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "Weighted-bottle sampler",
+        "US DH-81 with Teflon cap and nozzle",
+        "US D-95 Teflon bottle",
+        "US DH-95 Teflon bottle",
+        "US DH-81",
+        "US DH-2 Bag Sampler"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-08188500": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 5,
+      "grab": 1
+    },
+    "n_unknown_samples": 1,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "US DH-2 Bag Sampler",
+      "US DH-81",
+      "US DH-81 with Teflon cap and nozzle",
+      "US DH-95 Teflon bottle",
+      "US DH-95 plastic bottle",
+      "Open-Mouth Bottle"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US DH-2 Bag Sampler",
+        "US DH-81",
+        "US DH-81 with Teflon cap and nozzle",
+        "US DH-95 Teflon bottle",
+        "US DH-95 plastic bottle"
+      ],
+      "grab": [
+        "Open-Mouth Bottle"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-08211200": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 4,
+      "grab": 1
+    },
+    "n_unknown_samples": 1,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "US DH-81 with Teflon cap and nozzle",
+      "US DH-95 Teflon bottle",
+      "US DH-2 Bag Sampler",
+      "US DH-81",
+      "Unknown",
+      "Open-Mouth Bottle"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US DH-81 with Teflon cap and nozzle",
+        "US DH-95 Teflon bottle",
+        "US DH-2 Bag Sampler",
+        "US DH-81"
+      ],
+      "grab": [
+        "Open-Mouth Bottle"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-08317400": {
+    "resolved_method": "depth_integrated",
+    "confidence": "high",
+    "known_categories": {
+      "depth_integrated": 6
+    },
+    "n_unknown_samples": 2,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "US DH-81 with Teflon cap and nozzle",
+      "US D-77 TM",
+      "Other",
+      "US D-95 Teflon bottle",
+      "US DH-95 Teflon bottle",
+      "US DH-81",
+      "US DH-95 plastic bottle"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US DH-81 with Teflon cap and nozzle",
+        "US D-77 TM",
+        "US D-95 Teflon bottle",
+        "US DH-95 Teflon bottle",
+        "US DH-81",
+        "US DH-95 plastic bottle"
+      ],
+      "unknown": [
+        "Unknown"
+      ],
+      "other": [
+        "Other"
+      ]
+    }
+  },
+  "USGS-08380500": {
+    "resolved_method": "depth_integrated",
+    "confidence": "high",
+    "known_categories": {
+      "depth_integrated": 1
+    },
+    "n_unknown_samples": 13,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "US DH-81"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US DH-81"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-09132095": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 5
+    },
+    "n_unknown_samples": 410,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "US DH-81 with Teflon cap and nozzle",
+      "Sampler, US D-74",
+      "US DH-95 plastic bottle",
+      "US D-95 plastic bottle",
+      "US DH-81",
+      "Sampler, point, automatic"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US DH-81 with Teflon cap and nozzle",
+        "Sampler, US D-74",
+        "US DH-95 plastic bottle",
+        "US D-95 plastic bottle",
+        "US DH-81"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-09327000": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 2
+    },
+    "n_unknown_samples": 1,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Sampler, point, automatic",
+      "US DH-81",
+      "US DH-95 plastic bottle",
+      "Unknown"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US DH-81",
+        "US DH-95 plastic bottle"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-09363500": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 5,
+      "grab": 1
+    },
+    "n_unknown_samples": 35,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "US DH-81 with Teflon cap and nozzle",
+      "US DH-48 TM with Teflon gasket and nozzle",
+      "US D-77 TM",
+      "US D-95 Teflon bottle",
+      "Sampler, point, automatic",
+      "US DH-81",
+      "Grab sample"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US DH-81 with Teflon cap and nozzle",
+        "US DH-48 TM with Teflon gasket and nozzle",
+        "US D-77 TM",
+        "US D-95 Teflon bottle",
+        "US DH-81"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-11185185": {
+    "resolved_method": "auto_point",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 1,
+      "grab": 1
+    },
+    "n_unknown_samples": 13,
+    "is_catastrophic": true,
+    "equipment_found": [
+      "Unknown",
+      "Peristaltic pump",
+      "Van Dorn sampler",
+      "US D-96-A1 Bag Sampler"
+    ],
+    "classified": {
+      "auto_point": [
+        "Peristaltic pump"
+      ],
+      "depth_integrated": [
+        "US D-96-A1 Bag Sampler"
+      ],
+      "grab": [
+        "Van Dorn sampler"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-11313315": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 1,
+      "grab": 1
+    },
+    "n_unknown_samples": 2,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Van Dorn sampler",
+      "US D-96-A1 Bag Sampler"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US D-96-A1 Bag Sampler"
+      ],
+      "grab": [
+        "Van Dorn sampler"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-11313460": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 2,
+      "grab": 1
+    },
+    "n_unknown_samples": 1,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Van Dorn sampler",
+      "US D-96-A1 Bag Sampler",
+      "Mulitple samplers used",
+      "Submersible centrifugal pump"
+    ],
+    "classified": {
+      "auto_point": [
+        "Submersible centrifugal pump"
+      ],
+      "depth_integrated": [
+        "US D-96-A1 Bag Sampler",
+        "Mulitple samplers used"
+      ],
+      "grab": [
+        "Van Dorn sampler"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-11336680": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 2,
+      "grab": 2
+    },
+    "n_unknown_samples": 5,
+    "is_catastrophic": true,
+    "equipment_found": [
+      "Unknown",
+      "Grab sample",
+      "US D-96-A1 Bag Sampler",
+      "Van Dorn sampler",
+      "Sampler, US D-74"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US D-96-A1 Bag Sampler",
+        "Sampler, US D-74"
+      ],
+      "grab": [
+        "Grab sample",
+        "Van Dorn sampler"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-11336685": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 3,
+      "grab": 1
+    },
+    "n_unknown_samples": 5,
+    "is_catastrophic": true,
+    "equipment_found": [
+      "Unknown",
+      "US D-96-A1 Bag Sampler",
+      "Van Dorn sampler",
+      "Sampler, US D-74",
+      "Mulitple samplers used"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US D-96-A1 Bag Sampler",
+        "Sampler, US D-74",
+        "Mulitple samplers used"
+      ],
+      "grab": [
+        "Van Dorn sampler"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-11336790": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 2,
+      "grab": 2
+    },
+    "n_unknown_samples": 12,
+    "is_catastrophic": true,
+    "equipment_found": [
+      "Unknown",
+      "US D-96-A1 Bag Sampler",
+      "Van Dorn sampler",
+      "Open-Mouth Bottle",
+      "Mulitple samplers used"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US D-96-A1 Bag Sampler",
+        "Mulitple samplers used"
+      ],
+      "grab": [
+        "Van Dorn sampler",
+        "Open-Mouth Bottle"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-11337190": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 2,
+      "grab": 1
+    },
+    "n_unknown_samples": 2,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "US D-96-A1 Bag Sampler",
+      "Van Dorn sampler",
+      "Mulitple samplers used"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US D-96-A1 Bag Sampler",
+        "Mulitple samplers used"
+      ],
+      "grab": [
+        "Van Dorn sampler"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-11425500": {
+    "resolved_method": null,
+    "confidence": "unresolvable",
+    "known_categories": {},
+    "n_unknown_samples": 2,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown"
+    ],
+    "classified": {
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-11447903": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 1,
+      "grab": 1
+    },
+    "n_unknown_samples": 7,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "US D-96-A1 Bag Sampler",
+      "Van Dorn sampler"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US D-96-A1 Bag Sampler"
+      ],
+      "grab": [
+        "Van Dorn sampler"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-11447905": {
+    "resolved_method": "grab",
+    "confidence": "high",
+    "known_categories": {
+      "grab": 1
+    },
+    "n_unknown_samples": 1,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Van Dorn sampler"
+    ],
+    "classified": {
+      "grab": [
+        "Van Dorn sampler"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-11448750": {
+    "resolved_method": "grab",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "grab": 2
+    },
+    "n_unknown_samples": 3,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Open-Mouth Bottle",
+      "Sampler, point, automatic",
+      "Other",
+      "Grab sample"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "grab": [
+        "Open-Mouth Bottle",
+        "Grab sample"
+      ],
+      "other": [
+        "Other"
+      ]
+    }
+  },
+  "USGS-11452600": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 9,
+      "grab": 1
+    },
+    "n_unknown_samples": 31,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Sampler, US DH-48",
+      "US DH-95 Teflon bottle",
+      "Sampler, US D-77",
+      "Open-Mouth Bottle",
+      "Sampler, US D-74",
+      "US D-95 Teflon bottle",
+      "Sampler, US D-49",
+      "Sampler, US DH-59",
+      "US DH-95 plastic bottle",
+      "Sampler, US D-74AL"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "Sampler, US DH-48",
+        "US DH-95 Teflon bottle",
+        "Sampler, US D-77",
+        "Sampler, US D-74",
+        "US D-95 Teflon bottle",
+        "Sampler, US D-49",
+        "Sampler, US DH-59",
+        "US DH-95 plastic bottle",
+        "Sampler, US D-74AL"
+      ],
+      "grab": [
+        "Open-Mouth Bottle"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-11455143": {
+    "resolved_method": "depth_integrated",
+    "confidence": "high",
+    "known_categories": {
+      "depth_integrated": 3
+    },
+    "n_unknown_samples": 1,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Sampler, US D-74",
+      "US D-96-A1 Bag Sampler",
+      "Weighted-bottle sampler",
+      "Unknown"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "Sampler, US D-74",
+        "US D-96-A1 Bag Sampler",
+        "Weighted-bottle sampler"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-11455165": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 2,
+      "grab": 1
+    },
+    "n_unknown_samples": 8,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "US D-96-A1 Bag Sampler",
+      "Unknown",
+      "Van Dorn sampler",
+      "Sampler, US D-74"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US D-96-A1 Bag Sampler",
+        "Sampler, US D-74"
+      ],
+      "grab": [
+        "Van Dorn sampler"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-11455167": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 4,
+      "grab": 1
+    },
+    "n_unknown_samples": 2,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Sampler, US D-74",
+      "US D-96-A1 Bag Sampler",
+      "Van Dorn sampler",
+      "US D-74 AL-TM",
+      "Sampler, US D-74AL",
+      "Unknown"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "Sampler, US D-74",
+        "US D-96-A1 Bag Sampler",
+        "US D-74 AL-TM",
+        "Sampler, US D-74AL"
+      ],
+      "grab": [
+        "Van Dorn sampler"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-11455280": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 2,
+      "grab": 1
+    },
+    "n_unknown_samples": 7,
+    "is_catastrophic": true,
+    "equipment_found": [
+      "Unknown",
+      "US D-96-A1 Bag Sampler",
+      "Sampler, US D-74",
+      "Van Dorn sampler",
+      "Sampler, point, automatic"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US D-96-A1 Bag Sampler",
+        "Sampler, US D-74"
+      ],
+      "grab": [
+        "Van Dorn sampler"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-11455335": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 1,
+      "grab": 1
+    },
+    "n_unknown_samples": 10,
+    "is_catastrophic": true,
+    "equipment_found": [
+      "Unknown",
+      "US D-96-A1 Bag Sampler",
+      "Van Dorn sampler"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US D-96-A1 Bag Sampler"
+      ],
+      "grab": [
+        "Van Dorn sampler"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-11455350": {
+    "resolved_method": "grab",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 1,
+      "grab": 2
+    },
+    "n_unknown_samples": 13,
+    "is_catastrophic": true,
+    "equipment_found": [
+      "Unknown",
+      "Van Dorn sampler",
+      "US D-96-A1 Bag Sampler",
+      "Grab sample",
+      "Sampler, point, automatic"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US D-96-A1 Bag Sampler"
+      ],
+      "grab": [
+        "Van Dorn sampler",
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-11455478": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 1,
+      "grab": 1
+    },
+    "n_unknown_samples": 1,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "US D-96 bag sampler",
+      "Van Dorn sampler"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US D-96 bag sampler"
+      ],
+      "grab": [
+        "Van Dorn sampler"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-11504115": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 3,
+      "grab": 1
+    },
+    "n_unknown_samples": 3,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Grab sample",
+      "US DH-95 plastic bottle",
+      "US DH-95 Teflon bottle",
+      "US DH-81"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US DH-95 plastic bottle",
+        "US DH-95 Teflon bottle",
+        "US DH-81"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-11509500": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 3,
+      "grab": 1
+    },
+    "n_unknown_samples": 1,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Grab sample",
+      "Sampler, point, automatic",
+      "Sampler, US D-74",
+      "US D-74 TM",
+      "US DH-76 TM with Teflon gasket and nozzle",
+      "Unknown"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "Sampler, US D-74",
+        "US D-74 TM",
+        "US DH-76 TM with Teflon gasket and nozzle"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-12037400": {
+    "resolved_method": "depth_integrated",
+    "confidence": "high",
+    "known_categories": {
+      "depth_integrated": 4
+    },
+    "n_unknown_samples": 1,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Sampler, US D-74",
+      "Sampler, US DH-59",
+      "US D-96-A1 Bag Sampler",
+      "US D-99 Bag Sampler"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "Sampler, US D-74",
+        "Sampler, US DH-59",
+        "US D-96-A1 Bag Sampler",
+        "US D-99 Bag Sampler"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-12113390": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 7
+    },
+    "n_unknown_samples": 8,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "US D-77 TM",
+      "US D-95 Teflon bottle",
+      "US D-96-A1 Bag Sampler",
+      "US D-95 plastic bottle",
+      "US DH-95 plastic bottle",
+      "Sampler, point, automatic",
+      "Unknown",
+      "US D-96 bag sampler",
+      "US D-74 TM"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US D-77 TM",
+        "US D-95 Teflon bottle",
+        "US D-96-A1 Bag Sampler",
+        "US D-95 plastic bottle",
+        "US DH-95 plastic bottle",
+        "US D-96 bag sampler",
+        "US D-74 TM"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-12166300": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 4
+    },
+    "n_unknown_samples": 1,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Sampler, US D-74",
+      "Sampler, point, automatic",
+      "US D-96 bag sampler",
+      "Sampler, US D-74AL",
+      "Sampler, US D-49"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "Sampler, US D-74",
+        "US D-96 bag sampler",
+        "Sampler, US D-74AL",
+        "Sampler, US D-49"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-12170300": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 3
+    },
+    "n_unknown_samples": 2,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "US D-96 bag sampler",
+      "Sampler, US D-74",
+      "Unknown",
+      "US D-96-A1 Bag Sampler",
+      "Sampler, point, automatic"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US D-96 bag sampler",
+        "Sampler, US D-74",
+        "US D-96-A1 Bag Sampler"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-12187500": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 3,
+      "grab": 1
+    },
+    "n_unknown_samples": 2,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Sampler, US D-74",
+      "Grab sample",
+      "Sampler, US D-74AL",
+      "US D-99 Bag Sampler",
+      "Unknown"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "Sampler, US D-74",
+        "Sampler, US D-74AL",
+        "US D-99 Bag Sampler"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-12213100": {
+    "resolved_method": "depth_integrated",
+    "confidence": "high",
+    "known_categories": {
+      "depth_integrated": 5
+    },
+    "n_unknown_samples": 2,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "US P-61",
+      "Sampler, US D-74",
+      "Sampler, US P-61-A1",
+      "Unknown",
+      "US D-96 bag sampler",
+      "US D-96-A1 Bag Sampler"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US P-61",
+        "Sampler, US D-74",
+        "Sampler, US P-61-A1",
+        "US D-96 bag sampler",
+        "US D-96-A1 Bag Sampler"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-12214350": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 3,
+      "grab": 1
+    },
+    "n_unknown_samples": 40,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Sampler, point, automatic",
+      "Sampler, US DH-59",
+      "Unknown",
+      "Open-Mouth Bottle",
+      "Sampler, US DH-48",
+      "Sampler, US D-49"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "Sampler, US DH-59",
+        "Sampler, US DH-48",
+        "Sampler, US D-49"
+      ],
+      "grab": [
+        "Open-Mouth Bottle"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-12214500": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 2
+    },
+    "n_unknown_samples": 21,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Sampler, point, automatic",
+      "Unknown",
+      "Sampler, US DH-59",
+      "Sampler, US DH-48"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "Sampler, US DH-59",
+        "Sampler, US DH-48"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-12323700": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 2,
+      "grab": 2
+    },
+    "n_unknown_samples": 2,
+    "is_catastrophic": true,
+    "equipment_found": [
+      "Grab sample",
+      "US DH-81",
+      "Other",
+      "Open-Mouth Bottle",
+      "US DH-81 with Teflon cap and nozzle",
+      "Unknown"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US DH-81",
+        "US DH-81 with Teflon cap and nozzle"
+      ],
+      "grab": [
+        "Grab sample",
+        "Open-Mouth Bottle"
+      ],
+      "unknown": [
+        "Unknown"
+      ],
+      "other": [
+        "Other"
+      ]
+    }
+  },
+  "USGS-12323720": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 2,
+      "grab": 2
+    },
+    "n_unknown_samples": 1,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "US DH-81",
+      "Grab sample",
+      "US DH-81 with Teflon cap and nozzle",
+      "Unknown",
+      "Open-Mouth Bottle"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US DH-81",
+        "US DH-81 with Teflon cap and nozzle"
+      ],
+      "grab": [
+        "Grab sample",
+        "Open-Mouth Bottle"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-12324400": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 5,
+      "grab": 1
+    },
+    "n_unknown_samples": 11,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "US D-74 TM",
+      "US DH-81",
+      "US D-95 plastic bottle",
+      "Unknown",
+      "US DH-95 plastic bottle",
+      "US DH-81 with Teflon cap and nozzle",
+      "Grab sample"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US D-74 TM",
+        "US DH-81",
+        "US D-95 plastic bottle",
+        "US DH-95 plastic bottle",
+        "US DH-81 with Teflon cap and nozzle"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-12510500": {
+    "resolved_method": "depth_integrated",
+    "confidence": "high",
+    "known_categories": {
+      "depth_integrated": 10
+    },
+    "n_unknown_samples": 1,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Sampler, US D-74AL",
+      "US D-77 TM",
+      "US DH-76 TM with Teflon gasket and nozzle",
+      "US DH-81 with Teflon cap and nozzle",
+      "US D-77 TM modified Teflon bag sampler",
+      "US D-95 Teflon bottle",
+      "Sampler, US DH-76",
+      "US DH-95 Teflon bottle",
+      "US DH-81",
+      "US DH-95 plastic bottle"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "Sampler, US D-74AL",
+        "US D-77 TM",
+        "US DH-76 TM with Teflon gasket and nozzle",
+        "US DH-81 with Teflon cap and nozzle",
+        "US D-77 TM modified Teflon bag sampler",
+        "US D-95 Teflon bottle",
+        "Sampler, US DH-76",
+        "US DH-95 Teflon bottle",
+        "US DH-81",
+        "US DH-95 plastic bottle"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-14151000": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 3,
+      "grab": 1
+    },
+    "n_unknown_samples": 8,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Sampler, US D-74",
+      "Open-Mouth Bottle",
+      "Sampler, point, automatic",
+      "Sampler, US DH-76",
+      "Sampler, US DH-48",
+      "Unknown"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "Sampler, US D-74",
+        "Sampler, US DH-76",
+        "Sampler, US DH-48"
+      ],
+      "grab": [
+        "Open-Mouth Bottle"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-14179000": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 4,
+      "grab": 1
+    },
+    "n_unknown_samples": 176,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Grab sample",
+      "Sampler, point, automatic",
+      "Sampler, US D-74",
+      "US D-95 plastic bottle",
+      "US DH-95 plastic bottle",
+      "US D-74 TM"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "Sampler, US D-74",
+        "US D-95 plastic bottle",
+        "US DH-95 plastic bottle",
+        "US D-74 TM"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-14180300": {
+    "resolved_method": null,
+    "confidence": "unresolvable",
+    "known_categories": {},
+    "n_unknown_samples": 186,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown"
+    ],
+    "classified": {
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-14181500": {
+    "resolved_method": null,
+    "confidence": "unresolvable",
+    "known_categories": {},
+    "n_unknown_samples": 20,
+    "is_catastrophic": true,
+    "equipment_found": [
+      "Unknown"
+    ],
+    "classified": {
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-14181900": {
+    "resolved_method": null,
+    "confidence": "unresolvable",
+    "known_categories": {},
+    "n_unknown_samples": 9,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown"
+    ],
+    "classified": {
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-14182500": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 2,
+      "grab": 1
+    },
+    "n_unknown_samples": 24,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Grab sample",
+      "US D-95 Teflon bottle",
+      "Sampler, point, automatic",
+      "US DH-95 plastic bottle"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US D-95 Teflon bottle",
+        "US DH-95 plastic bottle"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-14246900": {
+    "resolved_method": "depth_integrated",
+    "confidence": "high",
+    "known_categories": {
+      "depth_integrated": 7
+    },
+    "n_unknown_samples": 15,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Sampler, US P-61-A1",
+      "Sampler, US D-77",
+      "US P-61 TM",
+      "Sampler, frame-type, plastic bottle w/Teflon collaps. bag",
+      "US D-96-A1 Bag Sampler",
+      "US D-96 bag sampler",
+      "US P-61"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "Sampler, US P-61-A1",
+        "Sampler, US D-77",
+        "US P-61 TM",
+        "Sampler, frame-type, plastic bottle w/Teflon collaps. bag",
+        "US D-96-A1 Bag Sampler",
+        "US D-96 bag sampler",
+        "US P-61"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-14301500": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 2
+    },
+    "n_unknown_samples": 7,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Sampler, point, automatic",
+      "Sampler, US D-74",
+      "Sampler, US D-77"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "Sampler, US D-74",
+        "Sampler, US D-77"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-14302480": {
+    "resolved_method": "depth_integrated",
+    "confidence": "high",
+    "known_categories": {
+      "depth_integrated": 4
+    },
+    "n_unknown_samples": 8,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Sampler, US D-74",
+      "Sampler, US D-77",
+      "Sampler, US DH-59",
+      "Sampler, US DH-76"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "Sampler, US D-74",
+        "Sampler, US D-77",
+        "Sampler, US DH-59",
+        "Sampler, US DH-76"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-15008000": {
+    "resolved_method": "depth_integrated",
+    "confidence": "high",
+    "known_categories": {
+      "depth_integrated": 5
+    },
+    "n_unknown_samples": 6,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "US DH-95 plastic bottle",
+      "US DH-81 with Teflon cap and nozzle",
+      "US DH-95 Teflon bottle",
+      "US D-95 plastic bottle",
+      "US DH-81"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US DH-95 plastic bottle",
+        "US DH-81 with Teflon cap and nozzle",
+        "US DH-95 Teflon bottle",
+        "US D-95 plastic bottle",
+        "US DH-81"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-15015595": {
+    "resolved_method": "depth_integrated",
+    "confidence": "high",
+    "known_categories": {
+      "depth_integrated": 6
+    },
+    "n_unknown_samples": 11,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "US D-95 plastic bottle",
+      "US DH-81",
+      "US DH-95 Teflon bottle",
+      "Unknown",
+      "US DH-95 plastic bottle",
+      "US D-95 Teflon bottle",
+      "US DH-81 with Teflon cap and nozzle"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US D-95 plastic bottle",
+        "US DH-81",
+        "US DH-95 Teflon bottle",
+        "US DH-95 plastic bottle",
+        "US D-95 Teflon bottle",
+        "US DH-81 with Teflon cap and nozzle"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-15024800": {
+    "resolved_method": "depth_integrated",
+    "confidence": "high",
+    "known_categories": {
+      "depth_integrated": 5
+    },
+    "n_unknown_samples": 12,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "US P-61 TM",
+      "Other",
+      "US D-96 bag sampler",
+      "US D-95 Teflon bottle",
+      "US DH-95 plastic bottle",
+      "US DH-81 with Teflon cap and nozzle"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US P-61 TM",
+        "US D-96 bag sampler",
+        "US D-95 Teflon bottle",
+        "US DH-95 plastic bottle",
+        "US DH-81 with Teflon cap and nozzle"
+      ],
+      "unknown": [
+        "Unknown"
+      ],
+      "other": [
+        "Other"
+      ]
+    }
+  },
+  "USGS-15041200": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 6,
+      "grab": 1
+    },
+    "n_unknown_samples": 19,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "US DH-95 plastic bottle",
+      "US D-96 bag sampler",
+      "US D-95 plastic bottle",
+      "Unknown",
+      "US DH-95 Teflon bottle",
+      "US DH-2 Bag Sampler",
+      "Grab sample",
+      "US DH-81"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US DH-95 plastic bottle",
+        "US D-96 bag sampler",
+        "US D-95 plastic bottle",
+        "US DH-95 Teflon bottle",
+        "US DH-2 Bag Sampler",
+        "US DH-81"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-15129120": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 3,
+      "grab": 1
+    },
+    "n_unknown_samples": 9,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "US D-96 bag sampler",
+      "US DH-95 plastic bottle",
+      "US D-95 plastic bottle",
+      "Grab sample"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US D-96 bag sampler",
+        "US DH-95 plastic bottle",
+        "US D-95 plastic bottle"
+      ],
+      "grab": [
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-15209700": {
+    "resolved_method": "depth_integrated",
+    "confidence": "high",
+    "known_categories": {
+      "depth_integrated": 3
+    },
+    "n_unknown_samples": 18,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "US D-96 bag sampler",
+      "Sampler, US DH-59",
+      "US D-95 plastic bottle",
+      "Unknown"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "US D-96 bag sampler",
+        "Sampler, US DH-59",
+        "US D-95 plastic bottle"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-250813081040000": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 3
+    },
+    "n_unknown_samples": 3,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Sampler, point, automatic",
+      "US DH-81",
+      "Weighted-bottle sampler",
+      "Unknown",
+      "US DH-81 with Teflon cap and nozzle"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US DH-81",
+        "Weighted-bottle sampler",
+        "US DH-81 with Teflon cap and nozzle"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-250921081054200": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 3
+    },
+    "n_unknown_samples": 2,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Sampler, point, automatic",
+      "Unknown",
+      "Weighted-bottle sampler",
+      "US DH-81",
+      "US DH-95 plastic bottle"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "Weighted-bottle sampler",
+        "US DH-81",
+        "US DH-95 plastic bottle"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-342804118011501": {
+    "resolved_method": "auto_point",
+    "confidence": "high",
+    "known_categories": {
+      "auto_point": 2
+    },
+    "n_unknown_samples": 8,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Suction pump",
+      "Sampler, point, automatic"
+    ],
+    "classified": {
+      "auto_point": [
+        "Suction pump",
+        "Sampler, point, automatic"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-375350097262800": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "depth_integrated": 3,
+      "grab": 3
+    },
+    "n_unknown_samples": 2,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Weighted-bottle sampler",
+      "Grab sample",
+      "US DH-81",
+      "US DH-81 with Teflon cap and nozzle",
+      "Other",
+      "Open-top bailer",
+      "Open-Mouth Bottle"
+    ],
+    "classified": {
+      "depth_integrated": [
+        "Weighted-bottle sampler",
+        "US DH-81",
+        "US DH-81 with Teflon cap and nozzle"
+      ],
+      "grab": [
+        "Grab sample",
+        "Open-top bailer",
+        "Open-Mouth Bottle"
+      ],
+      "other": [
+        "Other"
+      ]
+    }
+  },
+  "USGS-384115121402501": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 2,
+      "depth_integrated": 3,
+      "grab": 2
+    },
+    "n_unknown_samples": 2,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Open-Mouth Bottle",
+      "Sampler, US DH-59",
+      "Sampler, US DH-48",
+      "Sampler, point, automatic",
+      "Sampler, US D-74",
+      "Grab sample",
+      "Peristaltic pump"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic",
+        "Peristaltic pump"
+      ],
+      "depth_integrated": [
+        "Sampler, US DH-59",
+        "Sampler, US DH-48",
+        "Sampler, US D-74"
+      ],
+      "grab": [
+        "Open-Mouth Bottle",
+        "Grab sample"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-385553107243301": {
+    "resolved_method": "depth_integrated",
+    "confidence": "low_mixed",
+    "known_categories": {
+      "auto_point": 1,
+      "depth_integrated": 5
+    },
+    "n_unknown_samples": 477,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "US DH-81 with Teflon cap and nozzle",
+      "Sampler, US D-74",
+      "US D-95 plastic bottle",
+      "US DH-95 plastic bottle",
+      "US DH-81",
+      "Sampler, point, automatic"
+    ],
+    "classified": {
+      "auto_point": [
+        "Sampler, point, automatic"
+      ],
+      "depth_integrated": [
+        "US DH-81 with Teflon cap and nozzle",
+        "Sampler, US D-74",
+        "US D-95 plastic bottle",
+        "US DH-95 plastic bottle",
+        "US DH-81"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-404038124131801": {
+    "resolved_method": "grab",
+    "confidence": "high",
+    "known_categories": {
+      "grab": 1
+    },
+    "n_unknown_samples": 29,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Van Dorn sampler"
+    ],
+    "classified": {
+      "grab": [
+        "Van Dorn sampler"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  },
+  "USGS-405219124085601": {
+    "resolved_method": "grab",
+    "confidence": "high",
+    "known_categories": {
+      "grab": 1
+    },
+    "n_unknown_samples": 28,
+    "is_catastrophic": false,
+    "equipment_found": [
+      "Unknown",
+      "Van Dorn sampler"
+    ],
+    "classified": {
+      "grab": [
+        "Van Dorn sampler"
+      ],
+      "unknown": [
+        "Unknown"
+      ]
+    }
+  }
+}
