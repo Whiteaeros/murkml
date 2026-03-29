@@ -230,6 +230,8 @@ These are network-bound or compute-bound. Start them before anything else so the
 - **#11 Anchor sites (10 more random sets)** — 10 additional random-100-site model trains (~20 min compute). Start running, analyze when done.
 - **#4 Unknown methods audit** — NWIS API queries for 51+ catastrophic sites. Network-dependent, start early.
 
+**AFTER Phase 0 tasks complete:** Run `/record-experiment` for #11 (anchor sites) and #4 (method audit). Update MODEL_VERSIONS.md. Commit all downloaded data and results.
+
 ### Phase 1: Quick analyses (parallel, ~1 hour total)
 All pure analysis on existing data. Run in parallel. Results inform Phase 2.
 
@@ -237,14 +239,29 @@ All pure analysis on existing data. Run in parallel. Results inform Phase 2.
 - **Agent B: #8 + #10** — Individual error distribution + catastrophic site classification. These are related (both about understanding where errors are).
 - **Agent C: #9** — Instrument model check. Requires NWIS metadata query + analysis of turb_source SHAP=0.000.
 
+**AFTER Phase 1:** Run `/record-experiment` for each analysis. Update MODEL_VERSIONS.md with findings. Commit.
+
 ### Phase 2: Core implementation (depends on Phase 1 results)
 - **#1 + #13: Bayesian adaptation** — depends on #5 (if bimodal, may need 2-component adaptation instead of single prior) and #6 (residual distribution shape affects shrinkage prior).
 - **#12 + #15: Manual MERF with categoricals** — agent must first research whether the EM approach is the best method for mixed-effects gradient boosting, then implement the winner. Depends on #5 (bimodal check may suggest mixture model instead).
+
+**AFTER each Phase 2 implementation:** Run `/record-experiment` for every model trained. Save models with versioned names. Update MODEL_VERSIONS.md. Commit immediately — do NOT batch commits.
 
 ### Phase 3: Integration
 - **#7: Temporal stationarity** — run after core implementation to check if improved model is temporally stable.
 - Combine SGMC features (#3) with winning model from Phase 2.
 - Re-run adaptation curve with all improvements.
+
+**AFTER Phase 3:** Run `/record-experiment` for every result. Final commit with complete MODEL_VERSIONS.md update.
+
+### DATA CAPTURE RULE (applies to ALL phases)
+**Every agent must, before reporting completion:**
+1. Save any model files with versioned names (never overwrite)
+2. Record results in MODEL_VERSIONS.md results table
+3. Git add + commit with descriptive message
+4. Verify the commit landed by checking git log
+
+**No analysis or experiment is "done" until it is recorded and committed.** If an agent forgets, the first thing the next agent does is go back and record it.
 
 ### Deferred:
 - #2: Paper — not now
