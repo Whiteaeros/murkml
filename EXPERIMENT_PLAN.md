@@ -182,8 +182,22 @@ This ensures each random subset is a miniature version of the full dataset, not 
 - If D5 beats D4: discrete turbidity pairs are hurting
 - If std across 5 seeds is >0.05: results are unstable, site selection matters a lot
 
-**Status:** NOT STARTED
-**Result:** _pending_
+**Status:** COMPLETE
+**Result:**
+- Zero variance across seeds (std=0.000) — all eligible sites selected at each tier, no randomness
+- D1 (96 highest-quality sites): BEST pooled R²=0.386 but WORST median site R²=0.158
+- D2 (194 good sites): pooled 0.315, med site 0.293 — best per-site performance
+- D3 (256 moderate): pooled 0.311, med site 0.294 — nearly identical to D2
+- D4 (287 all): pooled 0.319, med site 0.266 — adding low-quality sites hurts per-site
+- D5 (109 continuous only): WORST both metrics (0.224 / 0.165) — too few sites
+- **Key findings:**
+  1. Pooled R² and median site R² tell OPPOSITE stories again (same as Experiment B)
+  2. D1 has best pooled (high-quality sites produce less variance in predictions) but worst per-site (not enough diversity to generalize)
+  3. Sweet spot is D2-D3 (~200 sites, known methods, ≥20 samples) — best per-site generalization
+  4. Adding the last 30-90 low-quality sites (D3→D4) slightly hurts per-site R²
+  5. Continuous-only (D5) is terrible — need the discrete turbidity data for sample count
+  6. More data helps up to ~200 sites, then plateaus or slightly degrades
+- Date: 2026-03-29
 
 ---
 
@@ -246,6 +260,11 @@ After each experiment: update this file with results, commit to git.
 | B1 | no catastrophic | 0.312 | 0.273 | Pooled better, per-site slightly worse | 2026-03-29 |
 | B2 | no negative | 0.282 | 0.128 | Too aggressive — per-site much worse | 2026-03-29 |
 | B3 | no low-var | 0.324 | 0.236 | Best pooled, but per-site worse | 2026-03-29 |
+| D1 | highest quality (96) | 0.386 | 0.158 | Best pooled, worst per-site | 2026-03-29 |
+| D2 | good quality (194) | 0.315 | 0.293 | Best per-site — sweet spot | 2026-03-29 |
+| D3 | moderate (256) | 0.311 | 0.294 | Nearly = D2 | 2026-03-29 |
+| D4 | all (287) | 0.319 | 0.266 | Adding low-quality hurts per-site | 2026-03-29 |
+| D5 | continuous only (109) | 0.224 | 0.165 | Too few sites | 2026-03-29 |
 
 ---
 
