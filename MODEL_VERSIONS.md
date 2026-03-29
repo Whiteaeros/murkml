@@ -400,3 +400,4 @@ Pooled R² is lower (0.207 vs 0.319) because fewer sites = fewer samples = less 
 | OLS-comparison | — | — | — | — | — | OLS never beats CatBoost+Bayesian at ANY N. OLS plateaus at ~0.39 (N=50). CatBoost hits 0.51 (N=20). No crossover point. | 2026-03-29 |
 | Bayesian-adapt-k30 | 0.512 (N=20) | — | — | — | — | Best holdout R² ever. Monotonic curve (almost). N=2: 0.486 vs old -0.012. Student-t prior, k=30. | 2026-03-29 |
 | OLS-extended-N50 | — | — | — | — | — | OLS drops from 0.407 (N=20) to 0.372 (N=50) — overfits seasonal patterns. CatBoost stays ~0.44. Gap widens with more samples. | 2026-03-29 |
+| #3-sgmc-watershed | — | — | — | — | — | Watershed-level lithology: 5 significant categories. Metamorphic amphibolite rho=+0.174, carbonate rho=-0.150. Stronger than point-based. 355 sites processed. | 2026-03-29 |
