@@ -518,3 +518,5 @@ so sites that genuinely need large corrections aren't penalized.
 
 | #1/#13-bayesian-adapt | 0.509 (N=20) | — | — | — | — | Bayesian shrinkage eliminates adaptation collapse. N=2: 0.485 vs -0.012. Monotonic curve (practical). Student-t df=4, k=15. | 2026-03-28 |
 | Bayesian-k15-200mc | 0.509 (N=20) | — | — | — | — | Best Bayesian: k=15, Student-t df=4, 200 MC trials. N=2: 0.485 (was -0.012). Adaptation never hurts. | 2026-03-29 |
+| v4-eval-bayesian-k15 | pooled=0.665 | 0.337 (zero-shot) | 0.665 | 127.7% | 62.2% | VERIFIED PIPELINE. Bayesian wins N=2-5 (0.368 vs 0.031), old wins N=10+ (0.483 vs 0.393). | 2026-03-29 |
+| v4-eval-old2param | pooled=0.665 | 0.337 (zero-shot) | 0.665 | 127.7% | 62.2% | VERIFIED PIPELINE. Old 2-param still better at high N but catastrophic at N=2. | 2026-03-29 |
