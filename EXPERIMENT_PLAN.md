@@ -301,3 +301,56 @@ After all experiments:
 - If E (MERF) improves on that, it becomes the production architecture
 - Winner gets full LOGO CV for final reportable numbers
 - All decisions documented here with reasoning
+
+---
+
+## SYNTHESIS: What We Learned (2026-03-29)
+
+### The Big Picture
+
+Five experiments, 30+ models trained. Here's what we now know:
+
+**1. The model's problem is site heterogeneity, not any single configuration choice.**
+- Splitting by collection method (A): doesn't help
+- Excluding bad sites (B): cosmetic improvement only
+- Changing site count (D): ~200 good-quality sites is the sweet spot
+- Flow stratification (C): not a flow-specific problem
+- The turbidity-SSC relationship varies fundamentally across sites, and no feature engineering or data curation within a standard CatBoost framework fixes that.
+
+**2. MERF is the clear winner.**
+- Only approach that improved BOTH pooled R² AND per-site R²
+- Zero-shot: median site R²=0.357 (vs baseline 0.290) — +23% relative improvement
+- N=10 adaptation: R²=0.394 — adaptation finally WORKS (only approach where it does)
+- Achieved in 71 seconds training time
+- Limitation: dropped categoricals (collection_method, turb_source, sensor_family)
+
+**3. Pooled R² and per-site R² tell opposite stories.**
+- This showed up in EVERY experiment (A, B, D)
+- Removing sites/samples improves pooled (fewer bad predictions) but hurts per-site (less training data)
+- The two metrics optimize for different things — need to be clear about which we care about
+- For deployment: per-site R² is what a user at a single site experiences
+
+**4. The adaptation curve problem (small-N hurts) is NOT fully solved.**
+- Even MERF with shrinkage: N=1-5 still degrades vs zero-shot
+- The fundamental issue: 1-5 samples from one season don't represent the full site behavior
+- Minimum viable adaptation: N=10 spanning multiple seasons
+- Possible fix: intercept-only correction for N<5, full correction for N≥10
+
+### Recommended Next Steps
+
+1. **MERF + categoricals:** One-hot encode collection_method/turb_source/sensor_family and re-run MERF. This could recover the information lost by dropping categoricals.
+
+2. **MERF + D2 data selection:** Train MERF on the ~194 good-quality sites (D2 tier) instead of all 287. D2 was the per-site sweet spot, and MERF should amplify that.
+
+3. **Fix the small-N adaptation:** Implement intercept-only correction with stronger shrinkage for N<5. Compare multiplicative native-space correction vs additive Box-Cox-space correction.
+
+4. **Proper evaluation:** Run GKF5 on MERF to get cross-validation numbers, not just holdout.
+
+5. **If results are good:** Full LOGO CV on the winning MERF configuration for final reportable numbers.
+
+### What NOT to Do Next
+- Don't add new features (ablation showed most add noise)
+- Don't try more transforms (Box-Cox vs log1p makes no difference on holdout)
+- Don't try custom loss functions (the problem is structural, not loss-related)
+- Don't exclude sites (cosmetic fix, doesn't help the model generalize)
+- Don't split by collection method (model already handles it as a feature)
