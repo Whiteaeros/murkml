@@ -289,6 +289,12 @@ After each experiment: update this file with results, commit to git.
 | D3 | moderate (256) | 0.311 | 0.294 | Nearly = D2 | 2026-03-29 |
 | D4 | all (287) | 0.319 | 0.266 | Adding low-quality hurts per-site | 2026-03-29 |
 | D5 | continuous only (109) | 0.224 | 0.165 | Too few sites | 2026-03-29 |
+| D-rand-100 | 100 random (5 seeds) | 0.281±0.031 | 0.205±0.083 | High variance | 2026-03-29 |
+| D-rand-150 | 150 random (5 seeds) | 0.286±0.016 | 0.226±0.089 | High variance | 2026-03-29 |
+| D-rand-200 | 200 random (5 seeds) | 0.316±0.025 | 0.191±0.071 | Pooled improves | 2026-03-29 |
+| D-rand-250 | 250 random (5 seeds) | 0.305±0.021 | 0.275±0.064 | Best per-site | 2026-03-29 |
+| D-all | 287 (deterministic) | 0.319 | 0.266 | Reference | 2026-03-29 |
+| E-MERF-v6 | site_adapt pipeline | 0.417 zero-shot | — | v4 (0.472) wins by 0.055 | 2026-03-29 |
 | **E-MERF** | **zero-shot** | **0.290** | **0.357** | **Best per-site R² — MERF wins** | 2026-03-29 |
 | E-MERF | N=10 adapted | — | 0.394 | Adaptation works at N=10 | 2026-03-29 |
 
