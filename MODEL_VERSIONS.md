@@ -203,3 +203,77 @@ On identical pipeline (site_adaptation.py): v4 wins 0.472 vs MERF 0.417. MERF lo
 | D-rand-200 (5 seeds) | — | 0.191±0.071 | 0.316±0.025 | — | — | Pooled improving | 2026-03-29 |
 | D-rand-250 (5 seeds) | — | 0.275±0.064 | 0.305±0.021 | — | — | Best random per-site | 2026-03-29 |
 | C-flow (analysis) | — | — | — | — | — | Not a flow problem; MAPE best at storms | 2026-03-29 |
+
+---
+
+## Task 8: Individual Prediction Error Distribution (v4-boxcox, 32,003 predictions)
+
+### Overall Error Quantiles
+
+| Quantile | Absolute Error (mg/L) | Percentage Error |
+|---|---|---|
+| 25th | 8.1 | 28.7% |
+| 50th (median) | 29.1 | 63.6% |
+| 75th | 125.5 | 125.3% |
+| 90th | 367.3 | 251.6% |
+| 95th | 679.9 | 386.5% |
+| Mean | 181.6 | 137.5% |
+
+### Error Stratified by SSC Level
+
+| SSC Level | n | Med Abs Err (mg/L) | Mean Abs Err | 90th Abs Err | Med Pct Err | Mean Pct Err |
+|---|---|---|---|---|---|---|
+| Low (<50 mg/L) | 15,602 | 9.1 | 23.2 | 43.7 | 86.1% | 202.1% |
+| Medium (50–500) | 12,184 | 77.9 | 131.0 | 293.9 | 54.0% | 85.0% |
+| High (500–5000) | 4,066 | 403.4 | 619.3 | 1,443.6 | 42.1% | 48.8% |
+| Extreme (>5000) | 151 | 5,556.3 | 8,846.8 | 16,128.4 | 83.6% | 73.3% |
+
+### Heteroscedasticity
+
+**Yes, strongly heteroscedastic.** Absolute error grows ~600x from Low to Extreme SSC (median 9→5,556 mg/L). Percentage error shrinks from Low to High (86%→42% median) but reverses at Extreme (84%) — model completely underpredicts extreme events. The model is proportionally best in the 500–5000 mg/L range (42% median pct error) and worst at low SSC where small absolute errors look huge as percentages.
+
+### Worst Single Predictions
+
+- **Worst absolute:** USGS-12170300 — true 70,000 mg/L, predicted 997 mg/L (error: 69,003 mg/L, 98.6%). A lahar/volcanic sediment event the model cannot capture.
+- **Worst percentage:** USGS-02336240 — true 1 mg/L, predicted 1,228 mg/L (122,704%). Model grossly overpredicted a near-zero observation.
+
+---
+
+## Task 10: Catastrophic Site Classification (51 sites with R²(native) < -1)
+
+### Classification Results
+
+| Category | Count | Description |
+|---|---|---|
+| **Low signal** | 17 (33%) | SSC range <100 mg/L AND mean abs error <50 mg/L. R² is bad because there's nothing to predict, but predictions aren't far off in absolute terms. |
+| **Mixed** | 27 (53%) | Intermediate — some signal, moderate errors. |
+| **Genuinely wrong** | 7 (14%) | Mean abs error >200 mg/L OR error >2x SSC range. Model is making large, substantive mistakes. |
+
+### Low Signal Examples (R² is misleading — errors are small)
+
+| Site | R²(native) | SSC Range (mg/L) | Mean Abs Error (mg/L) | n |
+|---|---|---|---|---|
+| USGS-09013500 | -21.9 | 2.5 | 3.5 | 20 |
+| USGS-05536356 | -2.5 | 9.0 | 4.3 | 20 |
+| USGS-04249000 | -13.0 | 26.5 | 9.3 | 148 |
+| USGS-14181500 | -34.6 | 37.0 | 41.5 | 20 |
+
+These sites have near-constant SSC. A 3–41 mg/L average error is operationally acceptable; R² is just the wrong metric for flat signals.
+
+### Genuinely Wrong Examples (model fails substantively)
+
+| Site | R²(native) | SSC Range (mg/L) | Mean Abs Error (mg/L) | n | Collection | Sensor |
+|---|---|---|---|---|---|---|
+| USGS-432004118453400 | -4.0 | 1,546 | 607.5 | 51 | grab | unknown |
+| USGS-01478185 | -2.0 | 1,046 | 472.5 | 22 | depth_integrated | unknown |
+| USGS-06893820 | -1.5 | 2,109 | 272.1 | 142 | unknown | ysi_6series |
+| USGS-07048600 | -2.5 | 899 | 263.7 | 16 | depth_integrated | unknown |
+| USGS-11336685 | -45.9 | 41 | 84.6 | 6 | unknown | unknown |
+| USGS-11336680 | -44.8 | 30 | 70.9 | 5 | unknown | unknown |
+
+### What genuinely wrong sites have in common
+
+1. **Unknown metadata:** 4/7 have unknown collection method, 5/7 have unknown sensor — the model's categorical features can't help differentiate them.
+2. **Highly skewed SSC:** Most have SSC skew >1.0 (heavy right tail). The model predicts near the median but misses the extremes.
+3. **Unusual turbidity-SSC ratios:** USGS-07048600 has turb/SSC ratio of 2.74 (turbidity much higher than SSC), while USGS-06893820 and USGS-05406479 have ratios of 0.47 (SSC much higher than turbidity). These abnormal ratios suggest site-specific sediment properties the global model can't capture.
+4. **Last two (11336685, 11336680) are tiny-n sites** (5–6 samples) in Sacramento Delta with small SSC range but errors >2x the range — too few samples for reliable assessment.
