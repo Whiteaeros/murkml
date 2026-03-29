@@ -396,3 +396,4 @@ Pooled R² is lower (0.207 vs 0.319) because fewer sites = fewer samples = less 
 - Script: `scripts/anchor_site_identification.py`
 | #11-anchors | — | — | — | — | — | 50 anchor sites beat all-287 on per-site R² (0.367 vs 0.266, +38%). Anchor selection works. 36 strong anchors, 37 noise sites. | 2026-03-29 |
 | v7-anchor50 | — | 0.367 | 0.207 | — | — | 50 curated anchor sites. Best per-site R² of any model. Pooled lower (fewer sites). | 2026-03-29 |
+| #3-sgmc-lithology | — | — | — | — | — | SGMC lithology predicts slope (KW p=0.0024). Metamorphic=high slope (1.05-1.13), carbonate=low (0.71-0.87). Point-based, not watershed-averaged yet. | 2026-03-29 |
