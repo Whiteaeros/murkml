@@ -102,8 +102,60 @@ Each entry records: training config, dataset, performance, and what changed from
 6. Old holdout split is lost — cannot re-run v2 on the new holdout
 
 ### To make a fair comparison, need:
-- Run log1p model on same 396-site dataset with same 76-site holdout
-- OR: run Box-Cox model on 266-site dataset (if it can be reconstructed)
+- Run log1p model on same 396-site dataset with same 76-site holdout — DONE (v5)
+
+---
+
+### murkml-5-log1p-396sites
+- **Date:** 2026-03-29
+- **Purpose:** Fair comparison with v4 — same data, different transform
+- **Training sites:** 357 (same as v4)
+- **Samples:** 32,046 (same as v4)
+- **Features:** 44 (same as v4, but NO monotone — log1p + monotone hurts)
+- **Transform:** log1p
+- **Holdout R²(native):** 0.460
+- **Saved model:** data/results/models/ssc_C_v5_log1p_396sites.cbm
+- **Notes:** Essentially identical to v4 (0.472 vs 0.460). Proved the v2→v4 holdout drop (0.699→0.472) is from data expansion + different holdout split, NOT the transform choice.
+
+### murkml-6-merf-fe
+- **Date:** 2026-03-29
+- **Purpose:** MERF mixed-effects — test if per-site random effects improve generalization
+- **Training sites:** 287 (fewer — MERF uses different tier pipeline)
+- **Samples:** 26,515
+- **Features:** 41 numeric only (MERF can't handle categoricals — lost collection_method, turb_source, sensor_family)
+- **Transform:** Box-Cox 0.2
+- **Architecture:** MERF (10 EM iterations) with CatBoost fixed effects + per-site random intercept + random slope on turbidity
+- **Holdout R²(native):** 0.417 (via site_adaptation.py)
+- **Saved model:** data/results/models/ssc_C_v6_merf_fe.cbm (fixed-effects component only)
+- **Notes:** Worse than v4 (0.417 vs 0.472) because losing categoricals (especially collection_method, SHAP rank 3) costs more than the random-effects training benefit gains. MERF concept is sound but needs categorical support.
+
+---
+
+## Experiment Results (2026-03-29)
+
+### Experiment A: Collection Method Split (7 models)
+Specialist models trained on single collection methods are WORSE than v4 on their own domain:
+- auto_point specialist: 0.215 vs v4's 0.377 on auto_point data
+- depth_integrated specialist: 0.389 vs v4's 0.548 on depth_integrated data
+- grab specialist: 0.111 vs v4's 0.282 on grab data
+
+Splitting loses training data without gaining specialization. v4 handles collection_method well as a feature.
+
+### Experiment B: Exclude Low-Quality Sites (3 models)
+Removing bad sites improves pooled R² (cosmetic) but hurts per-site R² (real):
+- B1 (no catastrophic): pooled 0.312 (+0.101) but med site 0.273 (-0.017)
+- B3 (no low-var): pooled 0.324 (+0.113) but med site 0.236 (-0.054)
+
+### Experiment C: Flow-Stratified Metrics
+Not a flow-specific problem. MAPE actually best at storms (48.2%) vs baseflow (74.5%). Site heterogeneity dominates at all flow levels.
+
+### Experiment D: Site Count Impact
+Quality-tiered: sweet spot at ~194-256 sites (known methods, ≥20 samples). 96 best sites = best pooled but worst per-site.
+
+Random selection (5 seeds): per-site R² variance is huge (std 0.064-0.089). More sites helps slightly, reduces variance, but site heterogeneity dominates.
+
+### Experiment E: MERF
+On identical pipeline (site_adaptation.py): v4 wins 0.472 vs MERF 0.417. MERF lost categorical features. MERF concept promising if categoricals can be added.
 
 ---
 
@@ -114,3 +166,5 @@ Each entry records: training config, dataset, performance, and what changed from
 | v1 → v2 | Fixed GAGES-II bug, 102→37 features, 102→266 sites | 0.295 → 0.361 (+0.066) |
 | v2 → v3 | Added 117 sites (QC fix), same features | 0.361 → 0.154 (-0.207) COLLAPSE |
 | v3 → v4 | Box-Cox 0.2, more samples (discrete turb), 37→44 features | 0.154 → 0.290 (+0.136) |
+| v4 → v5 | Same data, log1p instead of Box-Cox | 0.290 → ~same (transform doesn't matter) |
+| v4 → v6 | MERF architecture, lost categoricals | Holdout: 0.472 → 0.417 (-0.055) |
