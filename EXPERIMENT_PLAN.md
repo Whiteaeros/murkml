@@ -118,8 +118,15 @@ Three approaches, all tested:
 - Step 2: If any of C1/C2/C3 improves high-flow R² without destroying low-flow R², that's the fix
 - C3 specifically: if the separate high-flow model beats the general model on storm events, flow regime fundamentally changes the turbidity-SSC relationship (not just scaling)
 
-**Status:** NOT STARTED
-**Result:** _pending_
+**Status:** STEP 1 COMPLETE
+**Result:**
+- 285 of 337 sites have discharge (85%), 13,491 samples
+- Pooled R²: low=0.331, mid=0.259, high=0.206, storm=0.109
+- BUT MAPE improves at high flow: low=74.5%, storm=48.2% (proportional accuracy better)
+- Per-site R² is negative at ALL flow regimes (median -0.07 to -0.39)
+- Conclusion: NOT a storm-specific problem. Site heterogeneity dominates at all flow levels.
+- Step 2 (flow retraining) likely won't help — problem is cross-site, not cross-flow.
+- Date: 2026-03-29
 
 ---
 
@@ -207,7 +214,7 @@ After each experiment: update this file with results, commit to git.
 | Experiment | Label | Holdout R² | Per-site R² median | Notes | Date |
 |---|---|---|---|---|---|
 | Baseline | v4-boxcox | 0.472 | 0.290 (LOGO) | Current model | 2026-03-29 |
-| _pending_ | | | | | |
+| C-Step1 | analysis only | — | — | Not a flow problem; site heterogeneity at all regimes. MAPE best at storms (48%) | 2026-03-29 |
 
 ---
 
