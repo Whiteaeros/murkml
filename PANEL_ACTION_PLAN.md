@@ -28,7 +28,7 @@ Derived from expert panel deliberation. Items numbered to match the panel briefi
 
 **How:**
 - Download SGMC geodatabase from USGS (doi:10.5066/F7WH2N65)
-- Spatial join: for each of our 396 sites, extract the bedrock lithology class at that point
+- Spatial join: for each of our 396 sites, extract the bedrock lithology class at that point. Watershed boundaries need to be utilized to give percentages of lithology
 - Also compute: % of upstream watershed in each lithology class (if catchment polygons available)
 - Correlate lithology with per-site log-log slope (we have these in site_turb_ssc_params.parquet)
 - If Spearman rho > 0.15 for any lithology feature, add to model and test with GKF5
@@ -146,7 +146,7 @@ Derived from expert panel deliberation. Items numbered to match the panel briefi
 **What:** Identify which training sites contribute most to holdout performance. Some sites teach the model transferable physics, others add noise.
 
 **How (cheap empirical approach first):**
-- Use the D-redo data: we have 5 random sets of 100 sites with different performance levels
+- Use the D-redo data: we have 5 random sets of 100 sites with different performance levels. run more of these sets to improve prediction. 
 - For each of the 287 training sites: count how many of the high-performing random sets (top 2) it appeared in vs low-performing sets (bottom 2)
 - Sites that consistently appear in winning sets are candidate anchors
 - Validate with a targeted test: train on just the top 50 candidate anchors, measure holdout R²
@@ -162,7 +162,7 @@ Derived from expert panel deliberation. Items numbered to match the panel briefi
 
 ## 12. Mixed-Effects with Categoricals (MERF Done Right)
 
-**What:** MERF showed the concept works (random effects capture site heterogeneity) but lost because it dropped categoricals. Implement the mixed-effects EM loop ourselves around standard CatBoost with full categorical support.
+**What:** MERF showed the concept works (random effects capture site heterogeneity) but lost because it dropped categoricals. Implement the mixed-effects EM loop ourselves around standard CatBoost with full categorical support. is this method actually the best?
 
 **How:**
 - Implement the EM algorithm manually (~100 lines):
@@ -220,27 +220,34 @@ Derived from expert panel deliberation. Items numbered to match the panel briefi
 
 ---
 
-## Execution Order
+## Execution Order — Parallel Tracks
 
-**Quick analyses (do first, inform the implementation):**
-- #5: Bimodal slope check (30 min)
-- #6: Residual normality (30 min)
-- #8: Individual prediction error distribution (30 min)
-- #10: Catastrophic site classification (30 min)
+### Phase 0: Start downloads and long-running tasks FIRST
+These are network-bound or compute-bound. Start them before anything else so they run in the background.
 
-**Core implementation (the main work):**
-- #1 + #13: Bayesian adaptation with staged correction (2-3 hours)
-- #3: SGMC geology download + correlation (half day)
-- #12 + #15: Manual MERF with categoricals + best-data physics (half day)
+- **#3 SGMC download** — large geodatabase download. Agent starts this immediately, then does spatial analysis while other tasks run.
+  - Note: We have NHDPlus COMIDs but no watershed polygons locally. Agent must research whether point-lookup or watershed-percentage approach is better, and determine what additional data is needed.
+- **#11 Anchor sites (10 more random sets)** — 10 additional random-100-site model trains (~20 min compute). Start running, analyze when done.
+- **#4 Unknown methods audit** — NWIS API queries for 51+ catastrophic sites. Network-dependent, start early.
 
-**Data investigation (parallel track):**
-- #4: Audit unknown collection methods (3-4 hours)
-- #9: Instrument model check (2-3 hours)
-- #7: Temporal stationarity (1-2 hours)
-- #11: Anchor site identification (2 hours cheap, 10 hours full)
+### Phase 1: Quick analyses (parallel, ~1 hour total)
+All pure analysis on existing data. Run in parallel. Results inform Phase 2.
 
-**Deferred:**
+- **Agent A: #5 + #6** — Bimodal slope check + residual normality. These are related (both about distribution shape).
+- **Agent B: #8 + #10** — Individual error distribution + catastrophic site classification. These are related (both about understanding where errors are).
+- **Agent C: #9** — Instrument model check. Requires NWIS metadata query + analysis of turb_source SHAP=0.000.
+
+### Phase 2: Core implementation (depends on Phase 1 results)
+- **#1 + #13: Bayesian adaptation** — depends on #5 (if bimodal, may need 2-component adaptation instead of single prior) and #6 (residual distribution shape affects shrinkage prior).
+- **#12 + #15: Manual MERF with categoricals** — agent must first research whether the EM approach is the best method for mixed-effects gradient boosting, then implement the winner. Depends on #5 (bimodal check may suggest mixture model instead).
+
+### Phase 3: Integration
+- **#7: Temporal stationarity** — run after core implementation to check if improved model is temporally stable.
+- Combine SGMC features (#3) with winning model from Phase 2.
+- Re-run adaptation curve with all improvements.
+
+### Deferred:
 - #2: Paper — not now
-- #14: Three-tier framing — after adaptation is working
-- #16: MVP packaging — after core improvements
-- #17: User guidance on sampling — after adaptation is working
+- #14: Three-tier framing — after adaptation works
+- #16: MVP packaging — not yet
+- #17: User guidance — not yet
