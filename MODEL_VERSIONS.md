@@ -129,6 +129,57 @@ Each entry records: training config, dataset, performance, and what changed from
 - **Saved model:** data/results/models/ssc_C_v6_merf_fe.cbm (fixed-effects component only)
 - **Notes:** Worse than v4 (0.417 vs 0.472) because losing categoricals (especially collection_method, SHAP rank 3) costs more than the random-effects training benefit gains. MERF concept is sound but needs categorical support.
 
+### murkml-8-mixed-effects-research (2026-03-28)
+
+**Research question:** Can mixed-effects gradient boosting beat v4 while keeping native categoricals?
+
+**Three approaches tested:**
+
+#### v8-gpboost (GPBoost library — LightGBM + mixed effects)
+- **Date:** 2026-03-28
+- **Architecture:** GPBoost v1.6.6, LightGBM trees + grouped random intercept + random slope on turbidity
+- **Features:** 44 (all v4 features including 3 categoricals via LightGBM native handling)
+- **Training:** 287 sites, 26,515 samples, 663 trees (early stopped)
+- **Holdout R²(native):** 0.145 — much worse than v4
+- **Why it failed:** LightGBM trees substantially underperform CatBoost trees on this dataset. The mixed-effects framework is correct but the tree model is weaker. GPBoost has no CatBoost backend.
+
+#### v8-catboost-merf (Custom EM loop around CatBoost)
+- **Date:** 2026-03-28
+- **Architecture:** Custom MERF EM loop (10 iterations) with CatBoost as fixed-effects model, native categoricals preserved
+- **Features:** 44 (all v4 features including 3 categoricals)
+- **Training:** 287 sites, 26,515 samples
+- **Holdout R²(native):** 0.144 — much worse than v4
+- **Saved model:** data/results/models/ssc_C_v8_merf_cat.cbm (fixed-effects component)
+- **Why it failed:** The EM loop "corrupts" fixed effects. By training CatBoost on y* = y - Z@b (residuals after subtracting random effects), the fixed-effects model learns a different function. For new sites where b=0, predictions are systematically biased (BCF=1.88 vs v4's 1.36). Random intercept std grew to 0.83 in Box-Cox space — the model over-relies on per-site correction.
+- **Key insight:** MERF fundamentally hurts zero-shot prediction because the fixed-effects model absorbs less site-level variation during training.
+
+#### v8-posthoc-RE (Post-hoc Bayesian shrinkage — WINNER)
+- **Date:** 2026-03-28
+- **Architecture:** v4 CatBoost model untouched + post-hoc Bayesian shrinkage random effects estimated from training residuals
+- **Zero-shot R²:** 0.472 (identical to v4 — same model)
+- **Population parameters learned from training:** sigma²=3.52 (within-site), D=0.42 (between-site intercept variance), RE std=0.65
+- **Shrinkage factors:** N=1: 0.107, N=3: 0.264, N=5: 0.374, N=10: 0.544, N=20: 0.705
+- **Saved:** data/results/models/ssc_C_v8_posthoc_re_params.json
+
+**Adaptation curve comparison (Naive vs Bayesian RE):**
+
+| N cal | Naive (v4) | Bayes RE | Delta | Winner |
+|---|---|---|---|---|
+| 0 | 0.472 | 0.472 | 0.000 | Tied |
+| 1 | 0.446 | 0.376 | -0.070 | Naive |
+| 2 | 0.004 | 0.422 | +0.418 | **Bayes** |
+| 3 | 0.267 | 0.485 | +0.218 | **Bayes** |
+| 5 | 0.388 | 0.463 | +0.076 | **Bayes** |
+| 10 | 0.487 | 0.504 | +0.016 | **Bayes** |
+| 20 | 0.509 | 0.524 | +0.015 | **Bayes** |
+
+**Key findings:**
+1. MERF (both GPBoost and custom EM) fundamentally degrades zero-shot performance. The approach of jointly training fixed+random effects hurts when most prediction targets are new sites.
+2. Post-hoc Bayesian shrinkage is the correct approach: keep the best zero-shot model, add shrinkage-based adaptation.
+3. The Bayesian RE fixes the "adaptation hurts at small N" problem: N=2 goes from catastrophic (0.004) to useful (0.422). N=3 already exceeds zero-shot (0.485 > 0.472).
+4. The shrinkage factor provides principled regularization: with 1 sample, trust only 10.7% of the empirical correction; with 20 samples, trust 70.5%.
+5. For deployment: use naive offset at N=1 (it's better), Bayesian shrinkage at N>=2.
+
 ---
 
 ## Experiment Results (2026-03-29)
@@ -168,6 +219,9 @@ On identical pipeline (site_adaptation.py): v4 wins 0.472 vs MERF 0.417. MERF lo
 | v3 → v4 | Box-Cox 0.2, more samples (discrete turb), 37→44 features | 0.154 → 0.290 (+0.136) |
 | v4 → v5 | Same data, log1p instead of Box-Cox | 0.290 → ~same (transform doesn't matter) |
 | v4 → v6 | MERF architecture, lost categoricals | Holdout: 0.472 → 0.417 (-0.055) |
+| v4 → v8-gpboost | GPBoost (LightGBM + mixed effects) | Holdout: 0.472 → 0.145 (-0.327) WORSE |
+| v4 → v8-catboost-merf | Custom EM loop around CatBoost w/ categoricals | Holdout: 0.472 → 0.144 (-0.328) WORSE |
+| v4 + v8-posthoc-RE | Post-hoc Bayesian shrinkage RE (intercept only) | Zero-shot same (0.472), adaptation N=3 improved 0.267→0.485 |
 
 ---
 
@@ -183,6 +237,9 @@ On identical pipeline (site_adaptation.py): v4 wins 0.472 vs MERF 0.417. MERF lo
 | **v4-boxcox** | **0.472** | **0.290** | **0.211** | — | — | **Current best. Box-Cox 0.2, monotone, 44 features** | 2026-03-29 |
 | v5-log1p | 0.460 | — | — | — | — | Transform doesn't matter (0.460 vs 0.472) | 2026-03-29 |
 | v6-merf-fe | 0.417 | 0.357 | 0.290 | 57.2% | 60.3% | MERF loses to v4 — lost categoricals | 2026-03-29 |
+| v8-gpboost | 0.145 | — | 0.084 | 72.4% | 46.0% | GPBoost (LightGBM trees) much worse — LightGBM underperforms CatBoost on this data | 2026-03-28 |
+| v8-catboost-merf | 0.144 | — | 0.326 | 78.6% | 53.0% | Custom EM loop around CatBoost: EM corrupts fixed effects for zero-shot | 2026-03-28 |
+| **v8-posthoc-RE** | **0.472** | — | — | — | — | **Post-hoc Bayesian RE: zero-shot=v4, N=3 adaptation 0.485 (was 0.267), N=10 0.504** | 2026-03-28 |
 | A1-auto_point | — | 0.146 | 0.296 | 75.3% | 51.9% | Specialist worse than v4 on own domain | 2026-03-29 |
 | A2-depth_integrated | — | 0.308 | 0.203 | 57.6% | 59.4% | Best per-site among splits | 2026-03-29 |
 | A3-grab | — | 0.222 | 0.175 | 49.2% | 63.6% | Best MAPE among pure splits | 2026-03-29 |
