@@ -224,8 +224,32 @@ This ensures each random subset is a miniature version of the full dataset, not 
 - Holdout R² at 5 samples exceeds 0.55
 - Fewer than 10% of sites have R² < -1 (vs current 15%)
 
-**Status:** NOT STARTED
-**Result:** _pending_
+**Status:** COMPLETE
+**Result:**
+- MERF training: 71 seconds (10 EM iterations with CatBoost)
+- Random effects: intercept std=0.360, slope std=0.179 — substantial per-site variation captured
+- Training R²(native): 0.619 (vs v4's ~0.3 — MERF fits training data much better with random effects)
+- **Zero-shot holdout (no random effects):**
+  - Pooled R²: 0.290 (vs v4 baseline 0.211) — +0.079 improvement
+  - Median site R²: 0.357 (vs v4 baseline 0.290) — +0.067 improvement
+  - MAPE: 57.2%, Within 2x: 60.3%
+  - % negative sites: 31% (vs v4's 33%)
+- **Site adaptation curve (with shrinkage k=10):**
+  - N=0: R²=0.290 (zero-shot)
+  - N=1: med site R²=0.230 (drops — still overfitting with 1 sample)
+  - N=2: med site R²=0.128 (drops more — 2-param estimation still unstable)
+  - N=5: med site R²=0.235 (recovering)
+  - N=10: med site R²=0.394 (EXCEEDS zero-shot! Adaptation finally works!)
+  - N=20: med site R²=0.306 (drops? Possibly noisy with fewer eligible sites)
+- **Key findings:**
+  1. MERF improves BOTH pooled and per-site R² for zero-shot — best result yet
+  2. Fixed effects model benefits from having random effects absorb site noise during training
+  3. Adaptation still hurts with 1-5 samples, but N=10 works (+0.037 vs zero-shot)
+  4. N=20 result suspicious (drops from N=10) — may be sample size issue (only 52 sites eligible)
+  5. Shrinkage helps but doesn't fully solve the small-N problem
+  6. The random effect slope std (0.179) confirms sites have genuinely different turbidity-SSC slopes
+  7. Dropped categoricals (MERF limitation) — adding them back could help further
+- Date: 2026-03-29
 
 ---
 
@@ -265,6 +289,8 @@ After each experiment: update this file with results, commit to git.
 | D3 | moderate (256) | 0.311 | 0.294 | Nearly = D2 | 2026-03-29 |
 | D4 | all (287) | 0.319 | 0.266 | Adding low-quality hurts per-site | 2026-03-29 |
 | D5 | continuous only (109) | 0.224 | 0.165 | Too few sites | 2026-03-29 |
+| **E-MERF** | **zero-shot** | **0.290** | **0.357** | **Best per-site R² — MERF wins** | 2026-03-29 |
+| E-MERF | N=10 adapted | — | 0.394 | Adaptation works at N=10 | 2026-03-29 |
 
 ---
 
