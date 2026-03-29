@@ -323,3 +323,74 @@ Queried all 396 sites via NWIS IV JSON API `methodDescription` field for pCode 6
 | #4-unknown-methods | — | — | — | — | — | 218/231 unknown sites resolved via WQP. 26/30 catastrophic unknowns fixable. 13 truly unresolvable. Most are depth_integrated. | 2026-03-29 |
 | #8-error-dist | — | — | — | — | — | Median abs error 29 mg/L, median pct error 64%. Heteroscedastic: best at 500-5000 mg/L (42% pct err). Extreme events underpredicted. | 2026-03-29 |
 | #10-catastrophic | — | — | — | — | — | Only 7/51 genuinely wrong. 17 are low-signal (small range, small errors). 27 mixed. R² misleading for flat sites. | 2026-03-29 |
+| #3-sgmc-lithology | — | — | — | — | — | SGMC bedrock lithology DOES predict turb-SSC slope (Kruskal-Wallis p=0.0024). Metamorphic rocks (gneiss, schist, amphibolite) produce higher slopes (~1.05-1.13); carbonate/chemical sedimentary produce lower slopes (~0.76-0.87). 8 categories significant at p<0.05. Best: metamorphic undiff rho=+0.165 p=0.004; coarse-detrital rho=-0.148 p=0.010. Effect sizes modest (rho 0.12-0.17). | 2026-03-29 |
+| D-rand-100 (15 seeds) | — | 0.245±0.081 | 0.264±0.035 | — | — | Extended from 5→15 seeds for anchor analysis | 2026-03-28 |
+| **v7-anchor50** | — | **0.367** | 0.207 | — | — | **50 anchor sites beat random-100 mean (0.245) and all-287 (0.266) on med-site R²** | 2026-03-28 |
+
+---
+
+## Task 11: Anchor Site Identification (2026-03-28)
+
+### Method
+Ran 15 random-100-site model trains (seeds 100-104 from D-redo + seeds 200-209 new).
+For each of 287 training sites, computed:
+- **Appearances**: how many of 15 random sets included the site
+- **Win rate**: fraction of appearances in above-median-performing sets (7 of 15 had med-site R² > 0.255)
+- **Anchor score**: win_rate - expected_win_rate (expected ≈ 0.467 since 7/15 sets were winners)
+
+### Key Results
+
+| Model | Sites | Samples | Pooled R² | Med Site R² |
+|---|---|---|---|---|
+| Anchor-50 | 50 | 4,981 | 0.207 | **0.367** |
+| Random-100 (mean±std) | 100 | ~9,200 | 0.264±0.035 | 0.245±0.081 |
+| Random-100 (best of 15) | 100 | ~9,200 | 0.347 | 0.360 |
+| All-287 | 287 | 26,515 | 0.319 | 0.266 |
+
+**Anchor-50 achieves the highest median per-site R² (0.367) with only 50 sites**, beating:
+- Random-100 mean by +0.122 (50% improvement)
+- All-287 by +0.101 (38% improvement)
+- Even the best single random-100 run (0.360)
+
+Pooled R² is lower (0.207 vs 0.319) because fewer sites = fewer samples = less pooled coverage, but per-site generalization is what matters for site-adaptive deployment.
+
+### Top 20 Anchor Sites (highest anchor score)
+
+| Site | Appeared | Won | Win Rate | Anchor Score | Samples | Median SSC | Std SSC | Method |
+|---|---|---|---|---|---|---|---|---|
+| USGS-01480870 | 4 | 4 | 1.00 | +0.533 | 129 | 289 | 354 | auto_point |
+| USGS-01645704 | 3 | 3 | 1.00 | +0.533 | 507 | 273 | 1034 | auto_point |
+| USGS-09144250 | 4 | 4 | 1.00 | +0.533 | 6 | 49 | 802 | depth_integrated |
+| USGS-04175120 | 4 | 4 | 1.00 | +0.533 | 20 | 18 | 97 | depth_integrated |
+| USGS-08188500 | 5 | 5 | 1.00 | +0.533 | 19 | 161 | 637 | depth_integrated |
+| USGS-034336392 | 3 | 3 | 1.00 | +0.533 | 232 | 102 | 240 | unknown |
+| USGS-02207400 | 3 | 3 | 1.00 | +0.533 | 102 | 89 | 323 | auto_point |
+| USGS-11447850 | 4 | 4 | 1.00 | +0.533 | 22 | 10 | 128 | depth_integrated |
+
+### Bottom 20 Noise Sites (lowest anchor score)
+
+| Site | Appeared | Won | Win Rate | Anchor Score | Samples | Median SSC | Std SSC | Method |
+|---|---|---|---|---|---|---|---|---|
+| USGS-14181500 | 5 | 0 | 0.00 | -0.467 | 20 | 14 | 8 | unknown |
+| USGS-03433637 | 3 | 0 | 0.00 | -0.467 | 110 | 211 | 1330 | unknown |
+| USGS-03302060 | 5 | 0 | 0.00 | -0.467 | 27 | 26 | 98 | depth_integrated |
+| USGS-07126485 | 3 | 0 | 0.00 | -0.467 | 63 | 105 | 2189 | auto_point |
+
+### Anchor Score Distribution
+- 36 sites with anchor_score > +0.2 (strong anchors)
+- 37 sites with anchor_score < -0.2 (strong noise)
+- 2 sites never appeared in any run
+- Mean anchor score: 0.005, Std: 0.218
+
+### Pattern Observations
+- **Anchors span all collection methods** — not dominated by one type
+- **Anchors include both high-sample and low-sample sites** — it's not just about data volume
+- **Noise sites often have unknown metadata** (unknown collection method) and extreme SSC std relative to median
+- **High-variance SSC sites appear in both lists** — variance alone doesn't determine anchor status
+
+### Saved Artifacts
+- Models: `data/results/models/ssc_C_anchor_s{200-209}.cbm` (10 random-100 models)
+- Anchor model: `data/results/models/ssc_C_v7_anchor50.cbm`
+- Analysis JSON: `data/results/anchor_site_analysis.json`
+- Scores CSV: `data/results/anchor_site_scores.csv`
+- Script: `scripts/anchor_site_identification.py`
