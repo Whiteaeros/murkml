@@ -105,16 +105,18 @@ If a site lacks discharge data, exclude it from this analysis. Count how many si
 
 **Step 2 — Conditional retraining (only if Step 1 shows a pattern):**
 
-Two approaches, both tested:
+Three approaches, all tested:
 
 | Label | Method | What it tests |
 |---|---|---|
 | C1-flow_regime_feature | Add "flow_regime" categorical (low/mid/high/storm) as a feature | Model can split on flow condition |
 | C2-weighted_highflow | All samples, 3x weight on top 25% discharge | Emphasize storms without losing baseflow |
+| C3-separate_flow_models | Train separate models for high-flow (top 25%) and low-flow (bottom 25%) samples | Completely separate relationships by flow regime |
 
 **Success criteria:**
 - Step 1: If high-flow R² is below 0.1 while low-flow R² is above 0.5, the model has a storm problem
-- Step 2: If C1 or C2 improves high-flow R² without destroying low-flow R², that's the fix
+- Step 2: If any of C1/C2/C3 improves high-flow R² without destroying low-flow R², that's the fix
+- C3 specifically: if the separate high-flow model beats the general model on storm events, flow regime fundamentally changes the turbidity-SSC relationship (not just scaling)
 
 **Status:** NOT STARTED
 **Result:** _pending_
