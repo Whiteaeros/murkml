@@ -52,8 +52,17 @@ Understand what's driving per-site performance variation and find the best model
 
 **Success criteria:** If any split/grouped model beats v4 (holdout R²=0.472) by >0.05, collection method split is worth pursuing. If A7 (known only) beats v4, "unknown" samples are hurting training.
 
-**Status:** NOT STARTED
-**Result:** _pending_
+**Status:** COMPLETE
+**Result:**
+- NO split/grouped model beats v4 baseline holdout R²=0.472 (best is A6 at pooled 0.203, med site 0.377)
+- A6 (depth+grab) has best MAPE (45.8%) and within-2x (65.5%) — manual methods are more consistent
+- A2 (depth_integrated only) has best median site R² among pure splits (0.308) — but pooled R² is low (0.203)
+- A7 (known only, exclude unknown) does NOT beat baseline — unknown samples are not hurting training
+- Depth_integrated holdout R² is consistently highest (~0.37-0.43) regardless of which model is used
+- Auto_point holdout R² is consistently lower (~0.10-0.25) — this method is inherently noisier
+- Collection method split does NOT improve overall performance — the model already handles it via the feature
+- **Key insight:** depth_integrated samples are just BETTER data. The model knows this (SHAP rank 3). But splitting doesn't help because you lose sample count.
+- Date: 2026-03-29
 
 ---
 
@@ -215,6 +224,13 @@ After each experiment: update this file with results, commit to git.
 |---|---|---|---|---|---|
 | Baseline | v4-boxcox | 0.472 | 0.290 (LOGO) | Current model | 2026-03-29 |
 | C-Step1 | analysis only | — | — | Not a flow problem; site heterogeneity at all regimes. MAPE best at storms (48%) | 2026-03-29 |
+| A1 | auto_point only | 0.296 | 0.146 | Pooled OK but per-site terrible | 2026-03-29 |
+| A2 | depth_integrated | 0.203 | 0.308 | Best per-site among splits | 2026-03-29 |
+| A3 | grab only | 0.175 | 0.222 | Lowest pooled | 2026-03-29 |
+| A4 | auto+depth | 0.294 | 0.204 | No improvement | 2026-03-29 |
+| A5 | auto+grab | 0.295 | 0.121 | Worst per-site | 2026-03-29 |
+| A6 | depth+grab | 0.203 | 0.377 | Best MAPE (45.8%), best within-2x (65.5%) | 2026-03-29 |
+| A7 | known only | 0.279 | 0.318 | Excluding unknown doesn't help | 2026-03-29 |
 
 ---
 
