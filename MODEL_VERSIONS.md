@@ -517,3 +517,4 @@ so sites that genuinely need large corrections aren't penalized.
 - Summary JSON: `data/results/site_adaptation_bayesian_summary.json`
 
 | #1/#13-bayesian-adapt | 0.509 (N=20) | — | — | — | — | Bayesian shrinkage eliminates adaptation collapse. N=2: 0.485 vs -0.012. Monotonic curve (practical). Student-t df=4, k=15. | 2026-03-28 |
+| Bayesian-k15-200mc | 0.509 (N=20) | — | — | — | — | Best Bayesian: k=15, Student-t df=4, 200 MC trials. N=2: 0.485 (was -0.012). Adaptation never hurts. | 2026-03-29 |
