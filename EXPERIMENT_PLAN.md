@@ -270,6 +270,8 @@ After each experiment: update this file with results, commit to git.
 
 ## Results Table
 
+**See MODEL_VERSIONS.md for the full results table.** That file is the single source of truth for all experiment results. This section is kept for quick reference only.
+
 | Experiment | Label | Holdout R² | Per-site R² median | Notes | Date |
 |---|---|---|---|---|---|
 | Baseline | v4-boxcox | 0.472 | 0.290 (LOGO) | Current model | 2026-03-29 |

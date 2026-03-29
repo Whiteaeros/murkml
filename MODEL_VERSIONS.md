@@ -168,3 +168,38 @@ On identical pipeline (site_adaptation.py): v4 wins 0.472 vs MERF 0.417. MERF lo
 | v3 → v4 | Box-Cox 0.2, more samples (discrete turb), 37→44 features | 0.154 → 0.290 (+0.136) |
 | v4 → v5 | Same data, log1p instead of Box-Cox | 0.290 → ~same (transform doesn't matter) |
 | v4 → v6 | MERF architecture, lost categoricals | Holdout: 0.472 → 0.417 (-0.055) |
+
+---
+
+## Results Table
+
+**This is the single source of truth for all experiment results. Updated via `/record-experiment` skill.**
+
+| Label | Holdout R² | Med Site R² | Pooled R² | MAPE | Within 2x | Key Finding | Date |
+|---|---|---|---|---|---|---|---|
+| v1-initial | — | — | — | — | — | Broken GAGES-II, 99 features | 2026-03-24 |
+| v2-pruned | 0.699 | — | — | — | — | 37 features, 266 sites (old holdout, 23 sites) | 2026-03-27 |
+| v3-expanded | — | — | — | — | — | Native R² collapsed 0.361→0.154 | 2026-03-28 |
+| **v4-boxcox** | **0.472** | **0.290** | **0.211** | — | — | **Current best. Box-Cox 0.2, monotone, 44 features** | 2026-03-29 |
+| v5-log1p | 0.460 | — | — | — | — | Transform doesn't matter (0.460 vs 0.472) | 2026-03-29 |
+| v6-merf-fe | 0.417 | 0.357 | 0.290 | 57.2% | 60.3% | MERF loses to v4 — lost categoricals | 2026-03-29 |
+| A1-auto_point | — | 0.146 | 0.296 | 75.3% | 51.9% | Specialist worse than v4 on own domain | 2026-03-29 |
+| A2-depth_integrated | — | 0.308 | 0.203 | 57.6% | 59.4% | Best per-site among splits | 2026-03-29 |
+| A3-grab | — | 0.222 | 0.175 | 49.2% | 63.6% | Best MAPE among pure splits | 2026-03-29 |
+| A4-auto+depth | — | 0.204 | 0.294 | 66.2% | 55.8% | No improvement | 2026-03-29 |
+| A5-auto+grab | — | 0.121 | 0.295 | 76.0% | 51.4% | Worst per-site | 2026-03-29 |
+| A6-depth+grab | — | 0.377 | 0.203 | 45.8% | 65.5% | Best MAPE and within-2x overall | 2026-03-29 |
+| A7-known_only | — | 0.318 | 0.279 | 53.4% | 64.0% | Excluding unknown doesn't help | 2026-03-29 |
+| B1-no_catastrophic | — | 0.273 | 0.312 | 58.0% | 60.4% | Cosmetic: pooled up, per-site down | 2026-03-29 |
+| B2-no_negative | — | 0.128 | 0.282 | 57.6% | 61.4% | Too aggressive — per-site much worse | 2026-03-29 |
+| B3-no_lowvar | — | 0.236 | 0.324 | 59.6% | 59.2% | Best pooled, per-site worse | 2026-03-29 |
+| D1-highest (96) | — | 0.158 | 0.386 | 62.1% | — | Best pooled, worst per-site | 2026-03-29 |
+| D2-good (194) | — | 0.293 | 0.315 | 56.5% | — | Sweet spot for per-site | 2026-03-29 |
+| D3-moderate (256) | — | 0.294 | 0.311 | 57.2% | — | Nearly = D2 | 2026-03-29 |
+| D4-all (287) | — | 0.266 | 0.319 | 54.3% | — | Adding low-quality hurts per-site | 2026-03-29 |
+| D5-continuous (109) | — | 0.165 | 0.224 | 77.6% | — | Too few sites | 2026-03-29 |
+| D-rand-100 (5 seeds) | — | 0.205±0.083 | 0.281±0.031 | — | — | High variance per-site | 2026-03-29 |
+| D-rand-150 (5 seeds) | — | 0.226±0.089 | 0.286±0.016 | — | — | High variance per-site | 2026-03-29 |
+| D-rand-200 (5 seeds) | — | 0.191±0.071 | 0.316±0.025 | — | — | Pooled improving | 2026-03-29 |
+| D-rand-250 (5 seeds) | — | 0.275±0.064 | 0.305±0.021 | — | — | Best random per-site | 2026-03-29 |
+| C-flow (analysis) | — | — | — | — | — | Not a flow problem; MAPE best at storms | 2026-03-29 |
