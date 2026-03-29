@@ -1,4 +1,10 @@
 /data/
+# BUT track model artifacts — these are irreplaceable
+!data/results/
+!data/results/models/
+!data/results/models/**
+# Allow .json meta files in models dir (override *.parquet exclusion doesn't apply, but be explicit)
+
 .venv/
 __pycache__/
 *.pyc
@@ -10,6 +16,8 @@ build/
 wandb/
 .env
 *.parquet
+# BUT allow parquet in tracked model results
+!data/results/models/*.parquet
 .ruff_cache/
 .pytest_cache/
 .mypy_cache/
