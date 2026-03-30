@@ -948,6 +948,16 @@ def main():
     else:
         logger.warning("No StreamCat attributes found — Tier C will be skipped")
 
+    # Merge SGMC lithology features if available
+    sgmc_path = DATA_DIR / "sgmc" / "sgmc_features_for_model.parquet"
+    if sgmc_path.exists() and watershed_attrs is not None:
+        sgmc = pd.read_parquet(sgmc_path)
+        n_before = len(watershed_attrs.columns)
+        watershed_attrs = watershed_attrs.merge(sgmc, on="site_id", how="left")
+        n_added = len(watershed_attrs.columns) - n_before
+        logger.info(f"SGMC lithology: merged {n_added} features for {sgmc['site_id'].nunique()} sites")
+        log_file(sgmc_path, role="input")
+
     # Select parameters
     params = {args.param: PARAM_CONFIG[args.param]} if args.param else PARAM_CONFIG
 

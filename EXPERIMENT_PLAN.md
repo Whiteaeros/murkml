@@ -362,3 +362,122 @@ Five experiments, 30+ models trained. Here's what we now know:
 - Don't try custom loss functions (the problem is structural, not loss-related)
 - Don't exclude sites (cosmetic fix, doesn't help the model generalize)
 - Don't split by collection method (model already handles it as a feature)
+
+---
+
+## Phase 3: Model Improvements (ready to start)
+
+### 3.1 Fix Gemini Bugs in evaluate_model.py
+- **hash() determinism:** Replace `hash(site_id)` with `hashlib.md5()` for cross-session reproducibility
+- **Slope clipping intercept:** Recalculate `b = y_mean - a * x_mean` after clipping slope in adapt_old_2param
+- **N=1 BCF collapse:** Document (not necessarily fix — Bayesian replaces old 2-param at N=1 anyway)
+
+### 3.2 SGMC Lithology Feature Ablation
+- 5 significant lithology categories ready (metamorphic_undiff, metamorphic_amphibolite, sed_carbonate, sed_chemical, sed_clastic)
+- Add as features, GKF5 ablation test
+- Data: already computed in SGMC watershed overlay (355 sites)
+
+### 3.3 Apply Resolved Collection Methods
+- 218/231 unknown methods recovered from WQP metadata
+- Update paired dataset with corrected collection_method values
+- Retrain v4 with corrected data, compare
+
+### 3.4 Hybrid Adaptation
+- Bayesian shrinkage (k=15, Student-t) for N<10
+- Old 2-param (with Gemini bug fixes) for N≥10
+- Integrate into evaluate_model.py as default adaptation method
+
+---
+
+## Phase 4: Diagnostic Validation & Stress Testing
+
+All analysis on existing predictions (32K LOGO CV + holdout). No retraining unless Phase 3 changes the model. Goal: prove the model captures real physics, expose failure modes, and produce disaggregated metrics for the paper.
+
+### 4.1 Disaggregated Metrics
+Break all evaluation metrics down by every meaningful grouping. Report R², RMSE, MAPE, within-2x for each subgroup.
+
+| Dimension | Groups | Source |
+|---|---|---|
+| Collection method | auto_point, depth_integrated, grab, unknown | paired dataset |
+| Geology (SGMC) | metamorphic, carbonate, clastic, other | SGMC watershed overlay |
+| HUC2 region | Pacific NW, Gulf Coast, Mid-Atlantic, etc. | site metadata |
+| SSC variability | low-var, medium, high-var (by std quartile) | site stats |
+| Sample count | 5, 10-20, 20-50, 50-200, 200+ samples | site stats |
+| Sensor family | EXO, YSI 6-series, unknown | sensor calibration |
+
+### 4.2 Physics-Based Phenomenon Validation
+
+For each phenomenon: identify matching samples in the data, check model predictions against expected physical behavior, verify SHAP values point the right direction.
+
+#### Identifiable from existing features:
+
+**4.2.1 First Flush Events**
+- **Find:** Low precip_30d (dry antecedent) + high precip_24h (storm arrives) + high flush_intensity
+- **Expected physics:** SSC spikes disproportionately to turbidity (stored sediment mobilized)
+- **Test:** Does the model predict elevated SSC/turbidity ratio for first-flush samples? Does flush_intensity SHAP push predictions up?
+
+**4.2.2 Sediment Exhaustion**
+- **Find:** Multi-day storm events at a single site (consecutive samples with sustained high precip)
+- **Expected physics:** SSC/turbidity ratio should DECREASE over the event (supply-limited)
+- **Test:** Do later-storm samples have lower predicted SSC at same turbidity than early-storm samples?
+
+**4.2.3 Hysteresis (Rising vs Falling Limb)**
+- **Find:** Samples with rising_limb=1 vs rising_limb=0 at same site, similar turbidity
+- **Expected physics:** SSC higher on rising limb (clockwise hysteresis is most common)
+- **Test:** Does rising_limb SHAP push SSC predictions UP? Are rising-limb residuals systematically different?
+
+**4.2.4 Snowmelt Dilution**
+- **Find:** Spring (Mar-May), high-latitude (>45°N) or high-elevation sites, gradual discharge increase
+- **Expected physics:** Meltwater is clean — low SSC relative to turbidity
+- **Test:** Do spring high-lat samples have lower SSC/turbidity ratio? Does the model capture this?
+
+**4.2.5 Extreme Events (Top 1%)**
+- **Find:** Top 1% of turbidity readings in the dataset
+- **Expected physics:** These should have proportionally high SSC
+- **Test:** Are extreme events systematically underpredicted? (We know kurtosis=13.8 suggests yes.) By how much? Which sites?
+
+#### Identifiable with additional data:
+
+**4.2.6 Post-Wildfire Response**
+- **Data needed:** MTBS (Monitoring Trends in Burn Severity) or GeoMAC fire perimeters, cross-referenced with site locations and sample dates
+- **Expected physics:** Post-fire watersheds have massively elevated SSC for given turbidity (no vegetation to hold soil)
+- **Test:** Do post-fire samples have higher residuals (model underpredicts)?
+
+**4.2.7 Regulated vs Unregulated Flow**
+- **Data needed:** GAGES-II dam density / regulation status (we may already have this in StreamCat features)
+- **Expected physics:** Dam releases produce high discharge with low SSC (clear water from reservoir)
+- **Test:** Do regulated sites have systematically different SSC/turbidity slopes? Different model accuracy?
+
+**4.2.8 Glacial/Volcanic Sites**
+- **Find:** Sites in HUC2 regions 17 (Pacific NW), 19 (Alaska), or near known volcanic/glacial areas. SGMC lithology = volcanic/glacial.
+- **Expected physics:** Glacial flour = very fine particles, fundamentally different light-scattering. Volcanic = lahar events with extreme SSC.
+- **Test:** Are these sites disproportionately in the catastrophic category? Does geology feature help?
+
+### 4.3 Advanced Validation
+
+**4.3.1 Temporal Stationarity**
+- For sites with 20+ samples: train on first 80% by date, predict last 20%
+- Compare temporal-split R² to random-split R²
+- Identifies sites where the relationship drifts over time
+
+**4.3.2 Spatial Leave-Location-Out CV**
+- Train entirely on Eastern/Southern US (HUC2 01-08), test on Pacific NW (HUC2 17)
+- Train on Pacific NW, test on Gulf Coast
+- Proves whether model learned physics or memorized spatial patterns
+
+**4.3.3 Adversarial Edge Cases**
+- Synthetic: high turbidity + zero recent precip (should produce wide uncertainty)
+- Synthetic: low turbidity + extreme precip (should predict elevated SSC)
+- Check if model predictions are physically plausible in edge conditions
+
+### 4.4 Anchor Site Data Leak Fix
+- Gemini identified: anchor sites selected using holdout performance = data leakage
+- Re-run anchor selection with nested CV (select anchors from training folds only)
+- Validate on sequestered fold that played no role in selection
+
+### Phase 4 Execution Plan
+- All 4.1 + 4.2 (existing features) + 4.3.1 can run in parallel — pure analysis on existing data
+- 4.2.6 (wildfire) needs MTBS download first
+- 4.2.7 (regulated) needs GAGES-II dam field check
+- 4.3.2 (spatial LOO) requires retraining on regional subsets
+- 4.4 (anchor fix) requires re-running anchor identification

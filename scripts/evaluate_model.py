@@ -17,6 +17,7 @@ Produces three output files:
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import logging
 import sys
@@ -256,6 +257,9 @@ def adapt_old_2param(
         coeffs = polyfit(cal_pred, cal_true, 1)  # [intercept, slope]
         b, a = float(coeffs[0]), float(coeffs[1])
         a = np.clip(a, 0.1, 10.0)
+        # Recalculate intercept so the line still passes through the
+        # calibration centroid after slope clipping (Gemini review fix)
+        b = float(np.mean(cal_true) - a * np.mean(cal_pred))
 
     # Apply correction in model space
     corrected_ms = a * y_pred_ms + b
@@ -273,6 +277,38 @@ def adapt_old_2param(
     return np.clip(pred_native, 0, None)
 
 
+def _student_t_shrinkage(residuals: np.ndarray, k: float, df: float = 4) -> float:
+    """Compute shrinkage-adjusted bias correction using Student-t prior.
+
+    Uses MAD-based robust scale estimation and t-distribution influence
+    weighting so that sites with legitimately large biases aren't over-shrunk.
+    Ported from site_adaptation_bayesian.py.
+    """
+    N = len(residuals)
+    if N == 0:
+        return 0.0
+    raw_delta = float(np.mean(residuals))
+
+    # Robust scale estimation (MAD-based)
+    if N > 1:
+        mad = float(np.median(np.abs(residuals - np.median(residuals))))
+        sigma = mad * 1.4826 if mad > 0 else float(np.std(residuals))
+        if sigma == 0:
+            sigma = 1.0
+    else:
+        sigma = 1.0
+
+    z = abs(raw_delta) / (sigma / max(np.sqrt(N), 1))
+
+    # Student-t influence weight: reduces effective k for extreme sites
+    w_t = (df + 1) / (df + z**2)
+    w_t = float(np.clip(w_t, 0.1, 1.0))
+
+    effective_k = k * w_t
+    delta = (N / (N + effective_k)) * raw_delta
+    return float(delta)
+
+
 def adapt_bayesian(
     y_pred_ms: np.ndarray,
     y_true_ms: np.ndarray,
@@ -281,15 +317,66 @@ def adapt_bayesian(
     transform_type: str,
     lmbda: float | None,
     bcf: float,
-    k: float = 30,
+    k: float = 15,
+    df: float = 4,
+    slope_k: float = 10,
+    bcf_k_mult: float = 3.0,
 ) -> np.ndarray:
-    """Bayesian shrinkage adaptation in model space."""
+    """Staged Bayesian shrinkage adaptation with Student-t prior.
+
+    Stage 1 (N < 10): intercept-only correction with shrinkage
+    Stage 2 (N >= 10): slope + intercept, both shrunk
+
+    Per-trial BCF shrunk toward 1.0 (more conservative than global BCF).
+    Ported from site_adaptation_bayesian.py's bayesian_adapt().
+    """
+    from scipy.stats import linregress
+
     N = len(cal_idx)
-    resid = y_true_ms[cal_idx] - y_pred_ms[cal_idx]
-    delta = (N / (N + k)) * np.mean(resid)
-    corrected_ms = y_pred_ms[test_idx] + delta
-    pred_native = inverse_transform(corrected_ms, transform_type, lmbda) * bcf
-    return np.clip(pred_native, 0, None)
+    cal_pred = y_pred_ms[cal_idx]
+    cal_true = y_true_ms[cal_idx]
+    residuals = cal_true - cal_pred
+
+    if N < 10:
+        # Stage 1: intercept-only with Student-t shrinkage
+        delta = _student_t_shrinkage(residuals, k=k, df=df)
+        a = 1.0
+        corrected_ms = y_pred_ms[test_idx] + delta
+    else:
+        # Stage 2: slope + intercept
+        try:
+            a_raw, _, _, _, _ = linregress(cal_pred, cal_true)
+            a_raw = float(np.clip(a_raw, 0.1, 10.0))
+        except Exception:
+            a_raw = 1.0
+        # Shrink slope toward 1.0
+        a = 1.0 + (N / (N + slope_k)) * (a_raw - 1.0)
+
+        # Intercept from residuals after slope correction
+        residuals_after_slope = cal_true - a * cal_pred
+        delta = _student_t_shrinkage(residuals_after_slope, k=k, df=df)
+
+        corrected_ms = a * y_pred_ms[test_idx] + delta
+
+    corrected_native = inverse_transform(corrected_ms, transform_type, lmbda)
+    corrected_native = np.clip(corrected_native, 0, None)
+
+    # Per-trial BCF shrunk toward 1.0 (more conservative than global)
+    k_bcf = bcf_k_mult * k
+    cal_corrected_ms = a * cal_pred + delta
+    cal_corrected_native = inverse_transform(cal_corrected_ms, transform_type, lmbda)
+    cal_corrected_native = np.clip(cal_corrected_native, 1e-6, None)
+    cal_true_native = inverse_transform(cal_true, transform_type, lmbda)
+    cal_pred_mean = float(np.mean(cal_corrected_native))
+    if cal_pred_mean > 0:
+        bcf_raw = float(np.clip(np.mean(cal_true_native) / cal_pred_mean, 0.1, 10.0))
+        bcf_shrinkage = N / (N + k_bcf)
+        trial_bcf = 1.0 + bcf_shrinkage * (bcf_raw - 1.0)
+    else:
+        trial_bcf = 1.0
+    corrected_native *= trial_bcf
+
+    return corrected_native
 
 
 def adapt_ols_loglog(
@@ -372,6 +459,9 @@ def run_adaptation_curve(
     seed: int,
     n_trials: int,
     k: float,
+    df: float = 4,
+    slope_k: float = 10,
+    bcf_k_mult: float = 3.0,
 ) -> dict:
     """Run adaptation curve for all N values across all holdout sites.
 
@@ -419,7 +509,8 @@ def run_adaptation_curve(
 
             trial_metrics = []
             for trial in range(n_trials):
-                rng = np.random.default_rng(seed + hash(site_id) % (2**31) + n_val * 1000 + trial)
+                site_hash = int(hashlib.md5(str(site_id).encode()).hexdigest(), 16) % (2**31)
+                rng = np.random.default_rng(seed + site_hash + n_val * 1000 + trial)
                 cal_idx = rng.choice(n_site, size=n_val, replace=False)
                 test_idx = np.setdiff1d(np.arange(n_site), cal_idx)
 
@@ -434,7 +525,8 @@ def run_adaptation_curve(
                                              transform_type, lmbda, bcf)
                 elif method == "bayesian":
                     pred = adapt_bayesian(y_pred_ms, y_true_ms, cal_idx, test_idx,
-                                           transform_type, lmbda, bcf, k=k)
+                                           transform_type, lmbda, bcf, k=k, df=df,
+                                           slope_k=slope_k, bcf_k_mult=bcf_k_mult)
                 elif method == "ols":
                     if turb is None:
                         continue
@@ -568,7 +660,7 @@ def save_summary(
         "model_path": str(args.model),
         "meta_path": str(args.meta),
         "adaptation_method": args.adaptation,
-        "adaptation_params": {"k": args.k, "n_trials": args.n_trials, "seed": args.seed},
+        "adaptation_params": {"k": args.k, "df": args.df, "slope_k": args.slope_k, "bcf_k_mult": args.bcf_k_mult, "n_trials": args.n_trials, "seed": args.seed},
         "holdout_sites": int(readings["site_id"].nunique()),
         "holdout_samples": len(readings),
         "zero_shot": {
@@ -645,7 +737,10 @@ def main():
                         help="Adaptation method (default: bayesian)")
     parser.add_argument("--seed", type=int, default=42, help="Random seed (default: 42)")
     parser.add_argument("--n-trials", type=int, default=50, help="Trials per site per N (default: 50)")
-    parser.add_argument("--k", type=float, default=30, help="Bayesian shrinkage parameter (default: 30)")
+    parser.add_argument("--k", type=float, default=15, help="Bayesian shrinkage parameter (default: 15)")
+    parser.add_argument("--df", type=float, default=4, help="Student-t prior degrees of freedom (default: 4)")
+    parser.add_argument("--slope-k", type=float, default=10, help="Slope shrinkage constant for N>=10 (default: 10)")
+    parser.add_argument("--bcf-k-mult", type=float, default=3.0, help="BCF shrinkage multiplier (default: 3.0)")
     parser.add_argument("--output-dir", type=str, default=None,
                         help="Output directory (default: data/results/evaluations/)")
     args = parser.parse_args()
@@ -666,7 +761,7 @@ def main():
     logger.info(f"Transform: {meta['transform_type']} (lambda={meta.get('transform_lmbda')})")
     logger.info(f"BCF: {meta['bcf']:.4f} ({meta.get('bcf_method', 'unknown')})")
     logger.info(f"Features: {len(meta['feature_cols'])}")
-    logger.info(f"Adaptation: {args.adaptation} (k={args.k}, trials={args.n_trials}, seed={args.seed})")
+    logger.info(f"Adaptation: {args.adaptation} (k={args.k}, df={args.df}, slope_k={args.slope_k}, bcf_k_mult={args.bcf_k_mult}, trials={args.n_trials}, seed={args.seed})")
 
     # Validate meta
     assert meta["transform_type"] in ("log1p", "boxcox", "sqrt", "none"), (
@@ -697,7 +792,8 @@ def main():
     # Run adaptation curve
     logger.info(f"Running adaptation curve ({args.adaptation})...")
     adaptation = run_adaptation_curve(
-        readings, meta, args.adaptation, args.seed, args.n_trials, args.k,
+        readings, meta, args.adaptation, args.seed, args.n_trials, args.k, args.df,
+        args.slope_k, args.bcf_k_mult,
     )
 
     # Save outputs
