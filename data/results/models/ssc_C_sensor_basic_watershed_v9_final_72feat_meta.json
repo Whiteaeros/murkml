@@ -1,0 +1,491 @@
+{
+  "schema_version": 3,
+  "param": "ssc",
+  "tier": "C_sensor_basic_watershed",
+  "transform_type": "boxcox",
+  "transform_lmbda": 0.2,
+  "feature_cols": [
+    "turbidity_instant",
+    "turbidity_max_1hr",
+    "turbidity_std_1hr",
+    "conductance_instant",
+    "temp_instant",
+    "sensor_offset",
+    "days_since_last_visit",
+    "discharge_slope_2hr",
+    "rising_limb",
+    "Q_7day_mean",
+    "turb_Q_ratio",
+    "DO_sat_departure",
+    "doy_sin",
+    "doy_cos",
+    "precip_48h",
+    "precip_7d",
+    "precip_30d",
+    "turb_below_detection",
+    "flush_intensity",
+    "longitude",
+    "drainage_area_km2",
+    "forest_pct",
+    "agriculture_pct",
+    "developed_pct",
+    "pct_carbonate_resid",
+    "pct_alluvial_coastal",
+    "pct_eolian_coarse",
+    "pct_eolian_fine",
+    "pct_colluvial_sediment",
+    "geo_fe2o3",
+    "clay_pct",
+    "sand_pct",
+    "soil_organic_matter",
+    "elevation_m",
+    "baseflow_index",
+    "wetness_index",
+    "dam_storage_density",
+    "wwtp_all_density",
+    "wwtp_minor_density",
+    "fertilizer_rate",
+    "nitrogen_surplus",
+    "sgmc_igneous_metamorphic_undifferentiated",
+    "sgmc_igneous_sedimentary_undifferentiated",
+    "sgmc_igneous_intrusive",
+    "sgmc_igneous_undifferentiated",
+    "sgmc_igneous_volcanic",
+    "sgmc_melange",
+    "sgmc_metamorphic_sedimentary_undifferentiated",
+    "sgmc_metamorphic_amphibolite",
+    "sgmc_metamorphic_carbonate",
+    "sgmc_metamorphic_gneiss",
+    "sgmc_metamorphic_granulite",
+    "sgmc_metamorphic_intrusive",
+    "sgmc_metamorphic_other",
+    "sgmc_metamorphic_schist",
+    "sgmc_metamorphic_sedimentary",
+    "sgmc_metamorphic_sedimentary_clastic",
+    "sgmc_metamorphic_serpentinite",
+    "sgmc_metamorphic_undifferentiated",
+    "sgmc_metamorphic_volcanic",
+    "sgmc_sedimentary_carbonate",
+    "sgmc_sedimentary_chemical",
+    "sgmc_sedimentary_clastic",
+    "sgmc_sedimentary_iron_formation_undifferentiated",
+    "sgmc_sedimentary_undifferentiated",
+    "sgmc_tectonite_undifferentiated",
+    "sgmc_unconsolidated_sedimentary_undifferentiated",
+    "sgmc_unconsolidated_undifferentiated",
+    "sgmc_water",
+    "collection_method",
+    "turb_source",
+    "sensor_family"
+  ],
+  "cat_cols": [
+    "collection_method",
+    "turb_source",
+    "sensor_family"
+  ],
+  "cat_indices": [
+    69,
+    70,
+    71
+  ],
+  "train_median": {
+    "turbidity_instant": 24.2,
+    "turbidity_max_1hr": 32.7,
+    "turbidity_std_1hr": 2.071022887963611,
+    "conductance_instant": 306.0,
+    "temp_instant": 13.5,
+    "sensor_offset": 0.0,
+    "days_since_last_visit": 98.05069444444445,
+    "discharge_slope_2hr": -4.847445471230972e-18,
+    "rising_limb": 0.0,
+    "Q_7day_mean": 93.84806547619048,
+    "turb_Q_ratio": 0.1720116618075802,
+    "DO_sat_departure": -0.9309552291703898,
+    "doy_sin": 0.11371951458594969,
+    "doy_cos": -0.11478762552212701,
+    "precip_48h": 5.100000202655792,
+    "precip_7d": 22.500000521540642,
+    "precip_30d": 91.39999808371067,
+    "turb_below_detection": 0.0,
+    "flush_intensity": 0.0,
+    "longitude": -86.6988753,
+    "drainage_area_km2": 151.29,
+    "forest_pct": 29.55,
+    "agriculture_pct": 6.84,
+    "developed_pct": 9.01,
+    "pct_carbonate_resid": 0.0,
+    "pct_alluvial_coastal": 0.0,
+    "pct_eolian_coarse": 0.0,
+    "pct_eolian_fine": 0.0,
+    "pct_colluvial_sediment": 0.0,
+    "geo_fe2o3": 5.4868,
+    "clay_pct": 22.818722660697322,
+    "sand_pct": 31.134900765786057,
+    "soil_organic_matter": 0.8150664502155911,
+    "elevation_m": 285.5647,
+    "baseflow_index": 48.0854,
+    "wetness_index": 771.2971,
+    "dam_storage_density": 5208.3536,
+    "wwtp_all_density": 0.0081,
+    "wwtp_minor_density": 0.0075,
+    "fertilizer_rate": 2.8223,
+    "nitrogen_surplus": 416285.01607214665,
+    "sgmc_igneous_metamorphic_undifferentiated": 0.0,
+    "sgmc_igneous_sedimentary_undifferentiated": 0.0,
+    "sgmc_igneous_intrusive": 0.0,
+    "sgmc_igneous_undifferentiated": 0.0,
+    "sgmc_igneous_volcanic": 0.0,
+    "sgmc_melange": 0.0,
+    "sgmc_metamorphic_sedimentary_undifferentiated": 0.0,
+    "sgmc_metamorphic_amphibolite": 0.0,
+    "sgmc_metamorphic_carbonate": 0.0,
+    "sgmc_metamorphic_gneiss": 0.0,
+    "sgmc_metamorphic_granulite": 0.0,
+    "sgmc_metamorphic_intrusive": 0.0,
+    "sgmc_metamorphic_other": 0.0,
+    "sgmc_metamorphic_schist": 0.0,
+    "sgmc_metamorphic_sedimentary": 0.0,
+    "sgmc_metamorphic_sedimentary_clastic": 0.0,
+    "sgmc_metamorphic_serpentinite": 0.0,
+    "sgmc_metamorphic_undifferentiated": 0.0,
+    "sgmc_metamorphic_volcanic": 0.0,
+    "sgmc_sedimentary_carbonate": 0.0,
+    "sgmc_sedimentary_chemical": 0.0,
+    "sgmc_sedimentary_clastic": 4.33848907099835,
+    "sgmc_sedimentary_iron_formation_undifferentiated": 0.0,
+    "sgmc_sedimentary_undifferentiated": 0.0,
+    "sgmc_tectonite_undifferentiated": 0.0,
+    "sgmc_unconsolidated_sedimentary_undifferentiated": 0.0,
+    "sgmc_unconsolidated_undifferentiated": 0.0,
+    "sgmc_water": 0.0
+  },
+  "feature_ranges": {
+    "turbidity_instant": {
+      "min": 0.0,
+      "max": 5790.0
+    },
+    "turbidity_max_1hr": {
+      "min": 0.0,
+      "max": 4000.0
+    },
+    "turbidity_std_1hr": {
+      "min": 0.0,
+      "max": 1643.2531355515496
+    },
+    "conductance_instant": {
+      "min": 13.0,
+      "max": 69700.0
+    },
+    "temp_instant": {
+      "min": 0.0,
+      "max": 34.373333333333335
+    },
+    "sensor_offset": {
+      "min": -586.0,
+      "max": 5521.0
+    },
+    "days_since_last_visit": {
+      "min": 0.0,
+      "max": 5767.40625
+    },
+    "discharge_slope_2hr": {
+      "min": -39.4503193960511,
+      "max": 55.17093495934958
+    },
+    "rising_limb": {
+      "min": 0.0,
+      "max": 1.0
+    },
+    "Q_7day_mean": {
+      "min": -7056.978584176086,
+      "max": 1161911.7647058824
+    },
+    "turb_Q_ratio": {
+      "min": 0.0,
+      "max": 11842.857142857141
+    },
+    "DO_sat_departure": {
+      "min": -6.9208337002172025,
+      "max": 8.597476243285975
+    },
+    "doy_sin": {
+      "min": -0.9999994220246925,
+      "max": 0.9999855506507186
+    },
+    "doy_cos": {
+      "min": -0.9999791929590823,
+      "max": 0.9999907524084426
+    },
+    "precip_48h": {
+      "min": 0.0,
+      "max": 244.1999969482422
+    },
+    "precip_7d": {
+      "min": 0.0,
+      "max": 754.8000015318394
+    },
+    "precip_30d": {
+      "min": 0.0,
+      "max": 958.599995136261
+    },
+    "turb_below_detection": {
+      "min": 0.0,
+      "max": 1.0
+    },
+    "flush_intensity": {
+      "min": 0.0,
+      "max": 3.7040181691759333
+    },
+    "longitude": {
+      "min": -124.3929872,
+      "max": -68.6966667
+    },
+    "drainage_area_km2": {
+      "min": 0.02,
+      "max": 3130494.43
+    },
+    "forest_pct": {
+      "min": 0.0,
+      "max": 98.14
+    },
+    "agriculture_pct": {
+      "min": 0.0,
+      "max": 88.14999999999999
+    },
+    "developed_pct": {
+      "min": 0.0,
+      "max": 99.35999999999999
+    },
+    "pct_carbonate_resid": {
+      "min": 0.0,
+      "max": 100.0
+    },
+    "pct_alluvial_coastal": {
+      "min": 0.0,
+      "max": 100.0
+    },
+    "pct_eolian_coarse": {
+      "min": 0.0,
+      "max": 20.87
+    },
+    "pct_eolian_fine": {
+      "min": 0.0,
+      "max": 100.0
+    },
+    "pct_colluvial_sediment": {
+      "min": 0.0,
+      "max": 100.0
+    },
+    "geo_fe2o3": {
+      "min": 0.6759,
+      "max": 26.1225
+    },
+    "clay_pct": {
+      "min": 3.751098113207547,
+      "max": 52.34537579268977
+    },
+    "sand_pct": {
+      "min": 4.236168499758467,
+      "max": 91.46850723270441
+    },
+    "soil_organic_matter": {
+      "min": 0.15,
+      "max": 31.72
+    },
+    "elevation_m": {
+      "min": 0.1467,
+      "max": 3298.5503
+    },
+    "baseflow_index": {
+      "min": 11.304,
+      "max": 82.0
+    },
+    "wetness_index": {
+      "min": 562.0794,
+      "max": 1934.0303
+    },
+    "dam_storage_density": {
+      "min": 0.0,
+      "max": 734585265.5681
+    },
+    "wwtp_all_density": {
+      "min": 0.0,
+      "max": 1.576
+    },
+    "wwtp_minor_density": {
+      "min": 0.0,
+      "max": 1.576
+    },
+    "fertilizer_rate": {
+      "min": 0.0,
+      "max": 100.5599
+    },
+    "nitrogen_surplus": {
+      "min": -8757016.434656538,
+      "max": 3735818411.61418
+    },
+    "sgmc_igneous_metamorphic_undifferentiated": {
+      "min": 0.0,
+      "max": 84.35720291405646
+    },
+    "sgmc_igneous_sedimentary_undifferentiated": {
+      "min": 0.0,
+      "max": 39.885700414078364
+    },
+    "sgmc_igneous_intrusive": {
+      "min": 0.0,
+      "max": 71.8425421290201
+    },
+    "sgmc_igneous_undifferentiated": {
+      "min": 0.0,
+      "max": 7.300699815911747
+    },
+    "sgmc_igneous_volcanic": {
+      "min": 0.0,
+      "max": 100.0
+    },
+    "sgmc_melange": {
+      "min": 0.0,
+      "max": 40.301784593337494
+    },
+    "sgmc_metamorphic_sedimentary_undifferentiated": {
+      "min": 0.0,
+      "max": 89.18388788333291
+    },
+    "sgmc_metamorphic_amphibolite": {
+      "min": 0.0,
+      "max": 19.693272919342736
+    },
+    "sgmc_metamorphic_carbonate": {
+      "min": 0.0,
+      "max": 32.83702560763369
+    },
+    "sgmc_metamorphic_gneiss": {
+      "min": 0.0,
+      "max": 100.0
+    },
+    "sgmc_metamorphic_granulite": {
+      "min": 0.0,
+      "max": 6.147731074181825
+    },
+    "sgmc_metamorphic_intrusive": {
+      "min": 0.0,
+      "max": 1.7376049314960114
+    },
+    "sgmc_metamorphic_other": {
+      "min": 0.0,
+      "max": 1.0566449188501768
+    },
+    "sgmc_metamorphic_schist": {
+      "min": 0.0,
+      "max": 98.95126372515293
+    },
+    "sgmc_metamorphic_sedimentary": {
+      "min": 0.0,
+      "max": 5.658459647303116
+    },
+    "sgmc_metamorphic_sedimentary_clastic": {
+      "min": 0.0,
+      "max": 67.54913067138466
+    },
+    "sgmc_metamorphic_serpentinite": {
+      "min": 0.0,
+      "max": 14.23944510941538
+    },
+    "sgmc_metamorphic_undifferentiated": {
+      "min": 0.0,
+      "max": 100.0
+    },
+    "sgmc_metamorphic_volcanic": {
+      "min": 0.0,
+      "max": 52.51847053060652
+    },
+    "sgmc_sedimentary_carbonate": {
+      "min": 0.0,
+      "max": 100.0
+    },
+    "sgmc_sedimentary_chemical": {
+      "min": 0.0,
+      "max": 99.17987406598455
+    },
+    "sgmc_sedimentary_clastic": {
+      "min": 0.0,
+      "max": 100.0
+    },
+    "sgmc_sedimentary_iron_formation_undifferentiated": {
+      "min": 0.0,
+      "max": 2.976497661296642
+    },
+    "sgmc_sedimentary_undifferentiated": {
+      "min": 0.0,
+      "max": 100.0
+    },
+    "sgmc_tectonite_undifferentiated": {
+      "min": 0.0,
+      "max": 2.6192374785569976
+    },
+    "sgmc_unconsolidated_sedimentary_undifferentiated": {
+      "min": 0.0,
+      "max": 99.99306430001796
+    },
+    "sgmc_unconsolidated_undifferentiated": {
+      "min": 0.0,
+      "max": 100.0
+    },
+    "sgmc_water": {
+      "min": 0.0,
+      "max": 23.008419196757995
+    }
+  },
+  "categorical_values_seen": {
+    "collection_method": [
+      "auto_point",
+      "depth_integrated",
+      "grab",
+      "unknown"
+    ],
+    "turb_source": [
+      "continuous",
+      "discrete"
+    ],
+    "sensor_family": [
+      "exo",
+      "unknown",
+      "ysi_6026",
+      "ysi_6series"
+    ]
+  },
+  "target_range": {
+    "min": 0.0,
+    "max": 41.55762877539822
+  },
+  "target_range_native": {
+    "min": 0.0,
+    "max": 70000.00000000001
+  },
+  "sites_per_ecoregion": {},
+  "sites_per_geology": {
+    "alluvial_coastal": 23,
+    "carbonate_resid": 22,
+    "colluvial_sediment": 27,
+    "eolian_fine": 1,
+    "glacial_lake_coarse": 17,
+    "glacial_lake_fine": 2,
+    "glacial_till_clay": 13,
+    "glacial_till_coarse": 6,
+    "glacial_till_loam": 57,
+    "hydric": 3,
+    "nonite_resid": 112,
+    "siliciclastic": 71,
+    "water_geology": 1
+  },
+  "n_sites": 357,
+  "n_samples": 32046,
+  "n_trees": 500,
+  "bcf": 1.3484172916092827,
+  "bcf_method": "snowdon",
+  "weight_scheme": null,
+  "slope_correction": false,
+  "quantile_mode": false,
+  "monotone_constraints": true
+}
