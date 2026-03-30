@@ -31,7 +31,7 @@ DATA_DIR = PROJECT_ROOT / "data"
 RESULTS_DIR = DATA_DIR / "results"
 OUTPUT_PATH = RESULTS_DIR / "phase5_ablation_screen.parquet"
 LOCK_PATH = RESULTS_DIR / "phase5_ablation.lock"
-PYTHON = str(PROJECT_ROOT / ".venv" / "Scripts" / "python")
+PYTHON = str(PROJECT_ROOT / ".venv" / "Scripts" / "python.exe")
 TRAIN_SCRIPT = str(PROJECT_ROOT / "scripts" / "train_tiered.py")
 
 logging.basicConfig(
@@ -148,7 +148,7 @@ def run_one_experiment(label: str, drop_features: list[str], timeout: int = 600)
         "--cv-mode", "gkf5",
         "--transform", "boxcox",
         "--boxcox-lambda", "0.2",
-        "--n-jobs", "12",
+        "--n-jobs", "24",
         "--skip-ridge",
         "--skip-save-model",
         "--skip-shap",
@@ -220,7 +220,7 @@ def acquire_lock() -> bool:
     if LOCK_PATH.exists():
         # Check if the lock is stale (>6 hours old)
         age_hrs = (time.time() - LOCK_PATH.stat().st_mtime) / 3600
-        if age_hrs > 6:
+        if age_hrs > 12:
             logger.warning(f"Removing stale lock file ({age_hrs:.1f} hours old)")
             LOCK_PATH.unlink()
         else:
