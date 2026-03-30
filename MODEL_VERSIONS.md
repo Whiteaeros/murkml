@@ -77,6 +77,75 @@ Each entry records: training config, dataset, performance, and what changed from
 - **Saved model:** data/results/models/ssc_C_sensor_basic_watershed.cbm (487 trees, lambda=0.2 confirmed)
 - **Notes:** Box-Cox 0.2 chosen from 24-experiment transform sweep. Raw SSC ruled out. KGE eval_metric tested (no improvement). Lambda confirmed via fine sweep at 0.18-0.20.
 
+### murkml-9-final-72feat (CURRENT BEST)
+- **Date:** 2026-03-30
+- **Training sites:** 254 (284 train - 30 w/o StreamCat). Split: 284 train / 76 validation / 36 vault
+- **Samples:** 23,088
+- **Features:** 72 (69 numeric + 3 categorical: 44 original + 28 SGMC lithology)
+- **Transform:** Box-Cox lambda=0.2
+- **Monotone:** ON (turbidity_instant, turbidity_max_1hr)
+- **CV:** LOGO (254 folds, on training sites only — vault + holdout excluded)
+- **R²(log):** 0.740
+- **R²(native):** 0.335
+- **MedSiteR²:** 0.335
+- **KGE:** 0.778
+- **Alpha:** 0.881
+- **RMSE:** 133.0 mg/L
+- **Bias:** +17.8%
+- **BCF:** 1.390 (Snowdon)
+- **Trees:** median 411
+- **Split:** data/train_holdout_vault_split.parquet (284 train / 76 validation / 36 vault)
+- **Saved model:** data/results/models/ssc_C_sensor_basic_watershed_v9_final_72feat.cbm
+- **Notes:** 72 features locked after Phase 5 ablation (unanimous expert panel: keep all). 28 SGMC lithology features added. 5,536 unknown collection methods resolved. 3-way split: vault sites never touched until final evaluation.
+
+### murkml-9-validation (76 sites — tainted by ablation, historical reference only)
+- **Date:** 2026-03-30
+- **Validation sites:** 76, 5,847 samples
+- **Pooled NSE:** 0.692
+- **Log-NSE:** 0.807
+- **KGE:** 0.745
+- **MAPE:** 55.6%
+- **Within 2x:** 65.4%
+- **Spearman rho:** 0.920
+- **Bias:** +2.0%
+- **Median per-site R²:** 0.418
+- **Bayesian adaptation (random, N=10):** MedR²=0.537
+- **Notes:** These 76 sites were used for 47+ ablation experiments during Phase 5. Numbers are valid for historical comparison with v4 but should NOT be reported as primary results in the paper.
+
+### murkml-9-vault (36 sites — ONE SHOT, CLEAN FINAL EXAM)
+- **Date:** 2026-03-30
+- **Vault sites:** 36, 3,660 samples (stratified by HUC2, never seen before)
+- **Pooled NSE:** 0.164
+- **Log-NSE:** 0.825
+- **Spearman rho:** 0.932
+- **MAPE:** 49.4%
+- **Within 2x:** 68.3%
+- **Bias:** -7.8%
+- **RMSE:** 1293.8 mg/L
+- **Median per-site R²:** 0.486
+- **Sites R² > 0.5:** 17/36 (47%)
+- **Sites R² > 0:** 28/36 (78%)
+- **Notes:** Completely clean evaluation. These 36 sites were sequestered from training and never used for any decision. MedSiteR²=0.486 is the best per-site number on untouched data.
+
+### murkml-9-external (260 non-USGS NTU sites)
+- **Date:** 2026-03-30
+- **Sites:** 260 (113 with 25+ samples for adaptation), 6 organizations (UMRR, SRBC, GLEC, UMC, MDNR, CEDEN)
+- **Sensor:** NTU (not FNU — model trained on FNU only)
+- **Zero-shot (NTU<400):** NSE=0.152, Spearman=0.929, MAPE=90%, bias=+66%
+- **Adaptation curve (random, NTU<400, 113 sites):**
+
+| N cal | R² | Log-NSE | Spearman | MAPE | Within 2x | Bias |
+|---|---|---|---|---|---|---|
+| 0 | -0.108 | +0.225 | 0.934 | 90% | 58% | +76% |
+| 3 | +0.242 | +0.485 | 0.932 | 61% | 77% | +55% |
+| 5 | +0.352 | +0.539 | 0.931 | 55% | 82% | +48% |
+| 10 | +0.430 | +0.613 | 0.931 | 45% | 86% | +40% |
+| 20 | +0.486 | +0.648 | 0.932 | 39% | 89% | +35% |
+
+- **Notes:** Model ranks correctly from zero-shot (Spearman 0.93) despite NTU sensors, no continuous data, no watershed features for most sites. 10 calibration samples achieves R²=0.43. Proves cross-network generalization.
+
+---
+
 ### murkml-4-holdout
 - **Date:** 2026-03-29
 - **Same model as murkml-4-boxcox, evaluated on 76 holdout sites**

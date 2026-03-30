@@ -6,40 +6,47 @@
 
 **Owner:** Kaleb — water science student, graduating mid-2026. Not on a deadline. Exploring what's possible, with eventual commercial product and paper goals.
 
-## Current State (2026-03-30)
+## Current State (2026-03-30 evening)
 
-**Current model: v4-boxcox**
-- CatBoost, 357 training sites, 32,046 samples, 72 features (41 numeric + 28 SGMC lithology + 3 categorical)
-- Box-Cox lambda=0.2, Snowdon BCF=1.36, monotone ON (turbidity_instant, turbidity_max_1hr)
-- LOGO CV (357 folds): R²(log)=0.718, R²(native)=0.290, KGE=0.767
-- Holdout (76 sites, 5847 samples): R²(native)=0.472, zero-shot
+**Current model: v9-final-72feat (BEST)**
+- CatBoost, 254 training sites (284 train - 30 w/o StreamCat), 23,088 samples
+- 72 features (69 numeric + 3 categorical: 44 original + 28 SGMC lithology)
+- Box-Cox lambda=0.2, Snowdon BCF=1.390, monotone ON (turbidity_instant, turbidity_max_1hr)
+- 3-way split: 284 train / 76 validation / 36 vault
+- LOGO CV (254 folds): R²(log)=0.740, MedSiteR²=0.335, KGE=0.778
+- Validation (76 sites): NSE=0.692, MedSiteR²=0.418, MAPE=55.6%
+- **Vault (36 clean sites): MedSiteR²=0.486, MAPE=49.4%, Spearman=0.932**
+- **External (260 NTU sites): 10 samples → R²=0.43, Spearman=0.93 zero-shot**
+- Model: data/results/models/ssc_C_sensor_basic_watershed_v9_final_72feat.cbm
 
 **Bayesian site adaptation (the killer feature):**
 - Student-t shrinkage (k=15, df=4), staged: intercept-only N<10, slope+intercept N>=10
-- N=2 samples: R²=0.485 (was catastrophic -0.012 with old 2-param method)
-- N=20 samples: R²=0.509
-- CatBoost+Bayesian with 2 samples beats USGS OLS with 50 samples at every N
+- Bayesian beats OLS at every N in every split mode
+- External NTU data: 10 samples → R²=0.43 on foreign sensors/networks
 
-**Key findings from 30+ experiments:**
+**Key findings from 100+ experiments:**
 - Site heterogeneity is THE problem — no architecture change fixes it
 - Site adaptation (Bayesian shrinkage) is the solution and the product
-- Pooled R² and per-site R² always disagree — per-site is what users experience
-- Collection method splitting doesn't help (model handles it as feature, SHAP rank 3)
-- Site exclusion is cosmetic only (improves pooled, hurts per-site)
-- MERF joint training hurts zero-shot; post-hoc Bayesian RE is the correct approach
-- Only 7/51 catastrophic sites are genuinely wrong; 17 are low-signal (small SSC range)
-- SGMC lithology predicts turb-SSC slope (p=0.0024): metamorphic=high, carbonate=low
-- Residuals NOT normal (skew=2.0, kurtosis=13.8) — need Student-t prior, not Gaussian
+- Aggregate metrics lie — dropping weather improved median R² but destroyed first flush and extremes
+- Feature ablation is in the noise floor — 72 vs 58 features statistically indistinguishable (p=0.81)
+- CatBoost handles irrelevant features internally — no need to prune
+- Low-SSC overprediction is sensor contamination (DOM, algae), not model failure
+- Extreme underprediction is particle size shift, not just sensor saturation
+- Model ranks correctly on foreign NTU data (Spearman 0.93) — adaptation just fixes the scale
+- EVERY evaluation must use the full suite (all modes, disaggregated, physics, external)
 
 **Data state:**
 - 396 total sites, 35,209 samples in paired dataset
 - Collection methods: depth_integrated 15,381, auto_point 14,444, grab 4,638, unknown 746
 - 28 SGMC watershed lithology features (355 sites with coverage)
+- 260 external NTU validation sites (11K samples, 6 organizations)
 - 65 features on drop list (`data/optimized_drop_list.txt`), always pass via `--drop-features`
+- 3-way split: data/train_holdout_vault_split.parquet
 
-**Phase 3 pipeline fixes completed (2026-03-30):**
-- evaluate_model.py: hash() → hashlib.md5() for deterministic seeding
-- evaluate_model.py: slope-clipping intercept recalculation after clip
+**Completed phases:**
+- Phase 3: Pipeline fixes (Gemini bugs, SGMC integration, collection methods, staged Bayesian)
+- Phase 4: Diagnostics (disaggregated metrics, physics validation, external validation, eval refactor)
+- Phase 5: Ablation (83 single-feature + group ablation + 5-seed stability → keep all 72)
 - evaluate_model.py: staged Bayesian adaptation (Student-t, per-trial BCF shrunk toward 1.0)
 - SGMC lithology: 28 watershed geology features integrated into train_tiered.py
 - Collection methods: 5,536 unknown samples resolved via WQP metadata (unknown 6,282→746)
