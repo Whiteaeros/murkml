@@ -1,0 +1,11 @@
+config,seed,elapsed,r2_log,r2_native,med_site_r2
+proposed_58feat,42,78,0.749,0.288,0.2876
+proposed_58feat,123,155,0.758,0.3,0.2998
+proposed_58feat,456,162,0.741,0.273,0.2728
+proposed_58feat,789,157,0.748,0.291,0.2908
+proposed_58feat,2024,95,0.753,0.282,0.2823
+baseline_72feat,42,124,0.749,0.287,0.2868
+baseline_72feat,123,124,0.756,0.285,0.2853
+baseline_72feat,456,108,0.75,0.29,0.2905
+baseline_72feat,789,128,0.759,0.312,0.3125
+baseline_72feat,2024,121,0.748,0.274,0.2738
