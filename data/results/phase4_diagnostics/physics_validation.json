@@ -1,0 +1,144 @@
+{
+  "first_flush": {
+    "n_first_flush": 1390,
+    "n_not_flush": 4457,
+    "ssc_turb_ratio_flush": 2.214737793851718,
+    "ssc_turb_ratio_normal": 2.073469387755102,
+    "ratio_elevation": 1.068131416326124,
+    "metrics_first_flush": {
+      "n": 1390,
+      "r2": 0.8637650466320903,
+      "rmse": 453.3150424239719,
+      "mape_pct": 61.50829054958872,
+      "within_2x_pct": 58.27338129496403,
+      "mean_true": 224.66294964028776,
+      "mean_pred": 208.4165893050089,
+      "median_abs_error": 14.82181301216447,
+      "bias_pct": -7.2314372980908646
+    },
+    "metrics_normal": {
+      "n": 4457,
+      "r2": 0.48702752772123215,
+      "rmse": 520.0838183464442,
+      "mape_pct": 56.99041270179326,
+      "within_2x_pct": 63.4507516266547,
+      "mean_true": 296.75689925959165,
+      "mean_pred": 290.67359833668183,
+      "median_abs_error": 39.19263282854172,
+      "bias_pct": -2.049927377623788
+    },
+    "first_flush_median_bias_mgL": 6.949159149681318,
+    "status": "OK"
+  },
+  "hysteresis": {
+    "n_rising": 1466,
+    "n_falling": 1430,
+    "ssc_turb_ratio_rising": 2.0266937453541467,
+    "ssc_turb_ratio_falling": 1.842739378566899,
+    "clockwise_hysteresis": "True",
+    "model_captures_hysteresis": "True",
+    "pred_ssc_turb_ratio_rising": 3.107673624224669,
+    "pred_ssc_turb_ratio_falling": 2.7376821527543163,
+    "metrics_rising": {
+      "n": 1466,
+      "r2": 0.5351751325638944,
+      "rmse": 357.3524847173036,
+      "mape_pct": 59.63131671088169,
+      "within_2x_pct": 62.41473396998636,
+      "mean_true": 305.94338335607097,
+      "mean_pred": 322.5670572022497,
+      "median_abs_error": 46.505567310203354,
+      "bias_pct": 5.433578482340097
+    },
+    "metrics_falling": {
+      "n": 1430,
+      "r2": 0.6480905028526898,
+      "rmse": 304.6761868383925,
+      "mape_pct": 58.68467346625563,
+      "within_2x_pct": 65.31468531468532,
+      "mean_true": 156.8272727272727,
+      "mean_pred": 172.69873057183267,
+      "median_abs_error": 23.81720837974702,
+      "bias_pct": 10.120342953461222
+    },
+    "status": "OK"
+  },
+  "extreme_events": {
+    "turb_99th_threshold": 855.8599999999997,
+    "turb_95th_threshold": 410.0,
+    "n_top1pct": 59,
+    "n_top5pct": 303,
+    "metrics_top1pct": {
+      "n": 59,
+      "r2": 0.7881849568027052,
+      "rmse": 2294.7056532743186,
+      "mape_pct": 46.980584477699104,
+      "within_2x_pct": 62.71186440677966,
+      "mean_true": 3850.864406779661,
+      "mean_pred": 3871.3020326701767,
+      "median_abs_error": 1333.6568303065592,
+      "bias_pct": 0.5307282659585278
+    },
+    "metrics_top5pct": {
+      "n": 303,
+      "r2": 0.6879929098989568,
+      "rmse": 1612.6316527816737,
+      "mape_pct": 41.676035883045984,
+      "within_2x_pct": 72.93729372937293,
+      "mean_true": 1864.996699669967,
+      "mean_pred": 1917.865543253022,
+      "median_abs_error": 490.9384481118384,
+      "bias_pct": 2.834795557140167
+    },
+    "metrics_bottom95pct": {
+      "n": 5544,
+      "r2": 0.37414040914238067,
+      "rmse": 356.1515552178643,
+      "mape_pct": 58.355813670985434,
+      "within_2x_pct": 61.63419913419913,
+      "mean_true": 192.97132034632034,
+      "mean_pred": 181.1179702948931,
+      "median_abs_error": 26.601388654641667,
+      "bias_pct": -6.1425449285180616
+    },
+    "top1_median_underprediction_pct": -37.088073970873864,
+    "top5_median_underprediction_pct": -26.46659412400153,
+    "status": "OK"
+  },
+  "snowmelt": {
+    "n_spring": 2171,
+    "n_other": 3676,
+    "ssc_turb_ratio_spring": 2.2604790419161676,
+    "ssc_turb_ratio_other": 2.02145360569264,
+    "spring_lower_ratio": "False",
+    "metrics_spring": {
+      "n": 2171,
+      "r2": 0.42144492025699987,
+      "rmse": 387.6009751374235,
+      "mape_pct": 55.00649935162857,
+      "within_2x_pct": 63.84154767388301,
+      "mean_true": 227.65269461077844,
+      "mean_pred": 223.34536684471098,
+      "median_abs_error": 31.994337454249028,
+      "bias_pct": -1.8920609630524114
+    },
+    "metrics_other": {
+      "n": 3676,
+      "r2": 0.6996728757457344,
+      "rmse": 562.9665547232706,
+      "mape_pct": 58.89401252368408,
+      "within_2x_pct": 61.26224156692056,
+      "mean_true": 310.3082154515778,
+      "mean_pred": 299.33310541367945,
+      "median_abs_error": 28.722066202793656,
+      "bias_pct": -3.5368415953560053
+    },
+    "status": "OK"
+  },
+  "regulated_flow": {
+    "n_regulated": 1518,
+    "n_unregulated": 0,
+    "dam_density_threshold_75th": 46240.4225,
+    "status": "SKIPPED \u2014 regulated=1518, unregulated=0"
+  }
+}
