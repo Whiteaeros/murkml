@@ -226,6 +226,45 @@ Our R² is computed as 1-SS_res/SS_tot, which IS Nash-Sutcliffe Efficiency. We j
 
 ---
 
+## External Validation Results (2026-03-30)
+
+### Data: 11,026 samples, 260 sites, 6 non-USGS organizations (NTU sensors)
+Downloaded via WQP from UMRR_LTRM, 42SRBCWQ_WQX, GLEC, UMC, MDNR, CEDEN.
+
+### Zero-Shot (NTU < 400, no calibration)
+- NSE: 0.060, Log-NSE: 0.417, Spearman rho: 0.930
+- MAPE: 103%, Within-2x: 48%, Bias: +70%
+- Model RANKS correctly (Spearman 0.93) but systematically overpredicts (+70% bias)
+- Expected: NTU sensors, no continuous data, no watershed features for most sites
+
+### Bayesian Adaptation Curve (113 sites with 25+ samples, 100 MC trials)
+
+| N cal | Median R² | Median MAPE |
+|---|---|---|
+| 0 (zero-shot) | -0.216 | 98% |
+| 1 | -0.169 | 94% |
+| 2 | +0.063 | 78% |
+| 3 | +0.251 | 66% |
+| 5 | +0.378 | 58% |
+| 10 | **+0.501** | 46% |
+| 20 | +0.554 | 42% |
+
+**Key finding:** On completely independent data from different organizations, different sensors (NTU not FNU), different protocols — 10 calibration samples achieves R²=0.501. This matches the USGS holdout performance (R²=0.502 at N=10 with Bayesian k=15) despite vastly worse input conditions. The adaptation curve is monotonically increasing and never hurts.
+
+**This is the strongest evidence that the model learned real sediment transport physics rather than USGS-specific patterns.** The Bayesian shrinkage adaptation transfers across monitoring networks, sensor types, and data protocols.
+
+### By Organization (NTU < 400, zero-shot)
+| Organization | Sites | Samples | NSE | MAPE | Bias |
+|---|---|---|---|---|---|
+| UMRR_LTRM | 133 | 9,625 | 0.441 | 92% | +59% |
+| 42SRBCWQ_WQX | 235→filtered | 494 | 0.499 | 427% | +123% |
+| CEDEN | 20 | 200 | -0.626 | 158% | +122% |
+| UMC | 113→filtered | 636 | -24.989 | 629% | +500% |
+
+UMC data needs investigation — +500% bias suggests unit mismatch or data quality issue.
+
+---
+
 ## Questions for Expert Panel
 
 1. The "unknown" collection method sites have R²=0.873 — best of any group. Is this because they're genuinely easy sites, or is the model using "unknown" as an informative signal? Should we investigate whether resolving them would hurt performance?
