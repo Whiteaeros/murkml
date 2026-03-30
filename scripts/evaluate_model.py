@@ -20,6 +20,7 @@ import argparse
 import hashlib
 import json
 import logging
+import subprocess
 import sys
 import time
 from datetime import datetime, timezone
@@ -526,8 +527,8 @@ def get_cal_test_split(
             months = pd.to_datetime(dates).month.values
             from collections import Counter
             peak_month = Counter(months).most_common(1)[0][0]
-            neighbors = [(peak_month - 2) % 12 + 1, (peak_month - 1) % 12 + 1,
-                         peak_month, peak_month % 12 + 1]
+            # Symmetric +/- 1 month window (3 months)
+            neighbors = {(peak_month - 2) % 12 + 1, peak_month, peak_month % 12 + 1}
             seasonal_mask = np.isin(months, neighbors)
             seasonal_idx = np.where(seasonal_mask)[0]
             if len(seasonal_idx) >= n_cal:
@@ -676,6 +677,7 @@ def _aggregate_trials(trial_metrics: list[dict]) -> dict | None:
         "frac_within_2x": float(np.nanmedian([m["frac_within_2x"] for m in valid])),
         "spearman_rho": float(np.nanmedian([m["spearman_rho"] for m in valid])),
         "bias_pct": float(np.nanmedian([m["bias_pct"] for m in valid])),
+        "median_abs_error": float(np.nanmedian([m["median_abs_error"] for m in valid])),
         "n": int(np.median([m["n"] for m in valid])),
     }
 
@@ -741,7 +743,7 @@ def run_adaptation_curve(
     # Pre-sort each site by date for temporal/seasonal modes
     has_dates = "sample_time" in readings.columns
     if has_dates:
-        readings = readings.sort_values(["site_id", "sample_time"])
+        readings = readings.sort_values(["site_id", "sample_time", "y_true_native"])
 
     # Prepare per-site data
     site_data_map = {}
@@ -991,7 +993,7 @@ def print_summary(readings: pd.DataFrame, adaptation: dict, method: str, baselin
             ns = c["n_sites"]
             ci_str = f"[{ci_lo:+.3f}, {ci_hi:+.3f}]" if np.isfinite(ci_lo) else "      —       "
             print(f"  {n_val:>4d}  {mr2:>+8.4f}  {ci_str:>16s}  {mlnse:>+8.4f}  "
-                  f"{mkge:>+6.3f}  {mmape:>5.1f}%  {m2x:>4.1f}%  {mbias:>+6.1f}%  {ns:>5d}")
+                  f"{mkge:>+6.3f}  {mmape:>5.1f}%  {m2x:>5.1%}  {mbias:>+6.1f}%  {ns:>5d}")
     print("=" * 70 + "\n")
 
 
@@ -1084,8 +1086,49 @@ def main():
     # Print summary
     print_summary(readings, adaptation, args.adaptation, baselines)
 
+    # --- Supplementary: disaggregated metrics + physics validation ---
+    logger.info("\nRunning disaggregated diagnostics on holdout predictions...")
+    try:
+        per_reading_path = output_dir / f"{args.label}_per_reading.parquet"
+        diag_cmd = [
+            str(Path(sys.executable)),
+            str(PROJECT_ROOT / "scripts" / "phase4_diagnostics.py"),
+            "--predictions", str(per_reading_path),
+            "--output-dir", str(output_dir / f"{args.label}_diagnostics"),
+        ]
+        result = subprocess.run(diag_cmd, capture_output=True, text=True, timeout=300)
+        if result.returncode == 0:
+            logger.info(f"  Diagnostics saved to {output_dir / f'{args.label}_diagnostics'}/")
+        else:
+            logger.warning(f"  Diagnostics failed: {result.stderr[-1000:]}")
+    except Exception as e:
+        logger.warning(f"  Diagnostics skipped: {e}")
+
+    # --- Supplementary: external validation (if data exists) ---
+    ext_data_path = DATA_DIR / "external_validation" / "filtered_external.parquet"
+    if ext_data_path.exists():
+        logger.info("\nRunning external validation...")
+        try:
+            ext_cmd = [
+                str(Path(sys.executable)),
+                str(PROJECT_ROOT / "scripts" / "validate_external.py"),
+                "--model", str(model_path),
+                "--meta", str(meta_path),
+                "--external-data", str(ext_data_path),
+                "--output-dir", str(output_dir / f"{args.label}_external"),
+            ]
+            result = subprocess.run(ext_cmd, capture_output=True, text=True, timeout=300)
+            if result.returncode == 0:
+                logger.info(f"  External validation saved to {output_dir / f'{args.label}_external'}/")
+            else:
+                logger.warning(f"  External validation failed: {result.stderr[-1000:]}")
+        except Exception as e:
+            logger.warning(f"  External validation skipped: {e}")
+    else:
+        logger.info("\nNo external validation data found — skipping (run download_external_validation.py first)")
+
     elapsed = time.time() - t0
-    logger.info(f"Done in {elapsed:.1f}s")
+    logger.info(f"\nDone in {elapsed:.1f}s")
 
 
 if __name__ == "__main__":
