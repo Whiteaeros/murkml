@@ -39,6 +39,8 @@ sys.path.insert(0, str(PROJECT_ROOT / "src"))
 DATA_DIR = PROJECT_ROOT / "data"
 
 from murkml.data.attributes import load_streamcat_attrs
+from scipy.stats import spearmanr as _spearmanr
+
 from murkml.evaluate.metrics import (
     kge,
     r_squared,
@@ -413,44 +415,302 @@ def adapt_ols_loglog(
 # ---------------------------------------------------------------------------
 
 def compute_site_metrics(y_true: np.ndarray, y_pred: np.ndarray) -> dict:
-    """Compute standard metrics for a single site."""
+    """Compute standard metrics for a single site or pooled set.
+
+    Returns dict with: nse (=R²), log_nse, kge, rmse, mape_pct,
+    frac_within_2x, spearman_rho, bias_pct, median_abs_error, n.
+    """
     y_true = np.asarray(y_true, dtype=float)
     y_pred = np.asarray(y_pred, dtype=float)
     n = len(y_true)
+    nan_result = {
+        "nse": np.nan, "r2": np.nan, "log_nse": np.nan, "kge": np.nan,
+        "rmse": np.nan, "mape_pct": np.nan, "frac_within_2x": np.nan,
+        "spearman_rho": np.nan, "bias_pct": np.nan, "median_abs_error": np.nan, "n": n,
+    }
     if n < 2:
-        return {"r2": np.nan, "kge": np.nan, "rmse": np.nan, "mape_pct": np.nan, "frac_within_2x": np.nan, "n": n}
+        return nan_result
 
-    # Guard against zero-variance sites (R² is undefined)
+    # NSE / R² (identical: 1 - SS_res/SS_tot)
     ss_tot = np.sum((y_true - y_true.mean()) ** 2)
     if ss_tot < 1e-10:
-        return {"r2": np.nan, "kge": np.nan, "rmse": float(rmse(y_true, y_pred)), "mape_pct": np.nan, "frac_within_2x": np.nan, "n": n}
+        nse_val = np.nan
+    else:
+        nse_val = float(r_squared(y_true, y_pred))
 
-    r2_val = r_squared(y_true, y_pred)
-    # Guard against zero-variance predictions (KGE correlation undefined)
+    # Log-NSE (same formula on log-transformed positive values)
+    pos = (y_true > 0) & (y_pred > 0)
+    if pos.sum() >= 2:
+        log_true = np.log(y_true[pos])
+        log_pred = np.log(y_pred[pos])
+        ss_res_log = np.sum((log_true - log_pred) ** 2)
+        ss_tot_log = np.sum((log_true - log_true.mean()) ** 2)
+        log_nse_val = float(1 - ss_res_log / ss_tot_log) if ss_tot_log > 1e-10 else np.nan
+    else:
+        log_nse_val = np.nan
+
+    # KGE
     if np.std(y_pred) < 1e-10 or np.std(y_true) < 1e-10:
         kge_val = np.nan
     else:
-        kge_val = kge(y_true, y_pred)
-    rmse_val = rmse(y_true, y_pred)
+        kge_val = float(kge(y_true, y_pred))
 
-    # MAPE (skip zeros)
+    # RMSE
+    rmse_val = float(rmse(y_true, y_pred))
+
+    # MAPE (median, skip zeros)
     nonzero = y_true > 0
     if nonzero.sum() > 0:
-        mape = 100 * np.mean(np.abs(y_true[nonzero] - y_pred[nonzero]) / y_true[nonzero])
+        pct_err = np.abs(y_true[nonzero] - y_pred[nonzero]) / y_true[nonzero] * 100
+        mape = float(np.median(pct_err))
     else:
         mape = np.nan
 
     # Fraction within 2x
     ratios = np.where(y_true > 0, y_pred / y_true, np.nan)
     valid_ratios = ratios[~np.isnan(ratios)]
-    frac_2x = np.mean((valid_ratios >= 0.5) & (valid_ratios <= 2.0)) if len(valid_ratios) > 0 else np.nan
+    frac_2x = float(np.mean((valid_ratios >= 0.5) & (valid_ratios <= 2.0))) if len(valid_ratios) > 0 else np.nan
 
-    return {"r2": r2_val, "kge": kge_val, "rmse": rmse_val, "mape_pct": mape, "frac_within_2x": frac_2x, "n": n}
+    # Spearman rank correlation
+    try:
+        rho, _ = _spearmanr(y_true, y_pred)
+        spearman = float(rho)
+    except Exception:
+        spearman = np.nan
+
+    # Bias %
+    mean_true = np.mean(y_true)
+    bias_pct = float((np.mean(y_pred) - mean_true) / mean_true * 100) if mean_true > 0 else np.nan
+
+    # Median absolute error
+    med_ae = float(np.median(np.abs(y_true - y_pred)))
+
+    return {
+        "nse": nse_val, "r2": nse_val,  # identical, both for compatibility
+        "log_nse": log_nse_val, "kge": kge_val, "rmse": rmse_val,
+        "mape_pct": mape, "frac_within_2x": frac_2x,
+        "spearman_rho": spearman, "bias_pct": bias_pct,
+        "median_abs_error": med_ae, "n": n,
+    }
+
+
+# ---------------------------------------------------------------------------
+# Split modes for adaptation trials
+# ---------------------------------------------------------------------------
+
+def get_cal_test_split(
+    n_site: int,
+    n_cal: int,
+    mode: str,
+    rng: np.random.Generator | None = None,
+    dates: np.ndarray | None = None,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Return (cal_idx, test_idx) for a given split mode.
+
+    Modes:
+        random: Random selection (optimistic — cal spans full record)
+        temporal: First N chronologically (realistic — predict the future)
+        seasonal: N samples from the dominant season (typical — one field campaign)
+    """
+    if n_cal >= n_site:
+        return np.arange(n_site), np.array([], dtype=int)
+
+    if mode == "random":
+        cal_idx = rng.choice(n_site, size=n_cal, replace=False)
+    elif mode == "temporal":
+        # First N in chronological order (data must be pre-sorted by date)
+        cal_idx = np.arange(n_cal)
+    elif mode == "seasonal":
+        # Pick from the most common month cluster (±1 month)
+        if dates is not None and len(dates) > 0:
+            months = pd.to_datetime(dates).month.values
+            from collections import Counter
+            peak_month = Counter(months).most_common(1)[0][0]
+            neighbors = [(peak_month - 2) % 12 + 1, (peak_month - 1) % 12 + 1,
+                         peak_month, peak_month % 12 + 1]
+            seasonal_mask = np.isin(months, neighbors)
+            seasonal_idx = np.where(seasonal_mask)[0]
+            if len(seasonal_idx) >= n_cal:
+                cal_idx = rng.choice(seasonal_idx, size=n_cal, replace=False)
+            elif len(seasonal_idx) > 0:
+                cal_idx = seasonal_idx
+            else:
+                cal_idx = rng.choice(n_site, size=n_cal, replace=False)
+        else:
+            cal_idx = rng.choice(n_site, size=n_cal, replace=False)
+    else:
+        raise ValueError(f"Unknown split mode: {mode!r}")
+
+    test_idx = np.setdiff1d(np.arange(n_site), cal_idx)
+    return cal_idx, test_idx
+
+
+def compute_baseline_metrics(readings: pd.DataFrame) -> dict:
+    """Compute baseline predictor metrics for comparison.
+
+    Baselines:
+        site_mean: Predict each site's mean SSC for all its samples (R²=0 by definition)
+        global_mean: Predict the global mean SSC for all samples
+    """
+    y_true = readings["y_true_native"].values
+
+    # Global mean predictor
+    global_mean = np.mean(y_true)
+    global_pred = np.full_like(y_true, global_mean)
+    global_metrics = compute_site_metrics(y_true, global_pred)
+
+    # Site-mean predictor (per-site, then pool)
+    site_mean_pred = np.empty_like(y_true)
+    for site_id in readings["site_id"].unique():
+        mask = (readings["site_id"] == site_id).values
+        site_mean_pred[mask] = np.mean(y_true[mask])
+    site_mean_metrics = compute_site_metrics(y_true, site_mean_pred)
+
+    return {
+        "global_mean": global_metrics,
+        "site_mean": site_mean_metrics,
+    }
+
+
+def bootstrap_ci(values: list[float], n_boot: int = 1000, ci: float = 0.95) -> dict:
+    """Bootstrap confidence interval for the median of a list of values."""
+    values = np.array([v for v in values if np.isfinite(v)])
+    if len(values) < 3:
+        return {"median": np.nan, "ci_lower": np.nan, "ci_upper": np.nan}
+    rng = np.random.default_rng(42)
+    boot_medians = np.array([
+        np.median(rng.choice(values, size=len(values), replace=True))
+        for _ in range(n_boot)
+    ])
+    alpha = (1 - ci) / 2
+    return {
+        "median": float(np.median(values)),
+        "ci_lower": float(np.percentile(boot_medians, alpha * 100)),
+        "ci_upper": float(np.percentile(boot_medians, (1 - alpha) * 100)),
+    }
 
 
 # ---------------------------------------------------------------------------
 # Adaptation curve
 # ---------------------------------------------------------------------------
+
+def _run_single_adaptation(
+    site_data: dict,
+    n_val: int,
+    mode: str,
+    method: str,
+    n_trials: int,
+    seed: int,
+    transform_type: str,
+    lmbda: float | None,
+    bcf: float,
+    k: float,
+    df: float,
+    slope_k: float,
+    bcf_k_mult: float,
+) -> list[dict]:
+    """Run adaptation trials for one site at one N for one split mode.
+
+    Returns list of per-trial metric dicts.
+    """
+    y_pred_ms = site_data["y_pred_ms"]
+    y_true_ms = site_data["y_true_ms"]
+    y_true_native = site_data["y_true_native"]
+    turb = site_data["turb"]
+    dates = site_data["dates"]
+    site_id = site_data["site_id"]
+    n_site = len(y_pred_ms)
+
+    if n_val >= n_site:
+        return []
+
+    # Temporal mode: 1 deterministic split (no MC trials)
+    trial_range = 1 if mode == "temporal" else n_trials
+
+    trial_metrics = []
+    for trial in range(trial_range):
+        site_hash = int(hashlib.md5(str(site_id).encode()).hexdigest(), 16) % (2**31)
+        rng = np.random.default_rng(seed + site_hash + n_val * 1000 + trial)
+
+        cal_idx, test_idx = get_cal_test_split(n_site, n_val, mode, rng, dates)
+
+        if len(test_idx) < 2:
+            continue
+
+        if method == "none":
+            pred = adapt_none(y_pred_ms, y_true_ms, cal_idx, test_idx,
+                               transform_type, lmbda, bcf)
+        elif method == "old_2param":
+            pred = adapt_old_2param(y_pred_ms, y_true_ms, cal_idx, test_idx,
+                                     transform_type, lmbda, bcf)
+        elif method == "bayesian":
+            pred = adapt_bayesian(y_pred_ms, y_true_ms, cal_idx, test_idx,
+                                   transform_type, lmbda, bcf, k=k, df=df,
+                                   slope_k=slope_k, bcf_k_mult=bcf_k_mult)
+        elif method == "ols":
+            if turb is None:
+                continue
+            pred = adapt_ols_loglog(turb[cal_idx], y_true_native[cal_idx], turb[test_idx])
+        else:
+            raise ValueError(f"Unknown adaptation method: {method}")
+
+        true_test = y_true_native[test_idx]
+        m = compute_site_metrics(true_test, pred)
+        trial_metrics.append(m)
+
+    return trial_metrics
+
+
+def _aggregate_trials(trial_metrics: list[dict]) -> dict | None:
+    """Aggregate MC trial metrics into median values. Returns None if no valid trials."""
+    valid = [m for m in trial_metrics if np.isfinite(m.get("nse", np.nan))]
+    if not valid:
+        return None
+    return {
+        "nse": float(np.nanmedian([m["nse"] for m in valid])),
+        "r2": float(np.nanmedian([m["r2"] for m in valid])),
+        "log_nse": float(np.nanmedian([m["log_nse"] for m in valid])),
+        "kge": float(np.nanmedian([m["kge"] for m in valid])),
+        "rmse": float(np.nanmedian([m["rmse"] for m in valid])),
+        "mape_pct": float(np.nanmedian([m["mape_pct"] for m in valid])),
+        "frac_within_2x": float(np.nanmedian([m["frac_within_2x"] for m in valid])),
+        "spearman_rho": float(np.nanmedian([m["spearman_rho"] for m in valid])),
+        "bias_pct": float(np.nanmedian([m["bias_pct"] for m in valid])),
+        "n": int(np.median([m["n"] for m in valid])),
+    }
+
+
+def _aggregate_curve(curve_results: dict, n_boot: int = 1000) -> dict:
+    """Aggregate per-site results into curve with bootstrap CIs."""
+    agg = {}
+    for n_val in ADAPTATION_NS:
+        entries = curve_results.get(n_val, [])
+        if not entries:
+            agg[n_val] = {"median_r2": np.nan, "ci_lower_r2": np.nan, "ci_upper_r2": np.nan,
+                          "median_nse": np.nan, "median_log_nse": np.nan,
+                          "median_kge": np.nan, "median_rmse": np.nan,
+                          "median_mape": np.nan, "median_within_2x": np.nan,
+                          "median_spearman": np.nan, "median_bias": np.nan,
+                          "n_sites": 0}
+            continue
+        r2s = [e["r2"] for e in entries]
+        ci = bootstrap_ci(r2s, n_boot=n_boot)
+        agg[n_val] = {
+            "median_r2": ci["median"],
+            "ci_lower_r2": ci["ci_lower"],
+            "ci_upper_r2": ci["ci_upper"],
+            "median_nse": float(np.nanmedian([e["nse"] for e in entries])),
+            "median_log_nse": float(np.nanmedian([e["log_nse"] for e in entries])),
+            "median_kge": float(np.nanmedian([e["kge"] for e in entries])),
+            "median_rmse": float(np.nanmedian([e["rmse"] for e in entries])),
+            "median_mape": float(np.nanmedian([e["mape_pct"] for e in entries])),
+            "median_within_2x": float(np.nanmedian([e["frac_within_2x"] for e in entries])),
+            "median_spearman": float(np.nanmedian([e["spearman_rho"] for e in entries])),
+            "median_bias": float(np.nanmedian([e["bias_pct"] for e in entries])),
+            "n_sites": len(entries),
+        }
+    return agg
+
 
 def run_adaptation_curve(
     readings: pd.DataFrame,
@@ -462,126 +722,92 @@ def run_adaptation_curve(
     df: float = 4,
     slope_k: float = 10,
     bcf_k_mult: float = 3.0,
+    split_modes: list[str] | None = None,
 ) -> dict:
-    """Run adaptation curve for all N values across all holdout sites.
+    """Run adaptation curve for all N values, all split modes, all holdout sites.
 
     Returns:
-        Dict with per-site-per-N results and aggregated curve.
+        Dict keyed by split mode, each containing {"curve": {...}, "per_site": {...}}.
     """
+    if split_modes is None:
+        split_modes = ["random", "temporal", "seasonal"]
+
     transform_type = meta["transform_type"]
     lmbda = meta.get("transform_lmbda")
-    bcf = meta["bcf"]
+    bcf_val = meta["bcf"]
 
     sites = sorted(readings["site_id"].unique())
-    curve_results = {n_val: [] for n_val in ADAPTATION_NS}
-    per_site_adaptation = {}  # site_id -> {n -> median_r2}
 
+    # Pre-sort each site by date for temporal/seasonal modes
+    has_dates = "sample_time" in readings.columns
+    if has_dates:
+        readings = readings.sort_values(["site_id", "sample_time"])
+
+    # Prepare per-site data
+    site_data_map = {}
     for site_id in sites:
-        site_mask = readings["site_id"] == site_id
-        site_data = readings[site_mask]
-        n_site = len(site_data)
-
-        y_pred_ms = site_data["y_pred_model_space"].values
-        y_true_ms = site_data["y_true_model_space"].values
-        y_true_native = site_data["y_true_native"].values
-        turb = site_data["turbidity_instant"].values if "turbidity_instant" in site_data.columns else None
-
-        site_adapt = {}
-
-        for n_val in ADAPTATION_NS:
-            if n_val == 0:
-                # Zero-shot: use all samples
-                if method == "ols":
-                    # OLS has no zero-shot — skip
-                    site_adapt[0] = np.nan
-                    continue
-                pred_native = adapt_none(y_pred_ms, y_true_ms, np.array([]), np.arange(n_site),
-                                          transform_type, lmbda, bcf)
-                metrics = compute_site_metrics(y_true_native, pred_native)
-                curve_results[0].append(metrics)
-                site_adapt[0] = metrics["r2"]
-                continue
-
-            if n_val >= n_site:
-                # Not enough samples — skip
-                site_adapt[n_val] = np.nan
-                continue
-
-            trial_metrics = []
-            for trial in range(n_trials):
-                site_hash = int(hashlib.md5(str(site_id).encode()).hexdigest(), 16) % (2**31)
-                rng = np.random.default_rng(seed + site_hash + n_val * 1000 + trial)
-                cal_idx = rng.choice(n_site, size=n_val, replace=False)
-                test_idx = np.setdiff1d(np.arange(n_site), cal_idx)
-
-                if len(test_idx) == 0:
-                    continue
-
-                if method == "none":
-                    pred = adapt_none(y_pred_ms, y_true_ms, cal_idx, test_idx,
-                                       transform_type, lmbda, bcf)
-                elif method == "old_2param":
-                    pred = adapt_old_2param(y_pred_ms, y_true_ms, cal_idx, test_idx,
-                                             transform_type, lmbda, bcf)
-                elif method == "bayesian":
-                    pred = adapt_bayesian(y_pred_ms, y_true_ms, cal_idx, test_idx,
-                                           transform_type, lmbda, bcf, k=k, df=df,
-                                           slope_k=slope_k, bcf_k_mult=bcf_k_mult)
-                elif method == "ols":
-                    if turb is None:
-                        continue
-                    pred = adapt_ols_loglog(turb[cal_idx], y_true_native[cal_idx], turb[test_idx])
-                else:
-                    raise ValueError(f"Unknown adaptation method: {method}")
-
-                true_test = y_true_native[test_idx]
-                m = compute_site_metrics(true_test, pred)
-                trial_metrics.append(m)
-
-            # Filter out NaN results from tiny test sets
-            valid_trials = [m for m in trial_metrics if not np.isnan(m.get("r2", np.nan))]
-            if valid_trials:
-                # Median across valid trials
-                median_r2 = float(np.nanmedian([m["r2"] for m in valid_trials]))
-                median_kge = float(np.nanmedian([m["kge"] for m in valid_trials]))
-                median_rmse = float(np.nanmedian([m["rmse"] for m in valid_trials]))
-                median_mape = float(np.nanmedian([m["mape_pct"] for m in valid_trials]))
-                median_2x = float(np.nanmedian([m["frac_within_2x"] for m in valid_trials]))
-                curve_results[n_val].append({
-                    "r2": median_r2, "kge": median_kge, "rmse": median_rmse,
-                    "mape_pct": median_mape, "frac_within_2x": median_2x,
-                    "n": int(np.median([m["n"] for m in valid_trials])),
-                })
-                site_adapt[n_val] = median_r2
-            else:
-                site_adapt[n_val] = np.nan
-
-        per_site_adaptation[site_id] = site_adapt
-
-    # Aggregate curve
-    agg_curve = {}
-    for n_val in ADAPTATION_NS:
-        entries = curve_results[n_val]
-        if not entries:
-            agg_curve[n_val] = {"median_r2": np.nan, "q25_r2": np.nan, "q75_r2": np.nan,
-                                "median_kge": np.nan, "median_rmse": np.nan, "n_sites": 0}
-            continue
-        r2s = [e["r2"] for e in entries]
-        kges = [e["kge"] for e in entries]
-        rmses = [e["rmse"] for e in entries]
-        agg_curve[n_val] = {
-            "median_r2": float(np.nanmedian(r2s)),
-            "q25_r2": float(np.nanpercentile(r2s, 25)),
-            "q75_r2": float(np.nanpercentile(r2s, 75)),
-            "median_kge": float(np.nanmedian(kges)),
-            "median_rmse": float(np.nanmedian(rmses)),
-            "n_sites": len(entries),
+        site_mask = (readings["site_id"] == site_id).values
+        site_df = readings[site_mask]
+        site_data_map[site_id] = {
+            "site_id": site_id,
+            "y_pred_ms": site_df["y_pred_model_space"].values,
+            "y_true_ms": site_df["y_true_model_space"].values,
+            "y_true_native": site_df["y_true_native"].values,
+            "turb": site_df["turbidity_instant"].values if "turbidity_instant" in site_df.columns else None,
+            "dates": site_df["sample_time"].values if has_dates else None,
+            "n_site": len(site_df),
         }
 
-    return {
-        "curve": agg_curve,
-        "per_site": per_site_adaptation,
-    }
+    results_by_mode = {}
+
+    for mode in split_modes:
+        logger.info(f"  Split mode: {mode}")
+        curve_results = {n_val: [] for n_val in ADAPTATION_NS}
+        per_site_adaptation = {}
+
+        for site_id in sites:
+            sd = site_data_map[site_id]
+            n_site = sd["n_site"]
+            site_adapt = {}
+
+            for n_val in ADAPTATION_NS:
+                if n_val == 0:
+                    if method == "ols":
+                        site_adapt[0] = np.nan
+                        continue
+                    pred_native = adapt_none(
+                        sd["y_pred_ms"], sd["y_true_ms"],
+                        np.array([]), np.arange(n_site),
+                        transform_type, lmbda, bcf_val,
+                    )
+                    metrics = compute_site_metrics(sd["y_true_native"], pred_native)
+                    curve_results[0].append(metrics)
+                    site_adapt[0] = metrics["r2"]
+                    continue
+
+                if n_val >= n_site:
+                    site_adapt[n_val] = np.nan
+                    continue
+
+                trials = _run_single_adaptation(
+                    sd, n_val, mode, method, n_trials, seed,
+                    transform_type, lmbda, bcf_val, k, df, slope_k, bcf_k_mult,
+                )
+                agg = _aggregate_trials(trials)
+                if agg is not None:
+                    curve_results[n_val].append(agg)
+                    site_adapt[n_val] = agg["r2"]
+                else:
+                    site_adapt[n_val] = np.nan
+
+            per_site_adaptation[site_id] = site_adapt
+
+        results_by_mode[mode] = {
+            "curve": _aggregate_curve(curve_results),
+            "per_site": per_site_adaptation,
+        }
+
+    return results_by_mode
 
 
 # ---------------------------------------------------------------------------
@@ -602,7 +828,7 @@ def save_per_site(
     output_dir: Path,
     label: str,
 ) -> Path:
-    """Save per-site parquet with zero-shot metrics and adaptation R2 at each N."""
+    """Save per-site parquet with zero-shot metrics and adaptation R2 at each N per mode."""
     rows = []
     for site_id, group in readings.groupby("site_id"):
         y_true = group["y_true_native"].values
@@ -611,15 +837,20 @@ def save_per_site(
         row = {
             "site_id": site_id,
             "n_samples": len(group),
-            "r2_native": m["r2"],
+            "nse_native": m["nse"],
+            "log_nse": m["log_nse"],
+            "kge": m["kge"],
             "rmse_native": m["rmse"],
             "mape_pct": m["mape_pct"],
             "frac_within_2x": m["frac_within_2x"],
+            "spearman_rho": m["spearman_rho"],
+            "bias_pct": m["bias_pct"],
         }
-        # Add adaptation results
-        site_adapt = adaptation["per_site"].get(site_id, {})
-        for n_val in ADAPTATION_NS:
-            row[f"r2_at_{n_val}"] = site_adapt.get(n_val, np.nan)
+        # Add adaptation results per mode
+        for mode, mode_data in adaptation.items():
+            site_adapt = mode_data["per_site"].get(site_id, {})
+            for n_val in ADAPTATION_NS:
+                row[f"r2_{mode}_at_{n_val}"] = site_adapt.get(n_val, np.nan)
 
         rows.append(row)
 
@@ -633,6 +864,7 @@ def save_per_site(
 def save_summary(
     readings: pd.DataFrame,
     adaptation: dict,
+    baselines: dict,
     meta: dict,
     args: argparse.Namespace,
     output_dir: Path,
@@ -644,34 +876,50 @@ def save_summary(
     y_pred = readings["y_pred_native"].values
     pooled = compute_site_metrics(y_true, y_pred)
 
-    # Median per-site R2
-    per_site_r2s = []
+    # Median per-site metrics
+    per_site_metrics = []
     for _, group in readings.groupby("site_id"):
         m = compute_site_metrics(group["y_true_native"].values, group["y_pred_native"].values)
-        per_site_r2s.append(m["r2"])
+        per_site_metrics.append(m)
+    per_site_r2s = [m["r2"] for m in per_site_metrics]
 
-    # Adaptation curve (convert int keys to strings for JSON)
-    curve_json = {}
-    for n_val, vals in adaptation["curve"].items():
-        curve_json[str(n_val)] = {k: (None if (isinstance(v, float) and np.isnan(v)) else v) for k, v in vals.items()}
+    def _clean(d):
+        """Replace NaN with None for JSON serialization."""
+        return {k: (None if (isinstance(v, float) and np.isnan(v)) else v) for k, v in d.items()}
+
+    # Adaptation curves per mode (convert int keys to strings for JSON)
+    adaptation_json = {}
+    for mode, mode_data in adaptation.items():
+        curve_json = {}
+        for n_val, vals in mode_data["curve"].items():
+            curve_json[str(n_val)] = _clean(vals)
+        adaptation_json[mode] = {"curve": curve_json}
 
     summary = {
         "label": label,
         "model_path": str(args.model),
         "meta_path": str(args.meta),
         "adaptation_method": args.adaptation,
-        "adaptation_params": {"k": args.k, "df": args.df, "slope_k": args.slope_k, "bcf_k_mult": args.bcf_k_mult, "n_trials": args.n_trials, "seed": args.seed},
+        "adaptation_params": {
+            "k": args.k, "df": args.df, "slope_k": args.slope_k,
+            "bcf_k_mult": args.bcf_k_mult, "n_trials": args.n_trials,
+            "seed": args.seed, "split_modes": args.split_modes.split(","),
+        },
         "holdout_sites": int(readings["site_id"].nunique()),
         "holdout_samples": len(readings),
-        "zero_shot": {
-            "pooled_r2": pooled["r2"],
+        "baselines": {k: _clean(v) for k, v in baselines.items()},
+        "zero_shot": _clean({
+            "pooled_nse": pooled["nse"],
+            "pooled_log_nse": pooled["log_nse"],
             "pooled_kge": pooled["kge"],
             "pooled_rmse": pooled["rmse"],
             "pooled_mape_pct": pooled["mape_pct"],
             "pooled_frac_within_2x": pooled["frac_within_2x"],
+            "pooled_spearman_rho": pooled["spearman_rho"],
+            "pooled_bias_pct": pooled["bias_pct"],
             "median_per_site_r2": float(np.nanmedian(per_site_r2s)),
-        },
-        "adaptation_curve": curve_json,
+        }),
+        "adaptation": adaptation_json,
         "transform_type": meta["transform_type"],
         "transform_lmbda": meta.get("transform_lmbda"),
         "bcf": meta["bcf"],
@@ -685,7 +933,7 @@ def save_summary(
     return path
 
 
-def print_summary(readings: pd.DataFrame, adaptation: dict, method: str):
+def print_summary(readings: pd.DataFrame, adaptation: dict, method: str, baselines: dict):
     """Print human-readable summary to stdout."""
     y_true = readings["y_true_native"].values
     y_pred = readings["y_pred_native"].values
@@ -696,31 +944,55 @@ def print_summary(readings: pd.DataFrame, adaptation: dict, method: str):
         m = compute_site_metrics(group["y_true_native"].values, group["y_pred_native"].values)
         per_site_r2s.append(m["r2"])
 
-    print("\n" + "=" * 60)
+    print("\n" + "=" * 70)
     print("EVALUATION SUMMARY")
-    print("=" * 60)
+    print("=" * 70)
     print(f"Sites: {readings['site_id'].nunique()}  |  Samples: {len(readings)}")
+
+    # Baselines
+    print(f"\nBaselines:")
+    gm = baselines["global_mean"]
+    sm = baselines["site_mean"]
+    print(f"  Global-mean predictor:  NSE={gm['nse']:.4f}  RMSE={gm['rmse']:.1f}  MAPE={gm['mape_pct']:.1f}%")
+    print(f"  Site-mean predictor:    NSE={sm['nse']:.4f}  RMSE={sm['rmse']:.1f}  MAPE={sm['mape_pct']:.1f}%")
+
+    # Zero-shot
     print(f"\nZero-shot (no adaptation):")
-    print(f"  Pooled R2:         {pooled['r2']:.4f}")
-    print(f"  Pooled KGE:        {pooled['kge']:.4f}")
-    print(f"  Pooled RMSE:       {pooled['rmse']:.2f} mg/L")
+    print(f"  NSE/R²:            {pooled['nse']:.4f}")
+    print(f"  Log-NSE:           {pooled['log_nse']:.4f}")
+    print(f"  KGE:               {pooled['kge']:.4f}")
+    print(f"  RMSE:              {pooled['rmse']:.2f} mg/L")
     print(f"  MAPE:              {pooled['mape_pct']:.1f}%")
     print(f"  Within 2x:         {pooled['frac_within_2x']:.1%}")
-    print(f"  Median per-site R2: {np.nanmedian(per_site_r2s):.4f}")
+    print(f"  Spearman rho:      {pooled['spearman_rho']:.4f}")
+    print(f"  Bias:              {pooled['bias_pct']:+.1f}%")
+    print(f"  Median per-site R²: {np.nanmedian(per_site_r2s):.4f}")
 
-    print(f"\nAdaptation curve ({method}):")
-    print(f"  {'N':>4s}  {'Med R2':>8s}  {'Q25':>8s}  {'Q75':>8s}  {'Med KGE':>8s}  {'Sites':>5s}")
-    for n_val in ADAPTATION_NS:
-        c = adaptation["curve"].get(n_val, {})
-        if not c or c.get("n_sites", 0) == 0:
-            continue
-        mr2 = c["median_r2"]
-        q25 = c["q25_r2"]
-        q75 = c["q75_r2"]
-        mkge = c["median_kge"]
-        ns = c["n_sites"]
-        print(f"  {n_val:>4d}  {mr2:>8.4f}  {q25:>8.4f}  {q75:>8.4f}  {mkge:>8.4f}  {ns:>5d}")
-    print("=" * 60 + "\n")
+    # Adaptation curves — one table per split mode
+    for mode in sorted(adaptation.keys()):
+        mode_data = adaptation[mode]
+        label = {"random": "RANDOM (optimistic)", "temporal": "TEMPORAL (first N, predict rest)",
+                 "seasonal": "SEASONAL (one season cal, all test)"}.get(mode, mode.upper())
+        print(f"\nAdaptation curve — {label} ({method}):")
+        print(f"  {'N':>4s}  {'Med R²':>8s}  {'95% CI':>16s}  {'Log-NSE':>8s}  "
+              f"{'KGE':>6s}  {'MAPE':>6s}  {'2x':>5s}  {'Bias':>7s}  {'Sites':>5s}")
+        for n_val in ADAPTATION_NS:
+            c = mode_data["curve"].get(n_val, {})
+            if not c or c.get("n_sites", 0) == 0:
+                continue
+            mr2 = c["median_r2"]
+            ci_lo = c.get("ci_lower_r2", np.nan)
+            ci_hi = c.get("ci_upper_r2", np.nan)
+            mlnse = c.get("median_log_nse", np.nan)
+            mkge = c.get("median_kge", np.nan)
+            mmape = c.get("median_mape", np.nan)
+            m2x = c.get("median_within_2x", np.nan)
+            mbias = c.get("median_bias", np.nan)
+            ns = c["n_sites"]
+            ci_str = f"[{ci_lo:+.3f}, {ci_hi:+.3f}]" if np.isfinite(ci_lo) else "      —       "
+            print(f"  {n_val:>4d}  {mr2:>+8.4f}  {ci_str:>16s}  {mlnse:>+8.4f}  "
+                  f"{mkge:>+6.3f}  {mmape:>5.1f}%  {m2x:>4.1f}%  {mbias:>+6.1f}%  {ns:>5d}")
+    print("=" * 70 + "\n")
 
 
 # ---------------------------------------------------------------------------
@@ -741,6 +1013,8 @@ def main():
     parser.add_argument("--df", type=float, default=4, help="Student-t prior degrees of freedom (default: 4)")
     parser.add_argument("--slope-k", type=float, default=10, help="Slope shrinkage constant for N>=10 (default: 10)")
     parser.add_argument("--bcf-k-mult", type=float, default=3.0, help="BCF shrinkage multiplier (default: 3.0)")
+    parser.add_argument("--split-modes", type=str, default="random,temporal,seasonal",
+                        help="Comma-separated split modes (default: random,temporal,seasonal)")
     parser.add_argument("--output-dir", type=str, default=None,
                         help="Output directory (default: data/results/evaluations/)")
     args = parser.parse_args()
@@ -789,21 +1063,26 @@ def main():
     readings = predict_holdout(model, holdout, meta)
     assert not readings["y_pred_native"].isna().any(), "NaN in native predictions"
 
-    # Run adaptation curve
-    logger.info(f"Running adaptation curve ({args.adaptation})...")
+    # Compute baselines
+    logger.info("Computing baselines...")
+    baselines = compute_baseline_metrics(readings)
+
+    # Run adaptation curve (all split modes)
+    split_modes = [m.strip() for m in args.split_modes.split(",")]
+    logger.info(f"Running adaptation curve ({args.adaptation}, modes: {split_modes})...")
     adaptation = run_adaptation_curve(
         readings, meta, args.adaptation, args.seed, args.n_trials, args.k, args.df,
-        args.slope_k, args.bcf_k_mult,
+        args.slope_k, args.bcf_k_mult, split_modes=split_modes,
     )
 
     # Save outputs
     logger.info("Saving outputs...")
     save_per_reading(readings, output_dir, args.label)
     save_per_site(readings, adaptation, output_dir, args.label)
-    save_summary(readings, adaptation, meta, args, output_dir, args.label)
+    save_summary(readings, adaptation, baselines, meta, args, output_dir, args.label)
 
     # Print summary
-    print_summary(readings, adaptation, args.adaptation)
+    print_summary(readings, adaptation, args.adaptation, baselines)
 
     elapsed = time.time() - t0
     logger.info(f"Done in {elapsed:.1f}s")
