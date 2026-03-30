@@ -124,6 +124,8 @@ def parse_train_output(output: str) -> dict:
                             metrics["rmse_native"] = float(part.split("=")[1])
                         elif "Bias=" in part:
                             metrics["bias_pct"] = float(part.split("=")[1].rstrip("%"))
+                        elif "MedSiteR" in part and "=" in part:
+                            metrics["med_site_r2"] = float(part.split("=")[1])
                         elif "BCF=" in part:
                             metrics["bcf"] = float(part.split("=")[1])
             except (ValueError, IndexError):
@@ -165,6 +167,11 @@ def run_one_experiment(label: str, drop_features: list[str], timeout: int = 600)
         "--label", label,
         "--drop-features", ",".join(drop_features),
     ]
+
+    # Exclude holdout + vault sites from GKF5 training
+    exclude_path = DATA_DIR / "exclude_sites_for_ablation.csv"
+    if exclude_path.exists():
+        cmd.extend(["--exclude-sites", str(exclude_path)])
 
     start = time.time()
     try:
@@ -240,8 +247,12 @@ def _save_quick_model(drop_features: list[str], model_path: Path, meta_path: Pat
         sgmc = pd.read_parquet(sgmc_path)
         watershed_attrs = watershed_attrs.merge(sgmc, on="site_id", how="left")
 
-    # Build tiers
-    split = pd.read_parquet(DATA_DIR / "train_holdout_split.parquet")
+    # Build tiers — use 3-way split, exclude vault sites from training
+    split_path = DATA_DIR / "train_holdout_vault_split.parquet"
+    if split_path.exists():
+        split = pd.read_parquet(split_path)
+    else:
+        split = pd.read_parquet(DATA_DIR / "train_holdout_split.parquet")
     train_sites = split[split["role"] == "training"]["site_id"]
     assembled = paired[paired["site_id"].isin(train_sites)]
 

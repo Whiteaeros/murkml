@@ -627,6 +627,26 @@ def train_catboost_logo_quick(
             f"min={trees.min():.0f}, max={trees.max():.0f}"
         )
 
+    # Compute per-site R² from out-of-fold predictions
+    # In GKF5, each fold has multiple sites — use sample_records to get per-site metrics
+    per_site_r2_native = []
+    if len(samples_df) > 0 and "site_id" in samples_df.columns:
+        for site_id, sdf in samples_df.groupby("site_id"):
+            yt = sdf["y_true_native_mgL"].values
+            yp = sdf["y_pred_native_mgL"].values
+            if len(yt) >= 2:
+                ss_tot = np.sum((yt - yt.mean()) ** 2)
+                if ss_tot > 1e-10:
+                    ss_res = np.sum((yt - yp) ** 2)
+                    per_site_r2_native.append(1 - ss_res / ss_tot)
+
+    median_per_site_r2 = float(np.nanmedian(per_site_r2_native)) if per_site_r2_native else np.nan
+    if per_site_r2_native:
+        logger.info(
+            f"    Per-site R²(native): median={median_per_site_r2:.4f}, "
+            f"n_sites={len(per_site_r2_native)}"
+        )
+
     summary = {
         "r2_log": metrics_df["r2_log"].median(),
         "kge_log": metrics_df["kge_log"].median(),
@@ -639,6 +659,7 @@ def train_catboost_logo_quick(
         "n_folds": len(metrics_df),
         "n_samples": len(clean),
         "median_trees": float(metrics_df["n_trees"].median()) if "n_trees" in metrics_df.columns else None,
+        "median_per_site_r2": median_per_site_r2,
     }
     return summary, metrics_df, samples_df
 
@@ -909,6 +930,10 @@ def main():
         "--kge-eval", action="store_true",
         help="Use KGE as eval_metric for early stopping instead of RMSE",
     )
+    parser.add_argument(
+        "--exclude-sites", type=str, default=None,
+        help="Path to CSV with site_id column — exclude these sites from training/CV",
+    )
     args = parser.parse_args()
 
     transform_type = args.transform
@@ -975,6 +1000,15 @@ def main():
 
         assembled = pd.read_parquet(dataset_path)
         log_file(dataset_path, role="input")
+
+        # Exclude vault/holdout sites if specified
+        if args.exclude_sites:
+            exclude_df = pd.read_csv(args.exclude_sites)
+            exclude_ids = set(exclude_df["site_id"])
+            n_before = len(assembled)
+            assembled = assembled[~assembled["site_id"].isin(exclude_ids)]
+            logger.info(f"Excluded {n_before - len(assembled)} samples from {len(exclude_ids)} sites")
+
         target_col = cfg["target_col"]
 
         # Apply chosen transform to target (overwrite the log1p column)
@@ -1044,6 +1078,7 @@ def main():
                 f"    R²(log)={result['r2_log']:.3f}  KGE(log)={result['kge_log']:.3f}  "
                 f"alpha={result.get('kge_alpha', float('nan')):.3f}  |  "
                 f"R²(mg/L)={result.get('r2_native', float('nan')):.3f}  "
+                f"MedSiteR²={result.get('median_per_site_r2', float('nan')):.4f}  "
                 f"RMSE(mg/L)={result.get('rmse_native_mgL', float('nan')):.1f}  "
                 f"Bias={result.get('pbias_native', float('nan')):.1f}%  "
                 f"BCF={result.get('smearing_factor', float('nan')):.3f}"
