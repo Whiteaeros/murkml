@@ -47,11 +47,17 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 
 def get_current_features() -> list[str]:
-    """Get the 44 features from the current model meta."""
+    """Get all features from the current model meta (numeric + categorical)."""
     meta_path = DATA_DIR / "results" / "models" / "ssc_C_sensor_basic_watershed_meta.json"
     with open(meta_path) as f:
         meta = json.load(f)
-    return meta["feature_cols"]
+    features = list(meta["feature_cols"])
+    # Add categorical features — always include these three
+    # (older meta.json versions may have empty cat_cols)
+    for cat in ["collection_method", "turb_source", "sensor_family"]:
+        if cat not in features:
+            features.append(cat)
+    return features
 
 
 def get_sgmc_features() -> list[str]:
@@ -137,10 +143,14 @@ def parse_train_output(output: str) -> dict:
 
 
 def run_one_experiment(label: str, drop_features: list[str], timeout: int = 600) -> dict:
-    """Run a single GKF5 training experiment.
+    """Run a single GKF5 training experiment + save a quick model.
+
+    1. Runs GKF5 via train_tiered.py with --skip-save-model (fast, metrics only)
+    2. Then trains one CatBoost model on all data and saves it with unique label
 
     Returns dict with metrics + status. Never raises — catches all errors.
     """
+    # Step 1: GKF5 for metrics (fast, no model save)
     cmd = [
         PYTHON, TRAIN_SCRIPT,
         "--param", "ssc",
@@ -148,8 +158,9 @@ def run_one_experiment(label: str, drop_features: list[str], timeout: int = 600)
         "--cv-mode", "gkf5",
         "--transform", "boxcox",
         "--boxcox-lambda", "0.2",
-        "--n-jobs", "8",
+        "--n-jobs", "5",
         "--skip-ridge",
+        "--skip-save-model",
         "--skip-shap",
         "--label", label,
         "--drop-features", ",".join(drop_features),
@@ -161,18 +172,35 @@ def run_one_experiment(label: str, drop_features: list[str], timeout: int = 600)
             cmd, capture_output=True, text=True, timeout=timeout,
             cwd=str(PROJECT_ROOT),
         )
-        elapsed = time.time() - start
+        elapsed_cv = time.time() - start
 
         if result.returncode != 0:
-            logger.error(f"  FAILED ({elapsed:.0f}s): {result.stderr[-2000:]}")
+            logger.error(f"  GKF5 FAILED ({elapsed_cv:.0f}s): {result.stderr[-2000:]}")
             return {
                 "label": label,
                 "status": "FAILED",
                 "error_msg": result.stderr[-2000:],
-                "elapsed_sec": elapsed,
+                "elapsed_sec": elapsed_cv,
             }
 
         metrics = parse_train_output(result.stderr)
+
+        # Step 2: Quick model save — train one model on all data
+        model_path = RESULTS_DIR / "models" / f"ssc_C_sensor_basic_watershed_{label}.cbm"
+        meta_path = RESULTS_DIR / "models" / f"ssc_C_sensor_basic_watershed_{label}_meta.json"
+
+        if not model_path.exists():  # NEVER overwrite
+            try:
+                t2 = time.time()
+                _save_quick_model(drop_features, model_path, meta_path)
+                elapsed_save = time.time() - t2
+                logger.info(f"  Model saved ({elapsed_save:.0f}s): {model_path.name}")
+            except Exception as e:
+                logger.warning(f"  Model save failed (metrics still valid): {e}")
+        else:
+            logger.info(f"  Model already exists: {model_path.name}")
+
+        elapsed = time.time() - start
         metrics["label"] = label
         metrics["status"] = "OK"
         metrics["elapsed_sec"] = round(elapsed, 1)
@@ -186,6 +214,105 @@ def run_one_experiment(label: str, drop_features: list[str], timeout: int = 600)
         elapsed = time.time() - start
         logger.error(f"  ERROR: {e}")
         return {"label": label, "status": "ERROR", "error_msg": str(e), "elapsed_sec": elapsed}
+
+
+def _save_quick_model(drop_features: list[str], model_path: Path, meta_path: Path):
+    """Train one CatBoost model on all Tier C data and save it.
+
+    Faster than the full train_tiered.py final model section because we skip
+    LOGO CV, Ridge, SHAP, and all the infrastructure.
+    """
+    from catboost import CatBoostRegressor, Pool
+    from scipy.special import boxcox1p
+
+    sys.path.insert(0, str(PROJECT_ROOT / "src"))
+    from murkml.data.attributes import build_feature_tiers, load_streamcat_attrs
+    from murkml.evaluate.metrics import snowdon_bcf, safe_inv_boxcox1p
+
+    # Load data (same as train_tiered.py)
+    paired = pd.read_parquet(DATA_DIR / "processed" / "turbidity_ssc_paired.parquet")
+    basic_attrs = pd.read_parquet(DATA_DIR / "site_attributes.parquet")
+    watershed_attrs = load_streamcat_attrs(DATA_DIR)
+
+    # Merge SGMC
+    sgmc_path = DATA_DIR / "sgmc" / "sgmc_features_for_model.parquet"
+    if sgmc_path.exists() and watershed_attrs is not None:
+        sgmc = pd.read_parquet(sgmc_path)
+        watershed_attrs = watershed_attrs.merge(sgmc, on="site_id", how="left")
+
+    # Build tiers
+    split = pd.read_parquet(DATA_DIR / "train_holdout_split.parquet")
+    train_sites = split[split["role"] == "training"]["site_id"]
+    assembled = paired[paired["site_id"].isin(train_sites)]
+
+    tiers = build_feature_tiers(assembled, basic_attrs, watershed_attrs)
+    tier_data = tiers["C_sensor_basic_watershed"]["data"]
+    feature_cols = tiers["C_sensor_basic_watershed"]["feature_cols"]
+
+    # Apply drop list
+    feature_cols = [c for c in feature_cols if c not in drop_features]
+
+    # Separate numeric and categorical
+    cat_cols = [c for c in feature_cols if tier_data[c].dtype == "object" or tier_data[c].dtype.name == "category"]
+    num_cols = [c for c in feature_cols if c not in cat_cols]
+    cat_indices = [feature_cols.index(c) for c in cat_cols]
+
+    # Prepare data
+    lmbda = 0.2
+    X = tier_data[feature_cols].copy()
+    y_raw = tier_data["lab_value"].values
+    y = boxcox1p(y_raw, lmbda)
+
+    train_median = X[num_cols].median()
+    X[num_cols] = X[num_cols].fillna(train_median)
+
+    # Monotone constraints
+    mono = {}
+    for col in ["turbidity_instant", "turbidity_max_1hr"]:
+        if col in feature_cols:
+            mono[feature_cols.index(col)] = 1
+
+    # Train
+    pool = Pool(X, y, cat_features=cat_indices)
+    model = CatBoostRegressor(
+        iterations=500, learning_rate=0.05, depth=6, l2_leaf_reg=3,
+        random_seed=42, verbose=0, thread_count=6,
+        monotone_constraints=mono if mono else None,
+    )
+    model.fit(pool)
+
+    # BCF
+    y_pred = model.predict(pool)
+    native_true = y_raw
+    native_pred = safe_inv_boxcox1p(y_pred, lmbda)
+    native_pred = np.clip(native_pred, 1e-6, None)
+    bcf_val = float(np.mean(native_true) / np.mean(native_pred))
+    bcf_val = np.clip(bcf_val, 0.5, 5.0)
+
+    # Save model
+    model.save_model(str(model_path))
+
+    # Save meta
+    meta = {
+        "schema_version": 3,
+        "param": "ssc",
+        "tier": "C_sensor_basic_watershed",
+        "transform_type": "boxcox",
+        "transform_lmbda": lmbda,
+        "feature_cols": num_cols,
+        "cat_cols": cat_cols,
+        "cat_indices": cat_indices,
+        "train_median": {k: float(v) for k, v in train_median.items()},
+        "n_sites": int(tier_data["site_id"].nunique()),
+        "n_samples": len(tier_data),
+        "n_trees": model.tree_count_,
+        "bcf": float(bcf_val),
+        "bcf_method": "snowdon",
+        "monotone_constraints": bool(mono),
+        "ablation_label": str(model_path.stem),
+    }
+    with open(meta_path, "w") as f:
+        json.dump(meta, f, indent=2)
 
 
 # ---------------------------------------------------------------------------
@@ -277,8 +404,9 @@ def _run(args):
     logger.info(f"  SGMC features: {len(sgmc_features)}")
     logger.info(f"  Base drop list: {len(base_drop_list)} features")
 
-    all_features = current_features + sgmc_features
-    logger.info(f"  Total features to screen: {len(all_features)}")
+    # Deduplicate — SGMC features may already be in meta if model was trained with them
+    all_features = list(dict.fromkeys(current_features + sgmc_features))
+    logger.info(f"  Total features to screen: {len(all_features)} (deduplicated)")
 
     # Build experiment list
     experiments = []
@@ -315,18 +443,53 @@ def _run(args):
             else:
                 logger.warning(f"  {feat} not in drop list — skipping reintroduce")
 
-    # Load checkpoint and filter already-completed experiments
+    # Check which experiments already have models saved (NEVER re-run those)
+    import glob
+    existing_models = set()
+    for f in glob.glob(str(RESULTS_DIR / "models" / "ssc_C_sensor_basic_watershed_*.cbm")):
+        name = Path(f).stem.replace("ssc_C_sensor_basic_watershed_", "")
+        existing_models.add(name)
+
+    # Check which experiments already have screening metrics
+    screening_csv = RESULTS_DIR / "phase5_screening_results.csv"
+    has_screening = set()
+    if screening_csv.exists():
+        screen_df = pd.read_csv(screening_csv)
+        has_screening = set(f"drop_{f}" for f in screen_df[screen_df["type"] == "drop"]["feature"])
+        has_screening |= set(f"add_{f}" for f in screen_df[screen_df["type"] == "reintroduce"]["feature"])
+        has_screening.add("phase5_baseline")
+        logger.info(f"  Screening CSV has metrics for {len(has_screening)} experiments")
+
+    # Load checkpoint parquet and filter already-completed experiments
     existing = load_existing_results()
     completed_labels = set(existing["label"]) if len(existing) > 0 else set()
-    remaining = [e for e in experiments if e["label"] not in completed_labels]
+
+    # Determine what each experiment needs
+    remaining = []
+    for e in experiments:
+        label = e["label"]
+        has_model = label in existing_models
+        has_metrics = label in completed_labels or label in has_screening
+
+        if has_model and has_metrics:
+            continue  # fully done, skip
+        elif has_metrics and not has_model:
+            e["mode"] = "model_only"  # just need the model, skip GKF5
+            remaining.append(e)
+        else:
+            e["mode"] = "full"  # need both GKF5 metrics + model
+            remaining.append(e)
+
+    n_model_only = sum(1 for e in remaining if e["mode"] == "model_only")
+    n_full = sum(1 for e in remaining if e["mode"] == "full")
 
     logger.info(f"\n{'='*70}")
-    logger.info(f"PHASE 5 ABLATION SCREENING")
+    logger.info(f"PHASE 5 ABLATION")
     logger.info(f"{'='*70}")
     logger.info(f"Total experiments: {len(experiments)}")
-    logger.info(f"Already completed: {len(completed_labels)}")
-    logger.info(f"Remaining: {len(remaining)}")
-    est_min = len(remaining) * 4 / max(args.parallel, 1)
+    logger.info(f"Already fully done (model + metrics): {len(experiments) - len(remaining)}")
+    logger.info(f"Remaining: {len(remaining)} ({n_model_only} model-only, {n_full} full)")
+    est_min = n_model_only * 1.5 + n_full * 4  # model-only ~90s, full ~240s
     logger.info(f"Estimated time: ~{est_min:.0f} min ({est_min/60:.1f} hrs)")
     logger.info(f"{'='*70}\n")
 
@@ -336,28 +499,46 @@ def _run(args):
         return
 
     # Run experiments
-    n_total = len(experiments)
-    n_done = len(completed_labels)
+    n_total = len(remaining)
+    n_done = 0
     n_failed = 0
 
     for i, exp in enumerate(remaining):
         n_done += 1
-        logger.info(f"[{n_done}/{n_total}] {exp['label']} ({exp['type']}: {exp['feature'] or 'baseline'})")
+        mode_str = exp["mode"]
+        logger.info(f"[{n_done}/{n_total}] {exp['label']} ({exp['type']}: {exp['feature'] or 'baseline'}) [{mode_str}]")
 
-        result = run_one_experiment(exp["label"], exp["drop_list"])
-        result["type"] = exp["type"]
-        result["feature"] = exp["feature"]
-
-        if result["status"] != "OK":
-            n_failed += 1
-            logger.warning(f"  >>> {result['status']}: {result.get('error_msg', '')[:200]}")
+        if mode_str == "model_only":
+            # We already have metrics from the screening CSV — just save the model
+            model_path = RESULTS_DIR / "models" / f"ssc_C_sensor_basic_watershed_{exp['label']}.cbm"
+            meta_path = RESULTS_DIR / "models" / f"ssc_C_sensor_basic_watershed_{exp['label']}_meta.json"
+            if model_path.exists():
+                logger.info(f"  Model already exists, skipping")
+                continue
+            try:
+                t0 = time.time()
+                _save_quick_model(exp["drop_list"], model_path, meta_path)
+                elapsed = time.time() - t0
+                logger.info(f"  Model saved ({elapsed:.0f}s): {model_path.name}")
+            except Exception as e:
+                n_failed += 1
+                logger.error(f"  Model save FAILED: {e}")
         else:
-            r2n = result.get("r2_native", np.nan)
-            r2l = result.get("r2_log", np.nan)
-            logger.info(f"  R2_native={r2n:.4f}  R2_log={r2l:.4f}  ({result['elapsed_sec']:.0f}s)")
+            # Full run: GKF5 metrics + model save
+            result = run_one_experiment(exp["label"], exp["drop_list"])
+            result["type"] = exp["type"]
+            result["feature"] = exp["feature"]
 
-        # Save immediately
-        existing = save_result(result, existing)
+            if result["status"] != "OK":
+                n_failed += 1
+                logger.warning(f"  >>> {result['status']}: {result.get('error_msg', '')[:200]}")
+            else:
+                r2n = result.get("r2_native", np.nan)
+                r2l = result.get("r2_log", np.nan)
+                logger.info(f"  R2_native={r2n:.4f}  R2_log={r2l:.4f}  ({result['elapsed_sec']:.0f}s)")
+
+            # Save metrics immediately
+            existing = save_result(result, existing)
 
     # Final summary
     logger.info(f"\n{'='*70}")
