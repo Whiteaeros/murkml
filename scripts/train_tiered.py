@@ -1256,9 +1256,12 @@ def main():
                     train_native_pred = np.square(y_train_pred_final)
                 final_bcf = snowdon_bcf(train_native_true, train_native_pred)
 
-            # Save model
+            # Save model — include label if provided for versioned filenames
             safe_tier = tier_name.replace("/", "_")
-            model_path = model_dir / f"{param_name}_{safe_tier}.cbm"
+            if args.label:
+                model_path = model_dir / f"{param_name}_{safe_tier}_{args.label}.cbm"
+            else:
+                model_path = model_dir / f"{param_name}_{safe_tier}.cbm"
             model.save_model(str(model_path))
 
             # Save metadata (schema v2 with applicability fields)
@@ -1365,7 +1368,10 @@ def main():
                     f"Ecoregion data may not have been loaded."
                 )
 
-            meta_path = model_dir / f"{param_name}_{safe_tier}_meta.json"
+            if args.label:
+                meta_path = model_dir / f"{param_name}_{safe_tier}_{args.label}_meta.json"
+            else:
+                meta_path = model_dir / f"{param_name}_{safe_tier}_meta.json"
             with open(meta_path, "w") as f:
                 json.dump(meta, f, indent=2)
 
