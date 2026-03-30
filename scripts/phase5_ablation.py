@@ -186,8 +186,8 @@ def run_one_experiment(label: str, drop_features: list[str], timeout: int = 600)
         metrics = parse_train_output(result.stderr)
 
         # Step 2: Quick model save — train one model on all data
-        model_path = RESULTS_DIR / "models" / f"ssc_C_sensor_basic_watershed_{label}.cbm"
-        meta_path = RESULTS_DIR / "models" / f"ssc_C_sensor_basic_watershed_{label}_meta.json"
+        model_path = RESULTS_DIR / "models" / f"ssc_C_sensor_basic_watershed_{label}_es.cbm"
+        meta_path = RESULTS_DIR / "models" / f"ssc_C_sensor_basic_watershed_{label}_es_meta.json"
 
         if not model_path.exists():  # NEVER overwrite
             try:
@@ -272,17 +272,27 @@ def _save_quick_model(drop_features: list[str], model_path: Path, meta_path: Pat
         if col in feature_cols:
             mono[feature_cols.index(col)] = 1
 
-    # Train
-    pool = Pool(X, y, cat_features=cat_indices)
+    # Validation split (grouped by site to prevent leakage)
+    from sklearn.model_selection import GroupShuffleSplit
+    sites = tier_data["site_id"].values
+    gss = GroupShuffleSplit(n_splits=1, test_size=0.15, random_state=42)
+    train_idx, val_idx = next(gss.split(X, y, groups=sites))
+
+    train_pool = Pool(X.iloc[train_idx], y[train_idx], cat_features=cat_indices)
+    val_pool = Pool(X.iloc[val_idx], y[val_idx], cat_features=cat_indices)
+
+    # Train with early stopping (mirrors GKF5 fold training)
     model = CatBoostRegressor(
         iterations=500, learning_rate=0.05, depth=6, l2_leaf_reg=3,
         random_seed=42, verbose=0, thread_count=6,
+        early_stopping_rounds=50,
         monotone_constraints=mono if mono else None,
     )
-    model.fit(pool)
+    model.fit(train_pool, eval_set=val_pool)
 
-    # BCF
-    y_pred = model.predict(pool)
+    # BCF (compute on full training data)
+    full_pool = Pool(X, cat_features=cat_indices)
+    y_pred = model.predict(full_pool)
     native_true = y_raw
     native_pred = safe_inv_boxcox1p(y_pred, lmbda)
     native_pred = np.clip(native_pred, 1e-6, None)
@@ -299,7 +309,7 @@ def _save_quick_model(drop_features: list[str], model_path: Path, meta_path: Pat
         "tier": "C_sensor_basic_watershed",
         "transform_type": "boxcox",
         "transform_lmbda": lmbda,
-        "feature_cols": num_cols,
+        "feature_cols": feature_cols,
         "cat_cols": cat_cols,
         "cat_indices": cat_indices,
         "train_median": {k: float(v) for k, v in train_median.items()},
@@ -443,11 +453,11 @@ def _run(args):
             else:
                 logger.warning(f"  {feat} not in drop list — skipping reintroduce")
 
-    # Check which experiments already have models saved (NEVER re-run those)
+    # Check which experiments already have early-stopped models saved (NEVER re-run those)
     import glob
     existing_models = set()
-    for f in glob.glob(str(RESULTS_DIR / "models" / "ssc_C_sensor_basic_watershed_*.cbm")):
-        name = Path(f).stem.replace("ssc_C_sensor_basic_watershed_", "")
+    for f in glob.glob(str(RESULTS_DIR / "models" / "ssc_C_sensor_basic_watershed_*_es.cbm")):
+        name = Path(f).stem.replace("ssc_C_sensor_basic_watershed_", "").replace("_es", "")
         existing_models.add(name)
 
     # Check which experiments already have screening metrics
@@ -510,8 +520,8 @@ def _run(args):
 
         if mode_str == "model_only":
             # We already have metrics from the screening CSV — just save the model
-            model_path = RESULTS_DIR / "models" / f"ssc_C_sensor_basic_watershed_{exp['label']}.cbm"
-            meta_path = RESULTS_DIR / "models" / f"ssc_C_sensor_basic_watershed_{exp['label']}_meta.json"
+            model_path = RESULTS_DIR / "models" / f"ssc_C_sensor_basic_watershed_{exp['label']}_es.cbm"
+            meta_path = RESULTS_DIR / "models" / f"ssc_C_sensor_basic_watershed_{exp['label']}_es_meta.json"
             if model_path.exists():
                 logger.info(f"  Model already exists, skipping")
                 continue

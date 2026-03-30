@@ -129,6 +129,15 @@ def load_holdout_data(meta: dict) -> pd.DataFrame:
     holdout = holdout.merge(streamcat_clean, on="site_id", how="left")
     logger.info(f"  After StreamCat merge: {len(holdout)} samples")
 
+    # 5. Merge SGMC lithology (if available)
+    sgmc_path = DATA_DIR / "sgmc" / "sgmc_features_for_model.parquet"
+    if sgmc_path.exists():
+        sgmc = pd.read_parquet(sgmc_path)
+        overlap_sgmc = set(sgmc.columns) & set(holdout.columns) - {"site_id"}
+        sgmc_clean = sgmc.drop(columns=list(overlap_sgmc))
+        holdout = holdout.merge(sgmc_clean, on="site_id", how="left")
+        logger.info(f"  After SGMC merge: {len(holdout)} samples")
+
     # Assertions
     n_sites = holdout["site_id"].nunique()
     n_samples = len(holdout)
