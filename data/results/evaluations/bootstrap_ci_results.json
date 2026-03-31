@@ -1,0 +1,47 @@
+{
+  "pooled_NSE": {
+    "point": 0.284,
+    "ci_lo": 0.2146,
+    "ci_hi": 0.4923
+  },
+  "pooled_logNSE": {
+    "point": 0.7668,
+    "ci_lo": 0.7235,
+    "ci_hi": 0.8079
+  },
+  "pooled_KGE": {
+    "point": 0.2748,
+    "ci_lo": 0.1298,
+    "ci_hi": 0.621
+  },
+  "MedSiteR2": {
+    "point": 0.409,
+    "ci_lo": 0.1435,
+    "ci_hi": 0.4585
+  },
+  "MedSiteMAPE": {
+    "point": 76.2518,
+    "ci_lo": 69.6817,
+    "ci_hi": 85.7882
+  },
+  "MedSiteSpearman": {
+    "point": 0.8731,
+    "ci_lo": 0.8415,
+    "ci_hi": 0.886
+  },
+  "MeanSiteR2_weighted": {
+    "point": -0.0351,
+    "ci_lo": -0.248,
+    "ci_hi": 0.1905
+  },
+  "frac_R2_gt_0": {
+    "point": 0.6806,
+    "ci_lo": 0.5957,
+    "ci_hi": 0.7674
+  },
+  "frac_R2_gt_0.5": {
+    "point": 0.3472,
+    "ci_lo": 0.2609,
+    "ci_hi": 0.4318
+  }
+}
