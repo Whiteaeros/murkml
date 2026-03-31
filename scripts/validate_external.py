@@ -193,6 +193,18 @@ def main():
         except Exception as e:
             logger.warning(f"  Could not match watershed features: {e}")
 
+    # Ensure no NaN in categorical features (CatBoost rejects them)
+    for col in cat_cols:
+        if col in X.columns and X[col].isna().any():
+            X[col] = X[col].fillna("missing").astype(str)
+
+    # Compute derived features if needed
+    if "log_drainage_area" in feature_cols and "log_drainage_area" not in X.columns:
+        if "drainage_area_km2" in X.columns:
+            X["log_drainage_area"] = np.log1p(X["drainage_area_km2"].clip(lower=0))
+        else:
+            X["log_drainage_area"] = np.nan
+
     # Make predictions
     logger.info("Running predictions...")
     pool = Pool(X, cat_features=cat_indices)
