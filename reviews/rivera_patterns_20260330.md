@@ -1,142 +1,246 @@
-# Dr. Marcus Rivera — Data Patterns Review
-## 2026-03-30
-
-**Reviewer background:** 20 years USGS Water Resources Division. Sediment transport, surrogate regression, turbidity-SSC method development. Thousands of datasets, dozens of WRR reviews.
-
----
-
-## Question 1: What other patterns should we look for in this data?
-
-There are several things I'd dig into that aren't in the briefing:
-
-**Hysteresis classification.** You have 213 site-days with 10+ samples (Pattern 9) but I don't see any analysis of clockwise vs. counterclockwise hysteresis loops in the turbidity-SSC-discharge space. This is fundamental sediment transport physics. Clockwise hysteresis means sediment source is proximal and exhausts before the flow peak. Counterclockwise means distal sources or bank collapse on the falling limb. Your model should perform differently on these two regimes, and if it doesn't, that's a red flag that it's not learning the right thing. Classify each storm event and stratify your errors by hysteresis type.
-
-**Spatial autocorrelation of residuals.** Are sites that are geographically close to each other making similar errors? Run a Moran's I on the site-level median residuals using the site coordinates. If there's significant spatial autocorrelation, your model is missing a regional covariate (geology, land use, sediment mineralogy) and a WRR reviewer will catch this immediately.
-
-**Grain size distribution effects.** The SSC/turbidity ratio differences by collection method (Pattern 6) are partly about vertical grain size sorting. Auto_point samplers near the bed capture more sand, which adds mass but not much turbidity. Depth-integrated samples average over the profile. If you have any concurrent bedload or grain size data (USGS parameter codes 80154, 70331), even at a handful of sites, you should check whether the model's residuals correlate with percent sand. This is THE classic confounder in turbidity-SSC work.
-
-**Sensor type and range effects.** Not all turbidity sensors are created equal. The Hach 2100AN and the YSI 6136 read differently on the same water sample, especially above 1000 FNU. Are you tracking which sensor model is deployed at each site? If not, at minimum check whether your errors cluster by the turbidity parameter code (63680 vs 63676 vs others). Mixing FNU, NTU, and NTRU without accounting for sensor response curves introduces systematic noise.
-
-**Discharge-normalized SSC.** Look at SSC/Q ratios across sites. Sites with high SSC/Q have easily mobilized sediment (fine-grained, disturbed catchments). Sites with low SSC/Q are armored or supply-limited. This ratio should predict your model's error pattern. If it doesn't, something is wrong.
-
-**First-flush vs. sustained events.** In the ISCO burst data, does the model's error change over the course of a storm event? If accuracy degrades as the event progresses, the model may be over-relying on turbidity magnitude and not capturing sediment exhaustion dynamics.
+# Dr. Marcus Rivera — Data Patterns & Next Steps Review
+**Date:** 2026-03-30
+**Affiliation:** USGS Water Resources Division (ret.), 20 years sediment transport & surrogate regression
 
 ---
 
-## Question 2: Adaptation hurting extremes at N=20
+## Summary
 
-This is textbook overfitting to the wrong part of the distribution. Here's what's happening mechanistically:
-
-When you give the Bayesian adaptation 20 calibration samples, the majority of those samples are from normal/baseflow conditions (because that's what most samples are). The adaptation shifts the site-specific parameters to minimize error on those normal samples. But the turbidity-SSC relationship during storms is physically different — it's driven by mechanical erosion and sediment mobilization, not by DOM and biofouling. By tuning to baseflow, you're rotating the regression away from the storm relationship.
-
-**What I'd do:**
-
-1. **Flow-stratified adaptation, yes, absolutely.** Split calibration samples into "event" (above some percentile of site-specific discharge, or above a rate-of-change threshold on turbidity) and "baseflow." Adapt separately. This is the single most important fix.
-
-2. **Cap adaptation magnitude.** Put a prior or hard constraint on how far the adaptation can move the prediction from the zero-shot estimate. Something like: the adapted prediction can't differ from zero-shot by more than X% at turbidity values above the 90th percentile. This protects the extremes that the pooled model already handles well.
-
-3. **Weighted adaptation loss.** Weight the calibration samples by turbidity magnitude or by SSC magnitude when computing the adaptation parameters. This prevents the baseflow samples from dominating.
-
-4. **Show us the adaptation at N=1, 5, 10, 20 as individual curves on a turbidity-SSC scatterplot for 3-4 example sites.** I want to see the regression line rotating. If the line is flattening at high turbidity at N=20, that confirms the mechanism I described.
-
-5. **Report performance at N=20 for extremes separately for sites where the 20 samples include at least one storm sample vs. sites where all 20 are baseflow.** I bet the collapse only happens when there are no storms in the calibration set.
-
-The N=20 collapse from 0.722 to 0.295 is severe. That's not a subtle degradation, that's the model becoming actively harmful for flood-event estimation. If you're going to recommend this tool for operational use, you need a guardrail that prevents this. A WRR reviewer will hammer you on this.
+I've spent time with the actual data files rather than just reasoning from the briefing summaries. Several of the patterns you've documented are solid and publishable. But I found things that concern me — some that could be red flags, some that are missed opportunities. I'll walk through each question with evidence.
 
 ---
 
-## Question 3: Additional validation tests for paper-readiness
+## Question 1: What other patterns should we look for?
 
-Here's what I'd demand as a reviewer, roughly in priority order:
+### Pattern A: Systematic Over-Prediction Bias — This is a Problem
 
-**A. Holdout by HUC or ecoregion, not just by site.** Your LOGO-CV leaves out individual sites, but sites in the same watershed share geology, land use, and climate. If your training set includes 5 sites on the Yakima and you test on a 6th Yakima site, that's not truly independent. Do a leave-one-HUC4-out or leave-one-ecoregion-out cross-validation. If performance drops substantially, your model is memorizing regional patterns, not learning generalizable physics.
+The model over-predicts 74.9% of the time. Mean log-space residual is +0.317 (i.e., predictions are exp(0.317) = 1.37x too high on average). This is not a minor calibration artifact — it's a fundamental bias.
 
-**B. Performance stratified by geology.** Show me error metrics broken out by dominant lithology (at least: igneous, sedimentary, metamorphic, unconsolidated). The turbidity-SSC relationship is fundamentally different in clay-dominated vs. sand-dominated catchments. If your model handles all of these equally well, that's a genuine contribution. If it fails on one, you need to document that limitation.
+Breakdown by SSC range:
+| SSC Range | % Over-Predicting | Mean Log Residual |
+|---|---|---|
+| 0-10 mg/L | **95.2%** | +0.735 |
+| 10-50 | 76.0% | +0.377 |
+| 50-200 | 76.7% | +0.314 |
+| 200-1000 | 67.9% | +0.117 |
+| >1000 | **29.9%** | **-0.452** |
 
-**C. Comparison with simple site-specific regressions.** At every site where you have N >= 20 samples, fit a simple log(SSC) = a + b*log(turbidity) regression and compare its performance to your model at N=0 and at N=10 adaptation. This is the baseline that every practitioner currently uses. If your model at N=0 doesn't beat the simple regression at N=20, that's fine — but you need to show where the crossover is. "How many samples does the practitioner need before the old method catches up?" That's the value proposition.
+The model is trained on log-transformed SSC and learns to predict the conditional mean in log-space. But when you exponentiate back, the geometric mean is always less than the arithmetic mean for right-skewed data. What I see here is the opposite — consistent over-prediction at low-to-moderate SSC and under-prediction at extremes. This is a **regression-to-the-mean artifact** of the pooled model: it's dragged toward the population mean (~55 mg/L), which is above most individual samples but below extremes.
 
-**D. Performance on rising vs. falling limb.** At the ISCO burst sites, tag each sample as rising or falling limb based on turbidity rate of change. Report metrics separately. Rising limb is always harder (sediment pulse arrives before the turbidity signal fully develops). If your model shows no difference, you should question whether it's actually resolving event dynamics or just doing static regression.
+This matters for regulatory applications. A model that reads 95% high at low SSC will trigger false exceedance flags. A model that reads 30% low at extreme SSC will miss real violations.
 
-**E. Residual analysis.** Show Q-Q plots of residuals in log space, by site and pooled. Show residuals vs. predicted values. Show residuals vs. time (looking for drift). A reviewer will want to see that errors are homoscedastic in log space and don't have systematic structure.
+**Recommendation:** Report the median bias by SSC range in the paper. This is honest and reviewers will check for it.
 
-**F. Bootstrap confidence intervals on all reported metrics.** Don't just report point estimates. Bootstrap the site-level metrics (resample sites, not individual observations) and report 95% CIs. MedSiteR² of 0.486 with a CI of [0.30, 0.65] tells a very different story than [0.45, 0.52].
+### Pattern B: Spatial Autocorrelation is Weak but Present
 
-**G. Detection limit and censored data handling.** How are you handling SSC values at or near the detection limit? If you have many values reported as "<1 mg/L" or similar, and you're treating them as 0 or 0.5, that contaminates your baseflow performance metrics. Document your approach.
+I computed pairwise error differences by distance:
+| Distance | Mean Error Diff | n pairs |
+|---|---|---|
+| 0-50 km | **39.1%** | 57 |
+| 50-100 km | 65.5% | 39 |
+| 100-200 km | 61.1% | 61 |
+| 200-500 km | 54.1% | 177 |
+| 500-1000 km | 57.4% | 304 |
+| 1000-5000 km | 55.4% | 1797 |
 
----
+Sites within 50 km have notably more similar errors (39% difference vs 55% at longer distances). The Spearman correlation between distance and error difference is weak (rho=0.068, p<0.001) but statistically significant. This suggests the model captures some regional information but there's room for a spatial random effect or regional feature.
 
-## Question 4: Red flags in the patterns found
+### Pattern C: Drainage Area is a Strong Error Predictor
 
-Several things concern me:
+Drainage area correlates significantly with MAPE (rho=-0.375, p=0.004). Small watersheds (<55 km2) have mean MAPE of 121%; large basins (>13,000 km2) have MAPE of 47%. This makes physical sense: large basins integrate sediment sources and smooth the turbidity-SSC relationship, while small basins have flashier, more heterogeneous responses.
 
-**Red flag 1: The "weekend effect" (Pattern 2) — the model performing BETTER on storms than calm conditions.** This is actually expected physics (storms produce a cleaner turbidity-SSC signal), but the fact that you frame it as a temporal pattern rather than a hydrologic regime pattern worries me. Make sure you aren't inadvertently encoding day-of-week as a feature. If hour or day-of-week is in the feature set, that's a proxy for collection method, not for hydrology. The model would learn "if it's Saturday, predict higher SSC" which is not generalizable.
+**Is drainage area in the feature set?** If not, it should be. If it is, the model may not be weighting it enough.
 
-**Red flag 2: Only 3 supply-limited sites out of 182 (Pattern 7).** This is suspicious. In my experience, supply limitation is common in arid watersheds, post-fire landscapes, and anywhere with reservoir regulation. Either your site selection is biased toward perennial, unregulated, humid catchments, or your method for detecting supply limitation is too coarse. Check whether you're capturing sites in the arid West, post-fire catchments, or regulated rivers. If not, you need to document this as a dataset limitation, because your model won't generalize to those settings.
+### Pattern D: Lithology Matters in the Direction You'd Expect
 
-**Red flag 3: The SSC trends (Pattern 5) — 125 of 254 sites showing significant trends.** Half your sites have non-stationary SSC. This means your assumption that there's a stable turbidity-SSC relationship to learn is violated at many sites. Are you checking whether the training data spans the full period of record? If a site's SSC doubled over 10 years, and you train on the early period, your predictions for the late period will be systematically biased. Run a test: at the trending sites, train on the first half and test on the second half. If error is much worse than random-split CV, you have a stationarity problem that must be disclosed.
+From the holdout sites (n=67 with lithology data):
+- Sedimentary clastic watersheds have **lower** error (rho=-0.189) — makes sense, predictable fine-grained sources
+- Igneous intrusive watersheds have **higher** error (rho=+0.259) — coarse granitic sediment produces highly variable SSC/FNU ratios
+- Igneous/metamorphic undifferentiated: rho=+0.384 — same story
 
-**Red flag 4: Vault NSE of 0.164.** That's barely above zero. Yes, MedSiteR² is 0.486, which means the model works at most sites but there are a few sites where it's catastrophically wrong, pulling the pooled NSE down. Identify those sites. Are they the supply-limited sites? The ones with extreme trends? If 3-5 bad sites are destroying your NSE, you need to characterize what's different about them and report it honestly. Don't hide behind the median.
+This confirms that geology modulates the turbidity-SSC relationship through particle size distribution, and the model partially captures this but incompletely.
 
-**Red flag 5: External NTU zero-shot MAPE of 90%.** That's not "validation," that's the model failing. I understand it drops to 45% at N=10, but the zero-shot NTU performance needs a frank discussion. The NTU-to-FNU conversion is not just a scaling factor — the spectral response is fundamentally different (90-degree vs. multi-angle scattering). If your model was trained on FNU, applying it zero-shot to NTU sites is like using a rating curve from one river on another. The N=10 improvement is real and valuable, but the zero-shot number shouldn't be presented as a success.
+### Pattern E: 65% of Sensors are "Unknown" Family
 
----
+23,064 of 35,209 samples (65.5%) have `sensor_family = unknown`. If sensor_family is a feature, two-thirds of the data contribute no information from it. The model is essentially building its turbidity-SSC relationship with minimal sensor metadata for most samples. This is a known problem in USGS turbidity data — the NWIS parameter codes don't always distinguish instruments well.
 
-## Question 5: What figures should be in the paper?
+### Pattern F: 391 Samples Have Extreme SSC/Turbidity Ratios (>50 or <0.01)
 
-**Figures that must be in the paper:**
+These are spread across 77 sites and include clearly erroneous data:
+- USGS-01362330: SSC = 18,800 mg/L with turbidity = 0.2 FNU — this is a data entry error or mismatched timestamp
+- USGS-02336240: Six samples on 2003-10-26 with SSC < 2 and turbidity 170-720 — sensor was reading something that wasn't sediment (likely algal bloom or dissolved organics)
+- USGS-02203603: SSC 1,960 with turbidity 1.1 — bedload-dominated event where turbidity sensor missed the coarse fraction
 
-1. **Turbidity-SSC scatterplot colored by collection method** (Pattern 6). Show the systematic offset between auto_point, depth-integrated, and grab. This is a publishable finding on its own — it quantifies a sampling bias that practitioners know intuitively but rarely see documented with n=35,000. Include the regression lines.
-
-2. **Adaptation curve: performance vs. N** with separate lines for extreme events and normal conditions (Pattern 4). This is the most important figure in the paper. It shows the model's value proposition AND its failure mode in one plot. Mark where N=20 destroys extremes.
-
-3. **Map of site locations colored by model performance** (MedSiteR² or site MAPE). This immediately shows spatial patterns and lets the reader assess geographic generalizability. Overlay HUC2 boundaries or ecoregions.
-
-4. **Residual plots**: (a) predicted vs. observed in log-log space with 1:1 line, (b) residuals vs. predicted, (c) residuals vs. discharge. These are mandatory for any regression paper.
-
-5. **Comparison with site-specific regression at various N** (see Question 3C). Bar chart or line plot showing your model's error at N=0, 5, 10, 20 vs. a simple turbidity-SSC regression at the same N. This is the figure that sells the paper.
-
-6. **Storm event time series at 2-3 ISCO sites** showing observed SSC, model-predicted SSC, turbidity, and discharge on the same time axis. Pick one site where the model works well and one where it struggles. Nothing communicates model capability like a time series that a practitioner can look at and evaluate intuitively.
-
-**Figures for supplement:**
-
-- The time-of-day / day-of-week patterns (Patterns 1-2) belong in the supplement. They're interesting but they're really about sampling design, not about the model.
-- Seasonal SSC pattern (Pattern 10) — supplement. It's expected and not novel.
-- Conductance anti-correlation (Pattern 8) — supplement unless you can show it improves predictions.
-- Feature importance plot — supplement or main text depending on space.
-
----
-
-## Question 6: What are we missing?
-
-**A. Uncertainty quantification.** You're reporting point predictions. Every operational user needs uncertainty bounds. Even if you use the quantile regression outputs you already have (I see MultiQuantile in earlier reviews), you need to validate that those uncertainty bounds have correct coverage. Do the 90% prediction intervals actually contain 90% of observations? If coverage is 70%, your uncertainty estimates are overconfident and operationally dangerous.
-
-**B. The sand fraction problem.** Turbidity is mainly driven by fine particles (silt, clay, organics). SSC includes sand. In sand-rich rivers, two samples can have identical turbidity but wildly different SSC because of varying sand content. This is the fundamental physical limitation of ANY turbidity-SSC model, and your paper needs to confront it directly. If you have any sites with concurrent sand/fine split data, test whether your residuals correlate with sand fraction. If you don't have that data, cite Glysson et al. (2000) and Topping et al. (2011) and discuss it as a known limitation.
-
-**C. What happens at turbidity values outside the training range?** Your training data probably maxes out somewhere. What does the model predict at 5000 FNU? 10000 FNU? Does it extrapolate sensibly or does it blow up? Extreme flood events are exactly when people need predictions most, and they'll push beyond your training envelope. Show an extrapolation test, even if it's synthetic.
-
-**D. Sensor fouling and maintenance artifacts.** Real-world turbidity sensors drift and foul. The classic signature is a sudden drop in turbidity when the wiper cleans the sensor, or a gradual upward drift between maintenance visits. Are you filtering for these? If your training data includes fouled readings paired with manually-collected SSC samples, you're teaching the model to associate artificially high turbidity with whatever SSC happens to be present. At minimum, flag observations where turbidity is anomalously high relative to discharge and check whether they're fouling artifacts.
-
-**E. The "is this actually better than existing USGS methods?" question.** USGS has a well-established protocol (Rasmussen et al., 2009, TM 3-C4) for developing turbidity-SSC regressions. Your paper needs a clear-eyed comparison with that approach. Not just "our model is general purpose" but a quantitative comparison: at how many sites does your zero-shot model beat a site-specific OLS regression with N=10, 20, 50 samples? That's the comparison that matters to the people who would actually use this.
-
-**F. Multi-collinearity in your feature set.** 72 features is a lot. How many of them are correlated with each other at r > 0.9? Do you have VIF analysis? Even with tree-based models that handle collinearity gracefully in terms of prediction, high collinearity makes feature importance unstable and misleading. If you're going to discuss which features matter (and you should), you need to address this.
-
-**G. The disconnect between pooled NSE and MedSiteR².** Vault pooled NSE is 0.164 while MedSiteR² is 0.486. That's a huge gap. It means you have outlier sites that are severely degrading the pooled metric. I said this above but I want to be very explicit: you MUST characterize those failure sites. What's different about them? Can you predict in advance which sites the model will fail on? If you can build a "model applicability" screening criterion (like: the model works when X > threshold), that's extremely useful operationally and it would significantly strengthen the paper.
-
-**H. Reproducibility.** Are your data sources, processing steps, and model configurations documented well enough that someone else can reproduce your results? For a WRR paper, you'll need a data availability statement and ideally a public code repository. Start preparing that now.
+All of these are in training, not holdout. They are teaching the model incorrect relationships.
 
 ---
 
-## Summary of Priority Actions
+## Question 2: Adaptation Hurting Extremes at N=20
 
-The three things that would most strengthen this paper, in my professional judgment:
+### Root Cause Analysis
 
-1. **Characterize and fix the N=20 extreme collapse** with flow-stratified adaptation. This is your biggest vulnerability.
-2. **Compare against site-specific OLS at various N** (Rasmussen-style regressions). This defines your value proposition.
-3. **Identify and characterize the failure sites** dragging vault NSE to 0.164. Turn a weakness into a contribution by explaining WHY the model fails where it does.
+I confirmed the pattern and dug deeper. The key finding:
 
-Everything else matters, but these three will determine whether the paper is accepted or desk-rejected.
+**SSC range is the strongest predictor of adaptation degradation** (rho=-0.541, p<0.001 between SSC range and delta-R2 at N=20). Sites with a wide SSC range get hurt the most.
+
+Additionally, **sites that already have good zero-shot R2 get hurt** (rho=-0.534, p<0.001). Sites with base R2 > 0.5 see an average delta of -0.032 at N=20, while sites with base R2 <= 0.5 see +0.474.
+
+This is textbook **adaptation overfitting to the mode**. When you calibrate with 20 samples, you're most likely drawing from the baseflow distribution (which has more mass). The adaptation adjusts the intercept/slope to minimize error on those 20 samples, which means it shifts the curve down for sites where storms produce SSC:FNU ratios much higher than baseflow. The extremes get compressed.
+
+At N=50, it gets worse: 21 sites degraded vs 16 improved.
+
+### Recommendation: Flow-Stratified Adaptation
+
+Yes, absolutely. The standard approach in USGS surrogate regression is to develop separate regressions for different flow regimes (Rasmussen et al., 2009). For adaptation:
+
+1. **Split calibration samples by discharge percentile** — e.g., Q < median vs Q >= median
+2. **Apply separate adaptation factors** to each regime
+3. At prediction time, route through the appropriate adaptation based on current discharge
+
+A simpler alternative: **cap adaptation at N=10** for operational use. The data show that N=5-10 improves normal-condition R2 without degrading extremes, while N=20 causes collapse.
+
+A third option: **weight calibration samples inversely to their frequency in the calibration set**. If you draw 18 baseflow and 2 storm samples, upweight the storm samples so they have equal influence on the adaptation.
 
 ---
 
-*Dr. Marcus Rivera*
-*USGS Water Resources Division (ret.)*
+## Question 3: Additional Validation Tests for Paper-Readiness
+
+### Must-Have (a WRR reviewer will demand these):
+
+1. **Comparison to simple OLS log-log regression per site.** For each holdout site, fit log(SSC) = a + b*log(FNU) on the calibration samples and compare R2. If the pooled ML model can't beat a site-specific OLS with 10-20 calibration samples, the value proposition collapses. (I see you have v4_ols_comparison files — make sure these are prominently reported.)
+
+2. **Residual diagnostics.** Plot residuals vs predicted, residuals vs turbidity, residuals vs discharge. Check for heteroscedasticity patterns. The 75% over-prediction rate needs to be visible and explained.
+
+3. **Temporal split validation.** You have data from 2003-2023. Train on pre-2015, test on post-2015. This tests whether the model generalizes to future conditions, not just unseen sites. The per-site file has `r2_temporal_at_*` columns — report these prominently.
+
+4. **Leave-one-HUC-out.** Your LOGO is leave-one-site-out. But nearby sites share geology, climate, land use. A WRR reviewer will ask: does the model work in a region it's never seen? Leave out all HUC2=17 (Pacific NW), retrain, and test.
+
+5. **Report KGE alongside NSE.** You have KGE in the per-site results (85% of sites KGE > 0, 50% > 0.5). This is a better metric for hydrological models and reviewers will want to see it.
+
+### Should-Have:
+
+6. **Prediction intervals.** Any operational user needs uncertainty bounds. Even if just bootstrap or quantile regression, you need to show that the model knows when it's uncertain.
+
+7. **Sensitivity to turbidity sensor type.** The discrete vs continuous split (27% discrete) means the model is mixing field readings with installed sensors. Discrete turbidity is a single grab measurement; continuous is a 15-min average from an installed probe. These have different precision characteristics.
+
+8. **Sample size sensitivity.** How does median site R2 change as you thin the training set? If you randomly drop 50% of sites, how much does performance degrade? This tells users how much more data collection would help.
+
+---
+
+## Question 4: Red Flags
+
+### RED FLAG 1: 69 Samples Where SSC > 500 and Turbidity < 10
+
+These are physically almost impossible in the same water sample at the same time. The most likely explanations:
+- Mismatched timestamps (turbidity reading from a different time than the SSC sample)
+- Sensor fouled or buried in sediment (reading clear water in its housing while the river is turbid)
+- Bedload-dominated event (turbidity sensor in upper water column, SSC sample near bed)
+- Data entry errors
+
+The worst: USGS-01362330 with SSC = 18,800 at turbidity = 0.2. This is a ratio of 94,000:1. No natural process produces this. This is bad data that is actively harming the model.
+
+**Action required:** Flag and remove samples with SSC:FNU ratio > 50 or < 0.01 from training. This is 391 samples across 77 sites. Re-run and compare.
+
+### RED FLAG 2: 11 Samples Where SSC < 5 and Turbidity > 100
+
+Same problem in reverse. Five of these are from USGS-02336240 on a single day (2003-10-26) — almost certainly a sensor malfunction (perhaps reporting in NTU while the database says FNU, or vice versa).
+
+### RED FLAG 3: The 75% Over-Prediction Rate
+
+A well-calibrated model should over-predict ~50% of the time. Systematic 75% over-prediction means the model has a positive bias that hasn't been corrected. At low SSC (<10 mg/L), it over-predicts 95% of the time. This is not acceptable for regulatory applications where low-SSC accuracy matters (e.g., drinking water source monitoring).
+
+### CAUTION: 58% of Holdout Samples Have No Discharge Data
+
+Only 41.7% of holdout predictions have discharge data. The model performs better with discharge (MAPE 99% vs 119% without). This means your reported performance is a weighted average of "with discharge" and "without discharge" cases. If the model is deployed at sites without discharge gages, performance will be worse than reported.
+
+### CAUTION: Duplicate Timestamps
+
+Only 4 exact duplicates found (0.01%), which is clean. But check for near-duplicates (same site, within 5 minutes) — these could be replicate samples that should be averaged, not treated as independent.
+
+---
+
+## Question 5: Figures for the Paper
+
+### Tier 1 — Must Include:
+
+1. **Observed vs Predicted scatterplot** (log-log scale, holdout data, colored by collection method). This is figure 1 in every surrogate paper. Show the 1:1 line and regression line. The offset from 1:1 will make the over-prediction bias visible.
+
+2. **Site adaptation curve** — Median site R2 vs N_cal, showing the improvement from 0-10 and the extreme degradation at 20+. Split into two lines: one for extreme events (top 5% turbidity), one for normal. This is your most interesting finding.
+
+3. **Error by SSC range** — Bar chart or box plot showing MAPE across SSC bins. The U-shape (highest error at both extremes of the turbidity range) is a real finding.
+
+4. **Geographic map of holdout site performance** — Points colored by site R2 or MAPE. This shows the spatial pattern and makes reviewers comfortable that you have national coverage.
+
+5. **SSC/FNU ratio by collection method** — Box plots showing the auto_point vs depth_integrated vs grab ratio distributions. The p90 difference (13.1 for auto_point vs 4.6 for depth_integrated) is a publishable finding about bedload representation.
+
+### Tier 2 — Strongly Recommended:
+
+6. **Bias by SSC range** — Show the 95% over-prediction at low SSC and 30% over-prediction at high SSC. This is honest reporting and will impress reviewers.
+
+7. **Weekend/weekday performance split** — This is genuinely novel. The finding that the model performs better on storm events than baseflow is counterintuitive and publishable.
+
+8. **Drainage area vs MAPE** — Shows the physical control on model performance.
+
+### Tier 3 — Supplementary:
+
+9. Temporal split results
+10. KGE distribution across sites
+11. Lithology correlation table
+
+---
+
+## Question 6: What Are We Missing?
+
+### Missing Analysis 1: Hysteresis Within Storm Events
+
+You have 213 site-days with 10+ samples. For these ISCO burst captures, compute the clockwise vs counterclockwise hysteresis index (Williams, 1989). Sites with consistent clockwise hysteresis (SSC peaks before turbidity peaks) have nearby/easily mobilized sediment. Sites with counterclockwise hysteresis have distal sources. The model should perform differently on these two types, and this would be a novel finding for a ML paper.
+
+### Missing Analysis 2: The Auto-Point Bedload Problem is Underexplored
+
+Your briefing notes that auto_point reads 35% more SSC per unit turbidity than grab. But the p90 ratio is 13.1 for auto_point vs 4.2 for grab — that's 3x at the tails, not 35%. The auto_point distribution has a long right tail because ISCO samplers positioned near the streambed capture bedload events that turbidity sensors (in the water column) don't see.
+
+This is not a bug — it's a physics problem. The model is being asked to predict total SSC from a measurement that only sees suspended load. At high transport rates, bedload can be 20-60% of total load. You should:
+- Quantify what fraction of the variance in model error is explained by collection method
+- Consider reporting separate performance for depth_integrated (which is the "gold standard" SSC method) vs auto_point
+
+### Missing Analysis 3: Sensor Offset as a Drift Indicator
+
+The `sensor_offset` column ranges from -617 to +5521 FNU, with a mean of -0.68. The extreme values (+5521!) suggest either sensor drift or calibration differences. The `days_since_last_visit` column shows 20.7% of samples are from sensors that haven't been serviced in 180+ days. In my USGS experience, turbidity sensors drift significantly after 60-90 days without cleaning. You should test whether `days_since_last_visit > 90` is associated with higher error.
+
+### Missing Analysis 4: Retransformation Bias Correction
+
+If the model operates in log-space (which it appears to from the `ssc_log1p` column), you need a bias correction factor (BCF) when back-transforming. The Duan (1983) smearing estimator or the Snowdon (1986) ratio estimator are standard. The systematic 75% over-prediction at low SSC suggests either the BCF is too aggressive or isn't being applied correctly. This needs investigation before publication.
+
+### Missing Analysis 5: Comparison to National Sediment Models
+
+How does this compare to Zhi et al.'s LSTM approach? To the USGS LOADEST models? To the simple power-law T = a*FNU^b approach that most Water Science Centers use? You need at least one external benchmark beyond "our model at N=0 vs N=10" to establish value.
+
+### Missing Analysis 6: Temporal Stationarity
+
+125 of 254 training sites show significant SSC trends over time. This means the turbidity-SSC relationship is non-stationary at half your sites. A model trained on 2003-2023 data may not be valid for 2025 predictions if land use, climate, or reservoir operations have shifted the relationship. You should test whether removing time-trending sites changes model performance.
+
+---
+
+## Quantitative Summary of Key Findings
+
+| Finding | Metric | Value |
+|---|---|---|
+| Over-prediction rate (all) | % samples over-predicted | 74.9% |
+| Over-prediction rate (SSC < 10) | % samples over-predicted | 95.2% |
+| Under-prediction rate (SSC > 1000) | % samples under-predicted | 70.1% |
+| Spatial autocorrelation (< 50 km) | Mean pairwise error diff | 39.1% vs 55.4% at 1000+ km |
+| Drainage area effect | Spearman rho with MAPE | -0.375, p=0.004 |
+| Anomalous training samples | Ratio > 50 or < 0.01 | 391 samples, 77 sites |
+| Adaptation collapse driver | SSC range vs delta-R2 at N=20 | rho=-0.541, p<0.001 |
+| Good-site adaptation harm | Base R2 > 0.5 mean delta at N=20 | -0.032 |
+| Bad-site adaptation help | Base R2 <= 0.5 mean delta at N=20 | +0.474 |
+| Discharge data availability (holdout) | % with Q | 41.7% |
+| Unknown sensor family | % of all samples | 65.5% |
+
+---
+
+## Bottom Line
+
+The model shows genuine skill for a zero-shot national pooled surrogate. The Spearman rho of 0.92 means the rank-ordering is excellent even when the magnitude is off. The adaptation curve up to N=10 is the real selling point. But the 75% over-prediction rate and the 391 anomalous training samples are problems that need to be fixed before submission. Clean the data, investigate the bias, and add the flow-stratified adaptation. Those three things will move this from "interesting ML exercise" to "tool that practitioners would actually use."
+
+— Marcus Rivera
