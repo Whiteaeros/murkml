@@ -34,6 +34,8 @@
 - Extreme underprediction is particle size shift, not just sensor saturation
 - Model ranks correctly on foreign NTU data (Spearman 0.93) — adaptation just fixes the scale
 - EVERY evaluation must use the full suite (all modes, disaggregated, physics, external)
+- "Noise" training sites carry extreme event signal — dropping them destroys first flush and extreme predictions
+- Site contribution analysis: 110 anchors, 110 noise, but noise sites are essential (keep all 284)
 
 **Data state:**
 - 396 total sites, 35,209 samples in paired dataset

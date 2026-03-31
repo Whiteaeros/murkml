@@ -158,6 +158,27 @@ Each entry records: training config, dataset, performance, and what changed from
 - **Site adaptation (20 samples):** R²=0.487
 - **Notes:** Adaptation with <10 samples HURTS performance (correction overfits). 2-parameter linear correction in Box-Cox space is too aggressive with few samples. Panel recommends shrinkage estimator. Temporal adaptation even worse (seasonal bias in first-N samples).
 
+### Site Contribution Analysis (2026-03-30)
+
+**Method:** Out-of-bag random subset scoring. 50 subsets of 100 training sites, train on subset, evaluate on the other 154 excluded sites. Score = mean(OOB R² with site) - mean(OOB R² without site).
+
+**Results:** 254 sites scored, ~20 appearances each. 110 anchors, 34 neutral, 110 noise.
+- Unknown collection method sites: 64% noise rate vs 43% overall
+- SSC variability correlates with noise (Spearman rho=-0.159, p=0.012)
+- Top anchor: USGS-02203655 (+0.081), Worst noise: USGS-02204037 (-0.086)
+
+**CRITICAL FINDING: "Noise" sites carry extreme event signal.**
+Dropping 15 worst noise sites destroyed the model:
+
+| Metric | v9 (all sites) | Drop 15 noise | Delta |
+|---|---|---|---|
+| First Flush R² | 0.905 | 0.264 | -0.641 |
+| Top 1% Extreme R² | 0.793 | -0.043 | -0.836 |
+| Zero-shot NSE | 0.692 | 0.302 | -0.390 |
+| MedSiteR² | 0.418 | 0.290 | -0.128 |
+
+**Conclusion:** Sites that hurt average performance carry the ONLY signal for extreme events, first flush, and unusual conditions. KEEP ALL 284 TRAINING SITES. Do not prune based on aggregate metrics.
+
 ---
 
 ## Key Comparisons
