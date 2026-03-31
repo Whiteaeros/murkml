@@ -176,7 +176,7 @@ def predict_holdout(
     train_medians = meta.get("train_median", {})
     transform_type = meta["transform_type"]
     lmbda = meta.get("transform_lmbda")
-    bcf = meta["bcf"]
+    bcf = meta["bcf"]  # Already set by main() based on --bcf-mode flag
 
     # Validate
     assert 0.5 <= bcf <= 5.0, f"BCF {bcf} outside sanity range [0.5, 5.0]"
@@ -540,20 +540,30 @@ def get_cal_test_split(
         # First N in chronological order (data must be pre-sorted by date)
         cal_idx = np.arange(n_cal)
     elif mode == "seasonal":
-        # Pick from the most common month cluster (±1 month)
+        # Calibrate from ONE season (peak SSC month ± 1), test on OTHER seasons.
+        # This tests cross-seasonal transfer — the hardest realistic scenario.
         if dates is not None and len(dates) > 0:
             months = pd.to_datetime(dates).month.values
             from collections import Counter
             peak_month = Counter(months).most_common(1)[0][0]
             # Symmetric +/- 1 month window (3 months)
             neighbors = {(peak_month - 2) % 12 + 1, peak_month, peak_month % 12 + 1}
-            seasonal_mask = np.isin(months, neighbors)
+            seasonal_mask = np.isin(months, list(neighbors))
             seasonal_idx = np.where(seasonal_mask)[0]
-            if len(seasonal_idx) >= n_cal:
+            non_seasonal_idx = np.where(~seasonal_mask)[0]
+
+            if len(seasonal_idx) >= n_cal and len(non_seasonal_idx) >= 2:
+                # Cal from seasonal window, test from OTHER seasons only
                 cal_idx = rng.choice(seasonal_idx, size=n_cal, replace=False)
-            elif len(seasonal_idx) > 0:
+                test_idx = non_seasonal_idx
+                return cal_idx, test_idx
+            elif len(seasonal_idx) > 0 and len(non_seasonal_idx) >= 2:
+                # Use all available seasonal samples for cal
                 cal_idx = seasonal_idx
+                test_idx = non_seasonal_idx
+                return cal_idx, test_idx
             else:
+                # Not enough seasonal structure — fall back to random with different seed
                 cal_idx = rng.choice(n_site, size=n_cal, replace=False)
         else:
             cal_idx = rng.choice(n_site, size=n_cal, replace=False)
@@ -647,9 +657,13 @@ def _run_single_adaptation(
     trial_range = 1 if mode == "temporal" else n_trials
 
     trial_metrics = []
+    # Mode-specific seed offset to ensure different RNG streams per mode
+    mode_offsets = {"random": 0, "temporal": 100_000, "seasonal": 200_000}
+    mode_offset = mode_offsets.get(mode, 0)
+
     for trial in range(trial_range):
         site_hash = int(hashlib.md5(str(site_id).encode()).hexdigest(), 16) % (2**31)
-        rng = np.random.default_rng(seed + site_hash + n_val * 1000 + trial)
+        rng = np.random.default_rng(seed + site_hash + n_val * 1000 + trial + mode_offset)
 
         cal_idx, test_idx = get_cal_test_split(n_site, n_val, mode, rng, dates)
 
@@ -754,7 +768,7 @@ def run_adaptation_curve(
 
     transform_type = meta["transform_type"]
     lmbda = meta.get("transform_lmbda")
-    bcf_val = meta["bcf"]
+    bcf_val = meta["bcf"]  # Already set by main() based on --bcf-mode flag
 
     sites = sorted(readings["site_id"].unique())
 
@@ -943,6 +957,9 @@ def save_summary(
         "transform_type": meta["transform_type"],
         "transform_lmbda": meta.get("transform_lmbda"),
         "bcf": meta["bcf"],
+        "bcf_mode": args.bcf_mode,
+        "bcf_mean_available": meta.get("bcf_mean"),
+        "bcf_median_available": meta.get("bcf_median"),
         "timestamp": datetime.now(timezone.utc).isoformat(),
     }
 
@@ -1033,6 +1050,9 @@ def main():
     parser.add_argument("--df", type=float, default=4, help="Student-t prior degrees of freedom (default: 4)")
     parser.add_argument("--slope-k", type=float, default=10, help="Slope shrinkage constant for N>=10 (default: 10)")
     parser.add_argument("--bcf-k-mult", type=float, default=3.0, help="BCF shrinkage multiplier (default: 3.0)")
+    parser.add_argument("--bcf-mode", type=str, default="median",
+                        choices=["median", "mean"],
+                        help="Which BCF to use: median for individual predictions (default), mean for load estimation")
     parser.add_argument("--split-modes", type=str, default="random,temporal,seasonal",
                         help="Comma-separated split modes (default: random,temporal,seasonal)")
     parser.add_argument("--output-dir", type=str, default=None,
@@ -1051,9 +1071,17 @@ def main():
     with open(meta_path) as f:
         meta = json.load(f)
 
+    # Select BCF based on --bcf-mode flag
+    if args.bcf_mode == "median":
+        meta["bcf"] = meta.get("bcf_median", meta.get("bcf", 1.0))
+        bcf_source = "bcf_median"
+    else:
+        meta["bcf"] = meta.get("bcf_mean", meta.get("bcf", 1.0))
+        bcf_source = "bcf_mean"
+
     logger.info(f"Model: {model_path}")
     logger.info(f"Transform: {meta['transform_type']} (lambda={meta.get('transform_lmbda')})")
-    logger.info(f"BCF: {meta['bcf']:.4f} ({meta.get('bcf_method', 'unknown')})")
+    logger.info(f"BCF: {meta['bcf']:.4f} ({bcf_source}, method={meta.get('bcf_method', 'unknown')})")
     logger.info(f"Features: {len(meta['feature_cols'])}")
     logger.info(f"Adaptation: {args.adaptation} (k={args.k}, df={args.df}, slope_k={args.slope_k}, bcf_k_mult={args.bcf_k_mult}, trials={args.n_trials}, seed={args.seed})")
 
