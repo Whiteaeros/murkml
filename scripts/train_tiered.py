@@ -802,12 +802,12 @@ def run_tier(param_name: str, tier_name: str, tier_data: pd.DataFrame,
     )
 
     # Quantile interval coverage stats
-    if quantile_mode and not samples_df.empty and "q05" in samples_df.columns:
+    if quantile_mode and not samples_df.empty and "q05_ms" in samples_df.columns:
         y_true_log = samples_df["y_true_log"].values
-        q05 = samples_df["q05"].values
-        q95 = samples_df["q95"].values
-        q10 = samples_df["q10"].values
-        q90 = samples_df["q90"].values
+        q05 = samples_df["q05_ms"].values
+        q95 = samples_df["q95_ms"].values
+        q10 = samples_df["q10_ms"].values
+        q90 = samples_df["q90_ms"].values
         coverage_90 = np.mean((y_true_log >= q05) & (y_true_log <= q95))
         coverage_80 = np.mean((y_true_log >= q10) & (y_true_log <= q90))
         median_width_90 = np.median(q95 - q05)
