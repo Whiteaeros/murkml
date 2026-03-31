@@ -60,7 +60,7 @@ logger = logging.getLogger(__name__)
 # Constants
 # ---------------------------------------------------------------------------
 EXPECTED_HOLDOUT_SITES = 76
-EXPECTED_HOLDOUT_SAMPLES = 5847
+EXPECTED_HOLDOUT_SAMPLES = 5829  # was 5847 pre-cleaning; 18 anomalous records removed from holdout sites
 ADAPTATION_NS = [0, 1, 2, 3, 5, 10, 20, 30, 50]
 
 
@@ -109,7 +109,12 @@ def load_holdout_data(meta: dict) -> pd.DataFrame:
     logger.info(f"  Paired data: {len(paired)} samples, {paired['site_id'].nunique()} sites")
 
     # 2. Filter to holdout sites
-    split = pd.read_parquet(DATA_DIR / "train_holdout_split.parquet")
+    split_path_3way = DATA_DIR / "train_holdout_vault_split.parquet"
+    split_path_2way = DATA_DIR / "train_holdout_split.parquet"
+    if split_path_3way.exists():
+        split = pd.read_parquet(split_path_3way)
+    else:
+        split = pd.read_parquet(split_path_2way)
     holdout_ids = set(split[split["role"] == "holdout"]["site_id"])
     holdout = paired[paired["site_id"].isin(holdout_ids)].copy()
     logger.info(f"  Holdout filter: {len(holdout)} samples, {holdout['site_id'].nunique()} sites")
@@ -137,6 +142,10 @@ def load_holdout_data(meta: dict) -> pd.DataFrame:
         sgmc_clean = sgmc.drop(columns=list(overlap_sgmc))
         holdout = holdout.merge(sgmc_clean, on="site_id", how="left")
         logger.info(f"  After SGMC merge: {len(holdout)} samples")
+
+    # Compute derived features that build_feature_tiers() creates during training
+    if "drainage_area_km2" in holdout.columns and "log_drainage_area" not in holdout.columns:
+        holdout["log_drainage_area"] = np.log1p(holdout["drainage_area_km2"].clip(lower=0))
 
     # Assertions
     n_sites = holdout["site_id"].nunique()
@@ -186,8 +195,8 @@ def predict_holdout(
     # Fill missing numeric features with training medians
     for col in feature_cols:
         if col in cat_cols:
-            continue
-        if col in train_medians and X[col].isna().any():
+            X[col] = X[col].fillna("missing").astype(str)
+        elif col in train_medians and X[col].isna().any():
             X[col] = X[col].fillna(train_medians[col])
 
     # Create CatBoost Pool
