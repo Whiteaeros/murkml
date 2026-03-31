@@ -1343,6 +1343,9 @@ def main():
                 y_train_pred_final = raw_train_pred
             if transform_type == "log1p":
                 final_bcf = duan_smearing_factor(y[train_idx], y_train_pred_final)
+                # For log1p, native predictions without BCF
+                _train_native_true = np.expm1(y[train_idx])
+                _train_native_pred_raw = np.expm1(y_train_pred_final)
             else:
                 if transform_type == "boxcox":
                     train_native_true = lab_values[train_idx] if lab_values is not None else np.expm1(y[train_idx])
@@ -1351,6 +1354,14 @@ def main():
                     train_native_true = np.square(y[train_idx])
                     train_native_pred = np.square(y_train_pred_final)
                 final_bcf = snowdon_bcf(train_native_true, train_native_pred)
+                _train_native_true = train_native_true
+                _train_native_pred_raw = train_native_pred
+
+            # Dual BCF: median-optimal BCF (scalar c such that median(pred*c) ≈ median(obs))
+            _ratios = _train_native_true / np.clip(_train_native_pred_raw, 1e-6, None)
+            final_bcf_median = float(np.median(_ratios))
+            final_bcf_median = np.clip(final_bcf_median, 0.1, 10.0)
+            logger.info(f"  BCF mean (Snowdon): {final_bcf:.4f}, BCF median: {final_bcf_median:.4f}")
 
             # Save model — include label if provided for versioned filenames
             safe_tier = tier_name.replace("/", "_")
@@ -1430,6 +1441,8 @@ def main():
                 "n_samples": len(clean),
                 "n_trees": model.tree_count_,
                 "bcf": final_bcf,
+                "bcf_mean": final_bcf,
+                "bcf_median": final_bcf_median,
                 "bcf_method": "duan" if transform_type == "log1p" else "snowdon",
                 "weight_scheme": args.weight_scheme,
                 "slope_correction": args.slope_correction,
