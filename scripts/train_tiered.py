@@ -932,7 +932,11 @@ def main():
     )
     parser.add_argument(
         "--exclude-sites", type=str, default=None,
-        help="Path to CSV with site_id column — exclude these sites from training/CV",
+        help="Path to CSV with site_id column — additional sites to exclude from training/CV",
+    )
+    parser.add_argument(
+        "--include-all-sites", action="store_true",
+        help="Override automatic holdout/vault exclusion (DANGEROUS — use only if you know what you're doing)",
     )
     args = parser.parse_args()
 
@@ -1001,13 +1005,44 @@ def main():
         assembled = pd.read_parquet(dataset_path)
         log_file(dataset_path, role="input")
 
-        # Exclude vault/holdout sites if specified
+        # --- Site exclusion: auto-detect split file + optional CSV ---
+        _excluded_site_ids = set()
+
+        # Auto-exclude holdout/vault from split file (unless --include-all-sites)
+        _split_path = DATA_DIR / "train_holdout_vault_split.parquet"
+        if _split_path.exists() and not args.include_all_sites:
+            _split = pd.read_parquet(_split_path)
+            _non_train = _split[_split["role"] != "training"]["site_id"]
+            _excluded_site_ids.update(_non_train)
+            logger.info(f"Split file: auto-excluding {len(_non_train)} holdout/vault sites")
+        elif _split_path.exists() and args.include_all_sites:
+            logger.warning("--include-all-sites: SKIPPING automatic holdout/vault exclusion")
+
+        # Additional CSV exclusion (on top of split-based exclusion)
         if args.exclude_sites:
             exclude_df = pd.read_csv(args.exclude_sites)
-            exclude_ids = set(exclude_df["site_id"])
+            _excluded_site_ids.update(exclude_df["site_id"])
+            logger.info(f"CSV exclude: {len(exclude_df)} additional sites")
+
+        if _excluded_site_ids:
             n_before = len(assembled)
-            assembled = assembled[~assembled["site_id"].isin(exclude_ids)]
-            logger.info(f"Excluded {n_before - len(assembled)} samples from {len(exclude_ids)} sites")
+            assembled = assembled[~assembled["site_id"].isin(_excluded_site_ids)]
+            logger.info(f"Excluded {n_before - len(assembled)} samples from {len(_excluded_site_ids)} sites "
+                        f"({assembled['site_id'].nunique()} sites remain, {len(assembled)} samples)")
+
+        # HARD GUARD: verify no holdout/vault sites leaked through
+        if _split_path.exists() and not args.include_all_sites:
+            _split = pd.read_parquet(_split_path)
+            _vault = set(_split[_split["role"] == "vault"]["site_id"])
+            _holdout = set(_split[_split["role"] == "holdout"]["site_id"])
+            _leaked = (_vault | _holdout) & set(assembled["site_id"].unique())
+            if _leaked:
+                raise RuntimeError(
+                    f"CONTAMINATION: {len(_leaked)} holdout/vault sites in training data: "
+                    f"{sorted(list(_leaked))[:5]}... "
+                    f"This would produce invalid evaluation metrics. "
+                    f"Pass --include-all-sites to override (not recommended)."
+                )
 
         target_col = cfg["target_col"]
 
@@ -1165,6 +1200,32 @@ def main():
 
         assembled = pd.read_parquet(dataset_path)
         target_col = cfg["target_col"]
+
+        # --- Apply same site exclusion as CV section ---
+        _split_path = DATA_DIR / "train_holdout_vault_split.parquet"
+        if _split_path.exists() and not args.include_all_sites:
+            _split = pd.read_parquet(_split_path)
+            _non_train = set(_split[_split["role"] != "training"]["site_id"])
+            n_before = len(assembled)
+            assembled = assembled[~assembled["site_id"].isin(_non_train)]
+            logger.info(f"Final model: excluded {n_before - len(assembled)} samples from "
+                        f"{len(_non_train)} holdout/vault sites "
+                        f"({assembled['site_id'].nunique()} sites remain)")
+        if args.exclude_sites:
+            exclude_df = pd.read_csv(args.exclude_sites)
+            assembled = assembled[~assembled["site_id"].isin(set(exclude_df["site_id"]))]
+
+        # HARD GUARD: verify no holdout/vault sites in final model training data
+        if _split_path.exists() and not args.include_all_sites:
+            _split = pd.read_parquet(_split_path)
+            _vault = set(_split[_split["role"] == "vault"]["site_id"])
+            _holdout = set(_split[_split["role"] == "holdout"]["site_id"])
+            _leaked = (_vault | _holdout) & set(assembled["site_id"].unique())
+            if _leaked:
+                raise RuntimeError(
+                    f"CONTAMINATION in final model: {len(_leaked)} holdout/vault sites. "
+                    f"Refusing to train. Pass --include-all-sites to override."
+                )
 
         # Apply chosen transform to target for final model training
         final_lmbda = None
@@ -1374,6 +1435,7 @@ def main():
                 "slope_correction": args.slope_correction,
                 "quantile_mode": args.quantile,
                 "monotone_constraints": bool(final_monotone),
+                "holdout_vault_excluded": not args.include_all_sites and _split_path.exists(),
             }
 
             # If slope correction was used, look up the fitted params from CV results
