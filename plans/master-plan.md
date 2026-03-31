@@ -36,11 +36,13 @@
 - Disaggregated analysis: do anchor sites improve specific geologies? specific HUC2 regions?
 - This tells us about data quality, not model architecture
 
-### 3. NTU Training Integration (future)
-- Add external NTU sites to training data with "ntu" sensor_family category
-- Model learns NTU-specific turbidity-SSC relationships natively
-- Expands geographic coverage (Upper Mississippi, Arizona, Susquehanna, Great Lakes, Texas)
-- Should eliminate the +35-66% bias on external NTU data
+### 3. NTU Integration — DECIDED: Validation Only, Not Training
+- Unanimous panel + Gemini: do NOT add NTU to training (sensor type confounded with era, zero temporal overlap)
+- 3,646 USGS NTU-SSC pairs preserved as validation dataset
+- 260 external NTU sites preserved for adaptation curve characterization
+- Bayesian adaptation (R²=0.43 at N=10) is the correct path for NTU users
+- +66% zero-shot bias is a feature for the paper (proves adaptation is necessary)
+- See NTU_FINDINGS.md for full analysis and paper framing
 
 ### 4. Paper & Product (Phase 6)
 - Three-tier product framing (screening/monitoring/publication grade)
