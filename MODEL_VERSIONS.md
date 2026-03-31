@@ -77,7 +77,7 @@ Each entry records: training config, dataset, performance, and what changed from
 - **Saved model:** data/results/models/ssc_C_sensor_basic_watershed.cbm (487 trees, lambda=0.2 confirmed)
 - **Notes:** Box-Cox 0.2 chosen from 24-experiment transform sweep. Raw SSC ruled out. KGE eval_metric tested (no improvement). Lambda confirmed via fine sweep at 0.18-0.20.
 
-### murkml-9-final-72feat (CURRENT BEST)
+### murkml-9-final-72feat (CONTAMINATED — DO NOT USE)
 - **Date:** 2026-03-30
 - **Training sites:** 254 (284 train - 30 w/o StreamCat). Split: 284 train / 76 validation / 36 vault
 - **Samples:** 23,088
@@ -96,10 +96,37 @@ Each entry records: training config, dataset, performance, and what changed from
 - **Trees:** median 411
 - **Split:** data/train_holdout_vault_split.parquet (284 train / 76 validation / 36 vault)
 - **Saved model:** data/results/models/ssc_C_sensor_basic_watershed_v9_final_72feat.cbm
-- **Notes:** 72 features locked after Phase 5 ablation (unanimous expert panel: keep all). 28 SGMC lithology features added. 5,536 unknown collection methods resolved. 3-way split: vault sites never touched until final evaluation.
+- **CONTAMINATION:** Model was trained on 357 sites including 76 holdout + 36 vault sites. All validation/vault results are data leakage. LOGO CV numbers are also tainted because the model saw more sites during training than it should have. Replaced by v10.
+- **Notes:** 72 features locked after Phase 5 ablation (unanimous expert panel: keep all). 28 SGMC lithology features added. 5,536 unknown collection methods resolved.
 
-### murkml-9-validation (76 sites — tainted by ablation, historical reference only)
+### murkml-10-clean-dualbcf (CURRENT BEST)
 - **Date:** 2026-03-30
+- **Training sites:** 254, holdout_vault_excluded=True (auto-exclusion + hard guard)
+- **Samples:** 22,995
+- **Features:** 72 (137 in tier, 65 dropped)
+- **Transform:** Box-Cox lambda=0.2
+- **Monotone:** ON (turbidity_instant, turbidity_max_1hr)
+- **CV:** LOGO (254 folds)
+- **R²(log):** 0.756
+- **MedSiteR²:** 0.395
+- **KGE:** 0.777
+- **RMSE:** 127.4 mg/L
+- **BCF:** Dual — bcf_mean=1.327 (for loads), bcf_median=1.021 (for individual predictions)
+- **Trees:** 446
+- **Split:** data/train_holdout_vault_split.parquet (254 train / 76 holdout / 36 vault)
+- **Saved model:** data/results/models/ssc_C_sensor_basic_watershed_v10_clean_dualbcf.cbm
+- **Key changes from v9:**
+  - Properly excludes holdout/vault from training (auto-exclusion + hard guard)
+  - Dual BCF: bcf_mean for loads, bcf_median for individual predictions
+  - 135 anomalous records cleaned from dataset
+  - Seasonal split bug fixed (was producing identical results to random)
+  - evaluate_model.py defaults to bcf_median (--bcf-mode flag added)
+  - OLS benchmark and bootstrap CIs completed
+  - CQR MultiQuantile model currently training
+
+### murkml-9-validation (76 sites — CONTAMINATED, model trained on these sites)
+- **Date:** 2026-03-30
+- **CONTAMINATION:** v9 model was trained on all 357 sites including these 76 holdout sites. All numbers below are data leakage, not honest holdout evaluation. Replaced by v10-holdout below.
 - **Validation sites:** 76, 5,847 samples
 - **Pooled NSE:** 0.692
 - **Log-NSE:** 0.807
@@ -109,12 +136,24 @@ Each entry records: training config, dataset, performance, and what changed from
 - **Spearman rho:** 0.920
 - **Bias:** +2.0%
 - **Median per-site R²:** 0.418
-- **Bayesian adaptation (random, N=10):** MedR²=0.537
-- **Notes:** These 76 sites were used for 47+ ablation experiments during Phase 5. Numbers are valid for historical comparison with v4 but should NOT be reported as primary results in the paper.
 
-### murkml-9-vault (36 sites — ONE SHOT, CLEAN FINAL EXAM)
+### murkml-10-holdout (76 sites, HONEST)
 - **Date:** 2026-03-30
-- **Vault sites:** 36, 3,660 samples (stratified by HUC2, never seen before)
+- **Holdout sites:** 76 (never seen during v10 training)
+- **BCF mode:** bcf_median
+- **MedSiteR²:** 0.393
+- **MAPE:** 41.7%
+- **Within 2x:** 70.3%
+- **Spearman rho:** 0.873
+- **Bias:** -26.4%
+- **Adaptation (N=10, random, bcf_median):** MedSiteR²=0.492, MAPE=36.4%, Within-2x=76.1%
+- **Adaptation (N=10, temporal):** MedSiteR²=0.405, MAPE=36.9%
+- **Bootstrap CIs (95%, bcf_mean):** MedSiteR²=0.409 [0.144, 0.459], Spearman=0.873 [0.842, 0.886]
+
+### murkml-9-vault (36 sites — CONTAMINATED, model trained on these sites)
+- **Date:** 2026-03-30
+- **CONTAMINATION:** v9 model was trained on all 357 sites including these 36 vault sites. All numbers below are data leakage, not a clean final exam. The vault was NOT actually sequestered.
+- **Vault sites:** 36, 3,660 samples
 - **Pooled NSE:** 0.164
 - **Log-NSE:** 0.825
 - **Spearman rho:** 0.932
@@ -123,26 +162,27 @@ Each entry records: training config, dataset, performance, and what changed from
 - **Bias:** -7.8%
 - **RMSE:** 1293.8 mg/L
 - **Median per-site R²:** 0.486
-- **Sites R² > 0.5:** 17/36 (47%)
-- **Sites R² > 0:** 28/36 (78%)
-- **Notes:** Completely clean evaluation. These 36 sites were sequestered from training and never used for any decision. MedSiteR²=0.486 is the best per-site number on untouched data.
 
-### murkml-9-external (260 non-USGS NTU sites)
+### murkml-9-external (260 non-USGS NTU sites — CONTAMINATED)
 - **Date:** 2026-03-30
-- **Sites:** 260 (113 with 25+ samples for adaptation), 6 organizations (UMRR, SRBC, GLEC, UMC, MDNR, CEDEN)
+- **CONTAMINATION:** These results used the v9 model which was trained on holdout+vault. External NTU sites were not in training, but the base model is still tainted. See v10-external below.
+- **Sites:** 260, 6 organizations (UMRR, SRBC, GLEC, UMC, MDNR, CEDEN)
+
+### murkml-10-external (260 non-USGS NTU sites, HONEST)
+- **Date:** 2026-03-30
+- **Sites:** 260, 11K samples
 - **Sensor:** NTU (not FNU — model trained on FNU only)
-- **Zero-shot (NTU<400):** NSE=0.152, Spearman=0.929, MAPE=90%, bias=+66%
-- **Adaptation curve (random, NTU<400, 113 sites):**
+- **Spearman:** 0.927
+- **MAPE:** 53%
+- **Bias:** -46%
+- **Notes:** Model ranks correctly from zero-shot (Spearman 0.927) despite NTU sensors. Proves cross-network generalization.
 
-| N cal | R² | Log-NSE | Spearman | MAPE | Within 2x | Bias |
-|---|---|---|---|---|---|---|
-| 0 | -0.108 | +0.225 | 0.934 | 90% | 58% | +76% |
-| 3 | +0.242 | +0.485 | 0.932 | 61% | 77% | +55% |
-| 5 | +0.352 | +0.539 | 0.931 | 55% | 82% | +48% |
-| 10 | +0.430 | +0.613 | 0.931 | 45% | 86% | +40% |
-| 20 | +0.486 | +0.648 | 0.932 | 39% | 89% | +35% |
-
-- **Notes:** Model ranks correctly from zero-shot (Spearman 0.93) despite NTU sensors, no continuous data, no watershed features for most sites. 10 calibration samples achieves R²=0.43. Proves cross-network generalization.
+### murkml-10-ols-benchmark
+- **Date:** 2026-03-30
+- **Finding:** CatBoost beats OLS at every N
+- N=2 temporal: CatBoost R²=0.36 vs OLS R²=-0.56
+- N=10 random: CatBoost R²=0.492 vs OLS R²=0.365
+- **Notes:** OLS benchmark completed for paper. CatBoost advantage is largest at low N where shrinkage matters most.
 
 ---
 
@@ -170,7 +210,7 @@ Each entry records: training config, dataset, performance, and what changed from
 **CRITICAL FINDING: "Noise" sites carry extreme event signal.**
 Dropping 15 worst noise sites destroyed the model:
 
-| Metric | v9 (all sites) | Drop 15 noise | Delta |
+| Metric | All sites | Drop 15 noise | Delta |
 |---|---|---|---|
 | First Flush R² | 0.905 | 0.264 | -0.641 |
 | Top 1% Extreme R² | 0.793 | -0.043 | -0.836 |

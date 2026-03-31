@@ -2,27 +2,30 @@
 
 ## What This Project Is
 
-`murkml` predicts suspended sediment concentration (SSC) in rivers using turbidity sensors and machine learning. The core innovation is **cross-site generalization**: one model trained on 357 USGS sites that works at new sites it's never seen, optionally improved with a handful of local grab samples via Bayesian shrinkage adaptation.
+`murkml` predicts suspended sediment concentration (SSC) in rivers using turbidity sensors and machine learning. The core innovation is **cross-site generalization**: one model trained on 254 USGS sites that works at new sites it's never seen, optionally improved with a handful of local grab samples via Bayesian shrinkage adaptation.
 
 **Owner:** Kaleb — water science student, graduating mid-2026. Not on a deadline. Exploring what's possible, with eventual commercial product and paper goals.
 
 ## Current State (2026-03-30 evening)
 
-**Current model: v9-final-72feat (BEST)**
-- CatBoost, 254 training sites (284 train - 30 w/o StreamCat), 23,088 samples
-- 72 features (69 numeric + 3 categorical: 44 original + 28 SGMC lithology)
-- Box-Cox lambda=0.2, Snowdon BCF=1.390, monotone ON (turbidity_instant, turbidity_max_1hr)
-- 3-way split: 284 train / 76 validation / 36 vault
-- LOGO CV (254 folds): R²(log)=0.740, MedSiteR²=0.335, KGE=0.778
-- Validation (76 sites): NSE=0.692, MedSiteR²=0.418, MAPE=55.6%
-- **Vault (36 clean sites): MedSiteR²=0.486, MAPE=49.4%, Spearman=0.932**
-- **External (260 NTU sites): 10 samples → R²=0.43, Spearman=0.93 zero-shot**
-- Model: data/results/models/ssc_C_sensor_basic_watershed_v9_final_72feat.cbm
+**Current model: v10-clean-dualbcf (BEST)**
+- CatBoost, 254 training sites, 22,995 samples, 72 features (137 in tier, 65 dropped)
+- Box-Cox lambda=0.2, Dual BCF (bcf_mean=1.327 for loads, bcf_median=1.021 for individual predictions)
+- holdout_vault_excluded=True, 446 trees
+- LOGO CV (254 sites): R²(log)=0.756, KGE=0.777, MedSiteR²=0.395, RMSE=127.4 mg/L
+- Holdout (76 sites, bcf_median): MedSiteR²=0.393, MAPE=41.7%, Within-2x=70.3%, Spearman=0.873, Bias=-26.4%
+- Adaptation (N=10, random, bcf_median): MedSiteR²=0.492, MAPE=36.4%, Within-2x=76.1%
+- Adaptation (N=10, temporal): MedSiteR²=0.405, MAPE=36.9%
+- **External (260 NTU sites, 11K samples): Spearman=0.927, MAPE=53%, Bias=-46%**
+- **OLS benchmark: CatBoost beats OLS at every N** (N=10 random: R²=0.492 vs OLS R²=0.365)
+- **Bootstrap CIs (95%): MedSiteR²=0.409 [0.144, 0.459], Spearman=0.873 [0.842, 0.886]**
+- Model: data/results/models/ssc_C_sensor_basic_watershed_v10_clean_dualbcf.cbm
+- **NOTE:** v9 was contaminated — trained on 357 sites including 76 holdout + 36 vault. All v9 numbers are invalid.
 
 **Bayesian site adaptation (the killer feature):**
 - Student-t shrinkage (k=15, df=4), staged: intercept-only N<10, slope+intercept N>=10
-- Bayesian beats OLS at every N in every split mode
-- External NTU data: 10 samples → R²=0.43 on foreign sensors/networks
+- CatBoost beats OLS at every N (N=2 temporal: R²=0.36 vs OLS R²=-0.56)
+- External NTU data: Spearman=0.927 zero-shot on foreign sensors/networks
 
 **Key findings from 100+ experiments:**
 - Site heterogeneity is THE problem — no architecture change fixes it
@@ -35,7 +38,7 @@
 - Model ranks correctly on foreign NTU data (Spearman 0.93) — adaptation just fixes the scale
 - EVERY evaluation must use the full suite (all modes, disaggregated, physics, external)
 - "Noise" training sites carry extreme event signal — dropping them destroys first flush and extreme predictions
-- Site contribution analysis: 110 anchors, 110 noise, but noise sites are essential (keep all 284)
+- Site contribution analysis: 110 anchors, 110 noise, but noise sites are essential (keep all training sites)
 
 **Data state:**
 - 396 total sites, 35,209 samples in paired dataset
@@ -43,7 +46,7 @@
 - 28 SGMC watershed lithology features (355 sites with coverage)
 - 260 external NTU validation sites (11K samples, 6 organizations)
 - 65 features on drop list (`data/optimized_drop_list.txt`), always pass via `--drop-features`
-- 3-way split: data/train_holdout_vault_split.parquet
+- 3-way split: data/train_holdout_vault_split.parquet (254 train / 76 holdout / 36 vault; 135 anomalous records cleaned)
 
 **Completed phases:**
 - Phase 3: Pipeline fixes (Gemini bugs, SGMC integration, collection methods, staged Bayesian)
@@ -53,11 +56,12 @@
 - SGMC lithology: 28 watershed geology features integrated into train_tiered.py
 - Collection methods: 5,536 unknown samples resolved via WQP metadata (unknown 6,282→746)
 
-**What's next: Phase 4 — Diagnostic validation**
-- Disaggregated metrics by collection method, geology, HUC2, SSC variability, sample count, sensor
-- Physics-based validation: first flush, sediment exhaustion, hysteresis, snowmelt, extreme events
-- Temporal stationarity, spatial LOO-CV, adversarial edge cases
-- Then Phase 5: informed ablation using disaggregated diagnostics
+**What's next:**
+- CQR MultiQuantile model currently training (~3 hrs) for prediction intervals
+- Paper writing (WRR target)
+- Seasonal split bug was fixed (was producing identical results to random)
+- evaluate_model.py defaults to bcf_median now (--bcf-mode flag added)
+- OLS benchmark and bootstrap CIs completed
 
 ## How the Pipeline Works
 
@@ -85,7 +89,7 @@
    → Tier B: + basic attrs (42 features, 396 sites)
    → Tier C: + StreamCat + SGMC (137 features pre-drop, 72 post-drop, 357 sites)
 
-6. TRAINING: CatBoost with Box-Cox lambda=0.2, monotone, Snowdon BCF
+6. TRAINING: CatBoost with Box-Cox lambda=0.2, monotone, Dual BCF (mean for loads, median for predictions)
    Script: scripts/train_tiered.py
    Flags: --param ssc --tier C --transform boxcox --boxcox-lambda 0.2 --n-jobs 12
           --drop-features "$(cat data/optimized_drop_list.txt)"
@@ -105,7 +109,7 @@
 | File | What it does |
 |------|-------------|
 | `scripts/train_tiered.py` | Main training. Key flags: `--cv-mode gkf5\|logo`, `--transform boxcox`, `--boxcox-lambda 0.2`, `--drop-features`, `--skip-ridge`, `--skip-save-model`, `--skip-shap`, `--n-jobs 12`, `--label`. |
-| `scripts/evaluate_model.py` | Canonical holdout evaluation. Adaptation methods: bayesian (staged, Student-t), old_2param, ols. Flags: `--k 15`, `--df 4`, `--slope-k 10`, `--bcf-k-mult 3.0`. |
+| `scripts/evaluate_model.py` | Canonical holdout evaluation. Adaptation methods: bayesian (staged, Student-t), old_2param, ols. Flags: `--k 15`, `--df 4`, `--slope-k 10`, `--bcf-k-mult 3.0`, `--bcf-mode {mean,median}` (default: median). |
 | `scripts/site_adaptation_bayesian.py` | Bayesian k-sweep with Student-t shrinkage. Reference implementation. |
 | `scripts/ablation_matrix.py` | Automated ablation runner. Calls train_tiered.py as subprocess. |
 | `scripts/assemble_dataset.py` | Builds paired dataset from continuous + discrete data. |
@@ -119,7 +123,7 @@
 
 - SSC only (param 80154), NOT TSS (00530) — different methods
 - Turbidity FNU only (param 63680), NOT NTU (00076) — diverge above 400
-- Target: Box-Cox(SSC, lambda=0.2) with Snowdon BCF for back-transform
+- Target: Box-Cox(SSC, lambda=0.2) with Dual BCF (bcf_mean=1.327 for loads, bcf_median=1.021 for individual predictions)
 - All timestamps UTC
 - DO saturation: Benson & Krause (1984) polynomial ONLY — never linear approx
 - QC qualifiers come as array strings `"['ICE' 'EQUIP']"` — must parse this format

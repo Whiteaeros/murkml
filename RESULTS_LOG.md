@@ -4,6 +4,46 @@ Reference for paper writing. Captures key results, expert panel findings, and de
 
 ---
 
+## v10 Clean Model Results (2026-03-30) — CURRENT BEST
+
+**v9 was contaminated:** trained on 357 sites including 76 holdout + 36 vault. All v9 validation/vault numbers were data leakage. v10 properly excludes holdout/vault (auto-exclusion + hard guard). 135 anomalous records cleaned from dataset.
+
+**Model:** ssc_C_sensor_basic_watershed_v10_clean_dualbcf.cbm
+- 254 training sites, 22,995 samples, 72 features (137 in tier, 65 dropped)
+- Box-Cox lambda=0.2, Dual BCF (bcf_mean=1.327 for loads, bcf_median=1.021 for individual predictions)
+- holdout_vault_excluded=True, 446 trees
+
+**LOGO CV (254 sites):**
+- R²(log)=0.756, KGE=0.777, MedSiteR²=0.395, RMSE=127.4 mg/L
+
+**Holdout (76 sites, bcf_median):**
+- MedSiteR²=0.393, MAPE=41.7%, Within-2x=70.3%, Spearman=0.873, Bias=-26.4%
+
+**Adaptation (N=10, random, bcf_median):**
+- MedSiteR²=0.492, MAPE=36.4%, Within-2x=76.1%
+
+**Adaptation (N=10, temporal):**
+- MedSiteR²=0.405, MAPE=36.9%
+
+**External NTU (260 sites, 11K samples):**
+- Spearman=0.927, MAPE=53%, Bias=-46%
+
+**OLS Benchmark:**
+- CatBoost beats OLS at every N
+- N=2 temporal: CatBoost R²=0.36 vs OLS R²=-0.56
+- N=10 random: CatBoost R²=0.492 vs OLS R²=0.365
+
+**Bootstrap CIs (95%, bcf_mean):**
+- MedSiteR² = 0.409 [0.144, 0.459]
+- Spearman = 0.873 [0.842, 0.886]
+
+**Key improvements:**
+- Seasonal split bug fixed (was producing identical results to random)
+- evaluate_model.py defaults to bcf_median now (--bcf-mode flag added)
+- CQR MultiQuantile model currently training (~3 hrs)
+
+---
+
 ## CRITICAL BUG: prune_gagesii destroyed all GAGES-II attributes (discovered 2026-03-24)
 
 **Root cause:** `train_tiered.py` calls `prune_gagesii()` on `site_attributes_gagesii.parquet`, but that parquet already stores data with **pruned column names** (e.g., `forest_pct`). `prune_gagesii()` looks for raw GAGES-II names (e.g., `FORESTNLCD06`), finds none, and replaces every column with zeros or NaN. The model trained on 25 columns of garbage for all Tier C/C_gagesii_only results.
