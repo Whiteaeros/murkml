@@ -403,13 +403,14 @@ def _train_one_fold(
     )
     if monotone_constraints:
         cb_params["monotone_constraints"] = monotone_constraints
+    if cb_overrides:
+        cb_params.update(cb_overrides)
+    # Apply quantile/kge AFTER overrides so they can't be silently disabled
     if quantile_mode:
         cb_params["loss_function"] = "MultiQuantile:alpha=0.05,0.1,0.25,0.5,0.75,0.9,0.95"
     if kge_eval:
         from murkml.evaluate.metrics import KGEMetric
         cb_params["eval_metric"] = KGEMetric()
-    if cb_overrides:
-        cb_params.update(cb_overrides)
 
     model = CatBoostRegressor(**cb_params)
     model.fit(train_pool, eval_set=val_pool)
@@ -503,7 +504,17 @@ def _train_one_fold(
         }
         if quantile_preds is not None:
             for j, qlabel in enumerate(quantile_labels):
-                record[qlabel] = float(quantile_preds[i, j])
+                q_ms = float(quantile_preds[i, j])  # model-space (Box-Cox)
+                record[qlabel + "_ms"] = q_ms
+                # Back-transform quantiles to native space (BCF=1.0 for quantile bounds —
+                # BCF corrects mean retransformation bias, not quantile ordering)
+                if transform_type == "boxcox":
+                    record[qlabel + "_native"] = float(safe_inv_boxcox1p(
+                        np.array([q_ms]), fold_lmbda)[0])
+                elif transform_type == "log1p":
+                    record[qlabel + "_native"] = float(np.expm1(q_ms))
+                else:
+                    record[qlabel + "_native"] = q_ms
         sample_records.append(record)
 
     return fold_metric, sample_records
@@ -1327,10 +1338,11 @@ def main():
                     final_cb_params["monotone_constraints"] = final_monotone
             else:
                 final_monotone = {}
-            if args.quantile:
-                final_cb_params["loss_function"] = "MultiQuantile:alpha=0.05,0.1,0.25,0.5,0.75,0.9,0.95"
             if cb_overrides:
                 final_cb_params.update(cb_overrides)
+            # Apply quantile AFTER overrides so it can't be silently disabled
+            if args.quantile:
+                final_cb_params["loss_function"] = "MultiQuantile:alpha=0.05,0.1,0.25,0.5,0.75,0.9,0.95"
 
             model = CatBoostRegressor(**final_cb_params)
             model.fit(train_pool, eval_set=val_pool)
