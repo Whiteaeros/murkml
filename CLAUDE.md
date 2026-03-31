@@ -160,6 +160,8 @@
 
 **Always use RDB format for USGS downloads, NOT JSON/WaterML.**
 
+**Turbidity unit split (USGS TM 2004.03):** Continuous sondes = FNU (pCode 63680, ISO 7027 infrared). Discrete lab/field = NTU (pCode 00076, EPA 180.1 white light). No continuous NTU exists in NWIS — by design since 2004.
+
 Direct HTTP to `waterservices.usgs.gov/nwis/iv/?format=rdb` is 70% smaller than JSON and much faster to parse. Use `requests.get()` with `parse_rdb()` from `scripts/download_gap_fill_fast.py`, NOT `dataretrieval.nwis.get_iv()` which downloads massive WaterML JSON blobs.
 
 Pattern: 8 concurrent workers, one site per request, 2-year chunks, exponential backoff.
