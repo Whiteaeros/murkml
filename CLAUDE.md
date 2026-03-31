@@ -156,6 +156,15 @@
 | `CHANGELOG.md` | History of changes by date | Significant feature, fix, or data change |
 | `PIPELINE.md` | Data pipeline flow | Pipeline architecture changes |
 
+## USGS Data Download — Use RDB Format
+
+**Always use RDB format for USGS downloads, NOT JSON/WaterML.**
+
+Direct HTTP to `waterservices.usgs.gov/nwis/iv/?format=rdb` is 70% smaller than JSON and much faster to parse. Use `requests.get()` with `parse_rdb()` from `scripts/download_gap_fill_fast.py`, NOT `dataretrieval.nwis.get_iv()` which downloads massive WaterML JSON blobs.
+
+Pattern: 8 concurrent workers, one site per request, 2-year chunks, exponential backoff.
+Reference implementation: `scripts/download_gap_fill_fast.py`
+
 ## Technical Notes
 
 - **Python venv:** `.venv/Scripts/python` (Windows). UV-managed, cpython 3.12.9. **NOT base conda.**
