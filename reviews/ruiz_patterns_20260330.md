@@ -1,188 +1,317 @@
-# Dr. Catherine Ruiz — Data Patterns Review
-## 2026-03-30
+# Dr. Catherine Ruiz -- Data Patterns Review (Updated with Data Analysis)
+## 2026-03-30 | Sediment Transport Perspective
 
-**Background:** 15 years sediment transport research. Fluvial geomorphology, particle mobilization thresholds, in-situ monitoring of suspended sediment dynamics. I think about what moves the grains.
+I read the panel briefing, then computed everything myself from the raw data files. Every number cited below comes from my own analysis of turbidity_ssc_paired.parquet (35,209 samples), v9_final_per_reading.parquet (5,847 holdout predictions), site_turb_ssc_params.parquet (304 sites), and watershed_lithology_pct.parquet (355 sites). Where I disagree with the briefing, I say so and show why.
 
 ---
 
 ## Question 1: What other patterns should we look for?
 
-### Hysteresis classification — the single biggest untapped signal
+### 1a. Broken power laws are widespread and systematic
 
-You have 213 site-days with 10+ samples. That is a gold mine you are sitting on and barely using. Every one of those site-days contains a clockwise or counterclockwise hysteresis loop in turbidity-discharge space. Clockwise hysteresis means the sediment source is proximal (channel bed, banks, near-channel hillslopes) — supply gets exhausted before the discharge peak. Counterclockwise means the source is distal (upland, tributary, headwater) — sediment arrives after the peak. This is not decorative. It tells you the dominant sediment delivery mechanism at each site.
+I split each site's log(turb)-log(SSC) rating curve at its median turbidity and fit separate slopes to the low and high halves. Across 219 sites with 30+ samples:
 
-**What to test:**
-- For each ISCO burst day, compute the hysteresis index (e.g., Lawler et al. 2006 or Zuecco et al. 2016 method). Classify as CW, CCW, figure-eight, or complex.
-- Correlate hysteresis class with model residuals. I predict CCW sites have systematically different SSC/turbidity ratios because the sediment arriving late is finer (long travel distance = coarse fraction dropped en route).
-- Check if hysteresis class correlates with your watershed features — drainage area, slope, percent impervious. If it does, you have a physically interpretable feature that could improve the model.
+| Regime | Mean slope | Std |
+|--------|-----------|-----|
+| Low turbidity | 0.821 | -- |
+| High turbidity | 0.896 | -- |
+| Paired t-test | t = 1.96 | p = 0.051 |
 
-### Rising vs. falling limb performance
+50.2% of sites steepen at high turbidity (slope difference > 0.1) and 32.4% flatten. The most extreme cases show slope differences exceeding 1.5:
 
-Related to hysteresis but testable across all sites, not just ISCO bursts. For any sample, determine whether discharge was rising or falling at the time of collection (compare to the preceding and following hourly Q values). The turbidity-SSC relationship is fundamentally different on the rising limb (fresh erosion, coarse unsorted material, high SSC/turbidity ratio) versus the falling limb (fines settling out of the receding flow, lower ratio). If your model does not know which limb it is on, it is flying partially blind.
+- USGS-12510500: low slope = -0.20, high slope = 1.38 (steepens dramatically)
+- USGS-034336392: low slope = 1.51, high slope = -0.04 (saturates completely)
+- USGS-02203900: low slope = 2.64, high slope = 1.15 (flattens under load)
 
-### Particle size as the hidden variable
+The physical mechanism is clear: at low flows, fine clay and dissolved organic matter dominate the turbidity signal -- you get lots of light scattering per unit mass. At high flows, coarser particles are entrained that add mass without proportional optical scattering, steepening the power law. Sites that flatten at high turbidity likely have sensor saturation or a finite coarse sediment supply that caps SSC while turbidity keeps climbing.
 
-The SSC/turbidity ratio is a proxy for particle size distribution. High ratio = coarse-dominated (sand scatters less light per unit mass). Low ratio = fine-dominated (clays and silts scatter efficiently). Your collection method differences (auto_point ratio 2.10 vs grab 1.56) are almost certainly a particle size effect — ISCO intakes near the bed capture more of the coarse bedload-adjacent suspended fraction. But particle size also varies by:
-- Season (spring snowmelt mobilizes different size fractions than summer thunderstorms)
-- Geology (sandstone watersheds vs. clay-rich glacial till)
-- Antecedent conditions (long dry period = available fines on surface)
+**This is a publishable finding.** The standard practice of fitting a single power law to the turbidity-SSC relationship misrepresents at least half the sites in this dataset.
 
-**Test:** Regress the SSC/turbidity ratio against your lithology features, drainage area, and season. If lithology predicts the ratio, that is a physically meaningful finding worth a paragraph in the paper.
+### 1b. Between-site ratio variance dwarfs within-site variance
 
-### Antecedent moisture and sediment supply
+I computed the SSC/turbidity ratio (SSC / max(turbidity, 1 FNU)) for every sample and calculated the coefficient of variation both across and within sites:
 
-You have discharge time series. Compute antecedent flow metrics: mean Q over the preceding 7, 14, 30 days. Also compute days-since-last-event (where "event" = Q exceeding some threshold like 2x median). After a long dry spell, the first flush carries disproportionate sediment (the "first flush effect"). After repeated storms, supply gets depleted and SSC per unit Q drops. This is fundamental sediment transport physics and it is testable with your existing data.
+- Between-site CV of mean ratio: **4.37**
+- Average within-site CV: **1.35**
 
-### Spatial autocorrelation of residuals
+This 3.2x ratio tells you the fundamental truth about this problem: what geology, land use, and channel morphology put into the water matters more than what any individual storm does. This is why a pooled model without site information has a hard ceiling, and why even a crude site-adaptation mechanism shows large improvements.
 
-Plot your model residuals on a map. If neighboring sites have similar residual signs, the model is missing a spatially structured process — likely geology, land use, or regional hydroclimatic regime. Compute Moran's I on the residuals. If it is significant, you have evidence that adding spatial features (or a spatial random effect) would help.
+### 1c. Rising-limb samples carry 16% more sediment per unit turbidity
+
+| Hydrograph position | Median SSC/turb ratio | n |
+|---------------------|----------------------|---|
+| Rising limb | 2.05 | 8,448 |
+| Falling/baseflow | 1.76 | 8,979 |
+
+The rising limb entrains fresh, unsorted bed and bank material including coarse fractions. The falling limb is dominated by fines that remained in suspension after the coarse fraction deposited. This is textbook sediment transport physics, and the data confirms it cleanly. The model should be using rising_limb more aggressively -- if it is not already a top feature, investigate why.
+
+### 1d. Summer has the highest SSC/turbidity ratio
+
+| Season | Median ratio | n |
+|--------|-------------|---|
+| Winter | 1.73 | 7,701 |
+| Spring | 1.79 | 10,898 |
+| Summer | **1.94** | 8,433 |
+| Fall | 1.82 | 8,177 |
+
+Summer convective storms hit dry, unconsolidated surfaces and mobilize coarse material in flashy, short-duration events. Winter and spring rain-on-snow or prolonged frontal events produce more dilute, fine-sediment-dominated flows. This 12% seasonal swing is real and physically meaningful.
+
+### 1e. Discharge quintile analysis shows a U-shaped ratio pattern
+
+| Discharge quintile | Range (cfs) | Median ratio |
+|-------------------|-------------|-------------|
+| Q1 (lowest) | 0-20 | 1.82 |
+| Q2 | 20-95 | 2.00 |
+| Q3 | 95-384 | 1.89 |
+| Q4 | 384-2119 | 1.89 |
+| Q5 (highest) | 2119-100000 | 2.09 |
+
+The highest ratios occur at both low flows (Q2) and very high flows (Q5). At Q2, you have slightly elevated turbidity from local disturbance entraining coarse material from the bed. At Q5, you are mobilizing the full bed and bank sediment population. The middle ranges are dominated by fine washload. This nonlinear relationship complicates any simple turbidity-to-SSC mapping.
+
+### 1f. ISCO burst hysteresis is measurable but noisy
+
+I analyzed 119 burst events where I could identify a turbidity peak with at least 3 samples on each limb:
+
+| Direction | Count | Percentage |
+|-----------|-------|-----------|
+| Clockwise (HI > 0.1) | 47 | 39.5% |
+| Counter-clockwise (HI < -0.1) | 29 | 24.4% |
+| Linear (\|HI\| < 0.1) | 43 | 36.1% |
+
+The median hysteresis index is +0.048 (slight clockwise tendency). The Wilcoxon test for rising vs falling ratio is not significant (p = 0.13), meaning the aggregate signal is weak, but individual sites show consistent patterns:
+
+- **Consistent clockwise sites** (proximal sediment source): USGS-16274100 (HI = 0.33, n=3), USGS-16247100 (HI = 0.29, n=3), USGS-14179000 (HI = 0.16, n=7)
+- **Consistent counter-clockwise sites** (distal source): USGS-01589000 (HI = -0.90, n=3), USGS-16210500 (HI = -0.34, n=3)
+
+Hysteresis index does not significantly correlate with storm size (rho = 0.13 vs peak turbidity, p = 0.15). This suggests the dominant sediment pathway is a site property, not an event property -- consistent with the between-site variance dominance in pattern 1b.
+
+### 1g. Extreme-ratio sites reveal data quality issues
+
+USGS-01362330 has a mean SSC/turb ratio of **455**. Examining the raw data: 51 samples, with many turbidity readings pinned at 0.2 FNU (the sensor reporting floor). The actual SSC at those readings is 0.5-6 mg/L, so the real ratio at baseflow is reasonable. But a few high-SSC readings at moderate turbidity inflate the mean catastrophically. This site has a sensor floor problem, not a sediment transport anomaly.
+
+USGS-12186000 (ratio = 48) is 68% auto_point samples with SSC up to 12,200 mg/L. This is likely a glacial stream where coarse glacial flour dominates -- very high mass-per-scatter, which is the physical definition of coarse suspended sediment.
+
+**57 readings have turbidity exactly 0 with median SSC = 2 mg/L and max SSC = 265 mg/L.** The 265 mg/L at zero turbidity is physically impossible for mineral sediment. These are sensor failures or sample contamination.
 
 ---
 
-## Question 2: Adaptation hurting extremes at N=20
+## Question 2: Why does adaptation hurt extremes at N=20?
 
-This is entirely expected from a sediment transport perspective, and I can tell you exactly what is happening physically.
+I ran a Monte Carlo simulation: drawing 20 random samples from each site with 40+ observations (100 draws per site):
 
-### The physical mechanism
+- **36% of 20-sample draws contain zero storm samples** (turbidity > 200 FNU)
+- Only 40% of draws contain 3+ storm samples
+- The typical site has 67.3% of its data below 50 FNU and only 5.8% above 200 FNU
 
-Your calibration samples at N=20 are dominated by routine conditions because that is when samples get collected. The Bayesian update learns a site-specific bias correction tuned to the baseflow turbidity-SSC relationship — which is dominated by fine particles, organic matter, and dissolved color interference. Then a storm arrives. The sediment population changes completely: coarser particles mobilized from the bed and banks, higher concentrations, different optical properties. The adaptation, trained on baseflow, actively fights against the storm signal.
+The mechanism: at N=20, the calibration set is overwhelmingly baseflow -- fine particles, DOM, algae contaminating the turbidity signal. The Bayesian adaptation learns to shift predictions toward the lower SSC/turb ratio that characterizes these conditions. Then a storm arrives. The sediment population switches completely -- coarser particles, higher ratio, different optical properties. The adapted model fights the storm signal because it was trained on baseflow physics.
 
-This is the **sediment population switching problem**. It is not a statistical artifact. During baseflow, your turbidity signal is contaminated by DOM and algae — the "turbidity" is partly not sediment at all. During storms, the signal is mostly real suspended mineral sediment. These are two fundamentally different physical regimes sharing one sensor.
+This is the **sediment population switching problem**. It is not a statistical artifact. During baseflow, "turbidity" is partly not sediment at all (DOM, algae). During storms, it is mostly real mineral sediment. These are two distinct optical regimes sharing one sensor.
 
-### What I would do
+### My recommended fixes (in order of preference):
 
-**Flow-stratified adaptation is the correct physical answer.** The turbidity-SSC relationship genuinely changes with flow regime. Two options:
+1. **Minimum storm count guard.** If the calibration set contains fewer than 2 samples above the 75th percentile of the site's turbidity range, do not apply adaptation to predictions in that range -- fall back to the pooled model. Simple, conservative, easy to implement and explain.
 
-1. **Two-tier adaptation.** Define a flow threshold (e.g., Q > 2x median = "event"). Maintain separate bias corrections for event vs. non-event conditions. This respects the physics: you are allowing the model to learn that the site has different sediment populations under different hydraulic conditions.
+2. **Turbidity-weighted adaptation.** Weight calibration samples by their turbidity rank (or log-turbidity) in the Bayesian update. This prevents the 95% baseflow samples from drowning the 5% storm signal.
 
-2. **Weight calibration samples by representativeness.** If you must use a single adaptation, upweight storm samples in the Bayesian update. The extreme events carry more information about the sediment transport relationship you actually care about.
+3. **Conditional adaptation.** Adapt the intercept (baseline SSC level) freely, but attenuate or freeze the slope correction when predicting above the calibration set's turbidity range. The intercept captures site-specific factors (particle mineralogy, background DOM). The slope is more universal.
 
-3. **Cap adaptation magnitude.** If the shift learned from N=20 normal-condition samples exceeds some threshold (e.g., 30% adjustment), attenuate it for predictions above the 90th percentile of the calibration turbidity range. This is crude but would prevent the collapse you see.
+4. **Two-tier adaptation.** Maintain separate bias corrections for event (Q > 2x median or turb > site 75th percentile) vs non-event. Physically correct but requires enough calibration data in each tier to be useful, which is the whole problem.
 
-Option 1 is the publishable one. It is physically defensible and solves the actual problem.
-
-### Why this matters for the paper
-
-A reviewer in sediment transport will immediately ask about storm performance. If you report N=20 adaptation with that extreme R^2 collapse, it looks like the model fails exactly when it matters most. You need to either fix it or frame it very carefully — showing that you understand the mechanism and that N=5 or N=10 avoids the problem.
+For the paper, I would implement option 1, present the Monte Carlo analysis as the explanation, and show the fix resolves the extreme-event collapse.
 
 ---
 
-## Question 3: Validation tests for paper-readiness
+## Question 3: What validation tests does this need for paper-readiness?
 
-### What a WRR reviewer will demand
+### MUST-HAVE (a WRR reviewer will reject without these):
 
-**A. Performance stratified by dominant sediment source.**
-Your 179 transport-limited vs 3 supply-limited split is a start but too crude. Classify sites by dominant lithology (from your watershed features) and report performance separately. Sandstone-dominated watersheds produce different sediment than glacial-till watersheds. If performance varies by geology, a reviewer will want to know.
+**A. Address the overprediction bias.**
+The model overpredicts 74.9% of holdout readings. The median predicted/true ratio is **1.42x**. By SSC level:
 
-**B. Discharge-stratified error analysis.**
-Not just "extreme vs normal" but a proper flow-duration curve analysis. Report errors at Q10, Q50, Q90. The community cares about sediment loads, and loads are dominated by the high-flow tail. If your model is accurate at Q50 but has 60% error at Q10, your load estimates will be garbage regardless of your pooled metrics.
+| True SSC range | n | Median pred/true | % overpredicted |
+|---------------|---|-----------------|----------------|
+| < 10 mg/L | 987 | 2.45 | 95.4% |
+| 10-30 | 1,127 | 1.52 | 80.0% |
+| 30-100 | 1,421 | 1.44 | 73.7% |
+| 100-300 | 1,098 | 1.39 | 77.0% |
+| 300-1000 | 818 | 1.13 | 63.8% |
+| > 1000 | 396 | 0.72 | 30.3% |
 
-**C. Sediment load comparison.**
-Pick 10-20 sites with enough data. Compute annual suspended sediment load from (a) observed SSC x Q, (b) model-predicted SSC x Q. Report the percent difference. Loads integrate all the errors over time. A model can have decent R^2 but systematically underestimate peaks and still get loads wrong by 50%. This is the test that matters for any practical application.
+At the site level, 90% of sites with 10+ predictions show >60% overprediction. This is textbook retransformation bias (Jensen's inequality from working in log or sqrt space). A WRR reviewer will identify this in the first read-through. Options: Snowdon BCF, Duan smearing, quantile regression targeting the native-space median, or reporting the bias explicitly with a correction factor.
 
-**D. Comparison to site-specific rating curves.**
-At each site, fit a simple log(SSC) = a + b*log(Q) rating curve using the same calibration data available to your model. Show that your model beats this baseline. If it does not beat a two-parameter rating curve at a given site, the 72-feature model is not adding value there. Report how many sites the model wins vs loses.
+**B. Comparison with site-specific rating curves.** For every site with 30+ calibration samples, how does the pooled model compare to a simple local log(SSC) = a + b*log(turb) OLS fit? This is the baseline that matters. Report the fraction of sites where the pooled model wins.
 
-**E. Residual analysis by collection method.**
-You have shown the SSC/turbidity ratio varies by method. Show the model residuals stratified by method. If auto_point samples have systematically positive residuals (model underpredicts because ISCO captures coarser near-bed particles), that is a known physical bias you should report and discuss.
+**C. Residual analysis.** Q-Q plots, residuals vs predicted, residuals vs key features. Show the distributional assumptions hold (or explain why they don't).
 
-**F. Independence of test sites.**
-If your training and test sites share the same river basins, spatial leakage is a concern. Show a map. Report performance for test sites that are in entirely different HUC-4 basins from any training site.
+**D. Nondetect handling.** 39 nondetect samples in the holdout have **519% median error** vs 55% for detected samples. These must be flagged or excluded from reported metrics. Leaving them in without comment inflates MAPE and confuses reviewers.
+
+**E. Independence confirmation.** Confirm that ISCO burst samples from the same storm event never appear in both training and validation for a given site. Since you split by site_id, this should be fine, but state it explicitly.
+
+### SHOULD-HAVE (strengthens the paper):
+
+**F. Discharge-stratified error analysis.** Report errors at Q10, Q50, Q90. Sediment loads are dominated by the high-flow tail. Good Q50 performance is irrelevant if Q10 performance is poor.
+
+**G. Sediment load comparison.** For 10-20 sites with dense temporal coverage, compute annual loads from observed vs predicted SSC and report the percent difference. This is the metric practitioners care about.
+
+**H. Temporal hold-out test.** Train on pre-2018, test on post-2018. If the 89 sites with increasing SSC/turb ratios represent real trends (not sensor drift), temporal performance should degrade for those sites.
 
 ---
 
-## Question 4: Red flags
+## Question 4: Red flags in the patterns
 
-### Red flag 1: The 3 supply-limited sites
+### RED FLAG 1 (CRITICAL): Systematic 1.42x overprediction
 
-Only 3 out of 254 sites show supply limitation? That is suspiciously low. Many headwater streams, especially in the western US, are genuinely supply-limited — sediment availability controls transport, not hydraulic capacity. I suspect this finding is an artifact of your detection method. If you are using the overall SSC-Q correlation, a site can be supply-limited during summer (exhausted bank sediment) but transport-limited during spring melt, and the net correlation looks positive. You need to check this seasonally.
+This is the most serious issue I found. It is not a few bad sites -- 90% of sites with 10+ predictions overshoot more often than not. The pattern is unmistakable: massive overprediction at low SSC (2.45x below 10 mg/L), tapering through moderate values, then reversing to underprediction above 1000 mg/L (0.72x). This is the signature of retransformation bias from a model trained in transformed space.
 
-If you truly have almost no supply-limited sites, say so explicitly and explain why — probably because the USGS monitoring network is biased toward larger, transport-limited rivers. This is a legitimate sampling bias worth acknowledging.
+The median log(pred/true) = 0.348, meaning the model predicts exp(0.348) = **1.42x** the true value at the geometric median. This single number should alarm you. Every metric you have reported is affected by this bias.
 
-### Red flag 2: "All rho > 0.3" for turbidity-SSC
+**This must be fixed or prominently documented before submission.**
 
-This is reported as reassuring but it should not be. A rho of 0.3 means turbidity explains roughly 9% of SSC variance. That is a site where your model's primary input is nearly useless. How many sites have rho < 0.5? These sites are where DOM, algae, color, and instrument differences are dominating the turbidity signal. They deserve special scrutiny — either flag them as low-confidence or explain what other features are compensating.
+### RED FLAG 2 (HIGH): Nondetects poison the metrics
 
-### Red flag 3: Collection method as confound
+39 nondetect samples have 519% median error. If these are coded as the detection limit (e.g., SSC = 1 mg/L), the model will always overshoot them by a large factor. These should be censored from MAPE/R-squared calculations and reported separately.
 
-The auto_point / depth_integrated split correlates with time of day, day of week, flow condition, SSC magnitude, AND SSC/turbidity ratio. This is a massive confound. Your model's apparently good storm performance may partly reflect the fact that storm samples come from ISCO samplers which have a systematically different SSC/turbidity relationship. If you trained on depth_integrated and predicted auto_point (or vice versa), would performance collapse?
+### RED FLAG 3 (HIGH): Sensor floor readings
 
-**Test this.** Train on depth_integrated only, predict auto_point only, and vice versa. If there is a large asymmetry, collection method is a confound the model has learned to exploit rather than a signal it has learned to generalize from.
+919 readings (2.6%) have turbidity below 1 FNU. Of these, 57 are exactly 0 FNU. While the median SSC at turb < 1 is only 2 mg/L (reasonable), there are 22 readings with turb < 1 and SSC > 50 mg/L. The extreme case is SSC = 265 at turb = 0 -- this is physically impossible for mineral sediment and represents either sensor failure or sample contamination. These readings add noise that the model cannot resolve.
 
-### Red flag 4: External NTU zero-shot NSE = 0.152
+### RED FLAG 4 (MEDIUM): Only 3 supply-limited sites is suspicious
 
-This is very low. I know NTU vs FNU is a different measurement, but physically they are both measuring light scattering by particles. NSE of 0.15 means the model barely beats predicting the mean. The jump to 0.43 at N=10 shows adaptation is doing heavy lifting. Be honest about this in the paper — the zero-shot transferability is limited, and adaptation is essential, not optional.
+179 transport-limited vs 3 supply-limited sites is an implausibly one-sided ratio. Many headwater streams, especially in the intermountain West, are genuinely supply-limited -- sediment availability constrains transport during late summer and fall. I suspect this classification uses the overall Q-SSC correlation, which averages across seasons. A site can be supply-limited in August (exhausted bank sediment) but transport-limited in April (snowmelt mobilizing everything), and the net correlation looks positive. The paper should acknowledge this is likely a sampling bias (USGS network favoring larger, transport-limited rivers) and/or an artifact of annual-scale analysis.
+
+### RED FLAG 5 (MEDIUM): "All rho > 0.3" is not reassuring
+
+A rho of 0.3 between turbidity and SSC means turbidity explains roughly 9% of SSC variance at that site. At those sites, the primary model input is nearly useless. How many sites have rho < 0.5? These are the sites where DOM, algae, and instrument differences dominate the turbidity signal. They deserve explicit flagging.
+
+### CAUTION: Long-term ratio trends may be sensor artifacts
+
+I found 126 of 313 sites with statistically significant trends in SSC/turbidity ratio over time. But 89 show increasing ratios (apparent coarsening) and only 37 show decreasing. This asymmetry is suspicious -- real geomorphic processes should not preferentially coarsen sediment at 2.4x the rate they fine it. More likely explanations: sensor technology changes (older sensors respond differently to the same particle population), drift in turbidity calibration, or changes in the USGS sampling protocol. Cross-reference with sensor_family metadata and days_since_last_visit before interpreting these as real.
 
 ---
 
 ## Question 5: Figures for the paper
 
-### Must-include (publishable findings)
+### Tier 1 -- Must include:
 
-1. **Extreme vs normal performance as a function of adaptation N.** This is your most interesting finding. The crossover where adaptation helps normal conditions but destroys extreme performance is physically meaningful and novel. Show it as a line plot: x-axis = N, two lines for extreme R^2 and normal R^2. A reviewer will remember this figure.
+1. **Overprediction bias diagnostic.** Predicted vs observed in native space (log-log axes), colored by SSC magnitude. Show the systematic upward displacement at low SSC and the crossover to underprediction above ~1000 mg/L. Include the 1:1 line and the empirical bias curve. This is the figure that preempts reviewer criticism -- you show you know about the bias.
 
-2. **SSC/turbidity ratio by collection method with physical interpretation.** Bar chart or violin plot. Annotate with the particle size / intake position explanation. This is a contribution to the monitoring community — people know ISCO and depth-integrated give different results, but quantifying the ratio difference across 35,000 samples is useful.
+2. **Broken power law figure.** A 2x3 panel showing representative sites: one that steepens at high turbidity (e.g., USGS-12510500), one that flattens (e.g., USGS-034336392), one that is linear, and annotate with the physical interpretation. Overlay the single power-law fit to demonstrate its inadequacy. This is a novel contribution.
 
-3. **Map of model residuals.** Color-coded by sign and magnitude. If there is spatial structure, show it. If there is not, that is also a finding worth showing (model generalizes spatially).
+3. **Adaptation performance vs N, stratified by regime.** The x-axis is N (0, 1, 5, 10, 20), y-axis is R-squared, with separate lines for extreme (>410 FNU) and normal (<410 FNU) conditions. Annotate the N=20 collapse with the Monte Carlo result: "36% of N=20 calibration sets contain zero storm samples."
 
-4. **Sediment load comparison** (once you compute it). Observed vs predicted annual loads, 1:1 line. This is the figure practitioners will look at first.
+4. **SSC/turbidity ratio by collection method.** Violin plots showing auto_point (2.10), depth_integrated (1.71), and grab (1.56). Annotate with the physical explanation (Rouse profile, ISCO intake position near bed captures coarser fraction). This quantifies a bias that practitioners know about qualitatively but have never seen at this scale.
 
-5. **Hysteresis examples from ISCO data** (if you analyze it). Two or three representative site-days showing CW and CCW loops with model predictions overlaid. This demonstrates the model captures intra-event dynamics. Visually compelling and physically rich.
+5. **Residual map** (once you have site coordinates). Color by median signed error. If there is spatial structure, it reveals missing regional factors. If there is not, it demonstrates the model generalizes geographically.
 
-### Nice to have
+### Tier 2 -- Should include:
 
-6. **Flow-duration error curve.** MAPE as a function of flow exceedance percentile. Shows where the model is reliable.
+6. **Geology-slope relationship.** Metamorphic-undifferentiated watersheds have steeper turbidity-SSC slopes (rho = +0.17, p = 0.005). Carbonate and clastic sedimentary watersheds have flatter slopes. Box plots of slope grouped by dominant lithology.
 
-7. **Seasonal SSC pattern with model predictions.** Monthly boxplots, observed vs predicted. Demonstrates the model captures the freeze-thaw / snowmelt cycle.
+7. **Error by physical condition.** Multi-panel showing median percent error by: conductance quartile (48.9% at 100-300 uS/cm vs 57.7% at >600), turbidity stability (66.1% for very stable vs 49.9% for highly variable), and pH range (38.7% acidic vs 65.5% high alkaline).
 
-### Do NOT include
+8. **Hysteresis examples from ISCO burst data.** Two representative storms (one clockwise, one counter-clockwise) showing SSC and turbidity on the same time axis, with the SSC/turb ratio plotted below.
 
-- The time-of-day pattern as a standalone figure. It is a sampling artifact, not a finding. Mention it in text as context for the collection method discussion.
-- The weekend/weekday pattern. Same reason. Interesting for understanding the data but not a scientific result.
+### Do NOT include:
+
+- Time-of-day or weekend/weekday patterns. These are fully explained by the collection method confound and add nothing scientific.
+- Seasonal SSC by itself (well-known). Include the seasonal ratio variation instead, which is more novel.
 
 ---
 
 ## Question 6: What are you missing?
 
-### A. Bedload is the elephant not in the room
+### 6a. The overprediction bias undermines everything else you have reported
 
-Your model predicts suspended sediment concentration. But total sediment transport includes bedload, which turbidity sensors cannot see at all. In coarse-bedded streams (gravel, cobble — common in your north Idaho watersheds), bedload can be 10-60% of total transport during high flows. Your model will systematically underestimate total sediment transport in these systems. You do not need to solve this, but you need to acknowledge it. A sediment transport reviewer will bring it up.
+This is the single most important finding from my analysis, and I want to make sure it does not get buried in a list. **The model overpredicts 75% of holdout readings by a median factor of 1.42x.** At SSC < 10 mg/L, it overpredicts by 2.45x. This is not a minor calibration issue. Every MAPE, R-squared, and NSE value you have reported is distorted by this bias. Any load estimates derived from this model will systematically overshoot unless corrected.
 
-### B. Flocculation in fine-sediment systems
+MAPE itself is asymmetric under directional bias: overpredicting 100 mg/L on a 50 mg/L sample gives 200% error, while underpredicting 100 mg/L on a 200 mg/L sample gives 50% error. With 75% overprediction, your MAPE is inflated at low SSC and deflated at high SSC. Consider reporting symmetric metrics (e.g., median absolute log-ratio error) alongside MAPE.
 
-In watersheds with high clay content, suspended particles flocculate — they clump into larger aggregates that settle faster and scatter light differently than their constituent particles. The turbidity-SSC relationship changes with ionic strength (which your conductance feature partially captures) and with turbulence intensity. If your conductance anti-correlation with turbidity is doing real work in the model, part of that may be a flocculation signal: high conductance = high ionic strength = more flocculation = larger effective particles = different optical response. This is testable — check if the conductance feature matters more in clay-rich watersheds.
+### 6b. Particle size distribution is the fundamental missing variable
 
-### C. Sensor fouling and biofouling
+Everything in this dataset -- the broken power laws, the collection method ratio differences, the rising-limb effect, the geology correlations, the hysteresis -- traces to one variable: particle size distribution. Turbidity responds to optical cross-section (proportional to particle surface area). SSC is mass. A given mass of clay has orders of magnitude more surface area than the same mass of silt. Until you have a particle-size proxy in the feature set, the model faces a hard physics ceiling.
 
-Turbidity sensors in the field accumulate biofilms, especially in summer. This causes positive drift — turbidity reads high even when the water is clear. Your seasonal pattern (summer trough) might partly mask a fouling signal. Sites with cleaning schedules vs. neglected sensors will have different error patterns. You probably cannot get cleaning schedule metadata, but you could look for characteristic fouling signatures: slow upward drift in turbidity over weeks, punctuated by sudden drops (when the sensor gets cleaned or a storm scours the lens).
+Possible proxies you could add without new field data:
+- Percent sand from USGS parameter 70331 (if available for your sites)
+- D50 estimates from the published Zenodo map
+- The site's own historical SSC/turb ratio (computed from calibration data) -- effectively a learned particle-size index
+- SGMC lithology fractions (you already have these, and they correlate with slope at p < 0.01 for metamorphic and sedimentary classes)
 
-### D. Freeze artifacts
+### 6c. The conductance signal deserves more investigation
 
-In cold-climate sites (you have these in Idaho, Montana, the upper Midwest), ice formation on or near turbidity sensors creates catastrophic readings — spikes to maximum range or sudden drops to zero. These are not sediment. If you have not already filtered for water temperature < 0 C, you may have ice artifacts in your training data contaminating the cold-season relationship.
+Model error varies meaningfully with conductance:
 
-### E. The grain size gap
+| SC range | Median % error | Median SSC |
+|----------|---------------|-----------|
+| < 100 uS/cm | 55.8% | 115 mg/L |
+| 100-300 | 48.9% | 64 |
+| 300-600 | 54.0% | 41 |
+| > 600 | 57.7% | 18 |
 
-The fundamental limitation of turbidity-based SSC estimation is that turbidity responds to particle surface area while SSC is particle mass. A given mass of clay has orders of magnitude more surface area than the same mass of sand. Without grain size information, you are estimating mass from an area-weighted signal. Your lithology and soil features are proxies for grain size distribution, but they are static — they do not change with flow conditions when the mobilized size fraction shifts. This is the hard physics ceiling on your model's accuracy. Name it. A reviewer who studies sediment transport will respect you more for acknowledging the fundamental limitation than for claiming higher accuracy.
+The best performance at SC 100-300 corresponds to "normal" runoff conditions. High SC (>600) indicates baseflow where turbidity is dominated by DOM, not mineral sediment -- the model struggles because the turbidity signal means something different. Very low SC (<100) indicates rapid surface runoff (fresh rainwater) where you get high SSC but the water chemistry gives the model fewer cues.
 
-### F. Channel morphology and sampling representativeness
+This suggests the SC_turb_interaction feature is doing real work, but may not be capturing the full nonlinearity. The model might benefit from knowing whether SC and turbidity are moving in the same direction (both rising = unusual, possible construction/disturbance) vs opposite directions (normal storm pattern).
 
-Depth-integrated samples attempt to capture the full vertical profile, but ISCO point samples capture one location. In a river cross-section, SSC varies enormously with depth (Rouse profile — coarse particles concentrated near the bed, fines more uniform). Your auto_point vs depth_integrated ratio difference (2.10 vs 1.71) is partly a Rouse profile effect. But the Rouse profile shape depends on shear velocity, particle settling velocity, and flow depth — all of which change with discharge. This means the collection method bias is not constant; it varies with flow. If your model treats it as a static feature, it is missing this interaction.
+### 6d. Sensor family effects are underexplored because 70% of the holdout is "unknown"
 
-**Test:** Within auto_point samples only, does the SSC/turbidity ratio increase with discharge? It should, because higher discharge means stronger vertical mixing, bringing coarser particles up to the ISCO intake depth. If you see this, it is a real physical signal worth reporting.
+| Sensor family | n | Median % error |
+|--------------|---|---------------|
+| unknown | 4,089 | 58.0% |
+| ysi_6series | 1,565 | 51.0% |
+| exo | 189 | 56.2% |
+
+The YSI 6-series outperforms by 7 percentage points, but you cannot meaningfully compare because the "unknown" bucket is enormous and heterogeneous. Different sensor families have different spectral responses, scattering geometries, and turbidity units. The 6-series uses a 90-degree detector at ~860 nm; the EXO uses a different geometry. These physical differences mean the same suspension produces different turbidity readings. If sensor_family is not already a model feature, it should be. If it is, the "unknown" category is limiting its utility.
+
+### 6e. Turbidity stability is informative -- stable readings have the worst errors
+
+| Turbidity 1hr variability | Median % error |
+|--------------------------|---------------|
+| Very stable (std < 0.5) | 66.1% |
+| Stable (0.5-3) | 51.7% |
+| Moderate (3-15) | 58.7% |
+| Highly variable (>15) | 49.9% |
+
+The 16 percentage-point spread between stable and variable turbidity is striking. Stable turbidity means baseflow -- the regime where DOM, algae, and biofouling contaminate the optical signal and turbidity is a poor proxy for mineral sediment. Variable turbidity means an active hydrologic event where the turbidity signal is dominated by real particle transport. **The model performs best when the physics are most straightforward (active sediment transport) and worst when the turbidity signal is ambiguous (quiescent conditions).**
+
+This is a key finding for the paper. It explains why "extreme events are easier" and gives a physical mechanism: turbidity variability is a proxy for whether the turbidity signal is sediment-dominated.
+
+### 6f. pH is doing something real
+
+| pH range | n | Median % error |
+|----------|---|---------------|
+| Acidic (<6.5) | 46 | 38.7% |
+| Neutral (6.5-7.5) | 326 | 59.3% |
+| Alkaline (7.5-8.5) | 554 | 56.9% |
+| High alkaline (>8.5) | 31 | 65.5% |
+
+The 27 percentage-point spread from acidic to high alkaline is large. Acidic waters tend to be organic-poor (less DOM interference with turbidity), while high-alkaline waters are often productive, mineral-rich systems where algae and calcite precipitation confuse the turbidity sensor. This is why the ablation study found ph_instant was "very helpful" -- it is disambiguating the turbidity signal.
+
+### 6g. Match gap is NOT a problem
+
+I checked: rho between match_gap_seconds and prediction error is 0.007 (p = 0.61). The temporal alignment of turbidity readings to SSC samples is not introducing systematic error. This is reassuring and worth a sentence in the methods section.
+
+### 6h. Spatial autocorrelation of residuals needs testing
+
+I did not have site coordinates to compute Moran's I, but this is critical. If nearby sites have correlated errors, the LOGO CV is optimistic because neighboring training sites leak information about the held-out site's sediment regime. You need to either test this or argue convincingly that your site selection is geographically diverse enough that spatial leakage is minimal.
 
 ---
 
-## Summary of priorities
+## Summary of Priorities
 
-Ranked by impact on paper quality:
+| Priority | Issue | Impact | Action |
+|----------|-------|--------|--------|
+| CRITICAL | 1.42x overprediction bias | All metrics distorted | Apply BCF or document prominently |
+| CRITICAL | Nondetects (519% error, n=39) | Inflates reported MAPE | Censor from metrics |
+| HIGH | Adaptation kills extremes at N=20 | Model fails when it matters most | Implement min-storm-count guard |
+| HIGH | Broken power laws undocumented | Novel finding for the field | Include as key result with figure |
+| HIGH | Turbidity stability predicts error | Explains "extremes are easier" | Report as a finding |
+| MEDIUM | Sensor floor (turb=0, SSC=265) | Data quality noise | Flag/exclude turb < 0.5 FNU |
+| MEDIUM | Long-term ratio trends (n=126 sites) | May be sensor drift, not real | Cross-reference with sensor metadata |
+| MEDIUM | Spatial autocorrelation untested | CV may be optimistic | Compute Moran's I on site residuals |
+| LOW | Particle size proxy missing | Hard physics ceiling | Discuss as fundamental limitation |
+| LOW | pH effect unexplained in text | Reviewer may question | One paragraph on DOM/calcite mechanism |
 
-1. Compute sediment loads and compare observed vs predicted. Non-negotiable for a sediment transport paper.
-2. Analyze the hysteresis in your ISCO burst data. You have the data. Use it.
-3. Test collection method as confound (cross-method prediction test).
-4. Implement flow-stratified adaptation to fix the extreme-event collapse.
-5. Discharge-stratified error analysis (Q10/Q50/Q90).
-6. Acknowledge bedload, grain size limitation, and sensor artifacts in the discussion.
+---
 
-The model is solid for what it is. The physics are working in the right direction — conductance as a baseflow indicator, lithology features capturing source material, adaptation capturing site-specific calibration. But the paper needs to show you understand WHY these features work, not just THAT they work. That is what separates a methods paper from a contribution to sediment transport science.
-
-— C. Ruiz
+*Dr. Catherine Ruiz*
+*Sediment Transport Research, 15 years*
+*All analyses performed directly on project data files. Monte Carlo: 100 draws per site, seed=42. Hysteresis: rising/falling limb SSC/turb ratio comparison with Wilcoxon test. Power law splits: OLS on log-transformed data, low vs high halves at median turbidity.*
