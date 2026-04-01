@@ -2,6 +2,8 @@
 title: "Prediction Intervals"
 ---
 
+A point prediction tells you the model's best guess; a prediction interval tells you how uncertain that guess is. For water quality decisions — permit compliance, flood warnings, sediment budget planning — knowing the uncertainty is often as important as knowing the predicted value. This page uses **CQR (Conformalized Quantile Regression)**, a method that produces prediction intervals with a statistical guarantee: if a 90% interval is reported, it actually contains 90% of observations, regardless of whether the model's assumptions are perfectly met. CQR achieves this by calibrating the interval width on held-out data, so the guarantee is empirical rather than theoretical.
+
 ::: {.callout-warning}
 ## CQR Model Training In Progress
 The MultiQuantile CQR model is currently training. These figures will be populated with real prediction interval data when training completes. Until then, placeholder panels are shown.
@@ -9,7 +11,7 @@ The MultiQuantile CQR model is currently training. These figures will be populat
 
 ## CQR Calibration
 
-When available, this will show how well-calibrated the prediction intervals are. Points near the diagonal indicate that a 90% interval actually contains 90% of observations.
+Calibration is the core guarantee of CQR: stated coverage (x-axis) should match actual coverage (y-axis). A 90% interval that contains only 70% of true values is dangerously overconfident. A 90% interval that contains 99% of true values is safe but overly wide and less useful for decision-making. Points near the diagonal indicate proper calibration — the intervals are honest. This plot is the first thing to check when the CQR model finishes training.
 
 ```{python}
 #| echo: false
@@ -25,7 +27,7 @@ fig.show()
 
 ## Prediction Interval Fan Plot
 
-When available, this will show time series with prediction intervals for selected holdout sites. Intervals should widen during storm events (high uncertainty) and narrow during baseflow (low uncertainty).
+Point predictions are most misleading precisely when they matter most — during storm events that can spike SSC by two orders of magnitude in hours. A well-designed uncertainty model should widen its intervals when conditions are extreme or unusual, and narrow them during stable baseflow periods when the turbidity-SSC relationship is well-behaved. This fan plot shows a time series for selected holdout sites, with the 90% prediction band shaded. Narrow bands that stay narrow through a storm peak are a warning sign of overconfidence.
 
 ```{python}
 #| echo: false
@@ -38,7 +40,7 @@ fig.show()
 
 ## Coverage by Regime
 
-When available, this will show whether the 90% interval maintains its coverage across different SSC ranges and collection methods. Drops below 90% indicate the model is overconfident in that regime.
+Global calibration can still hide local failures: a model might be perfectly calibrated on average but overconfident at high SSC and underconfident at low SSC, which would cancel out in aggregate. This figure breaks 90% interval coverage into subgroups — by SSC concentration range and collection method — to check for systematic gaps. Any bar falling below 90% indicates the model is overconfident in that regime; any bar well above 90% indicates it is being unnecessarily conservative there.
 
 ```{python}
 #| echo: false

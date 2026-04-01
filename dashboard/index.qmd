@@ -14,6 +14,10 @@ with open(data_dir / "summary.json") as f:
     summary = json.load(f)
 ```
 
+Rivers carry enormous quantities of fine particles — sand, silt, and clay — suspended in the water column. This **suspended sediment concentration (SSC)**, measured in milligrams per liter (mg/L), drives everything from reservoir silting and aquatic habitat quality to downstream flood risk. Measuring SSC directly requires collecting water samples in the field and filtering them in a lab, which is slow and expensive. Turbidity sensors offer a continuous, low-cost alternative: they shine a beam of light through the water and measure how much is scattered by particles (reported in FNU or NTU units, both proxies for "cloudiness"). But converting turbidity to SSC requires a **rating curve** — a calibrated relationship specific to each site — and building those curves traditionally demands 50 or more field samples per location.
+
+**murkml replaces that site-by-site approach with a single machine learning model** trained across 254 USGS stream gauges nationwide. The model learns what drives SSC across diverse watershed types, then uses as few as 10 local grab samples to fine-tune its predictions for a new site it has never seen — a process called **Bayesian adaptation** (a statistical method that blends global model knowledge with local calibration data). The result beats traditional regression-based rating curves while requiring far less field effort.
+
 ::: {.callout-note appearance="simple"}
 ## One model, 254 sites, Bayesian adaptation
 

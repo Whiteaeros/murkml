@@ -2,9 +2,11 @@
 title: "Model Performance"
 ---
 
+This page evaluates how well the model predicts SSC (suspended sediment concentration — the mass of particles in a water sample, in mg/L) across 76 holdout sites that were never used during training. "Holdout" means these sites are a genuinely independent test: if the model performs well here, it should generalize to new sites in the real world. Metrics are reported with 95% bootstrap confidence intervals. R² (also called NSE, Nash-Sutcliffe Efficiency) measures how much of the variation in SSC the model explains: 1.0 is perfect, 0.0 means the model is no better than predicting the long-run average, and negative values mean the model is actively worse than that baseline.
+
 ## Observed vs Predicted
 
-Predicted SSC plotted against observed values across all holdout readings on a log-log scale. Points near the 1:1 line indicate accurate predictions. The 2x envelope (dashed) shows factor-of-two accuracy.
+Every individual SSC reading from the 76 holdout sites is plotted here — what the model predicted vs. what was actually measured in the lab. The axes are on a log scale because SSC spans several orders of magnitude (from ~1 mg/L in clear streams to >10,000 mg/L in flashy storm events). Points near the 1:1 line (solid diagonal) are accurate; the dashed lines mark the factor-of-two envelope, meaning predictions within 2× of the true value. Scatter above the line means overprediction; below means underprediction. Look for systematic patterns by concentration range — they reveal where the model struggles physically.
 
 ```{python}
 #| echo: false
@@ -20,7 +22,7 @@ fig.show()
 
 ## SSC Distribution: Observed vs Predicted
 
-Do the observed and predicted SSC values span the same concentration range with the same shape? Mismatches reveal systematic bias.
+A model can predict individual readings well on average but still systematically miss the tails — under-representing extreme floods or over-representing clear-water conditions. This figure compares the full statistical distribution (histogram or density curve) of observed SSC values against predicted SSC values. A good model produces overlapping distributions. A gap at high concentrations means the model is clipping extreme events; a gap at low concentrations means it is over-smoothing baseflow conditions.
 
 ```{python}
 #| echo: false
@@ -33,7 +35,7 @@ fig.show()
 
 ## Pooled vs. Site-Level Performance
 
-Pooled metrics can mask poor performance at individual sites. This shows the distribution of per-site R2 values — note how many sites fall below zero.
+Aggregating all predictions into a single R² number hides a critical problem: a model can look excellent in aggregate while failing badly at specific sites. This figure shows the distribution of R² computed separately for each holdout site. A median site R² well below the pooled R² is a warning sign. Sites with R² below zero are actively worse than predicting the site's long-run average SSC — the model has learned nothing useful for those locations. The spread of this distribution is as important as its center.
 
 ```{python}
 #| echo: false
@@ -46,7 +48,7 @@ fig.show()
 
 ## CatBoost vs OLS Head-to-Head
 
-Each point is one holdout site at N=10 calibration samples (random split). Points above the diagonal: CatBoost outperforms OLS. Points below: OLS wins.
+The traditional method for converting turbidity to SSC is Ordinary Least Squares (OLS) regression — a simple log-linear line fit to local samples at each site individually. This comparison asks: does a complex cross-site machine learning model actually beat a simple local regression when both have the same number of local calibration samples? Each point represents one holdout site given 10 local samples (random split from available data). The x-axis shows the OLS R² and the y-axis shows the CatBoost R² at that site. Points above the diagonal mean CatBoost won; points below mean OLS won. At low N, OLS often over-fits to noisy samples, so CatBoost's advantage is expected to be largest here.
 
 ```{python}
 #| echo: false
@@ -59,7 +61,7 @@ fig.show()
 
 ## Disaggregated Performance
 
-Model performance broken down by hydrology regime, collection method, geology, and SSC range. Two views of the same data — heatmap and dot plot — for comparison.
+A single summary metric hides which types of sites or conditions the model handles well vs. poorly. This section breaks model accuracy down by four dimensions: (1) hydrology regime (e.g., rain-dominated vs. snowmelt), (2) how sediment samples were collected in the field (depth-integrated sampling vs. auto-sampler grab vs. manual grab), (3) dominant watershed geology, and (4) the SSC concentration range itself. If a particular subgroup shows sharply lower R², that points to a systematic gap — either a missing feature, a different physical process, or data quality issues in that category.
 
 ### Heatmap View
 
@@ -85,7 +87,7 @@ fig.show()
 
 ## Error Landscape
 
-Every prediction plotted by observed SSC concentration. Annotated zones show the physical mechanisms driving model error at different concentration ranges.
+This figure places every prediction error in context of the true SSC value, revealing how error behavior changes across the full concentration range. At very low SSC (clear water), turbidity sensors respond to dissolved organic matter and algae rather than sediment — the model appears to overpredict because the signal is contaminated, not because the model is wrong. At very high SSC (storm peaks), sediment particle size shifts dramatically; larger particles scatter light differently, causing systematic underprediction. The annotated zones name these physical mechanisms so errors can be interpreted rather than simply counted.
 
 ```{python}
 #| echo: false
@@ -97,6 +99,10 @@ fig.show()
 ```
 
 ## Geology Disaggregation
+
+Different bedrock types produce different sediment compositions — a watershed dominated by soft shales erodes very differently from one underlain by hard granite. This section isolates whether the model's accuracy varies with dominant watershed geology, which would indicate that sediment grain size or mineral composition introduces systematic error that watershed-average features don't fully capture. Two views of the same data are provided; use the one that makes the pattern clearest to you.
+
+<!-- TODO: Verify axis labels and geology category names match the SGMC classification used in the data pipeline — cannot confirm without rendered output. -->
 
 ### Grouped Bar View
 

@@ -2,9 +2,11 @@
 title: "Diagnostics"
 ---
 
+This page contains technical diagnostic figures intended to support model development and peer review. They document the structure of the data, the behavior of residuals, and key modeling choices. Most of these figures won't appear in the final paper but are essential for catching systematic errors — for example, confirming that the choice of data transformation (Box-Cox) is justified, or that errors are not correlated with time in a way that would bias the holdout evaluation.
+
 ## Per-Site R2 Distribution (CDF)
 
-Empirical cumulative distribution of per-site R2 at zero-shot, N=5, and N=10 adaptation. The vertical line marks R2=0 — sites to the left are worse than predicting the mean.
+A CDF (cumulative distribution function) reads as: "what fraction of holdout sites achieve R² at or below this value?" This view makes it easy to read off the median (50th percentile), the fraction of sites above zero (the model beats predicting the mean), and the long tail of poorly-predicted sites. Three lines are shown: zero-shot (no local samples), N=5, and N=10 adaptation. The curves should shift right with more samples — meaning more sites cross into positive R² territory. The vertical line at R²=0 is the critical threshold: sites to the left represent complete model failures at those locations.
 
 ```{python}
 #| echo: false
@@ -20,7 +22,7 @@ fig.show()
 
 ## Residual Diagnostics
 
-Four views of model residuals: vs predicted value (heteroscedasticity), Q-Q plot (normality), vs turbidity (input dependence), and histogram with normal overlay. The heavy tails (skew and kurtosis annotated) justify the Student-t prior in the Bayesian adaptation.
+A residual is the difference between a predicted value and the true observed value. Ideally, residuals should be random noise with no pattern — if they fan out at high predicted values (heteroscedasticity), cluster around certain turbidity levels (input dependence), or show heavy tails (extreme errors more common than a normal distribution would predict), those patterns point to model mis-specification. This four-panel figure is the standard diagnostic battery. The heavy-tailed residual distribution shown here directly motivated using a Student-t prior in the Bayesian adaptation rather than a Gaussian, because the Student-t is more robust to extreme, outlier-inducing observations.
 
 ```{python}
 #| echo: false
@@ -33,7 +35,7 @@ fig.show()
 
 ## Temporal Stability
 
-For sites with time-stamped data, each site's readings are split chronologically into first half and second half. R2 is computed independently for each half. Sites near the diagonal are temporally stable; sites far from it may reflect sensor drift, land use change, or non-stationarity.
+A model that performs well in the early part of a site's record but poorly in the later part (or vice versa) may be exploiting temporal coincidences rather than physical relationships. Sensor drift, land use change, wildfire, or channel migration can all shift the turbidity-SSC relationship over time. This figure splits each site's data chronologically and compares R² from the first half of the record against R² from the second half. Sites near the diagonal are stable. Sites far from it warrant further investigation — and may indicate that more frequent sensor calibration is needed in the field.
 
 ```{python}
 #| echo: false
@@ -46,7 +48,7 @@ fig.show()
 
 ## Data Funnel
 
-How the dataset was built: from 860 discovered USGS sites down to the final 254 training + 76 holdout + 36 vault split. Each narrowing step filters sites that lack turbidity sensors, temporal overlap, or watershed attributes.
+Building a cross-site dataset requires strict quality filters at every step — and each filter removes sites, reducing the final sample. This Sankey diagram traces that attrition: starting from 860 candidate USGS gauges that have both turbidity and SSC sensors, sites are progressively excluded for lacking overlapping records, insufficient sample counts, missing watershed attributes (land cover, geology), or falling into the reserved vault set. Understanding how many sites were lost at each step — and why — is critical for assessing whether the final 254 training sites are representative of US streams in general.
 
 ```{python}
 #| echo: false
@@ -59,7 +61,7 @@ fig.show()
 
 ## SSC vs Turbidity Joint Distribution
 
-The raw data the model learns from: SSC plotted against turbidity across all holdout readings.
+This is the fundamental empirical relationship the model is learning: how does turbidity (the sensor reading, x-axis) relate to SSC (the lab-measured truth, y-axis) across thousands of paired observations from 76 holdout sites? A tight, consistent relationship would be easy to model; the scatter seen here reflects genuine site-to-site variation in sediment grain size, organic content, and sensor calibration. Dense color regions show the most common combinations; sparse scatter at the edges shows storm-event extremes. Features that shift a site's relationship away from the center cloud are exactly what watershed attributes (geology, slope, land cover) are intended to capture.
 
 ```{python}
 #| echo: false
@@ -72,7 +74,7 @@ fig.show()
 
 ## Box-Cox Transform Effect
 
-Why Box-Cox lambda=0.2? Comparison of the SSC distribution under three transforms. The Box-Cox transform reduces skewness while preserving more of the extreme-value structure than log1p.
+SSC values are highly right-skewed: most readings are low, but a handful of extreme storm events produce values 100× larger. Training a model on raw SSC values would make it almost entirely focused on predicting those rare extremes, ignoring the majority of observations. Applying a mathematical transformation before training compresses the scale so that errors at low SSC count alongside errors at high SSC. The most common choice is a log transform; here a **Box-Cox transform with lambda=0.2** is used instead. This figure shows the SSC distribution under three candidate transforms (raw, log, Box-Cox) to justify that choice: Box-Cox reduces skewness substantially while preserving more of the high-SSC structure than a full log transform would.
 
 ```{python}
 #| echo: false
@@ -85,7 +87,7 @@ fig.show()
 
 ## Power-Law Slope Distribution
 
-Distribution of per-site turbidity-SSC slopes in log-log space. Slopes near 1.0 indicate a linear relationship; slopes < 1 mean SSC saturates at high turbidity (coarse material); slopes > 1 mean SSC accelerates (fine material mobilization).
+When turbidity and SSC are both plotted on log scales (log-log space), the relationship at each site approximates a straight line — a power law. The slope of that line carries physical meaning: a slope of exactly 1.0 means a doubling of turbidity produces a doubling of SSC (proportional, linear). A slope less than 1 means SSC grows more slowly than turbidity, which typically indicates coarse-grained sediment where particles saturate the sensor at high loads. A slope greater than 1 means SSC accelerates faster than turbidity, characteristic of fine-grained (silty/clayey) watersheds where particles stay in suspension easily. This distribution of slopes across all sites reveals whether a single global slope assumption would be reasonable — it is not — and why site-specific adaptation is necessary.
 
 ```{python}
 #| echo: false
@@ -98,7 +100,7 @@ fig.show()
 
 ## Rating Curves
 
-Six holdout sites spanning the performance range, showing the raw turbidity-SSC relationship. Gray dots are observed; colored dots are model predictions.
+A **rating curve** is the calibrated relationship between turbidity (the sensor signal) and SSC (the quantity we want to know) at a specific site. Traditionally, rating curves are fit individually at each site using local grab samples. This figure shows six holdout sites selected to span the full range of model performance — from excellent to poor. Viewing the raw data alongside model predictions reveals whether failures are due to noisy data, a fundamentally different relationship at that site, or gaps in the specific concentration range the model is missing. Gray dots are observed paired measurements; colored dots show where the model predicted those same turbidity readings to fall.
 
 ```{python}
 #| echo: false
@@ -114,7 +116,9 @@ fig.show()
 
 ## Feature Importance
 
-Top features ranked by importance. Colors indicate feature category.
+The model uses 72 input features: the turbidity reading itself, plus watershed characteristics such as land cover fractions, soil texture, geology, drainage area, and long-term climate averages. This figure ranks features by how much they influence predictions using SHAP (SHapley Additive exPlanations) values — a method that assigns each feature a contribution to each prediction, then averages over all predictions. Features at the top of the chart shift predictions the most. Colors group features by category (sensor-derived, soil, geology, climate, land cover) so patterns across categories are visible. If turbidity dominates overwhelmingly, the watershed features may not be adding much; if watershed features rank highly alongside turbidity, the model is genuinely learning site-specific context.
+
+<!-- TODO: Verify the SHAP beeswarm figure renders with labeled axes and a color legend for feature categories — cannot confirm without rendered output. -->
 
 ```{python}
 #| echo: false
@@ -127,7 +131,7 @@ fig.show()
 
 ## Load Estimation
 
-Cumulative sediment load comparison for selected holdout sites. If the curves track closely, the model produces accurate total loads even when individual predictions scatter.
+Individual SSC predictions that scatter around the truth can still produce accurate **sediment loads** if errors are unbiased and cancel over time. Sediment load (the total mass of sediment passing a point over a period) is often more important for management decisions — reservoir filling rates, downstream deltaic erosion, permit calculations — than any single concentration reading. This figure shows cumulative load curves (total tons carried up to each point in time) for selected holdout sites, comparing observed vs. predicted. If the curves track closely by the end of the record, the model is suitable for load estimation even if individual scatter is significant. A persistent gap at the end means the model has a systematic bias that would accumulate into load budget errors.
 
 ```{python}
 #| echo: false
@@ -140,7 +144,7 @@ fig.show()
 
 ## Sediment Load by Timescale
 
-Discharge-weighted sediment load (SSC × Q × 0.0027 tons/day) compared at daily, monthly, and annual aggregation. Even if individual predictions scatter, loads should converge at longer timescales if errors are unbiased.
+Averaging over longer time periods smooths out random prediction errors — so a model might look poor at the daily scale but excellent at the annual scale. This matters for management: a reservoir manager might care about annual sediment budget, while a flood hazard analyst needs daily accuracy. This figure compares observed vs. predicted discharge-weighted sediment load (SSC × streamflow × a unit conversion factor, in tons/day) at three timescales: daily, monthly, and annual. The formula SSC × Q × 0.0027 converts mg/L and cubic feet per second into metric tons per day. If bias narrows as timescale lengthens, errors are approximately random; if bias persists at the annual scale, the model has a systematic over- or underprediction that load budget calculations cannot average away.
 
 ```{python}
 #| echo: false

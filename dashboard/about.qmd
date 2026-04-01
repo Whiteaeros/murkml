@@ -13,3 +13,448 @@ Cross-site suspended sediment concentration (SSC) prediction using CatBoost and 
 **Paper:** In preparation for Water Resources Research.
 
 **Code:** [github.com/Whiteaeros/murkml](https://github.com/Whiteaeros/murkml)
+
+---
+
+## Project History
+
+Generated from git forensic analysis of 100+ commits (2026-03-15 to 2026-03-31) cross-referenced against DECISION_LOG.md.
+
+### Model Evolution DAG
+
+The ancestry of v10, with every dead-end branch and the state transition that caused each version jump.
+
+```{mermaid}
+graph TD
+    FEAS["Kansas Feasibility<br/>5 sites, 2362 SSC samples<br/>92.6% match rate at 15min<br/>Concept validated"]
+    POC["POC<br/>3 sites, 10 feat<br/>Per-site OLS R2=0.92"]
+    S17["17-site<br/>17 sites, 20 feat<br/>LOGO R2=0.84<br/>Cross-site transfer proven"]
+    AUDIT["4-Reviewer Code Audit<br/>Timezone off 5-8hrs<br/>Early-stop leakage<br/>Median imputation leak<br/>Garbage dQ/dt features"]
+    S57["57-site post-audit<br/>57 sites, 30 feat<br/>R2=0.63 to 0.75 from tz fix"]
+    V1["v1<br/>102 sites, 99 feat<br/>R2 log=0.721, nat=0.295<br/>GAGES-II silently broken"]
+    V2["v2<br/>243 sites, 37 feat<br/>R2 nat=0.361<br/>Holdout=0.699"]
+    V3["v3<br/>346 sites, 37 feat<br/>R2 nat=0.154 COLLAPSED"]
+    V4["v4 Stable Platform<br/>357 sites, 44 feat<br/>Box-Cox 0.2, Monotone ON<br/>R2 log=0.718, Holdout=0.472"]
+    V9["v9 CONTAMINATED<br/>254 train, 72 feat<br/>Trained on holdout+vault<br/>ALL EVALS INVALID"]
+    V10["v10 CURRENT BEST<br/>254 train, 72 feat<br/>R2=0.756, KGE=0.777<br/>Holdout MedR2=0.393<br/>Adapted N=10 R2=0.492"]
+
+    FEAS -->|"Proves 15min alignment works"| POC
+    POC -->|"First cross-site model"| S17
+    S17 -->|"Red team finds 4 bugs"| AUDIT
+    AUDIT -->|"R2 jumps 0.12 from tz fix alone"| S57
+    S57 -->|"Expand to 11 states<br/>GAGES-II broken but unknown"| V1
+    V1 -->|"prune_gagesii bug found<br/>StreamCat replaces GAGES-II<br/>Ablation 99 to 37 feat"| V2
+    V2 -->|"QC approval code fix<br/>+117 sites, native R2 collapses"| V3
+    V3 -->|"24-exp transform sweep<br/>Box-Cox 0.2 wins"| V4
+    V4 -->|"+SGMC lithology, 3-way split<br/>72 feat locked by expert panel<br/>Bayesian adaptation integrated"| V9
+    V9 -->|"Contamination discovered<br/>Dual BCF, 135 records cleaned<br/>Proper holdout exclusion"| V10
+
+    S17 -->|"Multi-param tested"| MPARAM["Multi-Param Dead End<br/>TP R2=0.62 at 42 sites<br/>collapsed to 0.08 at 72<br/>Nitrate=-0.72, OrthoP=-1.31<br/>Dissolved not predictable from turb"]
+
+    S57 -->|"14-state validation"| EXT1["Early External Validation<br/>20 sites, 14 states<br/>Median R2=0.61<br/>Best NY=0.90, MN=0.90"]
+
+    V3 -->|"Transform crisis"| TSWEEP
+    subgraph TSWEEP ["Transform Sweep - 24 experiments"]
+        direction TB
+        TS1["Raw SSC - R2 under 0.012, ruled out"]
+        TS2["log1p + monotone - R2 nat=0.217, monotone hurts"]
+        TS3["Box-Cox MLE - lambda near 0, BCF=1.675"]
+        TS4["Box-Cox 0.2 + monotone - R2 nat=0.241, WINNER"]
+        TS5["Fine sweep 0.15-0.25 - Peak at 0.18-0.20"]
+    end
+
+    V4 -->|"Fair comparison"| V5["v5 log1p fair test<br/>Same data, Holdout=0.460<br/>Transform barely matters<br/>v2-to-v4 drop was data not transform"]
+
+    V4 -->|"Loss function exps"| LOSS
+    subgraph LOSS ["Loss Function - all failed"]
+        direction TB
+        LKGE["KGE eval_metric<br/>Same R2, fewer trees<br/>No improvement"]
+        LSQRT["Sqrt sample weights<br/>R2 log 0.718 to 0.528<br/>Trees collapsed 281 to 86"]
+        LLIN["Linear sample weights<br/>R2 nat=0.004, 17 trees<br/>Catastrophic"]
+    end
+
+    V4 -->|"Architecture search"| ARCH
+    subgraph ARCH ["Architecture Search"]
+        direction TB
+        V6["v6 MERF<br/>Holdout=0.417<br/>Lost categoricals, SHAP rank 3"]
+        V8GPB["v8-gpb GPBoost<br/>Holdout=0.145<br/>LightGBM too weak"]
+        V8MERF["v8-merf CatBoost-MERF EM<br/>Holdout=0.144<br/>EM corrupts fixed effects<br/>BCF inflated to 1.88"]
+        V8POST["v8-post Bayesian<br/>N=3 R2=0.485<br/>Zero-shot preserved at 0.472<br/>BREAKTHROUGH"]
+    end
+    V8POST -.->|"Post-hoc approach kept<br/>CatBoost untouched +<br/>Bayesian from residuals"| V9
+
+    V4 -->|"Adaptation method"| ADAPT
+    subgraph ADAPT ["Adaptation Evolution"]
+        direction TB
+        AD_OLD["Old 2-param linear<br/>N=2 R2=-0.012 catastrophic<br/>No shrinkage, overfits"]
+        AD_BAYES["Bayesian Student-t k=15 df=4<br/>N=2 R2=0.485, delta +0.497<br/>Staged: intercept N under 10<br/>slope+intercept N over 10"]
+        AD_N20["N=20 collapse found<br/>36% draws have zero storms<br/>Cap reporting at N=10"]
+        AD_OLD --> AD_BAYES
+        AD_BAYES --> AD_N20
+    end
+    AD_BAYES -.->|"Bayesian adaptation<br/>is the product"| V9
+
+    V4 -->|"30+ experiments"| EXPS
+    subgraph EXPS ["Experiments A-E"]
+        direction TB
+        EXPA["Exp A - Method split<br/>7 models, all worse than v4<br/>Model knows via SHAP rank 3"]
+        EXPB["Exp B - Site exclusion<br/>Pooled up 0.211 to 0.324<br/>Per-site DOWN 0.290 to 0.236<br/>Aggregate metrics lie"]
+        EXPC["Exp C - Flow stratification<br/>NOT a flow problem<br/>Site heterogeneity at ALL regimes"]
+        EXPD["Exp D - Site count<br/>200 sweet spot, 96 too few<br/>Pooled and per-site tell<br/>OPPOSITE stories at every scale"]
+        EXPE["Exp E - MERF concept<br/>Led to architecture search"]
+    end
+
+    V4 -->|"Feature engineering"| FEAT
+    subgraph FEAT ["Feature Decisions"]
+        direction TB
+        F_SGMC["SGMC lithology 28 feat<br/>Net flat aggregate dR2=-0.007<br/>5 categories p under 0.05<br/>Panel unanimous: keep"]
+        F_WEATHER["Weather features<br/>+0.008 R2 log<br/>DROP destroys extreme events<br/>despite improving median"]
+        F_LONLAT["Longitude kept, latitude dropped<br/>lon=maritime-continental physics<br/>lat+lon together memorize geography"]
+        F_COLLECT["Collection method resolution<br/>5536 unknowns resolved via WQP<br/>88% fixed, unknown 6282 to 746"]
+    end
+    F_SGMC -.-> V9
+    F_WEATHER -.-> V9
+
+    V4 -->|"Feature ablation"| ABL
+    subgraph ABL ["Feature Ablation - 3 rounds"]
+        direction TB
+        ABL1["Round 1: 102 to 62 to 37<br/>R2 log only, missed native conflicts"]
+        ABL2["Round 2: 83 single-feature<br/>Multi-metric GKF5<br/>Native effects 10-100x larger than log"]
+        ABL3["Round 3: Group ablation<br/>5-seed stability p=0.81<br/>Expert panel locks at 72"]
+        ABL1 --> ABL2 --> ABL3
+    end
+    ABL3 -.->|"72 features locked<br/>65 on drop list"| V9
+
+    V4 -->|"Data investigations"| DATA
+    subgraph DATA ["Data Decisions"]
+        direction TB
+        D_NTU["NTU investigation<br/>89 dual-sensor sites found<br/>Zero temporal overlap<br/>NTU=1976-2005, FNU=2006+<br/>Panel unanimous: validation only"]
+        D_NOISE["Noise site analysis<br/>Drop 15 worst: first flush<br/>R2 collapses 0.905 to 0.264<br/>NEVER drop training sites"]
+        D_CLEAN["Data cleaning<br/>135 anomalous records removed<br/>SSC/turb ratio above 200 or below 0.01<br/>Includes SSC=70000 at turb=260"]
+        D_3WAY["3-way split created<br/>284 train / 76 holdout / 36 vault<br/>47+ ablation exps = implicit overfit<br/>Krishnamurthy identified"]
+        D_ANCHOR["Anchor site investigation<br/>50 curated beat 287 on per-site<br/>Gemini found data leak in selection"]
+    end
+    D_3WAY -.-> V9
+    D_CLEAN -.-> V10
+
+    V9 -->|"BCF investigation"| BCF
+    subgraph BCF ["BCF Evolution"]
+        direction TB
+        BCF_DUAN["Duan smearing - only valid for log"]
+        BCF_SNOW["Snowdon ratio - transform-agnostic"]
+        BCF_BIN["Binned BCF - R2 0.216 to 0.210, no help"]
+        BCF_DUAL["Dual BCF<br/>bcf_mean=1.327 for loads<br/>bcf_median=1.021 for predictions<br/>3 reviewers found 1.44x overprediction"]
+        BCF_DUAN --> BCF_SNOW
+        BCF_SNOW --> BCF_BIN
+        BCF_BIN --> BCF_DUAL
+    end
+    BCF_DUAL -.->|"Dual BCF integrated"| V10
+
+    V10 -->|"External validation"| EXT2["260 NTU Sites<br/>11K samples, 6 organizations<br/>Spearman=0.927 zero-shot<br/>N=10 adaptation R2=0.501<br/>Cross-network proven"]
+
+    V10 -->|"Paper analyses"| PAPER
+    subgraph PAPER ["Paper Ready"]
+        direction TB
+        P_OLS["OLS benchmark<br/>CatBoost wins at every N<br/>N=2 temporal: 0.36 vs -0.56"]
+        P_CI["Bootstrap CIs 1000 resamples<br/>MedR2=0.409 CI 0.144-0.459"]
+        P_CQR["CQR MultiQuantile<br/>Romano et al 2019<br/>Currently training"]
+    end
+
+    S17 -->|"Scientific discovery"| DISC
+    subgraph DISC ["Key Scientific Findings"]
+        direction TB
+        SC_BOUNDARY["Dissolved vs particulate boundary<br/>Particle params transfer cross-site<br/>Dissolved do not, physics limit<br/>Per-site OLS ceilings 0.04-0.06"]
+        SC_TURB["Nobody uses turbidity in<br/>large-scale ML models<br/>All published work uses hydromet only<br/>Continuous turb is THE advantage"]
+        SC_SONG["Song et al 2024 benchmark<br/>377 sites LSTM PUB R2=0.55<br/>murkml R2=0.80, delta +0.25"]
+        SC_OLS["Death of OLS<br/>CatBoost + 2 samples R2=0.48<br/>beats USGS OLS + 50 samples R2=0.40"]
+        SC_IOWA["Iowa River SSC/TP split<br/>SSC fails R2=-0.50, TP works R2=0.69<br/>Turb tracks fine P-bearing fraction<br/>Publishable finding"]
+        SC_GKF["GKF5 vs holdout disagreement<br/>turb_Q_ratio: +0.004 GKF5 vs -0.102 holdout<br/>CV folds lack geology diversity<br/>Major methodological finding"]
+    end
+
+    V10 -->|"Strategic decisions"| STRAT
+    subgraph STRAT ["Strategic Decisions"]
+        direction TB
+        ST_WRITE["Stop improving, start writing<br/>All 4 reviewers unanimous<br/>Submitted 0.80 beats unsubmitted 0.83"]
+        ST_PAPERS["Three-paper strategy<br/>1. Zenodo dataset deposit<br/>2. JOSS software paper<br/>3. WRR research paper"]
+        ST_TIERS["Three-tier product output<br/>Screening: zero-shot, wide CIs<br/>Monitoring: N>=10, medium CIs<br/>Publication: N>=30, tight CIs"]
+        ST_BIAS["Geographic bias identified<br/>CA+OR+KS = 50% of candidates<br/>Zero: loess belt, iron range, arid SW<br/>35-site gap-fill plan designed"]
+    end
+
+    V10 -->|"Shelved for future"| SHELVED
+    subgraph SHELVED ["Investigated and Shelved"]
+        direction TB
+        SH_Q90["Q90 quantile specialist<br/>Tanaka red-team: shifts ALL<br/>predictions up, not just extremes<br/>149 extreme samples insufficient"]
+        SH_WEPP["WEPP integration<br/>Physics-based erosion model<br/>Advisor area of work<br/>Paper 2 or 3"]
+        SH_TEMPORAL["Temporal stationarity testing<br/>No year-over-year validation<br/>Required for deployment claims"]
+    end
+
+    subgraph LEGEND [" "]
+        direction TB
+        L1["Current production model"]
+        L2["Contaminated / invalid"]
+        L3["Dead end / failed"]
+        L4["Breakthrough moment"]
+        L5["Investigation cluster"]
+        L6["Version milestone"]
+        L7["Validated output"]
+        L8["Scientific finding"]
+        L9["Strategic decision"]
+    end
+
+    classDef current fill:#2d6a4f,stroke:#1b4332,color:#fff,stroke-width:3px
+    classDef contaminated fill:#d62828,stroke:#6a040f,color:#fff,stroke-width:2px
+    classDef dead fill:#6c757d,stroke:#495057,color:#fff
+    classDef breakthrough fill:#e9c46a,stroke:#f4a261,color:#000,stroke-width:2px
+    classDef cluster fill:#264653,stroke:#2a9d8f,color:#fff
+    classDef milestone fill:#457b9d,stroke:#1d3557,color:#fff
+    classDef output fill:#a7c957,stroke:#6a994e,color:#000
+    classDef finding fill:#8ecae6,stroke:#219ebc,color:#000
+    classDef strategic fill:#c77dff,stroke:#9d4edd,color:#fff
+
+    class L1 current
+    class L2 contaminated
+    class L3 dead
+    class L4 breakthrough
+    class L5 cluster
+    class L6 milestone
+    class L7 output
+    class L8 finding
+    class L9 strategic
+
+    class V10 current
+    class V9 contaminated
+    class V5,V6,V8GPB,V8MERF,MPARAM dead
+    class LKGE,LSQRT,LLIN dead
+    class TS1,TS2,TS3 dead
+    class BCF_DUAN,BCF_BIN dead
+    class SH_Q90,SH_WEPP dead
+    class V8POST,AD_BAYES breakthrough
+    class TS4,TS5,BCF_DUAL breakthrough
+    class EXPA,EXPB,EXPC,EXPD,EXPE,D_NTU,D_ANCHOR cluster
+    class ABL1,ABL2,ABL3 cluster
+    class F_SGMC,F_WEATHER,F_LONLAT,F_COLLECT cluster
+    class D_NOISE,D_CLEAN,D_3WAY cluster
+    class POC,S17,S57,V1,V2,V3,V4,FEAS,AUDIT milestone
+    class EXT1,EXT2 output
+    class P_OLS,P_CI,P_CQR output
+    class AD_OLD,AD_N20 dead
+    class SC_BOUNDARY,SC_TURB,SC_SONG,SC_OLS,SC_IOWA,SC_GKF finding
+    class ST_WRITE,ST_PAPERS,ST_TIERS,ST_BIAS strategic
+    class SH_TEMPORAL dead
+```
+
+---
+
+### Bug Discovery Timeline
+
+Every bug that changed the project trajectory, in chronological order.
+
+```{mermaid}
+graph LR
+    B1["Mar 16: Timezone<br/>Off by 5-8 hours<br/>R2 0.63 to 0.75"]
+    B2["Mar 16: QC vectorization<br/>Qualifier matching<br/>silently skipped all filtering"]
+    B3["Mar 16: Early-stop leakage<br/>Test data in validation set"]
+    B4["Mar 17: Categorical dtype<br/>ecoregion, geology, huc2<br/>silently dropped<br/>R2 log 0.75 to 0.79"]
+    B5["Mar 25: prune_gagesii<br/>Double-pruning destroyed<br/>ALL Tier C attributes<br/>Trained on zeros/NaN"]
+    B6["Mar 25: DO saturation<br/>Linear approx 27-65% error<br/>Benson-Krause polynomial fix"]
+    B7["Mar 28: QC approval codes<br/>A vs Approved mismatch<br/>139 sites wrongly rejected"]
+    B8["Mar 28: Precip leakage<br/>precip_24h needed shift 1<br/>for strict antecedent"]
+    B9["Mar 28: Dedup key<br/>int64 nanoseconds<br/>phantom duplicates"]
+    B10["Mar 28: Weather timezone<br/>Strip tz before date compare"]
+    B11["Mar 29: Lambda passthrough<br/>Saved model used MLE -0.049<br/>not 0.2 as intended"]
+    B12["Mar 29: hash non-deterministic<br/>Python hash differs per session<br/>Adaptation not reproducible"]
+    B13["Mar 30: Ablation flatline<br/>No early stopping<br/>38 features identical -0.22<br/>Gemini caught it"]
+    B14["Mar 30: v9 contamination<br/>exclude-sites flag ignored<br/>Trained on holdout+vault<br/>ALL v9 evals invalid"]
+    B15["Mar 30: Model overwriting<br/>Lost model versions<br/>Now versioned + git tracked"]
+    B16["Mar 31: Seasonal split<br/>Produced identical to random<br/>Bug in split logic"]
+    B17["Mar 31: BCF selection<br/>Wrong BCF applied in some paths"]
+    B18["Mar 31: Quantile column names<br/>q05 vs q05_ms silently skipped<br/>coverage stats"]
+
+    B1 --> B2 --> B3 --> B4 --> B5 --> B6
+    B7 --> B8 --> B9 --> B10 --> B11 --> B12
+    B13 --> B14 --> B15 --> B16 --> B17 --> B18
+
+    subgraph BUGLEGEND [" "]
+        direction TB
+        BL1["Critical - invalidated results"]
+        BL2["Major - changed model behavior"]
+        BL3["Minor - caught and fixed"]
+    end
+
+    classDef critical fill:#d62828,stroke:#6a040f,color:#fff,stroke-width:2px
+    classDef major fill:#e76f51,stroke:#c1440e,color:#fff
+    classDef minor fill:#e9c46a,stroke:#f4a261,color:#000
+
+    class BL1 critical
+    class BL2 major
+    class BL3 minor
+
+    class B1,B5,B7,B14 critical
+    class B4,B6,B11,B13,B16 major
+    class B2,B3,B8,B9,B10,B12,B15,B17,B18 minor
+```
+
+---
+
+### Project State Transitions
+
+The narrative arc -- how the project evolved through eras, with the key trigger at each transition.
+
+```{mermaid}
+stateDiagram-v2
+    [*] --> feasibility
+
+    state "Feasibility (Mar 15)" as feasibility
+    feasibility --> early_models : Kansas 5-site test validates concept
+
+    state "Early Models (Mar 16-17)" as early_models {
+        poc : POC 3 sites, R2=0.92
+        s17 : 17-site cross-site, R2=0.84
+        audit : 4-reviewer audit finds 4 bugs
+        s57 : 57-site post-audit, R2=0.75
+        ext14 : 14-state external validation
+
+        poc --> s17
+        s17 --> audit
+        audit --> s57
+        s57 --> ext14
+    }
+
+    early_models --> log1p_era : Expand to 102 sites
+
+    state "log1p Era (Mar 17-28)" as log1p_era {
+        gagesii_bug : prune_gagesii destroys all attributes
+        streamcat : StreamCat replaces GAGES-II
+        expand : 266 to 396 sites via QC fix
+        collapse : Native R2 collapses 0.361 to 0.154
+
+        gagesii_bug --> streamcat
+        streamcat --> expand
+        expand --> collapse
+    }
+
+    log1p_era --> transform_crisis : v3 native R2 = 0.154
+
+    state "Transform Crisis (Mar 28)" as transform_crisis {
+        sweep24 : 24-experiment sweep
+        boxcox_wins : Box-Cox 0.2 + monotone wins
+        raw_fails : Raw SSC R2 under 0.012, ruled out
+
+        sweep24 --> boxcox_wins
+        sweep24 --> raw_fails
+    }
+
+    transform_crisis --> v4_platform : v4 Holdout=0.472
+
+    state "v4 Stable Platform (Mar 28-30)" as v4_platform {
+        arch : Architecture search, 4 approaches
+        exps : Experiments A-E, 30+ models
+        ablation : Feature ablation, 3 rounds
+        loss : Loss function experiments
+        bayesian : Bayesian shrinkage BREAKTHROUGH
+        meta : Site heterogeneity is THE problem
+        feat72 : 72 features locked by expert panel
+
+        arch --> bayesian
+        exps --> meta
+        ablation --> feat72
+    }
+
+    v4_platform --> integration : Combine all findings
+
+    state "Integration (Mar 30)" as integration {
+        v9_build : v9 assembled with all improvements
+        contaminated : CONTAMINATED, trained on holdout
+        ntu_reject : NTU investigated and rejected
+        noise_keep : Noise sites carry extreme signal
+        dual_bcf : Dual BCF discovered
+        v10_clean : v10 clean rebuild
+
+        v9_build --> contaminated
+        contaminated --> v10_clean
+        ntu_reject --> v10_clean
+        noise_keep --> v10_clean
+        dual_bcf --> v10_clean
+    }
+
+    integration --> paper_ready : v10 = current best
+
+    state "Paper Ready (Mar 31+)" as paper_ready {
+        ols : OLS benchmark, wins at every N
+        ci : Bootstrap CIs, 1000 resamples
+        cqr : CQR MultiQuantile training
+        ext260 : 260 NTU sites, Spearman=0.927
+    }
+```
+
+---
+
+### Chronological Project Timeline
+
+Day-by-day progression showing what happened and what was learned.
+
+```{mermaid}
+gantt
+    title murkml Development Timeline (Mar 15-31, 2026)
+    dateFormat YYYY-MM-DD
+    axisFormat %b %d
+
+    section Foundation
+    Project setup + Kansas feasibility     :done, 2026-03-15, 1d
+    POC 3 sites + 17-site cross-site       :done, 2026-03-16, 1d
+    4-reviewer code audit, timezone fix     :crit, done, 2026-03-16, 1d
+    57-site post-audit baseline             :done, 2026-03-16, 1d
+    14-state external validation            :done, 2026-03-17, 1d
+    102-site expansion, categorical fix     :done, 2026-03-17, 1d
+    Panel fixes, flow-strat, GAGES vintage  :done, 2026-03-18, 1d
+
+    section Pipeline Overhaul
+    prune_gagesii bug + DO fix discovered   :crit, done, 2026-03-25, 1d
+    StreamCat migration + site qualification:done, 2026-03-26, 1d
+    Site adaptation + conformal intervals   :done, 2026-03-26, 1d
+    USGS OLS comparison + error analysis    :done, 2026-03-26, 1d
+
+    section Transform + Expansion
+    Data expansion 266 to 396 sites         :done, 2026-03-28, 1d
+    Transform sweep 24 experiments          :done, 2026-03-28, 1d
+    Box-Cox 0.2 selected, v4 established    :milestone, done, 2026-03-28, 0d
+    Feature ablation Round 1                :done, 2026-03-28, 1d
+
+    section Experiments + Breakthrough
+    Experiments A-E, 30+ models             :done, 2026-03-29, 1d
+    MERF tested then abandoned              :done, 2026-03-29, 1d
+    Bayesian shrinkage BREAKTHROUGH         :crit, done, 2026-03-29, 1d
+    Phase 3 pipeline fixes, SGMC, methods   :done, 2026-03-29, 1d
+    Phase 4 diagnostics + external NTU      :done, 2026-03-29, 1d
+
+    section v9 to v10
+    Phase 5 ablation, 83 models             :done, 2026-03-30, 1d
+    Feature freeze at 72, expert panel      :milestone, done, 2026-03-30, 0d
+    v9 assembled then CONTAMINATED          :crit, done, 2026-03-30, 1d
+    NTU investigation, noise site analysis  :done, 2026-03-30, 1d
+    Dual BCF discovery                      :done, 2026-03-30, 1d
+    v10 clean rebuild                       :milestone, done, 2026-03-30, 0d
+
+    section Paper Prep
+    v10 holdout eval + DECISION_LOG         :done, 2026-03-31, 1d
+    OLS benchmark + Bootstrap CIs           :done, 2026-03-31, 1d
+    CQR MultiQuantile training              :active, 2026-03-31, 1d
+```
+
+---
+
+## How to Read These Diagrams
+
+**Diagram 1 (Model Evolution DAG)** -- The comprehensive map. Every model version, every investigation branch, every dead end. Follow the main spine from Kansas Feasibility down to v10. Dotted arrows show where investigation findings feed back into the spine. Color legend is in the bottom-right of the diagram.
+
+**Diagram 2 (Bug Timeline)** -- The 18 bugs that shaped the project. Left to right, chronological. Three rows because they came in waves. Color legend is at the bottom.
+
+**Diagram 3 (State Transitions)** -- The narrative arc. How the project evolved through eras, with nested details inside each state. Best for understanding the *story* of the project.
+
+**Diagram 4 (Gantt Timeline)** -- Day-by-day chronological view. Shows how much happened in parallel and where the critical moments fell.
+
+### The Meta-Finding
+
+The project began as a 5-site feasibility test and grew to 254 training sites + 76 holdout + 36 vault in 17 days. The central discovery is that **site heterogeneity is THE problem** -- between-site SSC/turb ratio CV is 3.2x larger than within-site. No architecture, feature, or training change fixes this. The only approach that works is **Bayesian site adaptation** (Student-t shrinkage), which is both the scientific finding and the commercial product.
+
+18 bugs were discovered and fixed along the way. 4 were critical enough to invalidate prior results. The project survived because of systematic practices: red-team reviews (human + Gemini), expert panels, multi-metric evaluation, and the principle of never overwriting model files.

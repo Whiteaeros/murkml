@@ -2,9 +2,13 @@
 title: "External Validation"
 ---
 
+The murkml model was trained on USGS data using sensors that report turbidity in **FNU** (Formazin Nephelometric Units). But many water monitoring networks — state agencies, tribal programs, academic groups — use sensors that report in **NTU** (Nephelometric Turbidity Units), a slightly different measurement scale from a different optical geometry. This page tests whether the model generalizes across that sensor gap without any retraining. If it does, the model is truly portable — not just a USGS-specific tool. **Spearman rank correlation** (which measures whether predictions rank sites in the right order, regardless of absolute scale) is the primary metric here, because the absolute SSC prediction will be systematically off for NTU sensors until Bayesian adaptation is applied to rescale it.
+
 ## Cross-Network NTU Validation
 
 The strongest test of generalization: 260 sites from 6 non-USGS monitoring networks using NTU sensors (not FNU). The model has never seen these sites, these sensors, or these organizations during training.
+
+<!-- TODO: Verify the external validation figure labels the six contributing organizations and displays both Spearman correlation and MAPE in its annotation — cannot confirm without rendered output. -->
 
 ```{python}
 #| echo: false

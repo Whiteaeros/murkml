@@ -2,9 +2,11 @@
 title: "Bayesian Adaptation"
 ---
 
+The murkml model's core innovation is that it can be quickly calibrated to a new site using a small number of local water samples. This process — called **Bayesian adaptation** — works by blending the model's existing global knowledge with site-specific observations. Think of it as the model saying: "I know a lot about how turbidity relates to SSC in general; now I'm adjusting my prediction scale to match what I actually see at your site." The Bayesian approach is more conservative than simple regression when data are sparse: it hedges toward the global prediction rather than over-fitting to a handful of potentially unrepresentative samples. The pages here show how much improvement users can expect as they collect more local samples, and which sites benefit most.
+
 ## Adaptation Curve
 
-Performance as a function of the number of local grab samples used for Bayesian adaptation. The curve shows how quickly per-site accuracy improves compared to traditional OLS regression.
+This is the key question for any practitioner considering the tool: how many field samples do I need to collect before the model is useful at my site? The x-axis shows the number of local grab samples provided; the y-axis shows median site-level R² across all holdout sites at that calibration count. Two adaptation strategies are compared — samples drawn randomly from across the record (best-case, information-rich) vs. samples drawn from the most recent period only (realistic for a new deployment). The OLS benchmark line shows what a traditional site-specific regression achieves with the same samples. The goal is to see CatBoost+adaptation cross and stay above the OLS line at low N.
 
 ```{python}
 #| echo: false
@@ -20,7 +22,9 @@ fig.show()
 
 ## How Shrinkage Works
 
-The Bayesian method balances global model predictions against local calibration data. With few samples, it trusts the global model; with more samples, it shifts toward the local correction. The Student-t prior is more conservative than Gaussian at small N (protects against outlier calibration samples) but converges faster at large N for sites with unusual SSC/turbidity ratios.
+When you have only 2–5 local samples, any single outlier — a storm event, a lab error, or a sensor glitch — can wildly distort a simple regression fit. Bayesian shrinkage (also called regularization) addresses this by treating local samples as evidence that updates a prior belief rather than as the sole truth. The parameter shown on the y-axis is the **effective weight given to local data** vs. global model knowledge. With few samples (left side), the weight stays low, so the global model dominates and is protected against over-fitting. As sample count grows (right side), local evidence earns more influence. The Student-t prior used here is heavier-tailed than a Gaussian, which means a single extreme sample has less ability to hijack the fit.
+
+<!-- TODO: Verify the y-axis label on the weight curve figure matches the shrinkage weight definition in the adaptation code — cannot confirm without rendered output. -->
 
 ```{python}
 #| echo: false
@@ -33,7 +37,7 @@ fig.show()
 
 ## Zero-Shot Baseline by Site Quality
 
-Three holdout sites showing how the model performs at different quality levels before any local calibration. Each panel shows observed vs predicted SSC at zero-shot.
+Before any local samples are added, the model still makes predictions — this is called **zero-shot** performance. The quality of that baseline varies enormously across sites: some sites are very well predicted out of the box because they resemble training sites; others are systematically off because their watershed or sensor characteristics are unusual. This figure shows three representative holdout sites — one that the global model handles well, one that is marginal, and one that is poorly predicted — illustrating the range of starting conditions that adaptation must overcome. Each panel shows observed SSC (x-axis) against predicted SSC (y-axis) at zero calibration samples.
 
 ```{python}
 #| echo: false
@@ -49,7 +53,7 @@ fig.show()
 
 ## Adaptation Surprise
 
-Which sites benefit most from adaptation? Sites in the upper-left quadrant were poorly predicted at zero-shot but improved dramatically with calibration samples.
+Not all sites benefit equally from local calibration. Some sites that start with poor zero-shot predictions improve dramatically with just 10 samples (the adaptation "works"), while others that look reasonable at zero-shot barely improve (perhaps because the global model is already near-optimal there). The x-axis shows zero-shot site R² and the y-axis shows R² after adaptation with N=10 samples. Sites in the upper-left quadrant are the "surprise" cases: poorly predicted without calibration, but rescued by it. Sites near the diagonal received little benefit from adaptation. Understanding which site characteristics fall into each region can guide field sampling prioritization.
 
 ```{python}
 #| echo: false

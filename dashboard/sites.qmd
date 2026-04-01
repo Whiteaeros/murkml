@@ -2,6 +2,8 @@
 title: "Site Explorer"
 ---
 
+The 396 sites in this dataset span the continental United States, covering a wide range of climates, geology types, land uses, and watershed sizes. This page lets you explore how the model performs across that geographic and hydrologic diversity. The three-way split — training, holdout, vault — ensures that model evaluation is honest: holdout and vault sites were never used to make any modeling decisions, so their performance reflects true out-of-sample generalization. The vault set is reserved for a single, irreversible final evaluation at the end of the project (used once, to avoid unconsciously optimizing for it).
+
 ## Site Map
 
 Geographic distribution of all sites in the dataset. Training sites (blue) were used to build the model. Holdout sites (orange) were never seen during training and are used for honest evaluation. Vault sites (purple) are reserved for one-shot final validation. Dot size reflects the number of paired SSC-turbidity samples at each site.
@@ -23,7 +25,7 @@ fig.show()
 
 ## Holdout Site Table
 
-All holdout sites ranked by R^2^ (NSE). Click column headers to sort. R^2^ cells are color-coded: green (>0.7), blue (0.3--0.7), yellow (0--0.3), red (<0).
+This sortable table gives the full scorecard for every holdout site — the 76 locations used for honest model evaluation. R² (equivalent to NSE, Nash-Sutcliffe Efficiency) is the primary ranking metric: values above 0.7 (green) indicate the model captures most SSC variability at that site; 0.3–0.7 (blue) indicates moderate skill; 0–0.3 (yellow) indicates marginal skill; and negative values (red) mean the model is actively worse than predicting the site's long-run average. Sorting by different columns (MAPE, Within-2x, Spearman) highlights different aspects of performance and can reveal sites where the model ranks correctly but is systematically biased in absolute scale. Click any column header to sort.
 
 ```{python}
 #| echo: false
@@ -39,7 +41,7 @@ fig.show()
 
 ## Best and Worst Sites
 
-The top 6 and bottom 6 holdout sites (by R^2^, minimum 5 samples) shown as observed-vs-predicted scatter plots. Top row: best-performing sites. Bottom row: worst-performing sites. Each panel shows the 1:1 reference line.
+Rather than summarizing performance as a single number, this gallery shows the actual scatter plots for the 6 best and 6 worst holdout sites. Visual inspection reveals patterns that metrics miss: are the worst sites characterized by a systematic offset (bias) that adaptation could fix, or is the data fundamentally noisy with no consistent turbidity-SSC signal? Sites in the top row are where the global model succeeds out of the box; sites in the bottom row are candidates for prioritizing local calibration samples. Each panel shows observed SSC (x-axis) against predicted SSC (y-axis), with the 1:1 reference line indicating perfect agreement. Minimum 5 samples per site required for inclusion.
 
 ```{python}
 #| echo: false
@@ -55,7 +57,7 @@ fig.show()
 
 ## Site Detail Pages
 
-Click a site ID below to see its detail page with location map, observed vs predicted scatter, metrics table, and rating curve.
+Each holdout site has its own detail page showing its location on a map, the full observed-vs-predicted scatter with metrics, and the raw turbidity-SSC rating curve. These are particularly useful for investigating individual failures — understanding whether a site's poor performance is explainable by a known physical reason (e.g., a reservoir immediately upstream, a recurring algae bloom, or a mine drainage input that contaminates the turbidity signal). Click a site ID below to open its detail page.
 
 ```{python}
 #| echo: false
