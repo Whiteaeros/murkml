@@ -1,0 +1,69 @@
+---
+title: "USGS-11447905"
+---
+
+```{python}
+#| echo: false
+from pathlib import Path
+import sys
+sys.path.insert(0, "..")
+```
+
+## Location
+
+- **Latitude:** 38.239
+- **Longitude:** -121.523
+- **Role:** Holdout
+- **Samples:** 15
+
+```{python}
+#| echo: false
+#| label: fig-site-map-USGS-11447905
+from _scripts.figures import make_site_location_map
+
+fig = make_site_location_map(
+    Path("../dashboard_data/site_metadata.parquet"),
+    "USGS-11447905",
+)
+fig.show()
+```
+
+## Observed vs Predicted
+
+```{python}
+#| echo: false
+#| label: fig-site-detail-USGS-11447905
+from _scripts.figures import make_site_detail
+
+fig = make_site_detail(
+    Path("../dashboard_data/per_reading.parquet"),
+    "USGS-11447905",
+)
+fig.show()
+```
+
+## Site Metrics
+
+| Metric | Value |
+|--------|-------|
+| R² (NSE) | N/A |
+| MAPE | N/A |
+| Bias | N/A |
+| Within 2x | N/A |
+| Samples | 15 |
+
+## Rating Curve
+
+```{python}
+#| echo: false
+#| label: fig-rating-curve-USGS-11447905
+from _scripts.figures import make_rating_curve
+
+fig = make_rating_curve(
+    Path("../dashboard_data/per_reading.parquet"),
+    "USGS-11447905",
+)
+fig.show()
+```
+
+[Back to Site Explorer](../sites.html)

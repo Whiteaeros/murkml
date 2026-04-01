@@ -1,0 +1,152 @@
+---
+title: "Diagnostics"
+---
+
+## Per-Site R2 Distribution (CDF)
+
+Empirical cumulative distribution of per-site R2 at zero-shot, N=5, and N=10 adaptation. The vertical line marks R2=0 — sites to the left are worse than predicting the mean.
+
+```{python}
+#| echo: false
+#| label: fig-r2-cdf
+from pathlib import Path
+import sys
+sys.path.insert(0, ".")
+from _scripts.figures import make_per_site_r2_cdf
+
+fig = make_per_site_r2_cdf(Path("dashboard_data/per_site.parquet"))
+fig.show()
+```
+
+## Residual Diagnostics
+
+Four views of model residuals: vs predicted value (heteroscedasticity), Q-Q plot (normality), vs turbidity (input dependence), and histogram with normal overlay. The heavy tails (skew and kurtosis annotated) justify the Student-t prior in the Bayesian adaptation.
+
+```{python}
+#| echo: false
+#| label: fig-residual-diagnostics
+from _scripts.figures import make_residual_diagnostics
+
+fig = make_residual_diagnostics(Path("dashboard_data/per_reading.parquet"))
+fig.show()
+```
+
+## Temporal Stability
+
+For sites with time-stamped data, each site's readings are split chronologically into first half and second half. R2 is computed independently for each half. Sites near the diagonal are temporally stable; sites far from it may reflect sensor drift, land use change, or non-stationarity.
+
+```{python}
+#| echo: false
+#| label: fig-temporal-stability
+from _scripts.figures import make_temporal_stability
+
+fig = make_temporal_stability(Path("dashboard_data/per_reading.parquet"))
+fig.show()
+```
+
+## Data Funnel
+
+How the dataset was built: from 860 discovered USGS sites down to the final 254 training + 76 holdout + 36 vault split. Each narrowing step filters sites that lack turbidity sensors, temporal overlap, or watershed attributes.
+
+```{python}
+#| echo: false
+#| label: fig-data-sankey
+from _scripts.figures import make_data_sankey
+
+fig = make_data_sankey(Path("dashboard_data/summary.json"))
+fig.show()
+```
+
+## SSC vs Turbidity Joint Distribution
+
+The raw data the model learns from: SSC plotted against turbidity across all holdout readings.
+
+```{python}
+#| echo: false
+#| label: fig-joint-distribution
+from _scripts.figures import make_joint_distribution
+
+fig = make_joint_distribution(Path("dashboard_data/per_reading.parquet"))
+fig.show()
+```
+
+## Box-Cox Transform Effect
+
+Why Box-Cox lambda=0.2? Comparison of the SSC distribution under three transforms. The Box-Cox transform reduces skewness while preserving more of the extreme-value structure than log1p.
+
+```{python}
+#| echo: false
+#| label: fig-boxcox-comparison
+from _scripts.figures import make_boxcox_comparison
+
+fig = make_boxcox_comparison(Path("dashboard_data/per_reading.parquet"))
+fig.show()
+```
+
+## Power-Law Slope Distribution
+
+Distribution of per-site turbidity-SSC slopes in log-log space. Slopes near 1.0 indicate a linear relationship; slopes < 1 mean SSC saturates at high turbidity (coarse material); slopes > 1 mean SSC accelerates (fine material mobilization).
+
+```{python}
+#| echo: false
+#| label: fig-slope-gallery
+from _scripts.figures import make_slope_gallery
+
+fig = make_slope_gallery(Path("dashboard_data/per_reading.parquet"))
+fig.show()
+```
+
+## Rating Curves
+
+Six holdout sites spanning the performance range, showing the raw turbidity-SSC relationship. Gray dots are observed; colored dots are model predictions.
+
+```{python}
+#| echo: false
+#| label: fig-rating-curves
+from _scripts.figures import make_rating_curves
+
+fig = make_rating_curves(
+    Path("dashboard_data/per_reading.parquet"),
+    Path("dashboard_data/per_site.parquet"),
+)
+fig.show()
+```
+
+## Feature Importance
+
+Top features ranked by importance. Colors indicate feature category.
+
+```{python}
+#| echo: false
+#| label: fig-feature-importance
+from _scripts.figures import make_shap_beeswarm
+
+fig = make_shap_beeswarm()
+fig.show()
+```
+
+## Load Estimation
+
+Cumulative sediment load comparison for selected holdout sites. If the curves track closely, the model produces accurate total loads even when individual predictions scatter.
+
+```{python}
+#| echo: false
+#| label: fig-load-estimation
+from _scripts.figures import make_load_estimation
+
+fig = make_load_estimation(Path("dashboard_data/per_reading.parquet"))
+fig.show()
+```
+
+## Sediment Load by Timescale
+
+Discharge-weighted sediment load (SSC × Q × 0.0027 tons/day) compared at daily, monthly, and annual aggregation. Even if individual predictions scatter, loads should converge at longer timescales if errors are unbiased.
+
+```{python}
+#| echo: false
+#| label: fig-load-timescale
+from _scripts.figures import make_sediment_load_timescale
+
+fig = make_sediment_load_timescale(Path("dashboard_data/per_reading.parquet"))
+fig.show()
+```

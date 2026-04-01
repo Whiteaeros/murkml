@@ -107,20 +107,22 @@ def run_download_with_file_monitoring():
                 last_file_count = current_count
                 last_progress_time = time.time()
 
-            # Stall detection
+            # Stall detection — kill if no new files for 10 min
             elapsed = time.time() - last_progress_time
             if elapsed > stall_timeout:
-                logger.warning(f"  No new files in {elapsed:.0f}s, killing stalled process")
-                proc.kill()
+                logger.warning(f"  No new files in {elapsed:.0f}s, killing stalled process tree")
+                # Kill the launcher AND any child interpreters
+                try:
+                    subprocess.run(
+                        ["taskkill", "/PID", str(proc.pid), "/F", "/T"],
+                        capture_output=True, timeout=10,
+                    )
+                except Exception:
+                    pass
                 try:
                     proc.wait(timeout=10)
                 except Exception:
                     pass
-                return -1
-
-            # Overall timeout (2 hours)
-            if time.time() - last_progress_time > 7200:
-                proc.kill()
                 return -1
     except Exception as e:
         logger.error(f"  Monitor error: {e}")

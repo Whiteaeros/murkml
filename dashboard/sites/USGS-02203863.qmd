@@ -1,0 +1,69 @@
+---
+title: "USGS-02203863"
+---
+
+```{python}
+#| echo: false
+from pathlib import Path
+import sys
+sys.path.insert(0, "..")
+```
+
+## Location
+
+- **Latitude:** 33.693
+- **Longitude:** -84.254
+- **Role:** Holdout
+- **Samples:** 85
+
+```{python}
+#| echo: false
+#| label: fig-site-map-USGS-02203863
+from _scripts.figures import make_site_location_map
+
+fig = make_site_location_map(
+    Path("../dashboard_data/site_metadata.parquet"),
+    "USGS-02203863",
+)
+fig.show()
+```
+
+## Observed vs Predicted
+
+```{python}
+#| echo: false
+#| label: fig-site-detail-USGS-02203863
+from _scripts.figures import make_site_detail
+
+fig = make_site_detail(
+    Path("../dashboard_data/per_reading.parquet"),
+    "USGS-02203863",
+)
+fig.show()
+```
+
+## Site Metrics
+
+| Metric | Value |
+|--------|-------|
+| R² (NSE) | 0.517 |
+| MAPE | 41.0% |
+| Bias | -22.1% |
+| Within 2x | 0.700 |
+| Samples | 85 |
+
+## Rating Curve
+
+```{python}
+#| echo: false
+#| label: fig-rating-curve-USGS-02203863
+from _scripts.figures import make_rating_curve
+
+fig = make_rating_curve(
+    Path("../dashboard_data/per_reading.parquet"),
+    "USGS-02203863",
+)
+fig.show()
+```
+
+[Back to Site Explorer](../sites.html)

@@ -1,0 +1,41 @@
+---
+title: "murkml — Cross-Site SSC Prediction"
+---
+
+```{python}
+#| echo: false
+import json
+from pathlib import Path
+
+data_dir = Path("dashboard_data")
+
+# Load summary
+with open(data_dir / "summary.json") as f:
+    summary = json.load(f)
+```
+
+::: {.callout-note appearance="simple"}
+## One model, 254 sites, Bayesian adaptation
+
+murkml predicts suspended sediment concentration (SSC) from turbidity using a single CatBoost model trained across 254 USGS sites. Rather than fitting a separate regression at each site, a shared model learns cross-site patterns, then Bayesian adaptation with just 10 local grab samples achieves **MedSiteR² = 0.492** — beating USGS OLS regressions that require 50+ samples.
+:::
+
+## Key Numbers
+
+| Metric | Value |
+|--------|-------|
+| Training sites | 254 |
+| Holdout sites | 76 (never seen in training) |
+| Features | 72 (137 in tier, 65 dropped) |
+| Zero-shot MedSiteR² | 0.409 (bcf_mean) |
+| Adapted (N=10) MedSiteR² | 0.492 |
+| External Spearman (260 NTU sites) | 0.927 |
+
+## Explore the Dashboard
+
+- **[Performance](performance.qmd)** — Observed vs predicted plots, pooled vs per-site metrics, and error structure across the prediction range.
+- **[Adaptation](adaptation.qmd)** — How Bayesian adaptation improves site-level accuracy with increasing local sample counts.
+- **[Sites](sites.qmd)** — Individual site performance breakdowns.
+- **[External](external.qmd)** — Validation against 260 independent NTU monitoring sites.
+- **[Diagnostics](diagnostics.qmd)** — Feature importance, residual diagnostics, and data quality checks.
+- **[About](about.qmd)** — Methods, data sources, and project background.

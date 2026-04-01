@@ -16,7 +16,7 @@ Each step has a script. They run in order. Skipping a step will break the next o
 
 ## Step 1: Download Raw Data
 
-**Scripts:** `download_data.py`, `download_diverse.py`, `download_expansion_sites.py`, `download_discrete_params.py`
+**Scripts:** `download_gap_fill_fast.py` (reference RDB implementation), `download_batch.py`, `qualify_sites.py`
 
 **What it does:**
 - Pulls continuous sensor data (15-min interval) from USGS waterdata API
@@ -47,7 +47,7 @@ Continuous data is chunked into 3-year windows because the API has row limits.
 
 **Rate limits:** USGS allows 1000 requests/hour with an API token (`API_USGS_PAT` env var). Scripts track remaining requests and pause if needed.
 
-**How to verify:** Check `data/continuous/` has a folder per site, and `data/discrete/` has parquet files per site+parameter. Currently ~124 site folders.
+**How to verify:** Check `data/continuous/` has a folder per site, and `data/discrete/` has parquet files per site+parameter. Currently 396 sites.
 
 ---
 
@@ -93,7 +93,7 @@ Continuous data is chunked into 3-year windows because the API has row limits.
 
 ## Step 4: Align Discrete Samples to Continuous Sensors
 
-**Scripts:** `assemble_dataset.py` (SSC), `assemble_multi_param.py` (TP, nitrate, orthoP)
+**Scripts:** `assemble_dataset.py` (SSC only — TP/nitrate/orthoP were dropped, see DECISION_LOG)
 
 **What it does:** This is the core step. For each discrete lab sample:
 
@@ -106,10 +106,7 @@ Continuous data is chunked into 3-year windows because the API has row limits.
    - Store as instantaneous value (NaN if no reading available)
 
 **Output:**
-- `data/processed/turbidity_ssc_paired.parquet` — SSC dataset
-- `data/processed/total_phosphorus_paired.parquet` — TP dataset
-- `data/processed/nitrate_nitrite_paired.parquet`
-- `data/processed/orthophosphate_paired.parquet`
+- `data/processed/turbidity_ssc_paired.parquet` — SSC dataset (396 sites, 35,209 samples)
 
 Each row = one lab sample matched to its sensor context. Columns include the lab value, all sensor readings, site_id, timestamp, and non-detect flag.
 
@@ -130,37 +127,21 @@ Each row = one lab sample matched to its sensor context. Columns include the lab
 
 ---
 
-## Step 6: Watershed Attributes (GAGES-II)
+## Step 6: Watershed Attributes (EPA StreamCat + SGMC Lithology)
 
-**Script:** `download_gagesii.py`
+**Scripts:** `download_streamcat.py` (StreamCat), `compute_watershed_lithology.py` + `extract_sgmc_lithology.py` (SGMC)
 
-**What it does:** Downloads the GAGES-II dataset from USGS ScienceBase — a massive table of catchment characteristics for 9,067 US stream gauges. Attributes include:
+**What it does:** Loads two complementary attribute datasets:
 
-- **Geology:** % limestone, % sandstone, karst fraction
-- **Land cover:** % forest, % agriculture, % urban, % wetland
-- **Soils:** Permeability, clay content, depth to bedrock
-- **Climate:** Mean precipitation, mean temperature, aridity index
-- **Topography:** Drainage area, mean slope, mean elevation
-- **Hydrology:** Base flow index, runoff ratio
+1. **EPA StreamCat** — 781 sites, 69 static catchment features after filtering. Loaded by `src/murkml/data/attributes.py` → `load_streamcat_attrs()`. Covers land cover, soils, climate, topography, hydrology from a single consistent framework.
+
+2. **SGMC Lithology** — 355 sites, 28 watershed geology percentage features. Loaded from `data/sgmc/sgmc_features_for_model.parquet`, merged into training in `train_tiered.py`. Categories include igneous, metamorphic, sedimentary, unconsolidated rock types as watershed percentages.
 
 **Output:**
-- `data/site_attributes_gagesii_full.parquet` — all 9,067 sites, all ~270 raw attributes (column names like `FORESTNLCD06`, `GEOL_HUNT_DOM_CODE`)
-- `data/site_attributes_gagesii.parquet` — subset matched to our training sites, **already pruned** (column names like `forest_pct`, `geol_class`)
+- StreamCat attributes loaded dynamically by `build_feature_tiers()` in `src/murkml/data/attributes.py`
+- `data/sgmc/sgmc_features_for_model.parquet` — SGMC lithology features
 
-**CRITICAL: Column name formats differ between these files.** The `_full` file has raw GAGES-II column names. The non-full file has already-pruned column names. `prune_gagesii()` expects raw names. **Do NOT call `prune_gagesii()` on `site_attributes_gagesii.parquet`** — it will silently destroy all data by looking for columns that don't exist and replacing them with zeros/NaN. (Bug discovered 2026-03-24.)
-
-**Matching:** GAGES-II uses plain station numbers (e.g., "01491000"). Our site IDs use "USGS-01491000". The script handles this conversion and zero-padding.
-
-**Sites not in GAGES-II:** Some newer or non-standard sites won't match. The `fill_landcover_nlcd.py` script pulls NLCD 2019 land cover via pygeohydro as a fallback (37 sites filled this way).
-
-**Two-source-of-truth problem (identified 2026-03-24):** The current attribute setup has a structural flaw:
-- 58 sites have full GAGES-II data (geology, soils, climate, land cover — but 2006 vintage)
-- 37 sites have NLCD 2019 backfill — land cover ONLY (no geology, soils, or climate attributes)
-- 7 sites have no watershed attributes at all
-
-This means Tier C models train on inconsistent feature sets across sites. The 37 backfill sites have NaN/default values for most GAGES-II columns, confounding tier comparisons.
-
-**Planned fix: Migrate to EPA StreamCat.** StreamCat covers all NHDPlus catchments with 600+ attributes from a single consistent framework, regularly updated. This will give all 102 sites the same attribute set from one source. Requires COMID lookup via NLDI first.
+**Note:** GAGES-II was the original attribute source but was replaced by StreamCat after a critical bug (`prune_gagesii()` silently destroying data). `prune_gagesii()` still exists in code but is dead — do not use it. See DECISION_LOG for full history.
 
 ---
 
@@ -172,59 +153,62 @@ Three tiers used for ablation testing:
 
 | Tier | Features | Purpose |
 |------|----------|---------|
-| A | Sensor readings only (turbidity, conductance, DO, pH, temp, discharge + engineered) | Baseline — what can sensors alone tell us? |
-| B | A + basic site attributes (lat, lon, drainage area, elevation) | Does location help? |
-| C | B + full GAGES-II attributes (geology, land cover, soils, climate) | Does watershed context help? |
+| A | Sensor readings only (turbidity, conductance, DO, pH, temp, discharge + engineered) — 37 features, 396 sites | Baseline — what can sensors alone tell us? |
+| B | A + basic site attributes (lat, lon, drainage area, elevation) — 42 features, 396 sites | Does location help? |
+| C | B + StreamCat + SGMC lithology — 137 features pre-drop, 72 post-drop, 357 sites | Does watershed context help? |
 
-Tier C is what we train the production model on. Tiers A and B exist to prove that watershed attributes actually improve predictions (they do — roughly +0.05 R² for SSC, +0.10 for TP).
+Tier C is the production tier. 65 features on `data/optimized_drop_list.txt` are always dropped via `--drop-features`. The B vs C improvement is statistically significant (p<0.01).
 
 ---
 
 ## Step 8: Train
 
-**Scripts:** `train_baseline.py` (quick single-tier), `train_tiered.py` (all tiers, all params)
+**Script:** `train_tiered.py` (main training — all tiers, all params)
 
-**Model:** CatBoost (gradient-boosted trees). Also tested Random Forest and XGBoost — CatBoost wins on our data.
+**Model:** CatBoost (gradient-boosted trees) with depth=6, lr=0.05, l2_reg=3, 500 iter max, ordered boosting. Key flags: `--cv-mode gkf5|logo`, `--transform boxcox`, `--boxcox-lambda 0.2`, `--drop-features`, `--skip-ridge`, `--n-jobs 12`, `--label`.
 
-**Validation:** Leave-One-Group-Out (LOGO) cross-validation, where each "group" is a site. The model is trained on N-1 sites and tested on the held-out site. This repeats for every site. Median R² across all folds is the reported metric.
+**Target:** Box-Cox(SSC, lambda=0.2) with Dual BCF back-transformation (bcf_mean=1.327 for loads, bcf_median=1.021 for individual predictions).
 
-**Early stopping:** 15% of training sites held out as an internal validation set to prevent overfitting (500 max iterations, stops if validation loss hasn't improved in 50 rounds).
+**Monotone constraints:** ON for turbidity_instant and turbidity_max_1hr (physics: turb up -> SSC up). Helps Box-Cox but would hurt log1p.
 
-**Ridge linear baseline (added 2026-03-24):** A Ridge regression model runs under the same LOGO CV framework for fair comparison against CatBoost. This addresses the red team finding that no linear baseline existed.
+**Validation:** Leave-One-Group-Out (LOGO) cross-validation, where each "group" is a site. 254 training sites, with 76 holdout + 36 vault excluded. GKF5 (5-fold grouped shuffle) used for quick experiments.
 
-**SHAP analysis (added 2026-03-24):** SHAP TreeExplainer is computed for Tier C models after final model save, identifying which features drive predictions and enabling interpretability analysis.
+**3-way split:** `data/train_holdout_vault_split.parquet` — 254 train / 76 holdout / 36 vault. Created after identifying that repeated ablation on holdout constitutes implicit overfitting.
 
-**Native-space metrics (added 2026-03-24):** Duan's smearing factor is computed per LOGO fold from training residuals, then applied to back-transform log-space predictions to mg/L. Both log-space and native-space R², RMSE, and bias are reported. This is critical because log-space R²=0.80 corresponds to only R²=0.61 in native space.
+**Early stopping:** GroupShuffleSplit validation + early_stopping_rounds=50.
 
-**Metrics:** R² (log-space AND native-space), KGE (Kling-Gupta Efficiency), RMSE (log + native), percent bias
+**Metrics:** R²(log), R²(native), KGE, RMSE, bias, MedSiteR², MAPE, Within-2x, Spearman. Always report both log-space and native-space.
 
 ---
 
 ## Running the Full Pipeline
 
-From the murkml project root, with the `.venv` activated:
+From the murkml project root, with `.venv` activated (`.venv/Scripts/python` on Windows):
 
 ```bash
-# 1. Download (already done for current sites)
-python scripts/download_data.py
+# 1. Discover + qualify sites
+python scripts/qualify_sites.py
 
-# 2. Temporal overlap audit (needed for TP/nutrient params)
-python scripts/check_temporal_overlap.py
+# 2. Download sensor + discrete data (RDB format, 8 concurrent workers)
+python scripts/download_gap_fill_fast.py
 
-# 3. Assemble SSC dataset
+# 3. Assemble SSC dataset (includes QC, alignment, feature engineering)
 python scripts/assemble_dataset.py
 
-# 4. Assemble TP, nitrate, orthoP datasets
-python scripts/assemble_multi_param.py
+# 4. Download StreamCat attributes (once)
+python scripts/download_streamcat.py
 
-# 5. Download/update GAGES-II (only need to run once)
-python scripts/download_gagesii.py
+# 5. Compute SGMC lithology features (once)
+python scripts/compute_watershed_lithology.py
 
-# 6. Train all tiers
-python scripts/train_tiered.py
+# 6. Train (Tier C, Box-Cox 0.2, LOGO CV)
+python scripts/train_tiered.py --param ssc --tier C --transform boxcox --boxcox-lambda 0.2 \
+    --n-jobs 12 --drop-features "$(cat data/optimized_drop_list.txt)"
+
+# 7. Evaluate (holdout + adaptation + external)
+python scripts/evaluate_model.py --model data/results/models/ssc_C_sensor_basic_watershed_v10_clean_dualbcf.cbm \
+    --bcf-mode median --k 15 --df 4
 ```
-
-Steps 3 and 4 include QC, alignment, and feature engineering automatically. You don't run those separately.
 
 ---
 
@@ -232,42 +216,37 @@ Steps 3 and 4 include QC, alignment, and feature engineering automatically. You 
 
 ```
 data/
-  continuous/          <- 15-min sensor data, one folder per site
+  continuous/          <- 15-min sensor data, one folder per site (396 sites)
     USGS_01491000/
       63680/           <- turbidity parquet chunks
       00095/           <- conductance
       ...
   discrete/            <- lab samples, one file per site+param
     USGS_01491000_ssc.parquet
-    USGS_01491000_total_phosphorus.parquet
     ...
   processed/           <- ML-ready aligned datasets
-    turbidity_ssc_paired.parquet
-    total_phosphorus_paired.parquet
-    ...
-  gagesii/             <- GAGES-II raw files
-  site_catalog.parquet
-  site_attributes.parquet            <- basic attrs (drainage area, elevation, HUC)
-  site_attributes_gagesii.parquet    <- PRUNED column names (forest_pct, geol_class, etc.)
-  site_attributes_gagesii_full.parquet <- RAW column names (FORESTNLCD06, GEOL_HUNT_DOM_CODE, etc.)
-  site_attributes_nlcd.parquet       <- NLCD 2019 backfill for non-GAGES-II sites
-  temporal_overlap_audit.parquet
-  expansion_candidates.parquet
-  results/             <- model outputs
+    turbidity_ssc_paired.parquet  (396 sites, 35,209 samples)
+  sgmc/                <- SGMC lithology features
+    sgmc_features_for_model.parquet  (355 sites, 28 features)
+  weather/             <- GridMET daily weather per site
+    USGS_{site_no}/daily_weather.parquet
+  train_holdout_vault_split.parquet  <- 3-way split (254/76/36)
+  optimized_drop_list.txt            <- 65 features to drop
+  results/
+    models/            <- saved .cbm + _meta.json files
+    evaluations/       <- per-reading, per-site, summary JSONs
 ```
 
 ---
 
 ## Data Integrity Rules (added 2026-03-24)
 
-These rules exist because of a bug where `prune_gagesii()` was called on already-pruned data, silently destroying all GAGES-II attributes. The model trained on 25 columns of zeros/NaN without any error or warning.
+These rules exist because of a bug where `prune_gagesii()` was called on already-pruned data, silently destroying all watershed attributes. The model trained on 25 columns of zeros/NaN without any error or warning. See DECISION_LOG for the full post-mortem.
 
-1. **Verify column names before calling transformation functions.** If a function expects raw GAGES-II names (`FORESTNLCD06`) but the input has pruned names (`forest_pct`), it will silently produce garbage. Check the first few column names before calling any pruning/transformation step.
+1. **Verify intermediate data products contain expected values.** After any transformation, check that output columns have real values (not all zeros, not all NaN, correct dtypes). A 5-row `head()` check would have caught the original bug.
 
-2. **Never trust default values from `_safe_col()` at scale.** If more than 50% of expected columns are missing, something is wrong — fail loudly instead of filling with defaults.
+2. **Transformation functions should validate their inputs and fail loudly on unexpected column names.** Never silently fill with defaults at scale.
 
-3. **Spot-check intermediate data products.** After any transformation, verify that output columns contain real values (not all zeros, not all NaN, correct dtypes). A 5-row `head()` check would have caught the prune_gagesii bug.
+3. **All results must have a clear provenance chain:** raw data file -> processing function -> feature columns -> model -> metrics. If you can't trace a reported R² value back to the exact input data and code path that produced it, it's not publishable.
 
-4. **Document column name formats in file names or metadata.** `site_attributes_gagesii.parquet` (pruned) and `site_attributes_gagesii_full.parquet` (raw) store the same sites with different column schemas. This must be obvious to any code that reads them.
-
-5. **All results must have a clear provenance chain:** raw data file → processing function → feature columns → model → metrics. If you can't trace a reported R² value back to the exact input data and code path that produced it, it's not publishable.
+4. **Never overwrite model files.** Version everything, commit to git immediately.

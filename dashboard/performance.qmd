@@ -1,0 +1,121 @@
+---
+title: "Model Performance"
+---
+
+## Observed vs Predicted
+
+Predicted SSC plotted against observed values across all holdout readings on a log-log scale. Points near the 1:1 line indicate accurate predictions. The 2x envelope (dashed) shows factor-of-two accuracy.
+
+```{python}
+#| echo: false
+#| label: fig-obs-pred
+from pathlib import Path
+import sys
+sys.path.insert(0, ".")
+from _scripts.figures import make_obs_vs_pred
+
+fig = make_obs_vs_pred(Path("dashboard_data/per_reading.parquet"))
+fig.show()
+```
+
+## SSC Distribution: Observed vs Predicted
+
+Do the observed and predicted SSC values span the same concentration range with the same shape? Mismatches reveal systematic bias.
+
+```{python}
+#| echo: false
+#| label: fig-distribution-comparison
+from _scripts.figures import make_distribution_comparison
+
+fig = make_distribution_comparison(Path("dashboard_data/per_reading.parquet"))
+fig.show()
+```
+
+## Pooled vs. Site-Level Performance
+
+Pooled metrics can mask poor performance at individual sites. This shows the distribution of per-site R2 values — note how many sites fall below zero.
+
+```{python}
+#| echo: false
+#| label: fig-pooled-vs-persite
+from _scripts.figures import make_pooled_vs_persite
+
+fig = make_pooled_vs_persite(Path("dashboard_data/per_site.parquet"))
+fig.show()
+```
+
+## CatBoost vs OLS Head-to-Head
+
+Each point is one holdout site at N=10 calibration samples (random split). Points above the diagonal: CatBoost outperforms OLS. Points below: OLS wins.
+
+```{python}
+#| echo: false
+#| label: fig-catboost-vs-ols
+from _scripts.figures import make_catboost_vs_ols
+
+fig = make_catboost_vs_ols(Path("dashboard_data/ols_ols_benchmark_per_site.parquet"))
+fig.show()
+```
+
+## Disaggregated Performance
+
+Model performance broken down by hydrology regime, collection method, geology, and SSC range. Two views of the same data — heatmap and dot plot — for comparison.
+
+### Heatmap View
+
+```{python}
+#| echo: false
+#| label: fig-disagg-heatmap
+from _scripts.figures import make_disaggregated_heatmap
+
+fig = make_disaggregated_heatmap(Path("dashboard_data/diag_disaggregated_metrics.parquet"))
+fig.show()
+```
+
+### Dot Plot View
+
+```{python}
+#| echo: false
+#| label: fig-disagg-dotplot
+from _scripts.figures import make_disaggregated_dotplot
+
+fig = make_disaggregated_dotplot(Path("dashboard_data/diag_disaggregated_metrics.parquet"))
+fig.show()
+```
+
+## Error Landscape
+
+Every prediction plotted by observed SSC concentration. Annotated zones show the physical mechanisms driving model error at different concentration ranges.
+
+```{python}
+#| echo: false
+#| label: fig-physics-wall
+from _scripts.figures import make_physics_wall
+
+fig = make_physics_wall(Path("dashboard_data/per_reading.parquet"))
+fig.show()
+```
+
+## Geology Disaggregation
+
+### Grouped Bar View
+
+```{python}
+#| echo: false
+#| label: fig-geology-disagg
+from _scripts.figures import make_geology_disaggregation
+
+fig = make_geology_disaggregation(Path("dashboard_data/diag_disaggregated_metrics.parquet"))
+fig.show()
+```
+
+### Slope Graph View
+
+```{python}
+#| echo: false
+#| label: fig-geology-slopegraph
+from _scripts.figures import make_geology_slopegraph
+
+fig = make_geology_slopegraph(Path("dashboard_data/diag_disaggregated_metrics.parquet"))
+fig.show()
+```

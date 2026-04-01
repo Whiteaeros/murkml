@@ -1,0 +1,73 @@
+---
+title: "Site Explorer"
+---
+
+## Site Map
+
+Geographic distribution of all sites in the dataset. Training sites (blue) were used to build the model. Holdout sites (orange) were never seen during training and are used for honest evaluation. Vault sites (purple) are reserved for one-shot final validation. Dot size reflects the number of paired SSC-turbidity samples at each site.
+
+```{python}
+#| echo: false
+#| label: fig-study-area-map
+from pathlib import Path
+import sys
+sys.path.insert(0, ".")
+from _scripts.figures import make_study_area_map
+
+fig = make_study_area_map(
+    Path("dashboard_data/site_metadata.parquet"),
+    Path("dashboard_data/per_site.parquet"),
+)
+fig.show()
+```
+
+## Holdout Site Table
+
+All holdout sites ranked by R^2^ (NSE). Click column headers to sort. R^2^ cells are color-coded: green (>0.7), blue (0.3--0.7), yellow (0--0.3), red (<0).
+
+```{python}
+#| echo: false
+#| label: fig-site-table
+from _scripts.figures import make_site_table
+
+fig = make_site_table(
+    Path("dashboard_data/per_site.parquet"),
+    Path("dashboard_data/site_metadata.parquet"),
+)
+fig.show()
+```
+
+## Best and Worst Sites
+
+The top 6 and bottom 6 holdout sites (by R^2^, minimum 5 samples) shown as observed-vs-predicted scatter plots. Top row: best-performing sites. Bottom row: worst-performing sites. Each panel shows the 1:1 reference line.
+
+```{python}
+#| echo: false
+#| label: fig-site-gallery
+from _scripts.figures import make_site_gallery
+
+fig = make_site_gallery(
+    Path("dashboard_data/per_reading.parquet"),
+    Path("dashboard_data/per_site.parquet"),
+)
+fig.show()
+```
+
+## Site Detail Pages
+
+Click a site ID below to see its detail page with location map, observed vs predicted scatter, metrics table, and rating curve.
+
+```{python}
+#| echo: false
+#| output: asis
+import re
+import pandas as pd
+
+meta = pd.read_parquet(Path("dashboard_data/site_metadata.parquet"))
+holdout = meta[meta["role"] == "holdout"].sort_values("site_id")
+
+for _, row in holdout.iterrows():
+    sid = row["site_id"]
+    fname = re.sub(r"[^A-Za-z0-9_-]", "_", sid)
+    print(f"- [{sid}](sites/{fname}.html)")
+```

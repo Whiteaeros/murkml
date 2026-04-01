@@ -1,0 +1,61 @@
+---
+title: "Bayesian Adaptation"
+---
+
+## Adaptation Curve
+
+Performance as a function of the number of local grab samples used for Bayesian adaptation. The curve shows how quickly per-site accuracy improves compared to traditional OLS regression.
+
+```{python}
+#| echo: false
+#| label: fig-adaptation-curve
+from pathlib import Path
+import sys
+sys.path.insert(0, ".")
+from _scripts.figures import make_adaptation_curve
+
+fig = make_adaptation_curve(Path("dashboard_data/summary.json"))
+fig.show()
+```
+
+## How Shrinkage Works
+
+The Bayesian method balances global model predictions against local calibration data. With few samples, it trusts the global model; with more samples, it shifts toward the local correction. The Student-t prior is more conservative than Gaussian at small N (protects against outlier calibration samples) but converges faster at large N for sites with unusual SSC/turbidity ratios.
+
+```{python}
+#| echo: false
+#| label: fig-weight-curve
+from _scripts.figures import make_bayesian_weight_curve
+
+fig = make_bayesian_weight_curve()
+fig.show()
+```
+
+## Zero-Shot Baseline by Site Quality
+
+Three holdout sites showing how the model performs at different quality levels before any local calibration. Each panel shows observed vs predicted SSC at zero-shot.
+
+```{python}
+#| echo: false
+#| label: fig-shrinkage-viz
+from _scripts.figures import make_bayesian_shrinkage_viz
+
+fig = make_bayesian_shrinkage_viz(
+    Path("dashboard_data/per_reading.parquet"),
+    Path("dashboard_data/summary.json"),
+)
+fig.show()
+```
+
+## Adaptation Surprise
+
+Which sites benefit most from adaptation? Sites in the upper-left quadrant were poorly predicted at zero-shot but improved dramatically with calibration samples.
+
+```{python}
+#| echo: false
+#| label: fig-adaptation-surprise
+from _scripts.figures import make_adaptation_surprise
+
+fig = make_adaptation_surprise(Path("dashboard_data/per_site.parquet"))
+fig.show()
+```

@@ -339,6 +339,15 @@ Bayesian wins at EVERY N in EVERY split mode (random, temporal, seasonal). Tempo
 | Ablation without early stopping | Fake flatline collapse (38 features identical -0.22) | early_stopping_rounds=50 |
 | Final model ignores --exclude-sites | v9 trained on holdout+vault (357 sites) | Auto-exclusion + hard guard |
 | Model file overwriting | Lost model versions | Versioned names + git |
+| Precip temporal leakage (Mar 28) | precip_24h/48h used future data | Added .shift(1) for strict antecedent *(Added 2026-03-31, from git forensics and expert review audit)* |
+| Dedup key int64 mismatch (Mar 28) | Nanoseconds format mismatch causing phantom duplicates | Fixed key format *(Added 2026-03-31, from git forensics and expert review audit)* |
+| Weather timezone strip (Mar 28) | Timezone not stripped before date comparison (distinct from Mar 16 discrete-sample tz bug) | Strip timezone before comparison *(Added 2026-03-31, from git forensics and expert review audit)* |
+| QC vectorization bug (Mar 16) | Qualifier matching silently skipped ALL filtering — no QC was applied | Fixed vectorized matching *(Added 2026-03-31, from git forensics and expert review audit)* |
+| Early-stop leakage (Mar 16) | Test data included in validation set during early stopping | Fixed split logic *(Added 2026-03-31, from git forensics and expert review audit)* |
+| Seasonal split bug (Mar 31) | Seasonal split produced identical results to random split | Fixed split implementation *(Added 2026-03-31, from git forensics and expert review audit)* |
+| BCF selection bug (Mar 31) | Wrong BCF applied in some evaluation paths | Fixed BCF dispatch *(Added 2026-03-31, from git forensics and expert review audit)* |
+| Quantile column name bug (Mar 31) | q05 vs q05_ms mismatch silently skipped coverage stats | Fixed column naming *(Added 2026-03-31, from git forensics and expert review audit)* |
+| Dedup policy divergence (Mar 31) | assemble_dataset.py uses old drop_duplicates while qc.py has new deduplicate_discrete() — new logic is unreachable dead code | Unresolved *(Added 2026-03-31, from git forensics and expert review audit)* |
 
 ---
 
@@ -382,3 +391,59 @@ Bayesian wins at EVERY N in EVERY split mode (random, temporal, seasonal). Tempo
 - **Why:** Extreme underprediction is likely a feature deficiency — ML model lacks event-dynamic physics that WEPP simulates (hillslope sediment generation, runoff-erosion coupling).
 - **Possible approaches:** WEPP outputs as CatBoost features, murkml as fast WEPP emulator, hybrid event magnitude correction.
 - **Timeline:** Paper 2 or 3. Discuss with advisor first.
+
+---
+
+## 17. Scientific Discoveries (for paper)
+
+*(Added 2026-03-31, from git forensics and expert review audit)*
+
+1. **Dissolved vs. particulate boundary**: Particle-associated parameters (SSC R²=0.80, TP R²=0.62) transfer cross-site. Dissolved parameters (Nitrate R²=-0.72, OrthoP R²=-1.31) do not. Per-site OLS ceilings of 0.04 (nitrate) and 0.06 (orthoP) confirm this is a physics limit, not modeling failure. This is the primary paper finding.
+
+2. **Nobody uses turbidity in large-scale ML models**: All published cross-site SSC/WQ models (Kratzert, Zhi, Song et al.) use hydromet + watershed attributes only. murkml's use of continuous turbidity is its primary competitive advantage.
+
+3. **Song et al. 2024 is the primary benchmark**: 377 USGS sites, LSTM, PUB test median R²=0.55 (no turbidity). murkml R²=0.80 is +0.25 better. Most directly comparable published result.
+
+4. **"Death of OLS" finding**: CatBoost with 1-parameter Bayesian adaptation using 2 grab samples (R²=0.48) outperforms USGS standard OLS using 50 grab samples (R²=0.40).
+
+5. **Iowa River SSC/TP divergence**: SSC fails (R²=-0.50) while TP succeeds (R²=0.69) at the same loess-dominated site. Turbidity tracks the fine, P-bearing fraction better than total mass in loess systems (Jones et al. 2024). Publishable finding.
+
+6. **GKF5 vs holdout disagreement**: Features neutral on GKF5 CV are critical for holdout generalization. turb_Q_ratio: +0.004 GKF5 vs -0.102 holdout. GKF5 folds lack sufficient geology/climate diversity. Major methodological finding.
+
+7. **Collection method gap quantified**: Auto-point R²=0.377 vs depth-integrated R²=0.548 — a 0.17 gap reflecting vertical concentration gradients. Most operational sensors are fixed-point, meaning the model works worst on the most common deployment.
+
+8. **Geology results match scattering theory**: Carbonate R²=0.823 (uniform optical properties), volcanic R²=0.326 (bimodal particles), unconsolidated R²=0.545.
+
+---
+
+## 18. Strategic Decisions
+
+*(Added 2026-03-31, from git forensics and expert review audit)*
+
+1. **"Stop improving, start writing" consensus (Mar 16-17)**: All 4 reviewers (Chen, Patel, Rivera, Okafor) independently recommended pulling publication forward. Patel: "A submitted R² of 0.80 is infinitely more valuable than an unsubmitted 0.83." Patel also noted: 36 review documents totaling ~40,000 words for ~2,000 lines of Python — marginal value of additional internal review is now zero.
+
+2. **Three-paper publication strategy**: (1) Zenodo dataset deposit, (2) JOSS software paper (after 6-month review clock), (3) WRR research paper. Venue ranking: WRR first (values negative results), EMS second (software focus), HESS third.
+
+3. **Paper framing**: "What transfers and what does not" — the particulate/dissolved boundary as the main finding. Negative results ARE the discussion section.
+
+4. **Three-tier product output**: Screening Grade (zero-shot, widest CIs), Monitoring Grade (10+ calibration samples, medium CIs), Publication Grade (30+ samples matching USGS standards, tightest CIs).
+
+5. **Physics panel 5-parameter suite (Mar 16)**: Confirmed SSC, TP, Nitrate+Nitrite, DO, TDS as the parameter suite. Excluded E. coli, metals, alkalinity, individual ions, BOD/COD. Species-level decisions: SSC never TSS (Gray et al. 2000), Nitrate+Nitrite not Total Nitrogen, TP primary / OrthoP secondary.
+
+6. **Geographic bias in training set**: CA (60), OR (40), KS (33) = nearly 50% of candidates. Zero coverage of loess belt, iron range, arid Southwest, Gulf Coastal Plain, SE Piedmont. 35-site targeted gap-fill plan was designed (Vasquez & Rivera) but not yet executed.
+
+7. **Torres regulatory positioning**: murkml is a screening tool, NOT compliance tool. Specific precision thresholds for each parameter. Trust barriers ranked: (1) black box, (2) uncalibrated uncertainty, (3) no institutional credibility, (4) "my watershed" skepticism, (5) tool complexity.
+
+8. **Temporal stationarity testing missing**: No split-by-time validation, no year-over-year bias trends, no change-point detection, no sensor drift analysis. Required for operational deployment claims.
+
+9. **Okafor's infrastructure gap analysis**: No config file, no data versioning/lineage, no pipeline orchestration (Makefile/DVC), no parameter-specific QC dispatch, no dataset manifest.
+
+---
+
+## 19. Project Inception (backfilled)
+
+*(Added 2026-03-31, from git forensics and expert review audit)*
+
+**Kansas Feasibility Test (Mar 15)**: 5 Kansas sites, 2,362 SSC samples, 92.6% match rate at ±15min alignment window. This test validated that the core concept — aligning discrete grab samples with continuous turbidity sensors — was feasible at scale. The high match rate proved the project was viable before any modeling began.
+
+**17-site Cross-Site Transfer Proof (Mar 16)**: First evidence that a single CatBoost model (LOGO R²=0.84) could predict SSC across sites it had never seen. This was the publishable result that justified the entire project direction.

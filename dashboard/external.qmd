@@ -1,0 +1,22 @@
+---
+title: "External Validation"
+---
+
+## Cross-Network NTU Validation
+
+The strongest test of generalization: 260 sites from 6 non-USGS monitoring networks using NTU sensors (not FNU). The model has never seen these sites, these sensors, or these organizations during training.
+
+```{python}
+#| echo: false
+#| label: fig-external-validation
+from pathlib import Path
+import sys
+sys.path.insert(0, ".")
+from _scripts.figures import make_external_validation
+
+fig = make_external_validation(
+    Path("dashboard_data/ext_external_predictions.parquet"),
+    Path("dashboard_data/ext_external_validation_summary.json"),
+)
+fig.show()
+```

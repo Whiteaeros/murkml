@@ -1,0 +1,15 @@
+---
+title: "About"
+---
+
+## murkml
+
+Cross-site suspended sediment concentration (SSC) prediction using CatBoost and Bayesian site adaptation.
+
+**Model:** v10-clean-dualbcf — 254 training sites, 72 features, Box-Cox lambda=0.2, dual BCF.
+
+**Author:** Kaleb — University of Idaho, Water Science and Management.
+
+**Paper:** In preparation for Water Resources Research.
+
+**Code:** [github.com/Whiteaeros/murkml](https://github.com/Whiteaeros/murkml)

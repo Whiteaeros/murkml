@@ -1,0 +1,38 @@
+project:
+  type: website
+  output-dir: _site
+
+website:
+  title: "murkml Dashboard"
+  navbar:
+    left:
+      - text: "Overview"
+        href: index.qmd
+      - text: "Performance"
+        href: performance.qmd
+      - text: "Adaptation"
+        href: adaptation.qmd
+      - text: "Sites"
+        href: sites.qmd
+      - text: "External"
+        href: external.qmd
+      - text: "Uncertainty"
+        href: uncertainty.qmd
+      - text: "Diagnostics"
+        href: diagnostics.qmd
+      - text: "About"
+        href: about.qmd
+  page-footer:
+    center: "murkml — SSC prediction from turbidity across 254 USGS sites"
+
+format:
+  html:
+    theme: cosmo
+    toc: true
+    code-fold: true
+    code-tools: false
+
+execute:
+  freeze: auto
+
+jupyter: murkml

@@ -1,0 +1,53 @@
+---
+title: "Prediction Intervals"
+---
+
+::: {.callout-warning}
+## CQR Model Training In Progress
+The MultiQuantile CQR model is currently training. These figures will be populated with real prediction interval data when training completes. Until then, placeholder panels are shown.
+:::
+
+## CQR Calibration
+
+When available, this will show how well-calibrated the prediction intervals are. Points near the diagonal indicate that a 90% interval actually contains 90% of observations.
+
+```{python}
+#| echo: false
+#| label: fig-cqr-calibration
+from pathlib import Path
+import sys
+sys.path.insert(0, ".")
+from _scripts.figures import make_cqr_calibration
+
+fig = make_cqr_calibration(Path("dashboard_data/per_reading.parquet"))
+fig.show()
+```
+
+## Prediction Interval Fan Plot
+
+When available, this will show time series with prediction intervals for selected holdout sites. Intervals should widen during storm events (high uncertainty) and narrow during baseflow (low uncertainty).
+
+```{python}
+#| echo: false
+#| label: fig-cqr-fan-plot
+from _scripts.figures import make_cqr_fan_plot
+
+fig = make_cqr_fan_plot(Path("dashboard_data/per_reading.parquet"))
+fig.show()
+```
+
+## Coverage by Regime
+
+When available, this will show whether the 90% interval maintains its coverage across different SSC ranges and collection methods. Drops below 90% indicate the model is overconfident in that regime.
+
+```{python}
+#| echo: false
+#| label: fig-cqr-coverage-regime
+from _scripts.figures import make_cqr_coverage_by_regime
+
+fig = make_cqr_coverage_by_regime(
+    Path("dashboard_data/per_reading.parquet"),
+    Path("dashboard_data/diag_disaggregated_metrics.parquet"),
+)
+fig.show()
+```

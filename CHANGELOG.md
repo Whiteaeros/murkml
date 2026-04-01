@@ -4,13 +4,42 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
-### Added
-- Initial project structure
-- Data pipeline: USGS data fetching, QC filtering, temporal alignment
-- Feature engineering for sensor time-series
-- CatBoost cross-site baseline model
+### In Progress
+- CQR MultiQuantile model training for prediction intervals
+- Paper writing (WRR target)
 
-## [2026-03-30] — Phase 3: Pipeline Fixes & Data Corrections
+## [2026-03-31] — v10 Clean Model + Paper Prep
+
+### v10-clean-dualbcf (CURRENT BEST)
+- Properly excludes holdout (76) + vault (36) from training (auto-exclusion + hard guard)
+- 254 training sites, 22,995 samples, 72 features, 446 trees
+- LOGO CV: R²(log)=0.756, KGE=0.777, MedSiteR²=0.395, RMSE=127.4 mg/L
+- Dual BCF: bcf_mean=1.327 (loads), bcf_median=1.021 (individual predictions)
+- 135 anomalous records cleaned from dataset (SSC/turb ratio >200 or <0.01, turb<=0, SSC<=0)
+- Seasonal split bug fixed (was producing identical results to random)
+
+### Holdout Evaluation (76 sites, bcf_median)
+- MedSiteR²=0.393, MAPE=41.7%, Within-2x=70.3%, Spearman=0.873, Bias=-26.4%
+- Adaptation (N=10, random): MedSiteR²=0.492, MAPE=36.4%, Within-2x=76.1%
+- External NTU (260 sites, 11K samples): Spearman=0.927, MAPE=53%, Bias=-46%
+
+### Paper-Ready Analyses
+- OLS benchmark: CatBoost beats OLS at every N (N=10: R²=0.492 vs 0.365)
+- Bootstrap CIs (95%): MedSiteR²=0.409 [0.144, 0.459], Spearman=0.873 [0.842, 0.886]
+- evaluate_model.py defaults to bcf_median (--bcf-mode flag added)
+
+### v9 CONTAMINATION DISCOVERED
+- v9 was trained on 357 sites including 76 holdout + 36 vault — all v9 numbers are invalid
+- Root cause: --exclude-sites flag was silently ignored by training code
+- Fix: auto-exclusion from split file + hard guard assertion in train_tiered.py
+
+### Project Hygiene
+- Moved 9 historical docs (panel briefings, gemini reviews) to reviews/
+- Moved 10 completed plan docs to docs/historical/
+- Fixed .gitignore: added cache/, gap_fill.log, *.code-workspace
+- Updated PIPELINE.md: GAGES-II references replaced with StreamCat + SGMC
+
+## [2026-03-30] — Phase 3-5: Pipeline Fixes, Diagnostics, Ablation
 
 ### Bug Fixes (evaluate_model.py — from Gemini red-team review)
 - hash() → hashlib.md5() for deterministic cross-session seeding of adaptation trials
