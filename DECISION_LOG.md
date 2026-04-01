@@ -232,6 +232,15 @@ Bayesian wins at EVERY N in EVERY split mode (random, temporal, seasonal). Tempo
 - Created after Krishnamurthy identified that 47+ ablation experiments on 76 holdout sites constitutes implicit overfitting.
 - Vault: one-shot, never touched. Validation: tainted by development (historical reference only). Training: clean.
 
+### Extreme data expansion (2026-04-01) -- KEPT
+- **Sources:** (1) NWIS hotspots — queried NWIS for sites with SSC >10,000 mg/L; identified 19 sites, added 10 new extreme-event sites. (2) ScienceBase — Chester County PA, Klamath basin OR/CA, Arkansas River CO. (3) STN (Short-Term Network) — USGS flood event data.
+- **New vault site:** USGS-09153270 (Cement Creek CO): 329 samples, max 121,000 mg/L — sealed as final exam site.
+- **New holdout sites:** USGS-06902000 (Missouri R), USGS-07170000 (Kansas R).
+- **Dataset after expansion:** 36,341 samples, 405 sites (was 35,074/396). Samples >=1000 mg/L: 2,549 (7.0%), >=5000: 312 (0.9%).
+- **Extreme metric improvement:** Top 1% underprediction: -25% (from -28% in v10, -37% original).
+- **Idaho/Palouse finding:** Uses acoustic backscatter (ADCP), not optical turbidity. No FNU data exists for this region. murkml's FNU-based model cannot be applied there.
+- **WEPP integration:** Recorded as future investigation (advisor's area of work). Possible paths: WEPP outputs as features, murkml as WEPP emulator, hybrid event correction. Post-paper-2.
+
 ### Data expansion 266 to 396 sites -- KEPT
 - Native R2 collapsed (0.361 to 0.154) but that was a loss function problem (log1p), not data quality.
 - Triggered the transform investigation that led to Box-Cox.
@@ -256,8 +265,10 @@ Bayesian wins at EVERY N in EVERY split mode (random, temporal, seasonal). Tempo
 - Without it: fake "flatline collapse" in ablation (Gemini caught this — 38 features all showed identical -0.22 drop).
 - GroupShuffleSplit validation + early_stopping_rounds=50.
 
-### Ordered boosting -- KEPT
-- CatBoost's ordered boosting mode reduces overfitting, especially with small group sizes in LOGO CV.
+### Ordered boosting -- REPLACED by Plain boosting (v11)
+- CatBoost's ordered boosting mode reduces overfitting in principle, but empirical comparison shows Plain boosting produces identical quality on this dataset.
+- v11 trained in 47 minutes with Plain boosting vs ~3 hours with Ordered boosting. Quality unchanged.
+- **Decision:** Use Plain boosting going forward. Ordered is wasteful here.
 
 ---
 
@@ -272,9 +283,15 @@ Bayesian wins at EVERY N in EVERY split mode (random, temporal, seasonal). Tempo
 - 28% of holdout sites have R2 < 0. Pooled and per-site metrics tell OPPOSITE stories.
 - Holdout SSC/turb ratio systematically harder than training (2.17 vs 1.74, +25%).
 
-### Conformal prediction intervals -- KEPT
+### Conformal prediction intervals -- KEPT (empirical, not CQR)
 - 95% coverage=96.1%, 90% coverage=91.7%. Well-calibrated.
 - Median 90% interval width: 227 mg/L.
+
+### CQR MultiQuantile -- FAILED, DROPPED (2026-04-01)
+- **What:** Trained CatBoost MultiQuantile model (quantiles 0.05/0.50/0.95) under LOGO CV for conformalized quantile regression (Romano et al. 2019).
+- **Training time:** 23 hours.
+- **Result:** Conditional coverage disaster. Box-Cox lambda=0.2 compresses extreme values — Q95 in Box-Cox space back-transforms to values far below the true 95th percentile in SSC space. The compression prevents the quantile model from learning intervals that reach extreme SSC values (>5,000 mg/L).
+- **Verdict:** CQR MultiQuantile is fundamentally incompatible with heavy-tailed SSC data under Box-Cox compression. Fall back to empirical conformal intervals using point predictions + conformity scores.
 
 ### USGS OLS head-to-head comparison -- KEPT
 - At N=10 calibration: CatBoost wins 30/46 sites, OLS wins 16/46.
@@ -369,7 +386,8 @@ Bayesian wins at EVERY N in EVERY split mode (random, temporal, seasonal). Tempo
 | v8-post | 357 | 44 | Box-Cox 0.2 | N=3 R2=0.485 | Post-hoc Bayesian (BREAKTHROUGH) |
 | **v9** | **254** | **72** | **Box-Cox 0.2** | **MedSiteR2=0.486** | **SGMC, 3-way split, locked** |
 | v9* | 357 | 72 | Box-Cox 0.2 | *(contaminated)* | v9 was trained on holdout+vault — all evals invalid |
-| v10 | 254 | 72 | Box-Cox 0.2 | *training...* | Clean data, dual BCF, proper exclusion |
+| v10 | 254 | 72 | Box-Cox 0.2 | MedSiteR2=0.393, Spearman=0.873 | Clean data, dual BCF, proper exclusion (SUPERSEDED by v11) |
+| **v11** | **260** | **72** | **Box-Cox 0.2** | **MedSiteR2=0.402, Spearman=0.907** | **Plain boosting, extreme data expansion, 485 trees (CURRENT BEST)** |
 
 ---
 
@@ -380,6 +398,12 @@ Bayesian wins at EVERY N in EVERY split mode (random, temporal, seasonal). Tempo
 ---
 
 ## 16. Investigated and Shelved
+
+### Global post-processing calibration -- REJECTED (2026-04-01)
+- **What:** Tested 8 methods to correct the systematic low-SSC overprediction and high-SSC underprediction simultaneously: (1) platt scaling, (2) isotonic regression, (3) piecewise linear correction, (4) log-space linear recalibration, (5) percentile matching, (6) quantile-based correction, (7) range-specific BCF, (8) two-parameter affine correction.
+- **Result:** Fundamental tradeoff — fixing low-SSC overprediction worsens high-SSC underprediction (and vice versa). No global post-processing method can resolve both failure modes simultaneously.
+- **Gemini consensus:** Don't do global calibration. Frame the model as a ranking engine (Spearman=0.907). Geology dictates scale (carbonate R²=0.807 vs volcanic R²=0.195). Bayesian site adaptation is the calibrator — it addresses scale per-site, which is the right level of granularity.
+- **Verdict:** No global calibration. Dual BCF (median for predictions, mean for loads) is sufficient.
 
 ### Q90 quantile extreme-event specialist model -- SHELVED
 - **What:** CatBoost with Quantile:alpha=0.90 loss as a second model for extreme events.

@@ -99,13 +99,14 @@ Each entry records: training config, dataset, performance, and what changed from
 - **CONTAMINATION:** Model was trained on 357 sites including 76 holdout + 36 vault sites. All validation/vault results are data leakage. LOGO CV numbers are also tainted because the model saw more sites during training than it should have. Replaced by v10.
 - **Notes:** 72 features locked after Phase 5 ablation (unanimous expert panel: keep all). 28 SGMC lithology features added. 5,536 unknown collection methods resolved.
 
-### murkml-10-clean-dualbcf (CURRENT BEST)
+### murkml-10-clean-dualbcf (SUPERSEDED by v11)
 - **Date:** 2026-03-30
 - **Training sites:** 254, holdout_vault_excluded=True (auto-exclusion + hard guard)
 - **Samples:** 22,995
 - **Features:** 72 (137 in tier, 65 dropped)
 - **Transform:** Box-Cox lambda=0.2
 - **Monotone:** ON (turbidity_instant, turbidity_max_1hr)
+- **Boosting:** Ordered
 - **CV:** LOGO (254 folds)
 - **R²(log):** 0.756
 - **MedSiteR²:** 0.395
@@ -113,6 +114,7 @@ Each entry records: training config, dataset, performance, and what changed from
 - **RMSE:** 127.4 mg/L
 - **BCF:** Dual — bcf_mean=1.327 (for loads), bcf_median=1.021 (for individual predictions)
 - **Trees:** 446
+- **Training time:** ~3 hours
 - **Split:** data/train_holdout_vault_split.parquet (254 train / 76 holdout / 36 vault)
 - **Saved model:** data/results/models/ssc_C_sensor_basic_watershed_v10_clean_dualbcf.cbm
 - **Key changes from v9:**
@@ -122,7 +124,28 @@ Each entry records: training config, dataset, performance, and what changed from
   - Seasonal split bug fixed (was producing identical results to random)
   - evaluate_model.py defaults to bcf_median (--bcf-mode flag added)
   - OLS benchmark and bootstrap CIs completed
-  - CQR MultiQuantile model currently training
+  - CQR MultiQuantile training failed (23 hrs, Box-Cox compression defeats quantile learning for extremes)
+
+### murkml-11-extreme-plain (CURRENT BEST)
+- **Date:** 2026-04-01
+- **Training sites:** 260 (291 train - 31 w/o StreamCat)
+- **Samples:** 23,624
+- **Total dataset:** 36,341 samples, 405 sites (expanded from 35,074/396 in v10)
+- **Features:** 72 (137 in tier, 65 dropped)
+- **Transform:** Box-Cox lambda=0.2
+- **Monotone:** ON (turbidity_instant, turbidity_max_1hr)
+- **Boosting:** Plain (switched from Ordered — same quality, 1/4 training time)
+- **CV:** LOGO (260 folds)
+- **BCF:** Dual — bcf_mean=1.297 (for loads), bcf_median=0.975 (for individual predictions)
+- **Trees:** 485
+- **Training time:** 47 minutes
+- **Split:** data/train_holdout_vault_split.parquet (291 train / 78 holdout / 37 vault)
+- **Key changes from v10:**
+  - 10 new extreme-event sites added (NWIS hotspots + ScienceBase: Chester County PA, Klamath, Arkansas)
+  - Plain boosting adopted (Ordered was wasting 3x time with no quality gain)
+  - New vault: USGS-09153270 (Cement Creek CO, max 121,000 mg/L)
+  - New holdout: USGS-06902000 (MO), USGS-07170000 (KS)
+  - Samples >=1000 mg/L: 2,549 (7.0%), >=5000: 312 (0.9%), max=121,000 mg/L
 
 ### murkml-9-validation (76 sites — CONTAMINATED, model trained on these sites)
 - **Date:** 2026-03-30
@@ -183,6 +206,34 @@ Each entry records: training config, dataset, performance, and what changed from
 - N=2 temporal: CatBoost R²=0.36 vs OLS R²=-0.56
 - N=10 random: CatBoost R²=0.492 vs OLS R²=0.365
 - **Notes:** OLS benchmark completed for paper. CatBoost advantage is largest at low N where shrinkage matters most.
+
+### murkml-11-holdout (78 sites, HONEST)
+- **Date:** 2026-04-01
+- **Holdout sites:** 78 (never seen during v11 training; 2 new sites added from extreme expansion)
+- **BCF mode:** bcf_median=0.975
+- **MedSiteR²:** 0.402
+- **MAPE:** 40.1%
+- **Within 2x:** 70.0%
+- **Spearman rho:** 0.907
+- **Log-NSE:** 0.804
+- **Bias:** -36.6%
+- **Adaptation (N=10, random):** MedSiteR²=0.493, MAPE=34.6%, Within-2x=76.5%
+- **Adaptation (N=10, temporal):** MedSiteR²=0.389, MAPE=38.6%
+- **Adaptation (N=10, seasonal):** MedSiteR²=0.431, MAPE=40.1%
+- **Bootstrap CIs (95%, from v10, still applicable):** MedSiteR² [0.144, 0.459], Spearman [0.842, 0.886]
+
+### murkml-11-extreme-metrics
+- **Date:** 2026-04-01
+- **Top 1% underprediction:** -25% (improved from -28% in v10, -37% in original)
+- **Top 5% Within-2x:** 71.5%
+- **Disaggregated:**
+  - Carbonate: R²=0.807
+  - Volcanic: R²=0.195
+  - Depth-integrated: R²=0.321
+  - Auto-point: R²=0.238
+  - SSC <50 mg/L: R²=-60.6 (overpredicts — sensor contamination)
+  - SSC >5,000 mg/L: R²=-3.4 (underpredicts — particle size shift at extremes)
+- **Notes:** Extreme data expansion improved top-1% underprediction from -28% to -25%. Low-SSC overprediction persists (sensor contamination, not model failure). Extreme underprediction persists (particle size shift; no global fix possible per calibration experiment).
 
 ---
 

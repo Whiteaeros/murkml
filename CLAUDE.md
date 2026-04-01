@@ -6,26 +6,50 @@
 
 **Owner:** Kaleb — water science student, graduating mid-2026. Not on a deadline. Exploring what's possible, with eventual commercial product and paper goals.
 
-## Current State (2026-03-30 evening)
+## Current State (2026-04-01)
 
-**Current model: v10-clean-dualbcf (BEST)**
-- CatBoost, 254 training sites, 22,995 samples, 72 features (137 in tier, 65 dropped)
-- Box-Cox lambda=0.2, Dual BCF (bcf_mean=1.327 for loads, bcf_median=1.021 for individual predictions)
-- holdout_vault_excluded=True, 446 trees
-- LOGO CV (254 sites): R²(log)=0.756, KGE=0.777, MedSiteR²=0.395, RMSE=127.4 mg/L
-- Holdout (76 sites, bcf_median): MedSiteR²=0.393, MAPE=41.7%, Within-2x=70.3%, Spearman=0.873, Bias=-26.4%
-- Adaptation (N=10, random, bcf_median): MedSiteR²=0.492, MAPE=36.4%, Within-2x=76.1%
-- Adaptation (N=10, temporal): MedSiteR²=0.405, MAPE=36.9%
-- **External (260 NTU sites, 11K samples): Spearman=0.927, MAPE=53%, Bias=-46%**
-- **OLS benchmark: CatBoost beats OLS at every N** (N=10 random: R²=0.492 vs OLS R²=0.365)
-- **Bootstrap CIs (95%): MedSiteR²=0.409 [0.144, 0.459], Spearman=0.873 [0.842, 0.886]**
-- Model: data/results/models/ssc_C_sensor_basic_watershed_v10_clean_dualbcf.cbm
-- **NOTE:** v9 was contaminated — trained on 357 sites including 76 holdout + 36 vault. All v9 numbers are invalid.
+**Current model: v11 (BEST — supersedes v10)**
+- CatBoost, 260 training sites, 23,624 samples, 72 features (137 in tier, 65 dropped)
+- Box-Cox lambda=0.2, **Plain boosting** (not Ordered), 485 trees
+- BCF_mean=1.297 (for loads), BCF_median=0.975 (for individual predictions)
+- Trained in 47 minutes (vs ~3 hrs for Ordered boosting — same quality, 1/4 the time)
+- Dataset expanded: 36,341 total samples, 405 sites (was 35,074/396 in v10)
+  - 10 new extreme-event sites from NWIS hotspots + ScienceBase
+  - New vault: USGS-09153270 (Cement Creek CO, 329 samples, max 121,000 mg/L)
+  - New holdout: USGS-06902000 (MO), USGS-07170000 (KS)
+- Samples >=1000 mg/L: 2,549 (7.0%), >=5000: 312 (0.9%), max=121,000 mg/L
+- Split: 291 train / 78 holdout / 37 vault
+
+**v11 Holdout (78 sites, bcf_median):**
+- MedSiteR²=0.402, MAPE=40.1%, Within-2x=70.0%, Spearman=0.907, Log-NSE=0.804, Bias=-36.6%
+
+**v11 Adaptation:**
+- N=10 random: MedSiteR²=0.493, MAPE=34.6%, Within-2x=76.5%
+- N=10 temporal: MedSiteR²=0.389, MAPE=38.6%
+- N=10 seasonal: MedSiteR²=0.431, MAPE=40.1%
+
+**v11 Extreme metrics:**
+- Top 1% underprediction: -25% (improved from -28% v10, -37% original)
+- Top 5%: Within-2x=71.5%
+
+**v11 Disaggregated:**
+- Carbonate: R²=0.807, Volcanic: R²=0.195
+- Depth-integrated: R²=0.321, Auto-point: R²=0.238
+- SSC <50: R²=-60.6 (overpredicts), >5K: R²=-3.4 (underpredicts)
+
+**OLS benchmark: CatBoost beats at every N** (N=2 temporal delta=+0.93)
+
+**Bootstrap CIs (95%, from v10, still applicable):** MedSiteR² [0.144, 0.459], Spearman [0.842, 0.886]
+
+**v10 superseded.** v10 was first honest model (254 sites, 22,995 samples). See MODEL_VERSIONS.md.
+**NOTE:** v9 was contaminated — trained on 357 sites including 76 holdout + 36 vault. All v9 numbers are invalid.
 
 **Bayesian site adaptation (the killer feature):**
 - Student-t shrinkage (k=15, df=4), staged: intercept-only N<10, slope+intercept N>=10
 - CatBoost beats OLS at every N (N=2 temporal: R²=0.36 vs OLS R²=-0.56)
 - External NTU data: Spearman=0.927 zero-shot on foreign sensors/networks
+- Global post-processing calibration tested (8 methods) — fundamental tradeoff: fixing low-SSC overprediction worsens high-SSC underprediction. No global fix possible.
+- Gemini consensus: frame model as ranking engine (Spearman=0.907), geology dictates scale, Bayesian adaptation is the calibrator.
 
 **Key findings from 100+ experiments:**
 - Site heterogeneity is THE problem — no architecture change fixes it
@@ -41,12 +65,16 @@
 - Site contribution analysis: 110 anchors, 110 noise, but noise sites are essential (keep all training sites)
 
 **Data state:**
-- 396 total sites, 35,209 samples in paired dataset
+- 405 total sites, 36,341 samples in paired dataset (expanded from 396/35,074 in v10)
+- 10 new extreme-event sites: NWIS hotspots (19 sites identified, 10 added), ScienceBase (Chester County PA, Klamath, Arkansas), STN flood events
 - Collection methods: depth_integrated 15,381, auto_point 14,444, grab 4,638, unknown 746
 - 28 SGMC watershed lithology features (355 sites with coverage)
 - 260 external NTU validation sites (11K samples, 6 organizations)
 - 65 features on drop list (`data/optimized_drop_list.txt`), always pass via `--drop-features`
-- 3-way split: data/train_holdout_vault_split.parquet (254 train / 76 holdout / 36 vault; 135 anomalous records cleaned)
+- 3-way split: data/train_holdout_vault_split.parquet (291 train / 78 holdout / 37 vault; 135 anomalous records cleaned)
+- New vault site: USGS-09153270 (Cement Creek CO, 329 samples, max 121,000 mg/L)
+- New holdout sites: USGS-06902000 (MO), USGS-07170000 (KS)
+- Idaho/Palouse: acoustic backscatter not optical turbidity — no FNU data exists there
 
 **Completed phases:**
 - Phase 3: Pipeline fixes (Gemini bugs, SGMC integration, collection methods, staged Bayesian)
@@ -55,13 +83,16 @@
 - evaluate_model.py: staged Bayesian adaptation (Student-t, per-trial BCF shrunk toward 1.0)
 - SGMC lithology: 28 watershed geology features integrated into train_tiered.py
 - Collection methods: 5,536 unknown samples resolved via WQP metadata (unknown 6,282→746)
+- CQR MultiQuantile: FAILED — Box-Cox compression prevents Q95 from reaching extreme values. Conditional coverage disaster. Fall back to empirical conformal intervals.
+- Calibration experiment (8 global post-processing methods tested) — no global fix possible (fundamental tradeoff)
+- Extreme data expansion: NWIS hotspots, ScienceBase, STN flood events
+- Plain boosting adopted (same quality as Ordered, 1/4 the time)
 
 **What's next:**
-- CQR MultiQuantile model currently training (~3 hrs) for prediction intervals
+- Empirical conformal prediction intervals (fallback from CQR MultiQuantile)
 - Paper writing (WRR target)
-- Seasonal split bug was fixed (was producing identical results to random)
-- evaluate_model.py defaults to bcf_median now (--bcf-mode flag added)
-- OLS benchmark and bootstrap CIs completed
+- Vault one-shot (37 sites, LAST — after paper methodology finalized)
+- WEPP integration: future investigation (advisor's work, post-paper)
 
 ## How the Pipeline Works
 
@@ -89,10 +120,11 @@
    → Tier B: + basic attrs (42 features, 396 sites)
    → Tier C: + StreamCat + SGMC (137 features pre-drop, 72 post-drop, 357 sites)
 
-6. TRAINING: CatBoost with Box-Cox lambda=0.2, monotone, Dual BCF (mean for loads, median for predictions)
+6. TRAINING: CatBoost with Box-Cox lambda=0.2, monotone, Plain boosting, Dual BCF (mean for loads, median for predictions)
    Script: scripts/train_tiered.py
    Flags: --param ssc --tier C --transform boxcox --boxcox-lambda 0.2 --n-jobs 12
           --drop-features "$(cat data/optimized_drop_list.txt)"
+          --boosting-type Plain  (Ordered is slow; Plain is equivalent for this dataset)
    → data/results/models/ssc_*.cbm + *_meta.json
 
 7. EVALUATION:
@@ -123,7 +155,7 @@
 
 - SSC only (param 80154), NOT TSS (00530) — different methods
 - Turbidity FNU only (param 63680), NOT NTU (00076) — diverge above 400
-- Target: Box-Cox(SSC, lambda=0.2) with Dual BCF (bcf_mean=1.327 for loads, bcf_median=1.021 for individual predictions)
+- Target: Box-Cox(SSC, lambda=0.2) with Dual BCF (bcf_mean=1.297 for loads, bcf_median=0.975 for individual predictions) [v11 values]
 - All timestamps UTC
 - DO saturation: Benson & Krause (1984) polynomial ONLY — never linear approx
 - QC qualifiers come as array strings `"['ICE' 'EQUIP']"` — must parse this format
@@ -176,5 +208,5 @@ Reference implementation: `scripts/download_gap_fill_fast.py`
 - **Python venv:** `.venv/Scripts/python` (Windows). UV-managed, cpython 3.12.9. **NOT base conda.**
 - **Random seed:** 42 everywhere
 - **Parallelization:** joblib with 12 workers (24-core i9)
-- **CatBoost:** v1.2.10, Ordered boosting
+- **CatBoost:** v1.2.10, Plain boosting (switched from Ordered in v11 — same quality, 1/4 the time)
 - **Weather data format:** `data/weather/USGS_{site_no}/daily_weather.parquet`, cols: date, precip_mm, tmax_c, tmin_c, tmean_c

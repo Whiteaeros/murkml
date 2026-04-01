@@ -4,7 +4,50 @@ Reference for paper writing. Captures key results, expert panel findings, and de
 
 ---
 
-## v10 Clean Model Results (2026-03-30) — CURRENT BEST
+## v11 Results (2026-04-01) — CURRENT BEST
+
+**v10 superseded.** v11 adds extreme data expansion + Plain boosting.
+
+**Model:** ssc_C_sensor_basic_watershed_v11_extreme_plain.cbm (or equivalent versioned name)
+- 260 training sites, 23,624 samples, 72 features (137 in tier, 65 dropped)
+- Box-Cox lambda=0.2, Plain boosting, 485 trees, 47-minute training time
+- BCF_mean=1.297 (loads), BCF_median=0.975 (individual predictions)
+- Dataset: 36,341 total samples, 405 sites
+
+**Holdout (78 sites, bcf_median):**
+- MedSiteR²=0.402, MAPE=40.1%, Within-2x=70.0%, Spearman=0.907, Log-NSE=0.804, Bias=-36.6%
+
+**Adaptation:**
+- N=10 random: MedSiteR²=0.493, MAPE=34.6%, Within-2x=76.5%
+- N=10 temporal: MedSiteR²=0.389, MAPE=38.6%
+- N=10 seasonal: MedSiteR²=0.431, MAPE=40.1%
+
+**Extreme metrics:**
+- Top 1% underprediction: -25% (improved from -28% v10, -37% original)
+- Top 5% Within-2x: 71.5%
+
+**Disaggregated:**
+- Carbonate: R²=0.807, Volcanic: R²=0.195
+- Depth-integrated: R²=0.321, Auto-point: R²=0.238
+- SSC <50 mg/L: R²=-60.6 (overpredicts), SSC >5,000 mg/L: R²=-3.4 (underpredicts)
+
+**OLS benchmark:** CatBoost beats OLS at every N. N=2 temporal delta=+0.93.
+
+**Bootstrap CIs (95%, from v10, still applicable):** MedSiteR² [0.144, 0.459], Spearman [0.842, 0.886]
+
+### Key decisions from this session:
+1. Plain boosting sufficient — same quality as Ordered in 1/4 the time (47 min vs ~3 hrs).
+2. CQR MultiQuantile failed after 23-hour training run — Box-Cox compression prevents Q95 from reaching extreme SSC values. Fall back to empirical conformal intervals.
+3. 8 global calibration methods tested — fundamental tradeoff: fixing low-SSC worsens high-SSC. No global fix. Gemini consensus: model is a ranking engine, Bayesian adaptation is the calibrator.
+4. Extreme data expansion: NWIS hotspots, ScienceBase (Chester County PA, Klamath, Arkansas), STN flood events.
+5. New vault: USGS-09153270 (Cement Creek CO, max 121,000 mg/L). New holdout: USGS-06902000, USGS-07170000.
+6. Idaho/Palouse uses acoustic backscatter — no FNU data. murkml inapplicable there.
+7. Q90 extreme specialist shelved (Tanaka red team — features lack extreme information).
+8. WEPP integration recorded as future investigation (post-paper-2).
+
+---
+
+## v10 Clean Model Results (2026-03-30) — SUPERSEDED by v11
 
 **v9 was contaminated:** trained on 357 sites including 76 holdout + 36 vault. All v9 validation/vault numbers were data leakage. v10 properly excludes holdout/vault (auto-exclusion + hard guard). 135 anomalous records cleaned from dataset.
 
