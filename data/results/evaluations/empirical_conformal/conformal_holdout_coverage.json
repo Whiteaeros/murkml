@@ -1,0 +1,148 @@
+{
+  "description": "Holdout validation of empirical conformal intervals on v11_extreme holdout set",
+  "holdout_set": {
+    "source": "v11_extreme_eval_per_reading.parquet",
+    "n_rows": 6026,
+    "n_sites": 78
+  },
+  "binned_approach": {
+    "90pct": {
+      "target_coverage": 0.9,
+      "overall_coverage": 0.9057417855957517,
+      "overall_median_width_mgL": 184.22194668456322,
+      "per_bin": {
+        "0-30": {
+          "n_holdout": 2223,
+          "coverage": 0.9199280251911831,
+          "median_width": 42.9484263401415,
+          "mean_width": 42.06044146127802
+        },
+        "30-100": {
+          "n_holdout": 1414,
+          "coverage": 0.9144271570014144,
+          "median_width": 184.22194668456322,
+          "mean_width": 179.4458579767678
+        },
+        "100-500": {
+          "n_holdout": 1808,
+          "coverage": 0.8871681415929203,
+          "median_width": 710.3092021618595,
+          "mean_width": 692.5587284018856
+        },
+        "500-2000": {
+          "n_holdout": 550,
+          "coverage": 0.9090909090909091,
+          "median_width": 2385.4883833133254,
+          "mean_width": 2333.4610274294705
+        },
+        "2000+": {
+          "n_holdout": 31,
+          "coverage": 0.5161290322580645,
+          "median_width": 8304.425930122135,
+          "mean_width": 8184.897428792157
+        }
+      }
+    },
+    "80pct": {
+      "target_coverage": 0.8,
+      "overall_coverage": 0.7738134749419183,
+      "overall_median_width_mgL": 88.0321973572992,
+      "per_bin": {
+        "0-30": {
+          "n_holdout": 2223,
+          "coverage": 0.7629329734592892,
+          "median_width": 21.516809278996664,
+          "mean_width": 19.43564195850637
+        },
+        "30-100": {
+          "n_holdout": 1414,
+          "coverage": 0.78995756718529,
+          "median_width": 88.0321973572992,
+          "mean_width": 86.48506523159114
+        },
+        "100-500": {
+          "n_holdout": 1808,
+          "coverage": 0.7643805309734514,
+          "median_width": 398.5152692497145,
+          "mean_width": 381.6957142501064
+        },
+        "500-2000": {
+          "n_holdout": 550,
+          "coverage": 0.8309090909090909,
+          "median_width": 1437.3478447060745,
+          "mean_width": 1433.926520329252
+        },
+        "2000+": {
+          "n_holdout": 31,
+          "coverage": 0.3548387096774194,
+          "median_width": 4972.584515198351,
+          "mean_width": 4972.5845151983485
+        }
+      }
+    }
+  },
+  "continuous_approach": {
+    "90pct": {
+      "overall_coverage": 0.9034185197477597,
+      "overall_median_width_mgL": 208.7483718277534,
+      "per_bin": {
+        "0-30": {
+          "n_holdout": 2223,
+          "coverage": 0.9109311740890689,
+          "median_width": 40.93958616549929
+        },
+        "30-100": {
+          "n_holdout": 1414,
+          "coverage": 0.9207920792079208,
+          "median_width": 190.50052453443786
+        },
+        "100-500": {
+          "n_holdout": 1808,
+          "coverage": 0.8838495575221239,
+          "median_width": 621.5335934740709
+        },
+        "500-2000": {
+          "n_holdout": 550,
+          "coverage": 0.9327272727272727,
+          "median_width": 2485.5738479888205
+        },
+        "2000+": {
+          "n_holdout": 31,
+          "coverage": 0.1935483870967742,
+          "median_width": 3253.512769991278
+        }
+      }
+    },
+    "80pct": {
+      "overall_coverage": 0.7816130102887487,
+      "overall_median_width_mgL": 105.45777313982705,
+      "per_bin": {
+        "0-30": {
+          "n_holdout": 2223,
+          "coverage": 0.7683310841205578,
+          "median_width": 18.689458718383577
+        },
+        "30-100": {
+          "n_holdout": 1414,
+          "coverage": 0.8104667609618105,
+          "median_width": 96.06086147232745
+        },
+        "100-500": {
+          "n_holdout": 1808,
+          "coverage": 0.7754424778761062,
+          "median_width": 345.69001660308305
+        },
+        "500-2000": {
+          "n_holdout": 550,
+          "coverage": 0.8181818181818182,
+          "median_width": 1443.9335285347531
+        },
+        "2000+": {
+          "n_holdout": 31,
+          "coverage": 0.12903225806451613,
+          "median_width": 2030.4868775366226
+        }
+      }
+    }
+  }
+}
