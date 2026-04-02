@@ -2111,11 +2111,11 @@ def make_data_sankey(summary_json_path: str | Path) -> go.Figure:
     """
     summary = _load_json(Path(summary_json_path))
 
-    # Default funnel numbers (v11: 405 total sites, 291/78/37 split)
+    # Default funnel numbers (v11: 405 total sites, 260/78/37 split + extras)
     discovered = 860
     qualified = 413
     paired = 405
-    train = 291
+    train = 260
     holdout = 78
     vault = 37
 
@@ -2129,6 +2129,8 @@ def make_data_sankey(summary_json_path: str | Path) -> go.Figure:
         holdout = funnel.get("holdout", holdout)
         vault = funnel.get("vault", vault)
 
+    dropped = paired - train - holdout - vault  # sites paired but not in any split
+
     labels = [
         f"Discovered ({discovered})",
         f"Qualified ({qualified})",
@@ -2139,9 +2141,12 @@ def make_data_sankey(summary_json_path: str | Path) -> go.Figure:
         f"Filtered ({discovered - qualified})",
         f"Unpaired ({qualified - paired})",
     ]
+    if dropped > 0:
+        labels.append(f"Dropped ({dropped})")
 
     # Node indices: 0=discovered, 1=qualified, 2=paired, 3=train,
-    #               4=holdout, 5=vault, 6=filtered, 7=unpaired
+    #               4=holdout, 5=vault, 6=filtered, 7=unpaired,
+    #               8=dropped (if any)
     source = [0, 0, 1, 1, 2, 2, 2]
     target = [1, 6, 2, 7, 3, 4, 5]
     value = [
@@ -2153,6 +2158,21 @@ def make_data_sankey(summary_json_path: str | Path) -> go.Figure:
         holdout,
         vault,
     ]
+    link_colors = [
+        "rgba(86,180,233,0.3)",   # discovered -> qualified
+        "rgba(153,153,153,0.3)",   # discovered -> filtered
+        "rgba(0,158,115,0.3)",     # qualified -> paired
+        "rgba(153,153,153,0.3)",   # qualified -> unpaired
+        "rgba(0,114,178,0.3)",     # paired -> train
+        "rgba(230,159,0,0.3)",     # paired -> holdout
+        "rgba(204,121,167,0.3)",   # paired -> vault
+    ]
+
+    if dropped > 0:
+        source.append(2)
+        target.append(8)
+        value.append(dropped)
+        link_colors.append("rgba(153,153,153,0.3)")  # paired -> dropped
 
     node_colors = [
         COLORS["blue"],       # discovered
@@ -2164,6 +2184,8 @@ def make_data_sankey(summary_json_path: str | Path) -> go.Figure:
         COLORS["gray"],       # filtered out
         COLORS["gray"],       # unpaired
     ]
+    if dropped > 0:
+        node_colors.append(COLORS["gray"])  # dropped
 
     fig = go.Figure(
         go.Sankey(
@@ -2178,15 +2200,7 @@ def make_data_sankey(summary_json_path: str | Path) -> go.Figure:
                 source=source,
                 target=target,
                 value=value,
-                color=[
-                    "rgba(86,180,233,0.3)",   # discovered -> qualified
-                    "rgba(153,153,153,0.3)",   # discovered -> filtered
-                    "rgba(0,158,115,0.3)",     # qualified -> paired
-                    "rgba(153,153,153,0.3)",   # qualified -> unpaired
-                    "rgba(0,114,178,0.3)",     # paired -> train
-                    "rgba(230,159,0,0.3)",     # paired -> holdout
-                    "rgba(204,121,167,0.3)",   # paired -> vault
-                ],
+                color=link_colors,
             ),
         )
     )
@@ -2829,15 +2843,6 @@ def make_rating_curve(
 
     apply_plotly_style(fig)
     return fig
-
-
-# ---------------------------------------------------------------------------
-# CQR Prediction Interval figures
-# ---------------------------------------------------------------------------
-
-# CQR quantile column names to detect real data
-_CQR_QUANTILE_COLS = ["q05", "q10", "q15", "q20", "q25", "q45", "q50",
-                       "q55", "q75", "q80", "q85", "q90", "q95"]
 
 
 # ---------------------------------------------------------------------------
@@ -3931,122 +3936,423 @@ def _categorize_feature(name: str) -> str:
 
 def make_shap_beeswarm(
     shap_path: str | Path | None = None,
-    per_reading_path: str | Path | None = None,
-    model_meta_path: str | Path | None = None,
-    model_path: str | Path | None = None,
+    feature_values_path: str | Path | None = None,
+    top_n: int = 15,
+    **_kwargs,
 ) -> go.Figure:
-    """Feature importance bar chart from CatBoost model or SHAP values.
+    """SHAP beeswarm plot — each dot is one sample's SHAP value for a feature.
 
-    If a SHAP values file exists at *shap_path*, uses those.  Otherwise
-    loads the CatBoost model directly to extract built-in feature importances.
-    Falls back to a placeholder if neither is available.
+    Dots are colored by the raw feature value (blue=low, red=high) so you can
+    see whether high feature values push predictions up or down.  Features are
+    ranked by mean |SHAP| (most important at the top).
 
-    Top 15 features are shown, colored by feature category (sensor, watershed,
-    weather, geology, method).
+    Requires shap_values.parquet and shap_feature_values.parquet with aligned
+    rows.  Falls back to a bar chart of mean |SHAP| if feature values are
+    unavailable.
     """
-    feat_names = None
-    feat_importances = None
-
-    # Strategy 1: SHAP file
-    if shap_path is not None:
-        sp = Path(shap_path)
-        if sp.exists():
-            try:
-                shap_df = pd.read_parquet(sp)
-                mean_abs = shap_df.abs().mean().sort_values(ascending=False)
-                feat_names = mean_abs.index.tolist()[:15]
-                feat_importances = mean_abs.values[:15]
-            except Exception:
-                pass
-
-    # Strategy 2: CatBoost model file (explicit paths)
-    if feat_names is None and model_path is not None:
-        mp = Path(model_path)
-        meta_p = Path(model_meta_path) if model_meta_path else None
-        if mp.exists():
-            try:
-                from catboost import CatBoostRegressor
-                m = CatBoostRegressor()
-                m.load_model(str(mp))
-                fi = m.get_feature_importance()
-                if meta_p and meta_p.exists():
-                    meta = _load_json(meta_p)
-                    cols = meta.get("feature_cols", [])
-                else:
-                    cols = [f"feature_{i}" for i in range(len(fi))]
-                order = np.argsort(fi)[::-1][:15]
-                feat_names = [cols[i] for i in order]
-                feat_importances = fi[order]
-            except Exception:
-                pass
-
-    # Strategy 3: Default model paths
-    if feat_names is None:
-        default_model = Path("data/results/models/ssc_C_sensor_basic_watershed_v10_clean_dualbcf.cbm")
-        default_meta = Path("data/results/models/ssc_C_sensor_basic_watershed_v10_clean_dualbcf_meta.json")
-        if default_model.exists():
-            try:
-                from catboost import CatBoostRegressor
-                m = CatBoostRegressor()
-                m.load_model(str(default_model))
-                fi = m.get_feature_importance()
-                meta = _load_json(default_meta) if default_meta.exists() else {}
-                cols = meta.get("feature_cols", [f"feature_{i}" for i in range(len(fi))])
-                order = np.argsort(fi)[::-1][:15]
-                feat_names = [cols[i] for i in order]
-                feat_importances = fi[order]
-            except Exception:
-                pass
-
-    if feat_names is None or feat_importances is None:
+    if shap_path is None:
         fig = go.Figure()
         fig.add_annotation(
             x=0.5, y=0.5, xref="paper", yref="paper",
-            text="No feature importance data available",
+            text="No SHAP data available — pass shap_path",
             showarrow=False, font=dict(size=16),
         )
         fig.update_layout(height=550)
         apply_plotly_style(fig)
         return fig
 
-    # Build bar chart — top 15, colored by category
-    categories = [_categorize_feature(f) for f in feat_names]
-    colors = [_FEATURE_CATEGORIES[c][1] for c in categories]
+    sp = Path(shap_path)
+    if not sp.exists():
+        fig = go.Figure()
+        fig.add_annotation(
+            x=0.5, y=0.5, xref="paper", yref="paper",
+            text="SHAP values file not found",
+            showarrow=False, font=dict(size=16),
+        )
+        fig.update_layout(height=550)
+        apply_plotly_style(fig)
+        return fig
 
-    # Reverse so highest importance is at the top of the horizontal bar chart
-    feat_names = feat_names[::-1]
-    feat_importances = feat_importances[::-1]
-    colors = colors[::-1]
-    categories = categories[::-1]
+    shap_df = pd.read_parquet(sp)
+
+    # Rank features by mean |SHAP|
+    mean_abs = shap_df.abs().mean().sort_values(ascending=False)
+    top_features = mean_abs.index.tolist()[:top_n]
+
+    # Load feature values for coloring
+    has_fv = False
+    fv_df = None
+    if feature_values_path is not None:
+        fvp = Path(feature_values_path)
+        if fvp.exists():
+            fv_df = pd.read_parquet(fvp)
+            has_fv = True
 
     fig = go.Figure()
 
-    # Group traces by category for legend
+    for rank, feat in enumerate(reversed(top_features)):
+        y_pos = rank  # bottom = least important, top = most
+        shap_vals = shap_df[feat].values
+
+        # Jitter y to spread dots vertically (beeswarm effect)
+        rng = np.random.RandomState(42 + rank)
+        jitter = rng.normal(0, 0.15, size=len(shap_vals))
+        y_jittered = y_pos + jitter
+
+        is_numeric = (
+            has_fv
+            and feat in fv_df.columns
+            and fv_df[feat].dtype.kind in ("f", "i", "u")
+        )
+        if is_numeric:
+            raw_vals = fv_df[feat].astype(float).values
+            # Normalize to 0-1 for coloring (handle NaN and constant features)
+            finite = raw_vals[np.isfinite(raw_vals)]
+            if len(finite) > 0:
+                vmin = float(np.percentile(finite, 2))
+                vmax = float(np.percentile(finite, 98))
+            else:
+                vmin, vmax = 0.0, 1.0
+            if vmax == vmin:
+                normed = np.full(len(raw_vals), 0.5)
+            else:
+                normed = np.clip((raw_vals - vmin) / (vmax - vmin), 0, 1)
+            normed = np.where(np.isfinite(normed), normed, 0.5)
+
+            fig.add_trace(go.Scattergl(
+                x=shap_vals,
+                y=y_jittered,
+                mode="markers",
+                marker=dict(
+                    size=3,
+                    color=normed,
+                    colorscale=[[0, COLORS["blue"]], [0.5, "#EEEEEE"], [1, COLORS["vermillion"]]],
+                    showscale=(rank == len(top_features) - 1),
+                    colorbar=dict(
+                        title="Feature<br>value",
+                        tickvals=[0, 1],
+                        ticktext=["Low", "High"],
+                        len=0.5,
+                        thickness=12,
+                        x=1.02,
+                    ) if rank == len(top_features) - 1 else None,
+                    opacity=0.6,
+                ),
+                showlegend=False,
+                hovertemplate=(
+                    f"{feat}<br>"
+                    "SHAP: %{x:.3f}<br>"
+                    "Feature value: %{customdata:.2g}<extra></extra>"
+                ),
+                customdata=raw_vals,
+            ))
+        else:
+            # No feature values — color by SHAP sign
+            colors_arr = np.where(
+                shap_vals >= 0,
+                COLORS["vermillion"],
+                COLORS["blue"],
+            )
+            fig.add_trace(go.Scattergl(
+                x=shap_vals,
+                y=y_jittered,
+                mode="markers",
+                marker=dict(size=3, color=colors_arr, opacity=0.6),
+                showlegend=False,
+                hovertemplate=f"{feat}<br>SHAP: %{{x:.3f}}<extra></extra>",
+            ))
+
+    # Y-axis: feature names
+    fig.update_layout(
+        title="SHAP Beeswarm — Feature Contributions to Predictions",
+        xaxis_title="SHAP value (impact on prediction)",
+        yaxis=dict(
+            tickvals=list(range(top_n)),
+            ticktext=list(reversed(top_features)),
+            tickfont=dict(size=10),
+        ),
+        height=max(500, top_n * 28),
+        showlegend=False,
+    )
+
+    # Zero reference line
+    fig.add_vline(x=0, line=dict(color=REF_COLOR, width=1, dash="dot"))
+
+    apply_plotly_style(fig)
+    return fig
+
+
+def make_shap_bar_chart(
+    importance_path: str | Path,
+    top_n: int = 15,
+) -> go.Figure:
+    """Horizontal bar chart of mean |SHAP| values, colored by feature category."""
+    df = pd.read_parquet(Path(importance_path))
+
+    top = df.nlargest(top_n, "mean_abs_shap")
+
+    # Reverse for horizontal bars (highest at top)
+    top = top.iloc[::-1].reset_index(drop=True)
+
+    categories = [_categorize_feature(f) for f in top["feature"]]
+    colors = [_FEATURE_CATEGORIES[c][1] for c in categories]
+
+    fig = go.Figure()
+
     seen_cats: set[str] = set()
-    for i, (fname, imp, color, cat) in enumerate(
-        zip(feat_names, feat_importances, colors, categories)
-    ):
+    for i, row in top.iterrows():
+        cat = categories[i]
         cat_label = _FEATURE_CATEGORIES[cat][0]
         show = cat not in seen_cats
         seen_cats.add(cat)
         fig.add_trace(go.Bar(
-            y=[fname],
-            x=[imp],
+            y=[row["feature"]],
+            x=[row["mean_abs_shap"]],
             orientation="h",
-            marker_color=color,
+            marker_color=colors[i],
             name=cat_label,
             showlegend=show,
             legendgroup=cat,
-            hovertemplate=f"{fname}: %{{x:.1f}}<extra>{cat_label}</extra>",
+            hovertemplate=f"{row['feature']}: %{{x:.3f}}<extra>{cat_label}</extra>",
         ))
 
     fig.update_layout(
-        title="Top 15 Feature Importances (CatBoost)",
-        xaxis_title="Importance",
-        yaxis_title="",
-        height=550,
+        title=f"Top {top_n} Features by Mean |SHAP| Value",
+        xaxis_title="Mean |SHAP value|",
+        height=500,
         barmode="stack",
-        legend=dict(x=0.65, y=0.05, bgcolor="rgba(255,255,255,0.85)"),
+    )
+
+    apply_plotly_style(fig)
+    return fig
+
+
+# ---------------------------------------------------------------------------
+# Regime-sliced SHAP analysis
+# ---------------------------------------------------------------------------
+
+def make_shap_regime_heatmap(
+    shap_path: str | Path,
+    feature_values_path: str | Path,
+    top_n: int = 20,
+) -> go.Figure:
+    """Heatmap: mean |SHAP| per feature (rows) across turbidity regimes (columns).
+
+    Shows how feature importance shifts from low turbidity (clear water)
+    to extreme events. Each cell is the mean |SHAP| for that feature within
+    that turbidity bin, normalized per-row so the color shows relative
+    importance shift, not absolute magnitude.
+    """
+    sv = pd.read_parquet(Path(shap_path))
+    fv = pd.read_parquet(Path(feature_values_path))
+
+    # Define turbidity regimes
+    turb = fv["turbidity_instant"].values
+    bins = [
+        ("< 10 FNU", turb < 10),
+        ("10–50", (turb >= 10) & (turb < 50)),
+        ("50–200", (turb >= 50) & (turb < 200)),
+        ("200–1000", (turb >= 200) & (turb < 1000)),
+        ("> 1000", turb >= 1000),
+    ]
+
+    # Rank features by overall mean |SHAP|
+    overall = sv.abs().mean().sort_values(ascending=False)
+    top_features = overall.index.tolist()[:top_n]
+
+    # Build matrix: features × regimes
+    matrix = []
+    regime_labels = []
+    regime_counts = []
+    for label, mask in bins:
+        n = int(mask.sum())
+        if n < 5:
+            continue
+        regime_labels.append(f"{label}\n(n={n})")
+        regime_counts.append(n)
+        mean_shap = sv.loc[mask, top_features].abs().mean()
+        matrix.append(mean_shap.values)
+
+    matrix = np.array(matrix).T  # (n_features, n_regimes)
+
+    # Normalize each row (feature) to show relative shift
+    row_max = matrix.max(axis=1, keepdims=True)
+    row_max[row_max == 0] = 1
+    normed = matrix / row_max
+
+    fig = go.Figure(data=go.Heatmap(
+        z=normed,
+        x=regime_labels,
+        y=top_features,
+        colorscale=[[0, "white"], [0.3, COLORS["sky_blue"]], [0.7, COLORS["blue"]], [1.0, COLORS["vermillion"]]],
+        colorbar=dict(title="Relative<br>importance", thickness=12, len=0.6),
+        hovertemplate=(
+            "Feature: %{y}<br>"
+            "Regime: %{x}<br>"
+            "Mean |SHAP|: %{customdata:.3f}<br>"
+            "Relative: %{z:.2f}<extra></extra>"
+        ),
+        customdata=matrix,
+    ))
+
+    fig.update_layout(
+        title=f"Feature Importance by Turbidity Regime (top {top_n})",
+        xaxis_title="Turbidity Regime",
+        yaxis=dict(autorange="reversed", tickfont=dict(size=9)),
+        height=max(500, top_n * 24),
+    )
+
+    apply_plotly_style(fig)
+    return fig
+
+
+def make_shap_regime_by_group(
+    shap_path: str | Path,
+    feature_values_path: str | Path,
+    group_col: str = "collection_method",
+    top_n: int = 15,
+) -> go.Figure:
+    """Grouped bar chart: mean |SHAP| for top features, split by a categorical variable.
+
+    Each group (e.g., collection method or geology class) gets its own color.
+    Features ranked by overall importance.
+    """
+    sv = pd.read_parquet(Path(shap_path))
+    fv = pd.read_parquet(Path(feature_values_path))
+
+    if group_col not in fv.columns:
+        fig = go.Figure()
+        fig.add_annotation(
+            x=0.5, y=0.5, xref="paper", yref="paper",
+            text=f"Column '{group_col}' not found in feature values",
+            showarrow=False, font=dict(size=14),
+        )
+        fig.update_layout(height=400)
+        apply_plotly_style(fig)
+        return fig
+
+    # Top features by overall importance
+    overall = sv.abs().mean().sort_values(ascending=False)
+    top_features = overall.index.tolist()[:top_n]
+
+    # Get groups (drop tiny ones)
+    groups = fv[group_col].value_counts()
+    groups = groups[groups >= 20].index.tolist()
+
+    palette = [COLORS["blue"], COLORS["orange"], COLORS["green"],
+               COLORS["vermillion"], COLORS["sky_blue"], COLORS["purple"],
+               COLORS["gray"], COLORS["yellow"]]
+
+    fig = go.Figure()
+
+    for gi, grp in enumerate(groups):
+        mask = fv[group_col] == grp
+        mean_shap = sv.loc[mask, top_features].abs().mean()
+        n = int(mask.sum())
+        fig.add_trace(go.Bar(
+            y=top_features[::-1],
+            x=mean_shap.values[::-1],
+            orientation="h",
+            name=f"{grp} (n={n})",
+            marker_color=palette[gi % len(palette)],
+            hovertemplate="%{y}: %{x:.3f}<extra>" + grp + "</extra>",
+        ))
+
+    fig.update_layout(
+        title=f"Feature Importance by {group_col.replace('_', ' ').title()}",
+        xaxis_title="Mean |SHAP value|",
+        height=max(500, top_n * 30),
+        barmode="group",
+    )
+
+    apply_plotly_style(fig)
+    return fig
+
+
+def make_shap_interaction_heatmap(
+    interaction_path: str | Path,
+    top_n: int = 20,
+) -> go.Figure:
+    """Heatmap of mean |SHAP interaction| values between feature pairs.
+
+    The diagonal shows each feature's self-interaction (main effect).
+    Off-diagonal cells show how strongly two features interact — i.e.,
+    the effect of one feature depends on the value of the other.
+    """
+    df = pd.read_parquet(Path(interaction_path))
+
+    # Rank by diagonal (main effect) to pick top features
+    diag = np.diag(df.values)
+    top_idx = np.argsort(diag)[::-1][:top_n]
+    top_feats = [df.columns[i] for i in top_idx]
+
+    sub = df.loc[top_feats, top_feats].values
+
+    # Zero out diagonal for off-diagonal visibility
+    sub_offdiag = sub.copy()
+    np.fill_diagonal(sub_offdiag, 0)
+
+    fig = go.Figure(data=go.Heatmap(
+        z=sub_offdiag,
+        x=top_feats,
+        y=top_feats,
+        colorscale=[[0, "white"], [0.2, COLORS["sky_blue"]], [0.6, COLORS["blue"]], [1.0, COLORS["vermillion"]]],
+        colorbar=dict(title="Mean |interaction|", thickness=12, len=0.6),
+        hovertemplate="Row: %{y}<br>Col: %{x}<br>Interaction: %{z:.4f}<extra></extra>",
+    ))
+
+    fig.update_layout(
+        title=f"SHAP Feature Interactions (top {top_n}, diagonal zeroed)",
+        height=max(600, top_n * 28),
+        xaxis=dict(tickfont=dict(size=9), tickangle=45),
+        yaxis=dict(tickfont=dict(size=9), autorange="reversed"),
+    )
+
+    apply_plotly_style(fig)
+    return fig
+
+
+def make_shap_failure_comparison(
+    per_site_shap_path: str | Path,
+    failure_shap_path: str | Path,
+    top_n: int = 15,
+) -> go.Figure:
+    """Side-by-side: mean |SHAP| for all sites vs failure sites (R² < 0).
+
+    Shows which features the model relies on differently when it fails.
+    """
+    all_sites = pd.read_parquet(Path(per_site_shap_path))
+    failures = pd.read_parquet(Path(failure_shap_path))
+
+    all_mean = all_sites.mean().sort_values(ascending=False)
+    top_feats = all_mean.index.tolist()[:top_n]
+
+    all_vals = all_mean[top_feats].values
+    fail_vals = failures[top_feats].mean().values if len(failures) > 0 else np.zeros(top_n)
+
+    fig = go.Figure()
+
+    fig.add_trace(go.Bar(
+        y=top_feats[::-1],
+        x=all_vals[::-1],
+        orientation="h",
+        name=f"All sites (n={len(all_sites)})",
+        marker_color=COLORS["blue"],
+    ))
+
+    fig.add_trace(go.Bar(
+        y=top_feats[::-1],
+        x=fail_vals[::-1],
+        orientation="h",
+        name=f"Failure sites (n={len(failures)}, R² < 0)",
+        marker_color=COLORS["vermillion"],
+    ))
+
+    fig.update_layout(
+        title="Feature Importance: All Sites vs Failure Sites",
+        xaxis_title="Mean |SHAP value|",
+        height=max(450, top_n * 30),
+        barmode="group",
     )
 
     apply_plotly_style(fig)

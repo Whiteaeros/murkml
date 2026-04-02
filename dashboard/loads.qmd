@@ -85,7 +85,7 @@ fig.show()
 
 ## Metrics Summary
 
-The full quantitative comparison across sites, time scales, and methods. "All Days" includes zero-transport days (where USGS reported 0 tons); "Transport Days" filters to days with ≥1 ton (the days that matter for load budgets). R² measures explained variance (higher is better), Spearman measures rank correlation (does the method know which days are big?), Bias % shows systematic over/underprediction, and Load Ratio is total predicted ÷ total observed (1.00 = perfect match, 2.00 = doubled the true load). Orange-tinted rows are v11; red-tinted rows are OLS.
+The full quantitative comparison across sites, time scales, and methods. "All Days" includes zero-transport days (where USGS reported 0 tons); "Transport Days" filters to days with ≥1 ton (the days that matter for load budgets). R² measures explained variance (higher is better), Spearman measures rank correlation (does the method know which days are big?), Bias % shows systematic over/underprediction, and Load Ratio is total predicted ÷ total observed (1.00 = perfect match, 2.00 = doubled the true load). Blue-tinted rows are v11; gray-tinted rows are OLS.
 
 ```{python}
 #| echo: false

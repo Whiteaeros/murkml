@@ -48,7 +48,7 @@ fig.show()
 
 ## Data Funnel
 
-Building a cross-site dataset requires strict quality filters at every step — and each filter removes sites, reducing the final sample. This Sankey diagram traces that attrition: starting from 860 candidate USGS gauges that have both turbidity and SSC sensors, sites are progressively excluded for lacking overlapping records, insufficient sample counts, missing watershed attributes (land cover, geology), or falling into the reserved vault set. Understanding how many sites were lost at each step — and why — is critical for assessing whether the final 291 training sites are representative of US streams in general.
+Building a cross-site dataset requires strict quality filters at every step — and each filter removes sites, reducing the final sample. This Sankey diagram traces that attrition: starting from 860 candidate USGS gauges that have both turbidity and SSC sensors, sites are progressively excluded for lacking overlapping records, insufficient sample counts, missing watershed attributes (land cover, geology), or falling into the reserved vault set. Understanding how many sites were lost at each step — and why — is critical for assessing whether the final 260 training sites are representative of US streams in general.
 
 ```{python}
 #| echo: false
@@ -116,16 +116,125 @@ fig.show()
 
 ## Feature Importance
 
-The model uses 72 input features: the turbidity reading itself, plus watershed characteristics such as land cover fractions, soil texture, geology, drainage area, and long-term climate averages. This figure ranks features by how much they influence predictions using SHAP (SHapley Additive exPlanations) values — a method that assigns each feature a contribution to each prediction, then averages over all predictions. Features at the top of the chart shift predictions the most. Colors group features by category (sensor-derived, soil, geology, climate, land cover) so patterns across categories are visible. If turbidity dominates overwhelmingly, the watershed features may not be adding much; if watershed features rank highly alongside turbidity, the model is genuinely learning site-specific context.
+The model uses 72 input features: the turbidity reading itself, plus watershed characteristics such as land cover fractions, soil texture, geology, drainage area, and long-term climate averages. To understand which features matter and *how* they matter, we use SHAP (SHapley Additive exPlanations) — a method that computes each feature's contribution to each individual prediction.
 
-<!-- TODO: Verify the SHAP beeswarm figure renders with labeled axes and a color legend for feature categories — cannot confirm without rendered output. -->
+### Beeswarm Plot
+
+Each dot in this plot represents one of the 6,026 holdout observations. Dots are spread horizontally by how much that feature pushed the prediction up (right) or down (left) for that particular observation. Features are ranked vertically — the most influential at the top. Dot color shows the raw feature value: blue means the feature was low for that observation, red means it was high. This lets you read *direction*: for example, if the `turbidity_instant` row shows red dots clustered to the right, that means high turbidity pushes predictions upward, which is physically expected. A feature where blue and red dots are intermixed without clear direction contributes to predictions but in a context-dependent way (its effect depends on other features).
 
 ```{python}
 #| echo: false
 #| label: fig-feature-importance
 from _scripts.figures import make_shap_beeswarm
 
-fig = make_shap_beeswarm()
+fig = make_shap_beeswarm(
+    shap_path=Path("dashboard_data/deep_holdout_shap_values.parquet"),
+    feature_values_path=Path("dashboard_data/deep_holdout_feature_values.parquet"),
+    top_n=137,
+)
+fig.show()
+```
+
+### Bar Chart View
+
+The same features, ranked by average importance (mean |SHAP value|), colored by category. This view is simpler to read for comparing magnitudes — which features matter most overall — but doesn't show direction. The beeswarm above tells you *how* each feature influences predictions; the bars below tell you *how much*.
+
+```{python}
+#| echo: false
+#| label: fig-feature-importance-bars
+from _scripts.figures import make_shap_bar_chart
+
+fig = make_shap_bar_chart(Path("dashboard_data/shap_importance.parquet"))
+fig.show()
+```
+
+## Feature Importance by Regime
+
+The overall feature importance tells you what matters *on average* — but the model may rely on completely different features during a low-flow baseflow period versus a major storm event. This section slices the full 6,026-sample holdout SHAP data by turbidity regime and by collection method to reveal those shifts.
+
+### By Turbidity Regime
+
+Each row is a feature; each column is a turbidity range (low to extreme). Color intensity shows how important that feature is *relative to its own maximum across regimes* — so a bright cell means "this feature matters most in this regime." Look for features that light up only at the extremes (storm-specific drivers) or only at low turbidity (baseflow confounders). If turbidity_instant dominates uniformly across all regimes, the model isn't doing much beyond a simple rating curve; if watershed features light up at high turbidity, the model is genuinely using site context when it matters most.
+
+```{python}
+#| echo: false
+#| label: fig-shap-regime-heatmap
+from _scripts.figures import make_shap_regime_heatmap
+
+fig = make_shap_regime_heatmap(
+    Path("dashboard_data/deep_holdout_shap_values.parquet"),
+    Path("dashboard_data/deep_holdout_feature_values.parquet"),
+    top_n=25,
+)
+fig.show()
+```
+
+### By Collection Method
+
+Different sampling methods introduce different biases. Depth-integrated samples capture the full water column and are considered the gold standard; auto-point samplers grab water at a fixed depth (often near the bank); manual grab samples are the least consistent. If the model leans heavily on `collection_method` for one group but not another, it's compensating for a systematic measurement difference rather than learning hydrology. This figure shows whether the model's feature usage shifts depending on how the sample was collected.
+
+```{python}
+#| echo: false
+#| label: fig-shap-by-method
+from _scripts.figures import make_shap_regime_by_group
+
+fig = make_shap_regime_by_group(
+    Path("dashboard_data/deep_holdout_shap_values.parquet"),
+    Path("dashboard_data/deep_holdout_feature_values.parquet"),
+    group_col="collection_method",
+    top_n=15,
+)
+fig.show()
+```
+
+### By Geology Class
+
+The dominant bedrock type controls sediment grain size, mineral composition, and how turbidity relates to SSC. A model that "knows" geology should adjust its feature usage depending on the watershed type — for example, relying more on hydrograph features in flashy shale watersheds and more on baseflow chemistry in carbonate terrain. This figure shows whether that pattern exists.
+
+```{python}
+#| echo: false
+#| label: fig-shap-by-geology
+from _scripts.figures import make_shap_regime_by_group
+
+fig = make_shap_regime_by_group(
+    Path("dashboard_data/deep_holdout_shap_values.parquet"),
+    Path("dashboard_data/deep_holdout_feature_values.parquet"),
+    group_col="geol_class",
+    top_n=15,
+)
+fig.show()
+```
+
+## Feature Interactions
+
+Two features *interact* when the effect of one depends on the value of the other. For example, turbidity's impact on predicted SSC might be larger in shale watersheds than in granite ones — that's a turbidity × geology interaction. This matrix shows the strength of every pairwise interaction among the top 20 features, computed via SHAP interaction values on 2,000 holdout samples. The diagonal (self-interaction, i.e., the main effect) is zeroed out so that off-diagonal interactions are visible. Strong off-diagonal cells reveal where the model is doing something more sophisticated than additive feature effects — it's learning conditional relationships between features.
+
+```{python}
+#| echo: false
+#| label: fig-shap-interactions
+from _scripts.figures import make_shap_interaction_heatmap
+
+fig = make_shap_interaction_heatmap(
+    Path("dashboard_data/deep_interaction_values.parquet"),
+    top_n=20,
+)
+fig.show()
+```
+
+## Failure Site Analysis
+
+About 23% of holdout sites have R² < 0, meaning the model is worse than predicting the site's long-run average. What's going wrong at these sites? This figure compares the average feature importance across all 78 holdout sites (blue) against only the 18 failure sites (red). If a feature is much more important at failure sites, the model may be over-relying on it when it shouldn't be. If a feature is much *less* important, the model may be ignoring a signal it needs. Differences here point toward what would need to change — either in the model or in the data — to rescue these sites.
+
+```{python}
+#| echo: false
+#| label: fig-shap-failure
+from _scripts.figures import make_shap_failure_comparison
+
+fig = make_shap_failure_comparison(
+    Path("dashboard_data/deep_per_site_shap.parquet"),
+    Path("dashboard_data/deep_failure_site_shap.parquet"),
+    top_n=20,
+)
 fig.show()
 ```
 

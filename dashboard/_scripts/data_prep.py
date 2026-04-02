@@ -82,6 +82,50 @@ def prep():
             shutil.copy(f, DASH_DATA / f"conformal_{f.name}")
         print(f"  Copied empirical conformal ({len(list(conformal_dir.iterdir()))} files)")
 
+    # --- SHAP values and feature importance ---
+    shap_vals = EVAL_DIR.parent / "shap_values_ssc_C_sensor_basic_watershed_v11.parquet"
+    shap_imp = EVAL_DIR.parent / "shap_importance_ssc_C_sensor_basic_watershed_v11.parquet"
+    if shap_vals.exists():
+        shutil.copy(shap_vals, DASH_DATA / "shap_values.parquet")
+        print(f"  Copied shap_values.parquet ({shap_vals.stat().st_size // 1024} KB)")
+    if shap_imp.exists():
+        shutil.copy(shap_imp, DASH_DATA / "shap_importance.parquet")
+        print(f"  Copied shap_importance.parquet ({shap_imp.stat().st_size // 1024} KB)")
+
+    # Generate CatBoost built-in feature importance as JSON
+    model_dir = PROJECT_ROOT / "data" / "results" / "models"
+    model_cbm = model_dir / "ssc_C_sensor_basic_watershed_v11_extreme_expanded.cbm"
+    model_meta = model_dir / "ssc_C_sensor_basic_watershed_v11_extreme_expanded_meta.json"
+    if model_cbm.exists() and model_meta.exists():
+        try:
+            from catboost import CatBoostRegressor
+            import numpy as np
+            m = CatBoostRegressor()
+            m.load_model(str(model_cbm))
+            with open(model_meta) as f:
+                meta = json.load(f)
+            fi = m.get_feature_importance()
+            cols = meta["feature_cols"]
+            order = np.argsort(fi)[::-1]
+            importance = [{"feature": cols[i], "importance": float(fi[i])} for i in order]
+            with open(DASH_DATA / "feature_importance.json", "w") as f:
+                json.dump(importance, f, indent=2)
+            print(f"  Generated feature_importance.json ({len(importance)} features)")
+        except Exception as e:
+            print(f"  Warning: Could not generate feature importance: {e}")
+
+    # --- Deep SHAP (full holdout, interactions, per-site) ---
+    shap_deep_dir = PROJECT_ROOT / "data" / "results" / "shap_deep"
+    latest_marker = shap_deep_dir / "LATEST"
+    if latest_marker.exists():
+        latest_ts = latest_marker.read_text().strip()
+        deep_dir = shap_deep_dir / latest_ts
+        if deep_dir.exists():
+            for f in deep_dir.iterdir():
+                if f.suffix in (".parquet", ".json", ".npy"):
+                    shutil.copy(f, DASH_DATA / f"deep_{f.name}")
+            print(f"  Copied deep SHAP ({latest_ts})")
+
     # --- Sediment load comparison (v11 vs OLS vs USGS 80155) ---
     load_dir = EVAL_DIR / "load_comparison"
     if load_dir.exists():

@@ -2,7 +2,7 @@
 title: "Site Explorer"
 ---
 
-The 396 sites in this dataset span the continental United States, covering a wide range of climates, geology types, land uses, and watershed sizes. This page lets you explore how the model performs across that geographic and hydrologic diversity. The three-way split — training, holdout, vault — ensures that model evaluation is honest: holdout and vault sites were never used to make any modeling decisions, so their performance reflects true out-of-sample generalization. The vault set is reserved for a single, irreversible final evaluation at the end of the project (used once, to avoid unconsciously optimizing for it).
+The 405 sites in this dataset span the continental United States, covering a wide range of climates, geology types, land uses, and watershed sizes. This page lets you explore how the model performs across that geographic and hydrologic diversity. The three-way split — training, holdout, vault — ensures that model evaluation is honest: holdout and vault sites were never used to make any modeling decisions, so their performance reflects true out-of-sample generalization. The vault set is reserved for a single, irreversible final evaluation at the end of the project (used once, to avoid unconsciously optimizing for it).
 
 ## Site Map
 
