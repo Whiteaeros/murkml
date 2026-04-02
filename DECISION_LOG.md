@@ -471,3 +471,43 @@ Bayesian wins at EVERY N in EVERY split mode (random, temporal, seasonal). Tempo
 **Kansas Feasibility Test (Mar 15)**: 5 Kansas sites, 2,362 SSC samples, 92.6% match rate at ±15min alignment window. This test validated that the core concept — aligning discrete grab samples with continuous turbidity sensors — was feasible at scale. The high match rate proved the project was viable before any modeling began.
 
 **17-site Cross-Site Transfer Proof (Mar 16)**: First evidence that a single CatBoost model (LOGO R²=0.84) could predict SSC across sites it had never seen. This was the publishable result that justified the entire project direction.
+
+---
+
+## 20. Late-Stage Findings (2026-04-01)
+
+### Log1p vs Box-Cox 0.2 retest (with expanded extreme data) -- Box-Cox STAYS
+- **What:** GKF5 comparison after adding 312 samples >5K mg/L (was 149). Gemini recommended retesting since original sweep had less extreme data.
+- **Result:** Log1p R²(log)=0.826 (better), R²(native)=0.359 (worse). Box-Cox R²(log)=0.760, R²(native)=0.416.
+- **Extreme tier:** Log1p >5K bias=-81%, Box-Cox >5K bias=-83%. Nearly identical. Log1p does NOT fix extremes.
+- **Verdict:** Box-Cox 0.2 stays. The extreme underprediction is a feature deficiency, not a transform problem.
+
+### v9 contamination quantified (same 78-site holdout)
+- v9 MedSiteR²=0.463 vs v11 0.402 (inflated by 0.061)
+- v9 first-flush R²=0.907 vs v11 0.285 (inflated by 0.622 — memorized holdout sites)
+- v9 pooled NSE=0.688 vs v11 0.306 (inflated by 0.382)
+- But v11 has BETTER MAPE (40.1% vs 53.5%) and within-2x (70.0% vs 66.4%)
+- Contamination inflates R²-based metrics but worsens practical accuracy metrics (bcf_mean overprediction)
+
+### Temporal N=10 worse than zero-shot -- FINDING about sampling strategy
+- Temporal N=10 MedSiteR²=0.389 vs zero-shot 0.401 (delta=-0.012)
+- Mechanism: first 10 temporal samples are overwhelmingly baseflow, poisoning adaptation with low-SSC bias
+- Expert consensus (Santos, Patel, both Gemini agents): frame as finding about sampling strategy, not a model bug
+- "Naive temporal sampling degrades adaptation. Practitioners must target high-flow events in calibration samples."
+
+### Dedup policy resolved
+- assemble_dataset.py used drop_duplicates(datetime, ssc_value); qc.py had unreachable deduplicate_discrete(datetime only)
+- Impact: 34 value conflicts across codebase, 8 in v11 training data (0.02%)
+- Fix: unified to deduplicate_discrete, dead code removed
+- Methods language: "233 duplicates removed from 296,436 raw samples (199 exact, 34 value conflicts)"
+
+### Bootstrap CIs rerun (v11, site-level blocking)
+- MedSiteR²=0.402 [0.358, 0.440] (v10 was [0.144, 0.459] — much tighter with site-level blocking)
+- N=10 random: 0.493 [0.440, 0.547] — improvement over N=0 statistically significant (CIs don't overlap)
+- KGE has wide CI [0.078, 0.406] — sensitive to a few high-discharge sites
+
+### Predictions parquet overwrite bug -- FIXED
+- Every training run overwrote logo_predictions_ssc_C_sensor_basic_watershed.parquet regardless of --label
+- Log1p test destroyed v11 LOGO predictions (had to regenerate, ~47 min)
+- Fix: label now included in parquet filename, same as model .cbm files
+- This is the THIRD time overwriting has caused data loss in this project
