@@ -1,0 +1,42 @@
+graph LR
+    B1["Mar 16: Timezone<br/>Off by 5-8 hours<br/>R2 0.63 to 0.75"]
+    B2["Mar 16: QC vectorization<br/>Qualifier matching<br/>silently skipped all filtering"]
+    B3["Mar 16: Early-stop leakage<br/>Test data in validation set"]
+    B4["Mar 17: Categorical dtype<br/>ecoregion, geology, huc2<br/>silently dropped<br/>R2 log 0.75 to 0.79"]
+    B5["Mar 25: prune_gagesii<br/>Double-pruning destroyed<br/>ALL Tier C attributes<br/>Trained on zeros/NaN"]
+    B6["Mar 25: DO saturation<br/>Linear approx 27-65% error<br/>Benson-Krause polynomial fix"]
+    B7["Mar 28: QC approval codes<br/>A vs Approved mismatch<br/>139 sites wrongly rejected"]
+    B8["Mar 28: Precip leakage<br/>precip_24h needed shift 1<br/>for strict antecedent"]
+    B9["Mar 28: Dedup key<br/>int64 nanoseconds<br/>phantom duplicates"]
+    B10["Mar 28: Weather timezone<br/>Strip tz before date compare"]
+    B11["Mar 29: Lambda passthrough<br/>Saved model used MLE -0.049<br/>not 0.2 as intended"]
+    B12["Mar 29: hash non-deterministic<br/>Python hash differs per session<br/>Adaptation not reproducible"]
+    B13["Mar 30: Ablation flatline<br/>No early stopping<br/>38 features identical -0.22<br/>Gemini caught it"]
+    B14["Mar 30: v9 contamination<br/>exclude-sites flag ignored<br/>Trained on holdout+vault<br/>ALL v9 evals invalid"]
+    B15["Mar 30: Model overwriting<br/>Lost model versions<br/>Now versioned + git tracked"]
+    B16["Mar 31: Seasonal split<br/>Produced identical to random<br/>Bug in split logic"]
+    B17["Mar 31: BCF selection<br/>Wrong BCF applied in some paths"]
+    B18["Mar 31: Quantile column names<br/>q05 vs q05_ms silently skipped<br/>coverage stats"]
+
+    B1 --> B2 --> B3 --> B4 --> B5 --> B6
+    B7 --> B8 --> B9 --> B10 --> B11 --> B12
+    B13 --> B14 --> B15 --> B16 --> B17 --> B18
+
+    subgraph BUGLEGEND [" "]
+        direction TB
+        BL1["Critical - invalidated results"]
+        BL2["Major - changed model behavior"]
+        BL3["Minor - caught and fixed"]
+    end
+
+    classDef critical fill:#d62828,stroke:#6a040f,color:#fff,stroke-width:2px
+    classDef major fill:#e76f51,stroke:#c1440e,color:#fff
+    classDef minor fill:#e9c46a,stroke:#f4a261,color:#000
+
+    class BL1 critical
+    class BL2 major
+    class BL3 minor
+
+    class B1,B5,B7,B14 critical
+    class B4,B6,B11,B13,B16 major
+    class B2,B3,B8,B9,B10,B12,B15,B17,B18 minor

@@ -1,0 +1,84 @@
+stateDiagram-v2
+    [*] --> feasibility
+
+    state "Feasibility (Mar 15)" as feasibility
+    feasibility --> early_models : Kansas 5-site test validates concept
+
+    state "Early Models (Mar 16-17)" as early_models {
+        poc : POC 3 sites, R2=0.92
+        s17 : 17-site cross-site, R2=0.84
+        audit : 4-reviewer audit finds 4 bugs
+        s57 : 57-site post-audit, R2=0.75
+        ext14 : 14-state external validation
+
+        poc --> s17
+        s17 --> audit
+        audit --> s57
+        s57 --> ext14
+    }
+
+    early_models --> log1p_era : Expand to 102 sites
+
+    state "log1p Era (Mar 17-28)" as log1p_era {
+        gagesii_bug : prune_gagesii destroys all attributes
+        streamcat : StreamCat replaces GAGES-II
+        expand : 266 to 396 sites via QC fix
+        collapse : Native R2 collapses 0.361 to 0.154
+
+        gagesii_bug --> streamcat
+        streamcat --> expand
+        expand --> collapse
+    }
+
+    log1p_era --> transform_crisis : v3 native R2 = 0.154
+
+    state "Transform Crisis (Mar 28)" as transform_crisis {
+        sweep24 : 24-experiment sweep
+        boxcox_wins : Box-Cox 0.2 + monotone wins
+        raw_fails : Raw SSC R2 under 0.012, ruled out
+
+        sweep24 --> boxcox_wins
+        sweep24 --> raw_fails
+    }
+
+    transform_crisis --> v4_platform : v4 Holdout=0.472
+
+    state "v4 Stable Platform (Mar 28-30)" as v4_platform {
+        arch : Architecture search, 4 approaches
+        exps : Experiments A-E, 30+ models
+        ablation : Feature ablation, 3 rounds
+        loss : Loss function experiments
+        bayesian : Bayesian shrinkage BREAKTHROUGH
+        meta : Site heterogeneity is THE problem
+        feat72 : 72 features locked by expert panel
+
+        arch --> bayesian
+        exps --> meta
+        ablation --> feat72
+    }
+
+    v4_platform --> integration : Combine all findings
+
+    state "Integration (Mar 30)" as integration {
+        v9_build : v9 assembled with all improvements
+        contaminated : CONTAMINATED, trained on holdout
+        ntu_reject : NTU investigated and rejected
+        noise_keep : Noise sites carry extreme signal
+        dual_bcf : Dual BCF discovered
+        v10_clean : v10 clean rebuild
+
+        v9_build --> contaminated
+        contaminated --> v10_clean
+        ntu_reject --> v10_clean
+        noise_keep --> v10_clean
+        dual_bcf --> v10_clean
+    }
+
+    integration --> paper_ready : v10 = current best
+
+    state "Paper Ready (Mar 31+)" as paper_ready {
+        ols : OLS benchmark, wins at every N
+        ci : Bootstrap CIs, 1000 resamples
+        cqr : CQR MultiQuantile training
+        ext260 : 260 NTU sites, Spearman=0.927
+    }

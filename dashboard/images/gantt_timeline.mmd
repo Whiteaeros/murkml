@@ -1,0 +1,45 @@
+gantt
+    title murkml Development Timeline (Mar 15-31, 2026)
+    dateFormat YYYY-MM-DD
+    axisFormat %b %d
+
+    section Foundation
+    Project setup + Kansas feasibility     :done, 2026-03-15, 1d
+    POC 3 sites + 17-site cross-site       :done, 2026-03-16, 1d
+    4-reviewer code audit, timezone fix     :crit, done, 2026-03-16, 1d
+    57-site post-audit baseline             :done, 2026-03-16, 1d
+    14-state external validation            :done, 2026-03-17, 1d
+    102-site expansion, categorical fix     :done, 2026-03-17, 1d
+    Panel fixes, flow-strat, GAGES vintage  :done, 2026-03-18, 1d
+
+    section Pipeline Overhaul
+    prune_gagesii bug + DO fix discovered   :crit, done, 2026-03-25, 1d
+    StreamCat migration + site qualification:done, 2026-03-26, 1d
+    Site adaptation + conformal intervals   :done, 2026-03-26, 1d
+    USGS OLS comparison + error analysis    :done, 2026-03-26, 1d
+
+    section Transform + Expansion
+    Data expansion 266 to 396 sites         :done, 2026-03-28, 1d
+    Transform sweep 24 experiments          :done, 2026-03-28, 1d
+    Box-Cox 0.2 selected, v4 established    :milestone, done, 2026-03-28, 0d
+    Feature ablation Round 1                :done, 2026-03-28, 1d
+
+    section Experiments + Breakthrough
+    Experiments A-E, 30+ models             :done, 2026-03-29, 1d
+    MERF tested then abandoned              :done, 2026-03-29, 1d
+    Bayesian shrinkage BREAKTHROUGH         :crit, done, 2026-03-29, 1d
+    Phase 3 pipeline fixes, SGMC, methods   :done, 2026-03-29, 1d
+    Phase 4 diagnostics + external NTU      :done, 2026-03-29, 1d
+
+    section v9 to v10
+    Phase 5 ablation, 83 models             :done, 2026-03-30, 1d
+    Feature freeze at 72, expert panel      :milestone, done, 2026-03-30, 0d
+    v9 assembled then CONTAMINATED          :crit, done, 2026-03-30, 1d
+    NTU investigation, noise site analysis  :done, 2026-03-30, 1d
+    Dual BCF discovery                      :done, 2026-03-30, 1d
+    v10 clean rebuild                       :milestone, done, 2026-03-30, 0d
+
+    section Paper Prep
+    v10 holdout eval + DECISION_LOG         :done, 2026-03-31, 1d
+    OLS benchmark + Bootstrap CIs           :done, 2026-03-31, 1d
+    CQR MultiQuantile training              :active, 2026-03-31, 1d
