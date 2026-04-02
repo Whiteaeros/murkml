@@ -24,7 +24,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from murkml.data.align import align_samples, FEATURE_WINDOW
 from murkml.data.features import engineer_features
-from murkml.data.qc import filter_continuous
+from murkml.data.qc import filter_continuous, deduplicate_discrete
 from murkml.provenance import start_run, log_step, log_file, end_run
 
 logging.basicConfig(
@@ -188,14 +188,21 @@ def load_discrete(site_id: str) -> pd.DataFrame:
     valid = df.dropna(subset=["datetime", "ssc_value"]).copy()
     valid = valid[valid["ssc_value"] >= 0]  # Fix 11: keep SSC=0 (log1p handles it)
 
-    # --- FIX 18: Deduplicate ---
-    n_before_dedup = len(valid)
-    valid = valid.drop_duplicates(
-        subset=["datetime", "ssc_value"], keep="first"
+    # --- FIX 18: Deduplicate (using canonical deduplicate_discrete from qc.py) ---
+    # Method: deduplicate on datetime only; for conflicting values at same timestamp,
+    # prefer USGS organisation; for identical values, keep first.
+    # This is strictly more thorough than the old drop_duplicates(subset=["datetime","ssc_value"])
+    # which would silently keep both rows when values differed at the same timestamp.
+    valid_renamed = valid.rename(columns={"ssc_value": "_ssc_tmp"})
+    valid_renamed, dedup_stats = deduplicate_discrete(
+        valid_renamed, datetime_col="datetime", value_col="_ssc_tmp"
     )
-    n_dupes = n_before_dedup - len(valid)
+    valid = valid_renamed.rename(columns={"_ssc_tmp": "ssc_value"})
+    n_dupes = dedup_stats.get("n_removed", 0)
     if n_dupes > 0:
-        logger.info(f"  Removed {n_dupes} duplicate samples")
+        logger.info(f"  Removed {n_dupes} duplicate samples "
+                    f"({dedup_stats.get('n_exact_dupes', 0)} exact, "
+                    f"{dedup_stats.get('n_conflicts_resolved', 0)} conflicts resolved)")
 
     valid = valid.sort_values("datetime").reset_index(drop=True)
     n_final = len(valid)
