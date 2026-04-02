@@ -221,7 +221,7 @@ Bayesian wins at EVERY N in EVERY split mode (random, temporal, seasonal). Tempo
 - Expert panels found 391-430 anomalous records; conservative threshold removed 135.
 
 ### Dropping noise sites -- REJECTED (critical finding)
-- Dropping 15 worst noise sites: first flush R2 collapsed 0.905 to 0.264, extreme R2 collapsed 0.793 to -0.043.
+- Dropping 15 worst noise sites: first flush R2 collapsed 0.905 to 0.264, extreme R2 collapsed 0.793 to -0.043. *(Note: absolute values from contaminated v9 holdout; the relative collapse is still valid.)*
 - "Noise" sites carry extreme event signal. NEVER drop based on aggregate metrics.
 
 ### Collection method split training -- DROPPED
@@ -325,7 +325,7 @@ Bayesian wins at EVERY N in EVERY split mode (random, temporal, seasonal). Tempo
 
 ## 12. Physics Findings (from diagnostics)
 
-- **First flush:** R2=0.864 across 1,390 events. Model captures event dynamics.
+- **First flush:** ~~R2=0.864~~ **CONTAMINATED (v9 trained on holdout sites).** Honest v11 first-flush R²=0.285 (1,434 events), bias=-52%. The 0.864/0.907 was a train-set metric. v11 MAPE (45.9%) and within-2x (65.3%) are actually better than v9's (53.8%, 64.5%) despite much lower R², because v11's bcf_median reduces scatter.
 - **Hysteresis:** 39.5% clockwise (proximal source), 24.4% CCW (distal), 36.1% linear across 119 ISCO events. Rising limb SSC/turb ratio 16% higher than falling.
 - **Extreme events:** Top 1% R2=0.788 but -37% underprediction. Particle size shift at high SSC (coarse sediment adds mass without changing scattering).
 - **Low-SSC overprediction:** 2.45x overprediction below 10 mg/L. Sensor contamination (DOM, algae) — not model failure.

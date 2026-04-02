@@ -235,6 +235,26 @@ Each entry records: training config, dataset, performance, and what changed from
   - SSC >5,000 mg/L: R²=-3.4 (underpredicts — particle size shift at extremes)
 - **Notes:** Extreme data expansion improved top-1% underprediction from -28% to -25%. Low-SSC overprediction persists (sensor contamination, not model failure). Extreme underprediction persists (particle size shift; no global fix possible per calibration experiment).
 
+### v9-vs-v11 contamination comparison (same 78-site holdout)
+
+Quantifies exactly how much the v9 contamination inflated metrics:
+
+| Metric | v9 (contaminated) | v11 (honest) | Delta |
+|--------|-------------------|-------------|-------|
+| MedSiteR² (zero-shot) | 0.463 | 0.402 | -0.061 |
+| Pooled NSE | 0.688 | 0.306 | -0.382 |
+| Spearman | 0.923 | 0.907 | -0.016 |
+| MAPE | 53.5% | **40.1%** | -13.4pp (v11 better) |
+| Within-2x | 66.4% | **70.0%** | +3.6pp (v11 better) |
+| Bias | +2.0% | -36.6% | v9 artificially unbiased |
+| First flush R² | 0.907 | 0.285 | -0.622 (contamination artifact) |
+| First flush bias | -0.8% | -52.5% | v9 memorized flush events |
+| N=10 random MedSiteR² | 0.537 | 0.493 | -0.044 |
+
+**Key finding:** v9 inflated R²-based metrics (NSE, MedSiteR², first flush R²) because it trained on holdout sites. But v11 actually has BETTER practical metrics (MAPE, within-2x) due to bcf_median and cleaned data. The "0.864 first-flush R²" cited in early analyses was a train-set metric, not real performance.
+
+Evaluation files: `data/results/evaluations/v9_on_v11_holdout_*`
+
 ---
 
 ### murkml-4-holdout
