@@ -31,6 +31,8 @@ format:
     toc: true
     code-fold: true
     code-tools: false
+    mermaid:
+      theme: default
 
 execute:
   freeze: auto
