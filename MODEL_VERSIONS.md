@@ -220,7 +220,8 @@ Each entry records: training config, dataset, performance, and what changed from
 - **Adaptation (N=10, random):** MedSiteR²=0.493, MAPE=34.6%, Within-2x=76.5%
 - **Adaptation (N=10, temporal):** MedSiteR²=0.389, MAPE=38.6%
 - **Adaptation (N=10, seasonal):** MedSiteR²=0.431, MAPE=40.1%
-- **Bootstrap CIs (95%, from v10, still applicable):** MedSiteR² [0.144, 0.459], Spearman [0.842, 0.886]
+- **Bootstrap CIs (95%, v11, site-level blocking):** MedSiteR²=0.402 [0.358, 0.440], N=10 random: 0.493 [0.440, 0.547], KGE: 0.186 [0.078, 0.406], Spearman: 0.874 [0.836, 0.899]
+  - Note: v10 CIs ([0.144, 0.459]) were much wider — site-level blocking is the correct method
 
 ### murkml-11-extreme-metrics
 - **Date:** 2026-04-01
@@ -233,7 +234,11 @@ Each entry records: training config, dataset, performance, and what changed from
   - Auto-point: R²=0.238
   - SSC <50 mg/L: R²=-60.6 (overpredicts — sensor contamination)
   - SSC >5,000 mg/L: R²=-3.4 (underpredicts — particle size shift at extremes)
-- **Notes:** Extreme data expansion improved top-1% underprediction from -28% to -25%. Low-SSC overprediction persists (sensor contamination, not model failure). Extreme underprediction persists (particle size shift; no global fix possible per calibration experiment).
+- **First-flush physics:**
+  - R²=0.285 (magnitude wrong, -52% bias)
+  - Spearman=0.902 on first-flush events (ranking preserved)
+  - Interpretation: model captures event timing and relative severity correctly; Bayesian adaptation corrects magnitude
+- **Notes:** Extreme data expansion improved top-1% underprediction from -28% to -25%. Low-SSC overprediction persists (sensor contamination, not model failure). Extreme underprediction persists (particle size shift; no global fix possible per calibration experiment). First-flush R² is low because bcf_median does not correct for event-scale bias; Spearman=0.902 is the correct ranking metric.
 
 ### v9-vs-v11 contamination comparison (same 78-site holdout)
 
@@ -254,6 +259,29 @@ Quantifies exactly how much the v9 contamination inflated metrics:
 **Key finding:** v9 inflated R²-based metrics (NSE, MedSiteR², first flush R²) because it trained on holdout sites. But v11 actually has BETTER practical metrics (MAPE, within-2x) due to bcf_median and cleaned data. The "0.864 first-flush R²" cited in early analyses was a train-set metric, not real performance.
 
 Evaluation files: `data/results/evaluations/v9_on_v11_holdout_*`
+
+---
+
+### murkml-11-conformal-intervals (Mondrian empirical CIs)
+- **Date:** 2026-04-01
+- **Method:** Mondrian conformal prediction — empirical nonconformity scores binned by predicted SSC range (5 bins), calibrated from 23,588 LOGO CV predictions
+- **Script:** `scripts/empirical_conformal_intervals.py`
+- **Results:** `data/results/evaluations/empirical_conformal/`
+- **90% target coverage — holdout result: 90.6%** (well-calibrated)
+- **Per-bin coverage and interval widths (90% target):**
+
+| Bin | SSC range | Coverage | Interval width (median) | Notes |
+|-----|-----------|----------|------------------------|-------|
+| 1 | 0–30 mg/L | 92% | 43 mg/L | Slightly conservative |
+| 2 | 30–100 mg/L | 91% | 184 mg/L | On target |
+| 3 | 100–500 mg/L | 89% | 710 mg/L | Slightly liberal |
+| 4 | 500–2000 mg/L | 91% | 2,385 mg/L | On target |
+| 5 | 2000+ mg/L | 52% | — | **UNRELIABLE** — only 31 holdout samples; flag as unreliable in outputs |
+
+- **Both versions available:** binned (step-function widths) and continuous interpolation (smooth widths)
+- **Calibration source:** 23,588 LOGO CV predictions (training sites only; holdout/vault never touched)
+- **Supersedes:** CQR MultiQuantile (23-hr failure — Box-Cox compression defeated quantile learning for extremes)
+- **Paper language:** "90% Mondrian conformal prediction intervals achieve 90.6% holdout coverage. The 2000+ mg/L bin (n=31) is flagged as unreliable and excluded from coverage claims."
 
 ---
 

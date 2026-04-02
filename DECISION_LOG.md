@@ -283,9 +283,12 @@ Bayesian wins at EVERY N in EVERY split mode (random, temporal, seasonal). Tempo
 - 28% of holdout sites have R2 < 0. Pooled and per-site metrics tell OPPOSITE stories.
 - Holdout SSC/turb ratio systematically harder than training (2.17 vs 1.74, +25%).
 
-### Conformal prediction intervals -- KEPT (empirical, not CQR)
-- 95% coverage=96.1%, 90% coverage=91.7%. Well-calibrated.
-- Median 90% interval width: 227 mg/L.
+### Conformal prediction intervals -- KEPT (empirical Mondrian, not CQR)
+- **Mondrian (final):** 90% target → 90.6% holdout coverage. Calibrated from 23,588 LOGO CV predictions across 5 predicted-SSC bins.
+- Per-bin: 92% (0–30), 91% (30–100), 89% (100–500), 91% (500–2K). 2000+ bin flagged unreliable (52% coverage, n=31 holdout samples).
+- Interval widths scale appropriately: 43 mg/L (low SSC) → 2,385 mg/L (high SSC).
+- Both binned and continuous interpolation versions available.
+- Script: `scripts/empirical_conformal_intervals.py`. Results: `data/results/evaluations/empirical_conformal/`
 
 ### CQR MultiQuantile -- FAILED, DROPPED (2026-04-01)
 - **What:** Trained CatBoost MultiQuantile model (quantiles 0.05/0.50/0.95) under LOGO CV for conformalized quantile regression (Romano et al. 2019).
@@ -325,7 +328,7 @@ Bayesian wins at EVERY N in EVERY split mode (random, temporal, seasonal). Tempo
 
 ## 12. Physics Findings (from diagnostics)
 
-- **First flush:** ~~R2=0.864~~ **CONTAMINATED (v9 trained on holdout sites).** Honest v11 first-flush R²=0.285 (1,434 events), bias=-52%. The 0.864/0.907 was a train-set metric. v11 MAPE (45.9%) and within-2x (65.3%) are actually better than v9's (53.8%, 64.5%) despite much lower R², because v11's bcf_median reduces scatter.
+- **First flush:** ~~R2=0.864~~ **CONTAMINATED (v9 trained on holdout sites).** Honest v11 first-flush R²=0.285 (1,434 events), bias=-52%, **Spearman=0.902**. The 0.864/0.907 was a train-set metric. v11 MAPE (45.9%) and within-2x (65.3%) are actually better than v9's (53.8%, 64.5%) despite much lower R², because v11's bcf_median reduces scatter. Spearman=0.902 means the model ranks first-flush events correctly (timing and relative severity) even though absolute magnitudes are biased; Bayesian adaptation corrects the scale.
 - **Hysteresis:** 39.5% clockwise (proximal source), 24.4% CCW (distal), 36.1% linear across 119 ISCO events. Rising limb SSC/turb ratio 16% higher than falling.
 - **Extreme events:** Top 1% R2=0.788 but -37% underprediction. Particle size shift at high SSC (coarse sediment adds mass without changing scattering).
 - **Low-SSC overprediction:** 2.45x overprediction below 10 mg/L. Sensor contamination (DOM, algae) — not model failure.
@@ -364,7 +367,7 @@ Bayesian wins at EVERY N in EVERY split mode (random, temporal, seasonal). Tempo
 | Seasonal split bug (Mar 31) | Seasonal split produced identical results to random split | Fixed split implementation *(Added 2026-03-31, from git forensics and expert review audit)* |
 | BCF selection bug (Mar 31) | Wrong BCF applied in some evaluation paths | Fixed BCF dispatch *(Added 2026-03-31, from git forensics and expert review audit)* |
 | Quantile column name bug (Mar 31) | q05 vs q05_ms mismatch silently skipped coverage stats | Fixed column naming *(Added 2026-03-31, from git forensics and expert review audit)* |
-| Dedup policy divergence (Mar 31) | assemble_dataset.py uses old drop_duplicates while qc.py has new deduplicate_discrete() — new logic is unreachable dead code | Unresolved *(Added 2026-03-31, from git forensics and expert review audit)* |
+| Dedup policy divergence (Mar 31) | assemble_dataset.py uses old drop_duplicates while qc.py has new deduplicate_discrete() — new logic is unreachable dead code | **Resolved (2026-04-01):** unified to deduplicate_discrete(), dead code removed. 8 conflicting rows in v11 (0.02%), flagged for v12. Methods language: "233 duplicates removed from 296,436 raw samples." |
 
 ---
 

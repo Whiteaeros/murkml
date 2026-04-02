@@ -39,7 +39,7 @@
 
 **OLS benchmark: CatBoost beats at every N** (N=2 temporal delta=+0.93)
 
-**Bootstrap CIs (95%, from v10, still applicable):** MedSiteR² [0.144, 0.459], Spearman [0.842, 0.886]
+**v11 Bootstrap CIs (95%, site-level blocking):** MedSiteR²=0.402 [0.358, 0.440], N=10 random: 0.493 [0.440, 0.547], KGE: 0.186 [0.078, 0.406], Spearman: 0.874 [0.836, 0.899]
 
 **v10 superseded.** v10 was first honest model (254 sites, 22,995 samples). See MODEL_VERSIONS.md.
 **NOTE:** v9 was contaminated — trained on 357 sites including 76 holdout + 36 vault. All v9 numbers are invalid.
@@ -87,9 +87,14 @@
 - Calibration experiment (8 global post-processing methods tested) — no global fix possible (fundamental tradeoff)
 - Extreme data expansion: NWIS hotspots, ScienceBase, STN flood events
 - Plain boosting adopted (same quality as Ordered, 1/4 the time)
+- Empirical conformal prediction intervals (Mondrian, 5 predicted-SSC bins): 90% coverage achieved (90.6% holdout). Script: scripts/empirical_conformal_intervals.py. Results: data/results/evaluations/empirical_conformal/
+- Log1p retest with expanded extreme data (GKF5): Box-Cox 0.2 confirmed as final transform. Log1p does NOT fix extremes (>5K bias nearly identical: log1p=-81%, box-cox=-83%).
+- Dedup unified to deduplicate_discrete() from qc.py; 8 conflicting rows in v11 (0.02%)
+- Predictions parquet overwrite bug fixed (label now in filename)
+- v11 bootstrap CIs rerun with site-level blocking (tighter than v10 CIs)
+- First-flush Spearman=0.902 confirmed on v11 holdout events
 
 **What's next:**
-- Empirical conformal prediction intervals (fallback from CQR MultiQuantile)
 - Paper writing (WRR target)
 - Vault one-shot (37 sites, LAST — after paper methodology finalized)
 - WEPP integration: future investigation (advisor's work, post-paper)
@@ -131,7 +136,8 @@
    → scripts/evaluate_model.py (canonical: holdout eval + adaptation curves, Bayesian/old_2param/ols)
    → scripts/site_adaptation_bayesian.py (Bayesian k-sweep with Student-t)
    → scripts/site_adaptation.py (older 2-param, random + temporal splits)
-   → scripts/prediction_intervals.py (conformal intervals)
+   → scripts/empirical_conformal_intervals.py (Mondrian conformal intervals — 5 SSC bins, 90.6% holdout coverage)
+   → scripts/prediction_intervals.py (legacy conformal intervals)
    → scripts/error_analysis.py (failure modes by site characteristics)
    → scripts/compare_vs_usgs.py (head-to-head vs USGS OLS)
 ```
