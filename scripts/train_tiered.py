@@ -855,10 +855,12 @@ def run_tier(param_name: str, tier_name: str, tier_data: pd.DataFrame,
     results_dir = DATA_DIR / "results"
     results_dir.mkdir(parents=True, exist_ok=True)
     safe_tier = tier_name.replace("/", "_")
+    # Include label in output filenames to prevent overwrites
+    label_suffix = f"_{label}" if label else ""
     if not folds_df.empty:
-        folds_df.to_parquet(results_dir / f"logo_folds_{param_name}_{safe_tier}.parquet", index=False)
+        folds_df.to_parquet(results_dir / f"logo_folds_{param_name}_{safe_tier}{label_suffix}.parquet", index=False)
     if not samples_df.empty:
-        samples_df.to_parquet(results_dir / f"logo_predictions_{param_name}_{safe_tier}.parquet", index=False)
+        samples_df.to_parquet(results_dir / f"logo_predictions_{param_name}_{safe_tier}{label_suffix}.parquet", index=False)
     # Save Ridge folds too for comparison
     if not ridge_folds.empty:
         ridge_folds.to_parquet(results_dir / f"logo_folds_{param_name}_{safe_tier}_ridge.parquet", index=False)
