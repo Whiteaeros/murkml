@@ -20,7 +20,11 @@ graph LR
 
     B1 --> B2 --> B3 --> B4 --> B5 --> B6
     B7 --> B8 --> B9 --> B10 --> B11 --> B12
+    B19["Apr 1: Predictions overwrite<br/>Label missing from filename<br/>Silently overwrote prior preds"]
+    B20["Apr 1: Dedup conflict<br/>8 rows with conflicting SSC<br/>Unified to deduplicate_discrete"]
+
     B13 --> B14 --> B15 --> B16 --> B17 --> B18
+    B19 --> B20
 
     subgraph BUGLEGEND [" "]
         direction TB
@@ -39,4 +43,5 @@ graph LR
 
     class B1,B5,B7,B14 critical
     class B4,B6,B11,B13,B16 major
-    class B2,B3,B8,B9,B10,B12,B15,B17,B18 minor
+    class B2,B3,B8,B9,B10,B12,B15,B17,B18,B20 minor
+    class B19 major

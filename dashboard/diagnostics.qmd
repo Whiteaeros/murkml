@@ -48,7 +48,7 @@ fig.show()
 
 ## Data Funnel
 
-Building a cross-site dataset requires strict quality filters at every step — and each filter removes sites, reducing the final sample. This Sankey diagram traces that attrition: starting from 860 candidate USGS gauges that have both turbidity and SSC sensors, sites are progressively excluded for lacking overlapping records, insufficient sample counts, missing watershed attributes (land cover, geology), or falling into the reserved vault set. Understanding how many sites were lost at each step — and why — is critical for assessing whether the final 254 training sites are representative of US streams in general.
+Building a cross-site dataset requires strict quality filters at every step — and each filter removes sites, reducing the final sample. This Sankey diagram traces that attrition: starting from 860 candidate USGS gauges that have both turbidity and SSC sensors, sites are progressively excluded for lacking overlapping records, insufficient sample counts, missing watershed attributes (land cover, geology), or falling into the reserved vault set. Understanding how many sites were lost at each step — and why — is critical for assessing whether the final 291 training sites are representative of US streams in general.
 
 ```{python}
 #| echo: false
@@ -61,7 +61,7 @@ fig.show()
 
 ## SSC vs Turbidity Joint Distribution
 
-This is the fundamental empirical relationship the model is learning: how does turbidity (the sensor reading, x-axis) relate to SSC (the lab-measured truth, y-axis) across thousands of paired observations from 76 holdout sites? A tight, consistent relationship would be easy to model; the scatter seen here reflects genuine site-to-site variation in sediment grain size, organic content, and sensor calibration. Dense color regions show the most common combinations; sparse scatter at the edges shows storm-event extremes. Features that shift a site's relationship away from the center cloud are exactly what watershed attributes (geology, slope, land cover) are intended to capture.
+This is the fundamental empirical relationship the model is learning: how does turbidity (the sensor reading, x-axis) relate to SSC (the lab-measured truth, y-axis) across thousands of paired observations from 78 holdout sites? A tight, consistent relationship would be easy to model; the scatter seen here reflects genuine site-to-site variation in sediment grain size, organic content, and sensor calibration. Dense color regions show the most common combinations; sparse scatter at the edges shows storm-event extremes. Features that shift a site's relationship away from the center cloud are exactly what watershed attributes (geology, slope, land cover) are intended to capture.
 
 ```{python}
 #| echo: false
@@ -129,28 +129,3 @@ fig = make_shap_beeswarm()
 fig.show()
 ```
 
-## Load Estimation
-
-Individual SSC predictions that scatter around the truth can still produce accurate **sediment loads** if errors are unbiased and cancel over time. Sediment load (the total mass of sediment passing a point over a period) is often more important for management decisions — reservoir filling rates, downstream deltaic erosion, permit calculations — than any single concentration reading. This figure shows cumulative load curves (total tons carried up to each point in time) for selected holdout sites, comparing observed vs. predicted. If the curves track closely by the end of the record, the model is suitable for load estimation even if individual scatter is significant. A persistent gap at the end means the model has a systematic bias that would accumulate into load budget errors.
-
-```{python}
-#| echo: false
-#| label: fig-load-estimation
-from _scripts.figures import make_load_estimation
-
-fig = make_load_estimation(Path("dashboard_data/per_reading.parquet"))
-fig.show()
-```
-
-## Sediment Load by Timescale
-
-Averaging over longer time periods smooths out random prediction errors — so a model might look poor at the daily scale but excellent at the annual scale. This matters for management: a reservoir manager might care about annual sediment budget, while a flood hazard analyst needs daily accuracy. This figure compares observed vs. predicted discharge-weighted sediment load (SSC × streamflow × a unit conversion factor, in tons/day) at three timescales: daily, monthly, and annual. The formula SSC × Q × 0.0027 converts mg/L and cubic feet per second into metric tons per day. If bias narrows as timescale lengthens, errors are approximately random; if bias persists at the annual scale, the model has a systematic over- or underprediction that load budget calculations cannot average away.
-
-```{python}
-#| echo: false
-#| label: fig-load-timescale
-from _scripts.figures import make_sediment_load_timescale
-
-fig = make_sediment_load_timescale(Path("dashboard_data/per_reading.parquet"))
-fig.show()
-```

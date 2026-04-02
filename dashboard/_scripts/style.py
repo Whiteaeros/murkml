@@ -57,7 +57,16 @@ PLOTLY_LAYOUT = dict(
     font=dict(family="Source Sans Pro, Helvetica, Arial, sans-serif", size=13),
     plot_bgcolor="white",
     paper_bgcolor="white",
-    margin=dict(l=60, r=30, t=50, b=60),
+    margin=dict(l=60, r=30, t=80, b=60),
+    legend=dict(
+        orientation="h",
+        yanchor="bottom",
+        y=1.02,
+        xanchor="left",
+        x=0.0,
+        bgcolor="rgba(255,255,255,0.9)",
+        font=dict(size=11),
+    ),
     xaxis=dict(
         showgrid=True,
         gridcolor="#EEEEEE",

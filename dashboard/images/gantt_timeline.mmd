@@ -1,5 +1,5 @@
 gantt
-    title murkml Development Timeline (Mar 15-31, 2026)
+    title murkml Development Timeline (Mar 15 - Apr 1, 2026)
     dateFormat YYYY-MM-DD
     axisFormat %b %d
 
@@ -42,4 +42,13 @@ gantt
     section Paper Prep
     v10 holdout eval + DECISION_LOG         :done, 2026-03-31, 1d
     OLS benchmark + Bootstrap CIs           :done, 2026-03-31, 1d
-    CQR MultiQuantile training              :active, 2026-03-31, 1d
+    CQR MultiQuantile 23hr train            :crit, done, 2026-03-31, 1d
+
+    section v11 Era
+    CQR FAILED, 8 calibration methods rejected :crit, done, 2026-04-01, 1d
+    Extreme data expansion, 10 new sites    :done, 2026-04-01, 1d
+    Plain boosting adopted                  :done, 2026-04-01, 1d
+    v11 trained, 260 sites, 485 trees       :milestone, done, 2026-04-01, 0d
+    Empirical conformal intervals, 90.6%    :done, 2026-04-01, 1d
+    v11 Bootstrap CIs, site-level blocking  :done, 2026-04-01, 1d
+    Log1p retest, Box-Cox confirmed final   :done, 2026-04-01, 1d

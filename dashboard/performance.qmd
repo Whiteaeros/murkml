@@ -2,11 +2,11 @@
 title: "Model Performance"
 ---
 
-This page evaluates how well the model predicts SSC (suspended sediment concentration — the mass of particles in a water sample, in mg/L) across 76 holdout sites that were never used during training. "Holdout" means these sites are a genuinely independent test: if the model performs well here, it should generalize to new sites in the real world. Metrics are reported with 95% bootstrap confidence intervals. R² (also called NSE, Nash-Sutcliffe Efficiency) measures how much of the variation in SSC the model explains: 1.0 is perfect, 0.0 means the model is no better than predicting the long-run average, and negative values mean the model is actively worse than that baseline.
+This page evaluates how well the model predicts SSC (suspended sediment concentration — the mass of particles in a water sample, in mg/L) across 78 holdout sites that were never used during training. "Holdout" means these sites are a genuinely independent test: if the model performs well here, it should generalize to new sites in the real world. Metrics are reported with 95% bootstrap confidence intervals. R² (also called NSE, Nash-Sutcliffe Efficiency) measures how much of the variation in SSC the model explains: 1.0 is perfect, 0.0 means the model is no better than predicting the long-run average, and negative values mean the model is actively worse than that baseline.
 
 ## Observed vs Predicted
 
-Every individual SSC reading from the 76 holdout sites is plotted here — what the model predicted vs. what was actually measured in the lab. The axes are on a log scale because SSC spans several orders of magnitude (from ~1 mg/L in clear streams to >10,000 mg/L in flashy storm events). Points near the 1:1 line (solid diagonal) are accurate; the dashed lines mark the factor-of-two envelope, meaning predictions within 2× of the true value. Scatter above the line means overprediction; below means underprediction. Look for systematic patterns by concentration range — they reveal where the model struggles physically.
+Every individual SSC reading from the 78 holdout sites is plotted here — what the model predicted vs. what was actually measured in the lab. The axes are on a log scale because SSC spans several orders of magnitude (from ~1 mg/L in clear streams to >10,000 mg/L in flashy storm events). Points near the 1:1 line (solid diagonal) are accurate; the dashed lines mark the factor-of-two envelope, meaning predictions within 2× of the true value. Scatter above the line means overprediction; below means underprediction. Look for systematic patterns by concentration range — they reveal where the model struggles physically.
 
 ```{python}
 #| echo: false
@@ -100,28 +100,26 @@ fig.show()
 
 ## Geology Disaggregation
 
-Different bedrock types produce different sediment compositions — a watershed dominated by soft shales erodes very differently from one underlain by hard granite. This section isolates whether the model's accuracy varies with dominant watershed geology, which would indicate that sediment grain size or mineral composition introduces systematic error that watershed-average features don't fully capture. Two views of the same data are provided; use the one that makes the pattern clearest to you.
+Different bedrock types produce different sediment compositions — a watershed dominated by soft shales erodes very differently from one underlain by hard granite. This section isolates whether the model's accuracy varies with dominant watershed geology, which would indicate that sediment grain size or mineral composition introduces systematic error that watershed-average features don't fully capture.
 
-<!-- TODO: Verify axis labels and geology category names match the SGMC classification used in the data pipeline — cannot confirm without rendered output. -->
-
-### Grouped Bar View
+### R² by Geology
 
 ```{python}
 #| echo: false
-#| label: fig-geology-disagg
+#| label: fig-geology-r2
 from _scripts.figures import make_geology_disaggregation
 
 fig = make_geology_disaggregation(Path("dashboard_data/diag_disaggregated_metrics.parquet"))
 fig.show()
 ```
 
-### Slope Graph View
+### MAPE by Geology
 
 ```{python}
 #| echo: false
-#| label: fig-geology-slopegraph
-from _scripts.figures import make_geology_slopegraph
+#| label: fig-geology-mape
+from _scripts.figures import make_geology_mape
 
-fig = make_geology_slopegraph(Path("dashboard_data/diag_disaggregated_metrics.parquet"))
+fig = make_geology_mape(Path("dashboard_data/diag_disaggregated_metrics.parquet"))
 fig.show()
 ```

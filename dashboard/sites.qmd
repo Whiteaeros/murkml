@@ -25,7 +25,7 @@ fig.show()
 
 ## Holdout Site Table
 
-This sortable table gives the full scorecard for every holdout site — the 76 locations used for honest model evaluation. R² (equivalent to NSE, Nash-Sutcliffe Efficiency) is the primary ranking metric: values above 0.7 (green) indicate the model captures most SSC variability at that site; 0.3–0.7 (blue) indicates moderate skill; 0–0.3 (yellow) indicates marginal skill; and negative values (red) mean the model is actively worse than predicting the site's long-run average. Sorting by different columns (MAPE, Within-2x, Spearman) highlights different aspects of performance and can reveal sites where the model ranks correctly but is systematically biased in absolute scale. Click any column header to sort.
+This sortable table gives the full scorecard for every holdout site — the 78 locations used for honest model evaluation. R² (equivalent to NSE, Nash-Sutcliffe Efficiency) is the primary ranking metric: values above 0.7 (green) indicate the model captures most SSC variability at that site; 0.3–0.7 (blue) indicates moderate skill; 0–0.3 (yellow) indicates marginal skill; and negative values (red) mean the model is actively worse than predicting the site's long-run average. Sorting by different columns (MAPE, Within-2x, Spearman) highlights different aspects of performance and can reveal sites where the model ranks correctly but is systematically biased in absolute scale. Click any column header to sort.
 
 ```{python}
 #| echo: false

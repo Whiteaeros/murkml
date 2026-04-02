@@ -514,3 +514,41 @@ Bayesian wins at EVERY N in EVERY split mode (random, temporal, seasonal). Tempo
 - Log1p test destroyed v11 LOGO predictions (had to regenerate, ~47 min)
 - Fix: label now included in parquet filename, same as model .cbm files
 - This is the THIRD time overwriting has caused data loss in this project
+
+---
+
+## 21. Sediment Load Estimation — 3-Way Comparison (2026-04-02)
+
+### Approach
+Compared daily sediment loads from three methods at 3 holdout sites with published USGS 80155:
+1. **USGS 80155** — human-adjusted rating curves (Porterfield method, hysteresis corrections). Gold standard.
+2. **OLS** — automated log10(SSC) ~ log10(Q), discharge-only, Duan's smearing BCF. Standard USGS baseline.
+3. **v11 CatBoost** — continuous turbidity -> SSC x Q x 0.0027. Uses bcf_mean=1.297 for unbiased totals.
+
+Key design decisions:
+- **Let v11 predict without turbidity** — CatBoost handles NaN natively. Model has 137 features; turbidity is important but not the only input. If USGS covers a time period, we cover it too.
+- **OLS uses discharge only (no turbidity)** — this is the standard rating curve we're trying to beat.
+- **Hawaii excluded** — turbidity sensor installed Nov 2017, after 80155 ended Sep 2017. Zero overlap.
+- **Event detection** — 7-day rolling min as baseflow, events where Q > 1.5x baseflow for >= 6hrs.
+- **Transport-day filter** — 57% of Brandywine 80155 days are exactly 0.0 tons (hydrographer: "no measurable sediment"). Turbidity-based models always predict nonzero. Filtered metrics reported for 80155 >= 1 ton.
+
+### Results
+
+| Site | v11 R² | OLS R² | v11 Load Ratio | OLS Load Ratio | v11 Event Err | OLS Event Err |
+|------|--------|--------|---------------|---------------|--------------|--------------|
+| Brandywine, PA | 0.487 | 0.313 | 1.03x | 1.67x | +119% | +165% |
+| Valley Creek, PA | -0.756 | -5.537 | 1.55x | 3.26x | +169% | +591% |
+| Ferron Creek, UT | 0.764 | -3.972 | 0.75x | 3.14x | -39% | +124% |
+
+**Headline: Brandywine v11 total = 42,059 tons vs 80155 = 41,007 tons (2.6% overprediction). OLS overpredicted by 67%.**
+
+### Key findings
+- v11 beats OLS at every site on every metric
+- OLS consistently overpredicts by 2-5x (BCF amplification without turbidity signal)
+- v11 Spearman 0.76-0.96 — correctly ranks transport days even when magnitude is off
+- Event-scale is where turbidity proves its value (v11 error 2-4x smaller than OLS)
+- Valley Creek is hard for both methods (negative R²) — very flashy urban watershed
+- Annual loads incomplete due to discharge data gaps (not all days have continuous Q)
+
+### Script
+`scripts/sediment_load_comparison.py` — builds continuous 15-min feature matrix from all 6 sensor parameters, predicts SSC at every timestep, aggregates to daily/monthly/annual/event loads.

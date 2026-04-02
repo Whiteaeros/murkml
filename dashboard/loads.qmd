@@ -1,0 +1,99 @@
+---
+title: "Sediment Loads"
+---
+
+Knowing the SSC at any moment is useful, but what practitioners, regulators, and dam operators really need is the **total mass of sediment** passing a point over days, months, or years. This is called the *sediment load* — typically reported in tons per day — and it drives decisions about reservoir dredging, water treatment plant operations, habitat restoration, and TMDL (Total Maximum Daily Load) compliance.
+
+Computing a load is straightforward: multiply SSC (mg/L) by discharge (cfs) by a unit conversion factor (0.0027). The hard part is getting SSC right across the full range of flow conditions, especially during storms that can deliver more sediment in a few hours than the entire preceding month.
+
+This page compares three ways of estimating daily sediment loads at three USGS sites where the agency has published its own gold-standard estimates (parameter code 80155, "Suspended sediment discharge"). These published values are produced by trained USGS hydrographers who hand-adjust rating curves using the Porterfield method — a labor-intensive process that accounts for hysteresis, seasonal shifts, and local knowledge. They are the closest thing to ground truth that exists for continuous sediment transport.
+
+::: {.callout-note}
+## Three methods compared
+
+- **USGS 80155** (dark gray) — The gold standard. Published by USGS hydrographers using hand-adjusted rating curves. Only available at sites with dedicated sediment monitoring programs.
+- **v11 CatBoost** (orange) — This project's model. Uses turbidity plus 72 watershed features to predict SSC, then multiplies by measured discharge. Fully automated, no per-site calibration needed.
+- **OLS** (red-orange) — A simple discharge-only rating curve: log(SSC) = a + b·log(Q), fitted per site. This is what you'd get if turbidity data weren't available and you had to estimate sediment from streamflow alone.
+:::
+
+## Total Load Comparison
+
+The most basic question: over the full monitoring period at each site, how much total sediment did each method estimate? The bars show period totals in tons, with percent error annotations above the v11 and OLS bars. A method that's close to the USGS 80155 total (dark gray bar) is getting the overall mass balance right. Note that getting the total right doesn't guarantee getting individual days right — errors can cancel out — but getting it wrong guarantees something is fundamentally off.
+
+```{python}
+#| echo: false
+#| label: fig-load-total-bars
+from pathlib import Path
+import sys
+sys.path.insert(0, ".")
+from _scripts.figures import make_load_total_bars
+
+fig = make_load_total_bars(
+    Path("dashboard_data"),
+    Path("dashboard_data/load_load_comparison_summary.json"),
+)
+fig.show()
+```
+
+## Cumulative Load Over Time
+
+Total loads can hide timing errors. This figure shows the running total of sediment (cumulative tons) at each site over the monitoring period. If a method's line diverges from the USGS 80155 line early and never recovers, it has a persistent bias. If the lines stay close through baseflow but diverge during storms, the method struggles with event transport. The OLS line (dashed red-orange) typically climbs much faster than the truth because discharge-only models overshoot during every high-flow event. The v11 line (orange) should track the USGS line (dark gray) more closely because turbidity provides direct information about what's actually in the water.
+
+```{python}
+#| echo: false
+#| label: fig-load-cumulative
+from _scripts.figures import make_load_cumulative_timeseries
+
+fig = make_load_cumulative_timeseries(
+    Path("dashboard_data"),
+    Path("dashboard_data/load_load_comparison_summary.json"),
+)
+fig.show()
+```
+
+## Daily Load: Predicted vs Observed
+
+A scatter plot of predicted daily load vs the USGS 80155 published daily load, on log-log axes. Each dot is one day at one site. Points on the 1:1 dashed line are perfect predictions. Points above the line are overpredictions; below are underpredictions. The scatter width tells you the typical daily error. Orange dots (v11) should cluster tighter around the 1:1 line than red-orange diamonds (OLS), especially during high-transport days in the upper right corner — these are the days that matter most for total load budgets.
+
+```{python}
+#| echo: false
+#| label: fig-load-daily-scatter
+from _scripts.figures import make_load_daily_scatter
+
+fig = make_load_daily_scatter(
+    Path("dashboard_data"),
+    Path("dashboard_data/load_load_comparison_summary.json"),
+)
+fig.show()
+```
+
+## Top Storm Events
+
+Most sediment transport happens during a handful of large storms — at many rivers, the top 10 events move more sediment than the rest of the year combined. This figure isolates the 12 largest storm events at each site (ranked by USGS 80155 load) and compares the three methods side by side. Getting these events right is what separates a useful model from one that only works during baseflow. Event loads are computed by summing daily loads over the storm hydrograph duration. Hover over any bar to see the exact tonnage.
+
+```{python}
+#| echo: false
+#| label: fig-load-events
+from _scripts.figures import make_load_event_bars
+
+fig = make_load_event_bars(
+    Path("dashboard_data"),
+    Path("dashboard_data/load_load_comparison_summary.json"),
+)
+fig.show()
+```
+
+## Metrics Summary
+
+The full quantitative comparison across sites, time scales, and methods. "All Days" includes zero-transport days (where USGS reported 0 tons); "Transport Days" filters to days with ≥1 ton (the days that matter for load budgets). R² measures explained variance (higher is better), Spearman measures rank correlation (does the method know which days are big?), Bias % shows systematic over/underprediction, and Load Ratio is total predicted ÷ total observed (1.00 = perfect match, 2.00 = doubled the true load). Orange-tinted rows are v11; red-tinted rows are OLS.
+
+```{python}
+#| echo: false
+#| label: fig-load-metrics
+from _scripts.figures import make_load_metrics_table
+
+fig = make_load_metrics_table(
+    Path("dashboard_data/load_load_comparison_summary.json"),
+)
+fig.show()
+```

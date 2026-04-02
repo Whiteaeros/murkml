@@ -137,7 +137,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 Cross-site suspended sediment concentration (SSC) prediction using CatBoost and Bayesian site adaptation.
 
-**Model:** v10-clean-dualbcf — 254 training sites, 72 features, Box-Cox lambda=0.2, dual BCF.
+**Model:** v11-extreme-expanded — 260 training sites, 72 features, Box-Cox lambda=0.2, Plain boosting, dual BCF.
 
 **Author:** Kaleb — University of Idaho, Water Science and Management.
 
@@ -153,7 +153,7 @@ Generated from git forensic analysis of 100+ commits (2026-03-15 to 2026-03-31) 
 
 ### Model Evolution DAG
 
-The ancestry of v10, with every dead-end branch and the state transition that caused each version jump.
+The ancestry of the model lineage, with every dead-end branch and the state transition that caused each version jump.
 
 ::: {.diagram-box}
 ![](images/model_evolution.svg)
@@ -185,7 +185,7 @@ Day-by-day progression showing what happened and what was learned.
 
 ## How to Read These Diagrams
 
-**Diagram 1 (Model Evolution DAG)** -- The comprehensive map. Every model version, every investigation branch, every dead end. Follow the main spine from Kansas Feasibility down to v10. Dotted arrows show where investigation findings feed back into the spine. Color legend is in the bottom-right of the diagram.
+**Diagram 1 (Model Evolution DAG)** -- The comprehensive map. Every model version, every investigation branch, every dead end. Follow the main spine from Kansas Feasibility down to v11. Dotted arrows show where investigation findings feed back into the spine. Color legend is in the bottom-right of the diagram.
 
 **Diagram 2 (Bug Timeline)** -- The 18 bugs that shaped the project. Left to right, chronological. Three rows because they came in waves. Color legend is at the bottom.
 
@@ -195,6 +195,6 @@ Day-by-day progression showing what happened and what was learned.
 
 ### The Meta-Finding
 
-The project began as a 5-site feasibility test and grew to 254 training sites + 76 holdout + 36 vault in 17 days. The central discovery is that **site heterogeneity is THE problem** -- between-site SSC/turb ratio CV is 3.2x larger than within-site. No architecture, feature, or training change fixes this. The only approach that works is **Bayesian site adaptation** (Student-t shrinkage), which is both the scientific finding and the commercial product.
+The project began as a 5-site feasibility test and grew to 291 training sites + 78 holdout + 37 vault in 17 days. The central discovery is that **site heterogeneity is THE problem** -- between-site SSC/turb ratio CV is 3.2x larger than within-site. No architecture, feature, or training change fixes this. The only approach that works is **Bayesian site adaptation** (Student-t shrinkage), which is both the scientific finding and the commercial product.
 
 18 bugs were discovered and fixed along the way. 4 were critical enough to invalidate prior results. The project survived because of systematic practices: red-team reviews (human + Gemini), expert panels, multi-metric evaluation, and the principle of never overwriting model files.

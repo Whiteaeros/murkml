@@ -74,11 +74,27 @@ stateDiagram-v2
         dual_bcf --> v10_clean
     }
 
-    integration --> paper_ready : v10 = current best
+    integration --> v11_era : v10 = first honest model
 
-    state "Paper Ready (Mar 31+)" as paper_ready {
+    state "v11 Era (Apr 1)" as v11_era {
+        cqr_fail : CQR MultiQuantile FAILED (23hr)
+        calib_reject : 8 calibration methods all rejected
+        extreme_exp : 10 extreme sites added from NWIS+ScienceBase
+        plain_boost : Plain boosting adopted (same quality, 1/4 time)
+        v11_train : v11 trained: 260 sites, 485 trees, 47min
+        conformal : Empirical conformal intervals, 90.6% coverage
+
+        cqr_fail --> conformal
+        calib_reject --> v11_train
+        extreme_exp --> v11_train
+        plain_boost --> v11_train
+    }
+
+    v11_era --> paper_ready : v11 = current best
+
+    state "Paper Ready (Apr 1+)" as paper_ready {
         ols : OLS benchmark, wins at every N
-        ci : Bootstrap CIs, 1000 resamples
-        cqr : CQR MultiQuantile training
+        ci : Bootstrap CIs, site-level blocking
         ext260 : 260 NTU sites, Spearman=0.927
+        vault : Vault one-shot (37 sites, sealed)
     }

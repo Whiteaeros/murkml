@@ -1,12 +1,12 @@
 # murkml Project Lineage
 
-Generated from git forensic analysis of 100+ commits (2026-03-15 to 2026-03-31) cross-referenced against DECISION_LOG.md.
+Generated from git forensic analysis of 100+ commits (2026-03-15 to 2026-04-01) cross-referenced against DECISION_LOG.md.
 
 ---
 
 ## 1. Model Evolution DAG
 
-The ancestry of v10, with every dead-end branch and the state transition that caused each version jump.
+The ancestry of the model lineage, with every dead-end branch and the state transition that caused each version jump.
 
 ```mermaid
 graph TD
@@ -20,7 +20,8 @@ graph TD
     V3["v3<br/>346 sites, 37 feat<br/>R2 nat=0.154 COLLAPSED"]
     V4["v4 Stable Platform<br/>357 sites, 44 feat<br/>Box-Cox 0.2, Monotone ON<br/>R2 log=0.718, Holdout=0.472"]
     V9["v9 CONTAMINATED<br/>254 train, 72 feat<br/>Trained on holdout+vault<br/>ALL EVALS INVALID"]
-    V10["v10 CURRENT BEST<br/>254 train, 72 feat<br/>R2=0.756, KGE=0.777<br/>Holdout MedR2=0.393<br/>Adapted N=10 R2=0.492"]
+    V10["v10 First Honest Model<br/>254 train, 72 feat<br/>R2=0.756, KGE=0.777<br/>Holdout MedR2=0.393<br/>Adapted N=10 R2=0.492"]
+    V11["v11 CURRENT BEST<br/>260 train, 72 feat<br/>Plain boosting, 485 trees<br/>Holdout MedR2=0.402<br/>Spearman=0.907<br/>Adapted N=10 R2=0.493"]
 
     FEAS -->|"Proves 15min alignment works"| POC
     POC -->|"First cross-site model"| S17
@@ -32,6 +33,7 @@ graph TD
     V3 -->|"24-exp transform sweep<br/>Box-Cox 0.2 wins"| V4
     V4 -->|"+SGMC lithology, 3-way split<br/>72 feat locked by expert panel<br/>Bayesian adaptation integrated"| V9
     V9 -->|"Contamination discovered<br/>Dual BCF, 135 records cleaned<br/>Proper holdout exclusion"| V10
+    V10 -->|"10 extreme sites added<br/>Plain boosting adopted<br/>291/78/37 split"| V11
 
     S17 -->|"Multi-param tested"| MPARAM["Multi-Param Dead End<br/>TP R2=0.62 at 42 sites<br/>collapsed to 0.08 at 72<br/>Nitrate=-0.72, OrthoP=-1.31<br/>Dissolved not predictable from turb"]
 
@@ -134,14 +136,14 @@ graph TD
     end
     BCF_DUAL -.->|"Dual BCF integrated"| V10
 
-    V10 -->|"External validation"| EXT2["260 NTU Sites<br/>11K samples, 6 organizations<br/>Spearman=0.927 zero-shot<br/>N=10 adaptation R2=0.501<br/>Cross-network proven"]
+    V11 -->|"External validation"| EXT2["260 NTU Sites<br/>11K samples, 6 organizations<br/>Spearman=0.927 zero-shot<br/>Cross-network proven"]
 
-    V10 -->|"Paper analyses"| PAPER
+    V11 -->|"Paper analyses"| PAPER
     subgraph PAPER ["Paper Ready"]
         direction TB
         P_OLS["OLS benchmark<br/>CatBoost wins at every N<br/>N=2 temporal: 0.36 vs -0.56"]
-        P_CI["Bootstrap CIs 1000 resamples<br/>MedR2=0.409 CI 0.144-0.459"]
-        P_CQR["CQR MultiQuantile<br/>Romano et al 2019<br/>Currently training"]
+        P_CI["Bootstrap CIs 1000 resamples<br/>MedR2=0.402 CI 0.358-0.440"]
+        P_CONFORMAL["Empirical conformal intervals<br/>Mondrian 5-bin, 90.6% coverage<br/>CQR failed, this works"]
     end
 
     S17 -->|"Scientific discovery"| DISC
@@ -155,7 +157,21 @@ graph TD
         SC_GKF["GKF5 vs holdout disagreement<br/>turb_Q_ratio: +0.004 GKF5 vs -0.102 holdout<br/>CV folds lack geology diversity<br/>Major methodological finding"]
     end
 
-    V10 -->|"Strategic decisions"| STRAT
+    V10 -->|"CQR attempted"| CQR_FAIL
+    subgraph CQR_FAIL ["CQR Failure (Apr 1)"]
+        direction TB
+        CQR_TRAIN["MultiQuantile 23hr train<br/>Box-Cox compression defeats Q95<br/>Conditional coverage disaster"]
+        CQR_FALLBACK["Empirical conformal fallback<br/>Mondrian 5 SSC bins<br/>90.6% holdout coverage"]
+        CQR_TRAIN --> CQR_FALLBACK
+    end
+    CQR_FALLBACK -.->|"Empirical intervals adopted"| V11
+
+    V10 -->|"Calibration experiment"| CALIB["Global Calibration<br/>8 methods tested<br/>Fundamental tradeoff<br/>Fix low-SSC worsens high-SSC<br/>Gemini consensus: reject"]
+
+    V10 -->|"Extreme expansion"| EXTREME["Extreme Data Expansion<br/>NWIS hotspots + ScienceBase<br/>10 new sites, 1267 samples<br/>Top-1% underpred: -37% to -25%"]
+    EXTREME -.-> V11
+
+    V11 -->|"Strategic decisions"| STRAT
     subgraph STRAT ["Strategic Decisions"]
         direction TB
         ST_WRITE["Stop improving, start writing<br/>All 4 reviewers unanimous<br/>Submitted 0.80 beats unsubmitted 0.83"]
@@ -164,12 +180,13 @@ graph TD
         ST_BIAS["Geographic bias identified<br/>CA+OR+KS = 50% of candidates<br/>Zero: loess belt, iron range, arid SW<br/>35-site gap-fill plan designed"]
     end
 
-    V10 -->|"Shelved for future"| SHELVED
+    V11 -->|"Shelved for future"| SHELVED
     subgraph SHELVED ["Investigated and Shelved"]
         direction TB
         SH_Q90["Q90 quantile specialist<br/>Tanaka red-team: shifts ALL<br/>predictions up, not just extremes<br/>149 extreme samples insufficient"]
         SH_WEPP["WEPP integration<br/>Physics-based erosion model<br/>Advisor area of work<br/>Paper 2 or 3"]
         SH_TEMPORAL["Temporal stationarity testing<br/>No year-over-year validation<br/>Required for deployment claims"]
+        SH_LOG1P["Log1p retest with extremes<br/>Box-Cox 0.2 confirmed final<br/>Log1p does NOT fix extremes"]
     end
 
     subgraph LEGEND [" "]
@@ -205,7 +222,7 @@ graph TD
     class L8 finding
     class L9 strategic
 
-    class V10 current
+    class V11 current
     class V9 contaminated
     class V5,V6,V8GPB,V8MERF,MPARAM dead
     class LKGE,LSQRT,LLIN dead
@@ -214,17 +231,21 @@ graph TD
     class SH_Q90,SH_WEPP dead
     class V8POST,AD_BAYES breakthrough
     class TS4,TS5,BCF_DUAL breakthrough
+    class CQR_FALLBACK breakthrough
     class EXPA,EXPB,EXPC,EXPD,EXPE,D_NTU,D_ANCHOR cluster
     class ABL1,ABL2,ABL3 cluster
     class F_SGMC,F_WEATHER,F_LONLAT,F_COLLECT cluster
     class D_NOISE,D_CLEAN,D_3WAY cluster
-    class POC,S17,S57,V1,V2,V3,V4,FEAS,AUDIT milestone
+    class CQR_TRAIN dead
+    class CALIB dead
+    class POC,S17,S57,V1,V2,V3,V4,V10,FEAS,AUDIT milestone
     class EXT1,EXT2 output
-    class P_OLS,P_CI,P_CQR output
+    class P_OLS,P_CI,P_CONFORMAL output
+    class EXTREME output
     class AD_OLD,AD_N20 dead
     class SC_BOUNDARY,SC_TURB,SC_SONG,SC_OLS,SC_IOWA,SC_GKF finding
     class ST_WRITE,ST_PAPERS,ST_TIERS,ST_BIAS strategic
-    class SH_TEMPORAL dead
+    class SH_TEMPORAL,SH_LOG1P dead
 ```
 
 ---
@@ -256,7 +277,11 @@ graph LR
 
     B1 --> B2 --> B3 --> B4 --> B5 --> B6
     B7 --> B8 --> B9 --> B10 --> B11 --> B12
+    B19["Apr 1: Predictions overwrite<br/>Label missing from filename<br/>Silently overwrote prior preds"]
+    B20["Apr 1: Dedup conflict<br/>8 rows with conflicting SSC<br/>Unified to deduplicate_discrete"]
+
     B13 --> B14 --> B15 --> B16 --> B17 --> B18
+    B19 --> B20
 
     subgraph BUGLEGEND [" "]
         direction TB
@@ -275,7 +300,8 @@ graph LR
 
     class B1,B5,B7,B14 critical
     class B4,B6,B11,B13,B16 major
-    class B2,B3,B8,B9,B10,B12,B15,B17,B18 minor
+    class B2,B3,B8,B9,B10,B12,B15,B17,B18,B20 minor
+    class B19 major
 ```
 
 ---
@@ -361,13 +387,29 @@ stateDiagram-v2
         dual_bcf --> v10_clean
     }
 
-    integration --> paper_ready : v10 = current best
+    integration --> v11_era : v10 = first honest model
 
-    state "Paper Ready (Mar 31+)" as paper_ready {
+    state "v11 Era (Apr 1)" as v11_era {
+        cqr_fail : CQR MultiQuantile FAILED (23hr)
+        calib_reject : 8 calibration methods all rejected
+        extreme_exp : 10 extreme sites added from NWIS+ScienceBase
+        plain_boost : Plain boosting adopted (same quality, 1/4 time)
+        v11_train : v11 trained: 260 sites, 485 trees, 47min
+        conformal : Empirical conformal intervals, 90.6% coverage
+
+        cqr_fail --> conformal
+        calib_reject --> v11_train
+        extreme_exp --> v11_train
+        plain_boost --> v11_train
+    }
+
+    v11_era --> paper_ready : v11 = current best
+
+    state "Paper Ready (Apr 1+)" as paper_ready {
         ols : OLS benchmark, wins at every N
-        ci : Bootstrap CIs, 1000 resamples
-        cqr : CQR MultiQuantile training
+        ci : Bootstrap CIs, site-level blocking
         ext260 : 260 NTU sites, Spearman=0.927
+        vault : Vault one-shot (37 sites, sealed)
     }
 ```
 
@@ -379,7 +421,7 @@ Day-by-day progression showing what happened and what was learned.
 
 ```mermaid
 gantt
-    title murkml Development Timeline (Mar 15-31, 2026)
+    title murkml Development Timeline (Mar 15 - Apr 1, 2026)
     dateFormat YYYY-MM-DD
     axisFormat %b %d
 
@@ -422,22 +464,31 @@ gantt
     section Paper Prep
     v10 holdout eval + DECISION_LOG         :done, 2026-03-31, 1d
     OLS benchmark + Bootstrap CIs           :done, 2026-03-31, 1d
-    CQR MultiQuantile training              :active, 2026-03-31, 1d
+    CQR MultiQuantile 23hr train            :crit, done, 2026-03-31, 1d
+
+    section v11 Era
+    CQR FAILED, 8 calibration methods rejected :crit, done, 2026-04-01, 1d
+    Extreme data expansion, 10 new sites    :done, 2026-04-01, 1d
+    Plain boosting adopted                  :done, 2026-04-01, 1d
+    v11 trained, 260 sites, 485 trees       :milestone, done, 2026-04-01, 0d
+    Empirical conformal intervals, 90.6%    :done, 2026-04-01, 1d
+    v11 Bootstrap CIs, site-level blocking  :done, 2026-04-01, 1d
+    Log1p retest, Box-Cox confirmed final   :done, 2026-04-01, 1d
 ```
 
 ---
 
 ## How to Read These Diagrams
 
-**Diagram 1 (Model Evolution DAG)** -- The comprehensive map. Every model version, every investigation branch, every dead end. Follow the main spine from Kansas Feasibility down to v10. Dotted arrows show where investigation findings feed back into the spine. Color legend is in the bottom-right of the diagram.
+**Diagram 1 (Model Evolution DAG)** -- The comprehensive map. Every model version, every investigation branch, every dead end. Follow the main spine from Kansas Feasibility down to v11. Dotted arrows show where investigation findings feed back into the spine. Color legend is in the bottom-right of the diagram.
 
-**Diagram 2 (Bug Timeline)** -- The 18 bugs that shaped the project. Left to right, chronological. Three rows because they came in waves. Color legend is at the bottom.
+**Diagram 2 (Bug Timeline)** -- The 20 bugs that shaped the project. Left to right, chronological. Color legend is at the bottom.
 
 **Diagram 3 (State Transitions)** -- The narrative arc. How the project evolved through eras, with nested details inside each state. Best for understanding the *story* of the project.
 
 **Diagram 4 (Gantt Timeline)** -- Day-by-day chronological view. Shows how much happened in parallel and where the critical moments fell.
 
 ### The Meta-Finding
-The project began as a 5-site feasibility test and grew to 254 training sites + 76 holdout + 36 vault in 17 days. The central discovery is that **site heterogeneity is THE problem** -- between-site SSC/turb ratio CV is 3.2x larger than within-site. No architecture, feature, or training change fixes this. The only approach that works is **Bayesian site adaptation** (Student-t shrinkage), which is both the scientific finding and the commercial product.
+The project began as a 5-site feasibility test and grew to 291 training sites + 78 holdout + 37 vault in 18 days. The central discovery is that **site heterogeneity is THE problem** -- between-site SSC/turb ratio CV is 3.2x larger than within-site. No architecture, feature, or training change fixes this. The only approach that works is **Bayesian site adaptation** (Student-t shrinkage), which is both the scientific finding and the commercial product.
 
-18 bugs were discovered and fixed along the way. 4 were critical enough to invalidate prior results. The project survived because of systematic practices: red-team reviews (human + Gemini), expert panels, multi-metric evaluation, and the principle of never overwriting model files.
+20 bugs were discovered and fixed along the way. 4 were critical enough to invalidate prior results. The project survived because of systematic practices: red-team reviews (human + Gemini), expert panels, multi-metric evaluation, and the principle of never overwriting model files.

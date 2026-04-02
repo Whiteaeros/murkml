@@ -9,7 +9,8 @@ graph TD
     V3["v3<br/>346 sites, 37 feat<br/>R2 nat=0.154 COLLAPSED"]
     V4["v4 Stable Platform<br/>357 sites, 44 feat<br/>Box-Cox 0.2, Monotone ON<br/>R2 log=0.718, Holdout=0.472"]
     V9["v9 CONTAMINATED<br/>254 train, 72 feat<br/>Trained on holdout+vault<br/>ALL EVALS INVALID"]
-    V10["v10 CURRENT BEST<br/>254 train, 72 feat<br/>R2=0.756, KGE=0.777<br/>Holdout MedR2=0.393<br/>Adapted N=10 R2=0.492"]
+    V10["v10 First Honest Model<br/>254 train, 72 feat<br/>R2=0.756, KGE=0.777<br/>Holdout MedR2=0.393<br/>Adapted N=10 R2=0.492"]
+    V11["v11 CURRENT BEST<br/>260 train, 72 feat<br/>Plain boosting, 485 trees<br/>Holdout MedR2=0.402<br/>Spearman=0.907<br/>Adapted N=10 R2=0.493"]
 
     FEAS -->|"Proves 15min alignment works"| POC
     POC -->|"First cross-site model"| S17
@@ -21,6 +22,7 @@ graph TD
     V3 -->|"24-exp transform sweep<br/>Box-Cox 0.2 wins"| V4
     V4 -->|"+SGMC lithology, 3-way split<br/>72 feat locked by expert panel<br/>Bayesian adaptation integrated"| V9
     V9 -->|"Contamination discovered<br/>Dual BCF, 135 records cleaned<br/>Proper holdout exclusion"| V10
+    V10 -->|"10 extreme sites added<br/>Plain boosting adopted<br/>291/78/37 split"| V11
 
     S17 -->|"Multi-param tested"| MPARAM["Multi-Param Dead End<br/>TP R2=0.62 at 42 sites<br/>collapsed to 0.08 at 72<br/>Nitrate=-0.72, OrthoP=-1.31<br/>Dissolved not predictable from turb"]
 
@@ -123,14 +125,14 @@ graph TD
     end
     BCF_DUAL -.->|"Dual BCF integrated"| V10
 
-    V10 -->|"External validation"| EXT2["260 NTU Sites<br/>11K samples, 6 organizations<br/>Spearman=0.927 zero-shot<br/>N=10 adaptation R2=0.501<br/>Cross-network proven"]
+    V11 -->|"External validation"| EXT2["260 NTU Sites<br/>11K samples, 6 organizations<br/>Spearman=0.927 zero-shot<br/>Cross-network proven"]
 
-    V10 -->|"Paper analyses"| PAPER
+    V11 -->|"Paper analyses"| PAPER
     subgraph PAPER ["Paper Ready"]
         direction TB
         P_OLS["OLS benchmark<br/>CatBoost wins at every N<br/>N=2 temporal: 0.36 vs -0.56"]
-        P_CI["Bootstrap CIs 1000 resamples<br/>MedR2=0.409 CI 0.144-0.459"]
-        P_CQR["CQR MultiQuantile<br/>Romano et al 2019<br/>Currently training"]
+        P_CI["Bootstrap CIs 1000 resamples<br/>MedR2=0.402 CI 0.358-0.440"]
+        P_CONFORMAL["Empirical conformal intervals<br/>Mondrian 5-bin, 90.6% coverage<br/>CQR failed, this works"]
     end
 
     S17 -->|"Scientific discovery"| DISC
@@ -144,7 +146,21 @@ graph TD
         SC_GKF["GKF5 vs holdout disagreement<br/>turb_Q_ratio: +0.004 GKF5 vs -0.102 holdout<br/>CV folds lack geology diversity<br/>Major methodological finding"]
     end
 
-    V10 -->|"Strategic decisions"| STRAT
+    V10 -->|"CQR attempted"| CQR_FAIL
+    subgraph CQR_FAIL ["CQR Failure (Apr 1)"]
+        direction TB
+        CQR_TRAIN["MultiQuantile 23hr train<br/>Box-Cox compression defeats Q95<br/>Conditional coverage disaster"]
+        CQR_FALLBACK["Empirical conformal fallback<br/>Mondrian 5 SSC bins<br/>90.6% holdout coverage"]
+        CQR_TRAIN --> CQR_FALLBACK
+    end
+    CQR_FALLBACK -.->|"Empirical intervals adopted"| V11
+
+    V10 -->|"Calibration experiment"| CALIB["Global Calibration<br/>8 methods tested<br/>Fundamental tradeoff<br/>Fix low-SSC worsens high-SSC<br/>Gemini consensus: reject"]
+
+    V10 -->|"Extreme expansion"| EXTREME["Extreme Data Expansion<br/>NWIS hotspots + ScienceBase<br/>10 new sites, 1267 samples<br/>Top-1% underpred: -37% to -25%"]
+    EXTREME -.-> V11
+
+    V11 -->|"Strategic decisions"| STRAT
     subgraph STRAT ["Strategic Decisions"]
         direction TB
         ST_WRITE["Stop improving, start writing<br/>All 4 reviewers unanimous<br/>Submitted 0.80 beats unsubmitted 0.83"]
@@ -153,12 +169,13 @@ graph TD
         ST_BIAS["Geographic bias identified<br/>CA+OR+KS = 50% of candidates<br/>Zero: loess belt, iron range, arid SW<br/>35-site gap-fill plan designed"]
     end
 
-    V10 -->|"Shelved for future"| SHELVED
+    V11 -->|"Shelved for future"| SHELVED
     subgraph SHELVED ["Investigated and Shelved"]
         direction TB
         SH_Q90["Q90 quantile specialist<br/>Tanaka red-team: shifts ALL<br/>predictions up, not just extremes<br/>149 extreme samples insufficient"]
         SH_WEPP["WEPP integration<br/>Physics-based erosion model<br/>Advisor area of work<br/>Paper 2 or 3"]
         SH_TEMPORAL["Temporal stationarity testing<br/>No year-over-year validation<br/>Required for deployment claims"]
+        SH_LOG1P["Log1p retest with extremes<br/>Box-Cox 0.2 confirmed final<br/>Log1p does NOT fix extremes"]
     end
 
     subgraph LEGEND [" "]
@@ -194,7 +211,7 @@ graph TD
     class L8 finding
     class L9 strategic
 
-    class V10 current
+    class V11 current
     class V9 contaminated
     class V5,V6,V8GPB,V8MERF,MPARAM dead
     class LKGE,LSQRT,LLIN dead
@@ -203,14 +220,18 @@ graph TD
     class SH_Q90,SH_WEPP dead
     class V8POST,AD_BAYES breakthrough
     class TS4,TS5,BCF_DUAL breakthrough
+    class CQR_FALLBACK breakthrough
     class EXPA,EXPB,EXPC,EXPD,EXPE,D_NTU,D_ANCHOR cluster
     class ABL1,ABL2,ABL3 cluster
     class F_SGMC,F_WEATHER,F_LONLAT,F_COLLECT cluster
     class D_NOISE,D_CLEAN,D_3WAY cluster
-    class POC,S17,S57,V1,V2,V3,V4,FEAS,AUDIT milestone
+    class CQR_TRAIN dead
+    class CALIB dead
+    class POC,S17,S57,V1,V2,V3,V4,V10,FEAS,AUDIT milestone
     class EXT1,EXT2 output
-    class P_OLS,P_CI,P_CQR output
+    class P_OLS,P_CI,P_CONFORMAL output
+    class EXTREME output
     class AD_OLD,AD_N20 dead
     class SC_BOUNDARY,SC_TURB,SC_SONG,SC_OLS,SC_IOWA,SC_GKF finding
     class ST_WRITE,ST_PAPERS,ST_TIERS,ST_BIAS strategic
-    class SH_TEMPORAL dead
+    class SH_TEMPORAL,SH_LOG1P dead

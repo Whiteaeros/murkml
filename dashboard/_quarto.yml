@@ -18,12 +18,14 @@ website:
         href: external.qmd
       - text: "Uncertainty"
         href: uncertainty.qmd
+      - text: "Loads"
+        href: loads.qmd
       - text: "Diagnostics"
         href: diagnostics.qmd
       - text: "About"
         href: about.qmd
   page-footer:
-    center: "murkml — SSC prediction from turbidity across 254 USGS sites"
+    center: "murkml — SSC prediction from turbidity across 260 USGS sites"
 
 format:
   html:

@@ -214,16 +214,16 @@ def make_adaptation_curve(
                 ols_r2_at2 = ols_curve["2"].get("median_r2")
                 if bay_r2_at2 is not None and ols_r2_at2 is not None:
                     gap = bay_r2_at2 - ols_r2_at2
-                    mid_y = (bay_r2_at2 + ols_r2_at2) / 2
                     fig.add_annotation(
                         x=2,
-                        y=mid_y,
-                        text=f"\u0394R\u00b2={gap:+.2f}",
+                        y=bay_r2_at2,
+                        text=f"Bayesian \u0394R\u00b2={gap:+.2f} vs OLS at N=2",
                         showarrow=True,
                         arrowhead=2,
-                        ax=40,
-                        ay=-25,
-                        font=dict(size=11, color=GOOD_COLOR),
+                        ax=80,
+                        ay=-40,
+                        font=dict(size=10, color=GOOD_COLOR),
+                        bgcolor="rgba(255,255,255,0.9)",
                         row=1,
                         col=col_idx,
                     )
@@ -290,18 +290,24 @@ def make_pooled_vs_persite(per_site_path: str | Path, pooled_r2: float = 0.284) 
     fig.add_vline(
         x=median_r2,
         line=dict(color=GOOD_COLOR, width=2.5, dash="solid"),
-        annotation_text=f"Median R\u00b2 = {median_r2:.3f}",
-        annotation_position="top right",
-        annotation_font=dict(color=GOOD_COLOR, size=11),
+    )
+    fig.add_annotation(
+        x=median_r2, y=1.08, xref="x", yref="paper",
+        text=f"Median R\u00b2 = {median_r2:.3f}",
+        showarrow=False,
+        font=dict(color=GOOD_COLOR, size=11),
     )
 
     # Vertical line at pooled R2
     fig.add_vline(
         x=pooled_r2,
         line=dict(color=BAD_COLOR, width=2.5, dash="dash"),
-        annotation_text=f"Pooled NSE = {pooled_r2:.3f}",
-        annotation_position="top left",
-        annotation_font=dict(color=BAD_COLOR, size=11),
+    )
+    fig.add_annotation(
+        x=pooled_r2, y=1.14, xref="x", yref="paper",
+        text=f"Pooled NSE = {pooled_r2:.3f}",
+        showarrow=False,
+        font=dict(color=BAD_COLOR, size=11),
     )
 
     # Vertical line at R2 = 0 reference
@@ -430,12 +436,12 @@ def make_physics_wall(per_reading_path: str | Path) -> go.Figure:
         )
         fig.add_annotation(
             x=(x0 + x1) / 2,
-            y=0.97,
+            y=0.02,
             yref="paper",
             text=label,
             showarrow=False,
             font=dict(size=10, color=color),
-            bgcolor="rgba(255,255,255,0.7)",
+            bgcolor="rgba(255,255,255,0.85)",
         )
 
     fig.update_layout(
@@ -1804,7 +1810,7 @@ def make_residual_diagnostics(per_reading_path: str | Path) -> go.Figure:
             "Residuals vs Turbidity",
             "Residual Distribution",
         ],
-        vertical_spacing=0.12,
+        vertical_spacing=0.18,
         horizontal_spacing=0.10,
     )
 
@@ -1960,7 +1966,7 @@ def make_residual_diagnostics(per_reading_path: str | Path) -> go.Figure:
 
     fig.update_layout(
         title="Residual Diagnostics",
-        height=650,
+        height=750,
     )
 
     apply_plotly_style(fig)
@@ -2105,14 +2111,13 @@ def make_data_sankey(summary_json_path: str | Path) -> go.Figure:
     """
     summary = _load_json(Path(summary_json_path))
 
-    # Default funnel numbers (from project documentation)
+    # Default funnel numbers (v11: 405 total sites, 291/78/37 split)
     discovered = 860
     qualified = 413
-    paired = 396
-    # 254 sites actually used in training (284 eligible minus 30 without StreamCat coverage)
-    train = 254
-    holdout = 76
-    vault = 36
+    paired = 405
+    train = 291
+    holdout = 78
+    vault = 37
 
     # Try to extract from summary if keys exist
     if "data_funnel" in summary:
@@ -2835,106 +2840,133 @@ _CQR_QUANTILE_COLS = ["q05", "q10", "q15", "q20", "q25", "q45", "q50",
                        "q55", "q75", "q80", "q85", "q90", "q95"]
 
 
-def _has_cqr_data(df: pd.DataFrame) -> bool:
-    """Return True if the per-reading DataFrame contains CQR quantile columns."""
-    return "q05" in df.columns and "q95" in df.columns
+# ---------------------------------------------------------------------------
+# Empirical conformal prediction interval figures
+# ---------------------------------------------------------------------------
 
 
-_SYNTHETIC_ANNOTATION = dict(
-    x=0.5, y=1.0, xref="paper", yref="paper",
-    text="SYNTHETIC DATA \u2014 CQR model training in progress",
-    showarrow=False,
-    font=dict(size=13, color=BAD_COLOR, family="Source Sans Pro, Helvetica, Arial, sans-serif"),
-    bgcolor="rgba(255,255,255,0.85)",
-    bordercolor=BAD_COLOR,
-    borderwidth=2,
-    borderpad=6,
-    xanchor="center",
-    yanchor="bottom",
-)
-
-
-def make_cqr_calibration(per_reading_path: str | Path) -> go.Figure:
-    """Reliability diagram: nominal vs actual coverage for CQR intervals."""
-    df = pd.read_parquet(Path(per_reading_path))
-    is_real = _has_cqr_data(df)
-
-    nominal_levels = [0.50, 0.60, 0.70, 0.80, 0.90, 0.95]
-
-    if not is_real:
-        fig = go.Figure()
-        fig.add_annotation(
-            x=0.5, y=0.5, xref="paper", yref="paper",
-            text="CQR prediction intervals pending \u2014 model training in progress",
-            showarrow=False,
-            font=dict(size=16, color=BAD_COLOR),
-        )
-        fig.update_layout(
-            title="CQR Calibration \u2014 Reliability Diagram",
-            height=450,
-        )
-        apply_plotly_style(fig)
-        return fig
-
-    # Compute actual coverage from symmetric quantile pairs
-    actual_coverages = []
-    for nom in nominal_levels:
-        alpha = 1.0 - nom
-        lo_col = f"q{int(alpha / 2 * 100):02d}"
-        hi_col = f"q{int((1 - alpha / 2) * 100):02d}"
-        if lo_col in df.columns and hi_col in df.columns:
-            covered = (
-                (df["y_true_native"] >= df[lo_col])
-                & (df["y_true_native"] <= df[hi_col])
-            )
-            actual_coverages.append(covered.mean())
-        else:
-            actual_coverages.append(np.nan)
+def make_conformal_coverage_bars(conformal_holdout_path: str | Path) -> go.Figure:
+    """Bar chart: per-bin holdout coverage vs nominal for 90% and 80% intervals."""
+    with open(Path(conformal_holdout_path)) as f:
+        data = json.load(f)
 
     fig = go.Figure()
 
-    # Perfect calibration diagonal
+    for level_key, color, name in [
+        ("90pct", COLORS["blue"], "90% interval"),
+        ("80pct", COLORS["orange"], "80% interval"),
+    ]:
+        level_data = data["binned_approach"][level_key]
+        bins = level_data["per_bin"]
+        labels = list(bins.keys())
+        coverages = [bins[b]["coverage"] for b in labels]
+        counts = [bins[b]["n_holdout"] for b in labels]
+        target = level_data["target_coverage"]
+
+        fig.add_trace(
+            go.Bar(
+                x=labels,
+                y=coverages,
+                name=name,
+                marker_color=color,
+                hovertemplate=(
+                    "%{x}<br>Coverage: %{y:.1%}<br>"
+                    "N=%{customdata}<extra></extra>"
+                ),
+                customdata=counts,
+            )
+        )
+
+    # Nominal reference lines
+    fig.add_hline(
+        y=0.90, line_dash="dash", line_color=COLORS["blue"],
+        annotation_text="90% target", annotation_position="top right",
+        annotation_font_size=10,
+    )
+    fig.add_hline(
+        y=0.80, line_dash="dot", line_color=COLORS["orange"],
+        annotation_text="80% target", annotation_position="bottom right",
+        annotation_font_size=10,
+    )
+
+    overall_90 = data["binned_approach"]["90pct"]["overall_coverage"]
+    fig.add_annotation(
+        x=0.5, y=1.05, xref="paper", yref="paper",
+        text=f"Overall 90% coverage: {overall_90:.1%}",
+        showarrow=False, font=dict(size=12),
+    )
+
+    fig.update_layout(
+        title="Empirical Conformal Coverage by Predicted SSC Bin",
+        xaxis_title="Predicted SSC Bin (mg/L)",
+        yaxis_title="Actual Coverage",
+        yaxis=dict(tickformat=".0%", range=[0.4, 1.05]),
+        height=450,
+        barmode="group",
+        legend=dict(x=0.01, y=0.99, bgcolor="rgba(255,255,255,0.85)"),
+    )
+
+    apply_plotly_style(fig)
+    return fig
+
+
+def make_conformal_interval_widths(conformal_summary_path: str | Path) -> go.Figure:
+    """Show how interval width scales with predicted SSC (continuous knots)."""
+    with open(Path(conformal_summary_path)) as f:
+        data = json.load(f)
+
+    knots = data["continuous_knots"]
+    pred_vals = knots["knot_pred_values_mgL"]
+    lo_90 = knots["lo_offsets_90"]
+    hi_90 = knots["hi_offsets_90"]
+    lo_80 = knots["lo_offsets_80"]
+    hi_80 = knots["hi_offsets_80"]
+
+    widths_90 = [h - l for h, l in zip(hi_90, lo_90)]
+    widths_80 = [h - l for h, l in zip(hi_80, lo_80)]
+
+    fig = go.Figure()
+
     fig.add_trace(
         go.Scatter(
-            x=[0.45, 1.0], y=[0.45, 1.0],
+            x=pred_vals, y=widths_90,
+            mode="lines+markers",
+            marker=dict(size=6, color=COLORS["blue"]),
+            line=dict(color=COLORS["blue"], width=2),
+            name="90% interval width",
+            hovertemplate="Pred SSC: %{x:.0f} mg/L<br>Width: %{y:.0f} mg/L<extra></extra>",
+        )
+    )
+
+    fig.add_trace(
+        go.Scatter(
+            x=pred_vals, y=widths_80,
+            mode="lines+markers",
+            marker=dict(size=6, color=COLORS["orange"]),
+            line=dict(color=COLORS["orange"], width=2),
+            name="80% interval width",
+            hovertemplate="Pred SSC: %{x:.0f} mg/L<br>Width: %{y:.0f} mg/L<extra></extra>",
+        )
+    )
+
+    # Add 1:1 reference (interval width = predicted value)
+    fig.add_trace(
+        go.Scatter(
+            x=[min(pred_vals), max(pred_vals)],
+            y=[min(pred_vals), max(pred_vals)],
             mode="lines",
-            line=dict(color=REF_COLOR, dash="dash", width=1.5),
-            name="Perfect",
+            line=dict(color=REF_COLOR, dash="dash", width=1),
+            name="Width = Predicted SSC",
             showlegend=True,
         )
     )
 
-    # Actual coverage points
-    fig.add_trace(
-        go.Scatter(
-            x=nominal_levels,
-            y=actual_coverages,
-            mode="markers+lines",
-            marker=dict(size=10, color=GOOD_COLOR),
-            line=dict(color=GOOD_COLOR, width=2),
-            name="CQR coverage",
-            hovertemplate="Nominal: %{x:.0%}<br>Actual: %{y:.1%}<extra></extra>",
-        )
-    )
-
-    # Annotate each point with its nominal level
-    for nom, act in zip(nominal_levels, actual_coverages):
-        if np.isfinite(act):
-            fig.add_annotation(
-                x=nom, y=act,
-                text=f"{nom:.0%}",
-                showarrow=True,
-                arrowhead=0,
-                ax=20, ay=-20,
-                font=dict(size=10),
-            )
-
     fig.update_layout(
-        title="CQR Calibration \u2014 Reliability Diagram",
-        xaxis_title="Nominal Coverage",
-        yaxis_title="Actual Coverage",
-        xaxis=dict(tickformat=".0%", range=[0.45, 1.0]),
-        yaxis=dict(tickformat=".0%", range=[0.45, 1.0]),
+        title="Prediction Interval Width vs Predicted SSC",
+        xaxis_title="Predicted SSC (mg/L)",
+        yaxis_title="Interval Width (mg/L)",
+        xaxis=dict(type="log"),
+        yaxis=dict(type="log"),
         height=450,
         legend=dict(x=0.02, y=0.98, bgcolor="rgba(255,255,255,0.85)"),
     )
@@ -2943,25 +2975,19 @@ def make_cqr_calibration(per_reading_path: str | Path) -> go.Figure:
     return fig
 
 
-def make_cqr_fan_plot(per_reading_path: str | Path) -> go.Figure:
-    """Time series fan plot showing prediction intervals for holdout sites."""
+def make_conformal_fan_plot(
+    per_reading_path: str | Path,
+    conformal_summary_path: str | Path,
+) -> go.Figure:
+    """Time series with empirical conformal 90% bands for selected holdout sites."""
     df = pd.read_parquet(Path(per_reading_path))
-    is_real = _has_cqr_data(df)
+    with open(Path(conformal_summary_path)) as f:
+        conf = json.load(f)
 
-    if not is_real:
-        fig = go.Figure()
-        fig.add_annotation(
-            x=0.5, y=0.5, xref="paper", yref="paper",
-            text="CQR prediction intervals pending \u2014 model training in progress",
-            showarrow=False,
-            font=dict(size=16, color=BAD_COLOR),
-        )
-        fig.update_layout(
-            title="Prediction Intervals \u2014 Selected Holdout Sites",
-            height=500,
-        )
-        apply_plotly_style(fig)
-        return fig
+    knots = conf["continuous_knots"]
+    pred_knots = np.array(knots["knot_pred_values_mgL"])
+    lo_offsets = np.array(knots["lo_offsets_90"])
+    hi_offsets = np.array(knots["hi_offsets_90"])
 
     # Pick 3 sites with the most readings
     top_sites = (
@@ -2971,8 +2997,6 @@ def make_cqr_fan_plot(per_reading_path: str | Path) -> go.Figure:
     )
 
     site_colors = [COLORS["blue"], COLORS["vermillion"], COLORS["green"]]
-    ribbon_dark_alpha = 0.35
-    ribbon_light_alpha = 0.15
 
     fig = make_subplots(
         rows=len(top_sites), cols=1,
@@ -2989,44 +3013,25 @@ def make_cqr_fan_plot(per_reading_path: str | Path) -> go.Figure:
         pred = sdf["y_pred_native"].values
         color = site_colors[i]
 
-        q05 = sdf["q05"].values
-        q25 = sdf["q25"].values
-        q75 = sdf["q75"].values
-        q95 = sdf["q95"].values
+        # Interpolate conformal offsets at each prediction
+        lo_at_pred = np.interp(pred, pred_knots, lo_offsets)
+        hi_at_pred = np.interp(pred, pred_knots, hi_offsets)
+        band_lo = np.maximum(pred + lo_at_pred, 0)
+        band_hi = pred + hi_at_pred
 
-        # 90% ribbon (light)
+        r, g, b = int(color[1:3], 16), int(color[3:5], 16), int(color[5:7], 16)
+
+        # 90% ribbon
         fig.add_trace(
             go.Scatter(
                 x=pd.concat([times, times[::-1]]),
-                y=np.concatenate([q95, q05[::-1]]),
+                y=np.concatenate([band_hi, band_lo[::-1]]),
                 fill="toself",
-                fillcolor=(
-                    f"rgba({int(color[1:3], 16)},{int(color[3:5], 16)},"
-                    f"{int(color[5:7], 16)},{ribbon_light_alpha})"
-                ),
+                fillcolor=f"rgba({r},{g},{b},0.15)",
                 line=dict(width=0),
                 name="90% PI" if i == 0 else None,
                 showlegend=(i == 0),
                 legendgroup="90pi",
-                hoverinfo="skip",
-            ),
-            row=row, col=1,
-        )
-
-        # 50% ribbon (dark)
-        fig.add_trace(
-            go.Scatter(
-                x=pd.concat([times, times[::-1]]),
-                y=np.concatenate([q75, q25[::-1]]),
-                fill="toself",
-                fillcolor=(
-                    f"rgba({int(color[1:3], 16)},{int(color[3:5], 16)},"
-                    f"{int(color[5:7], 16)},{ribbon_dark_alpha})"
-                ),
-                line=dict(width=0),
-                name="50% PI" if i == 0 else None,
-                showlegend=(i == 0),
-                legendgroup="50pi",
                 hoverinfo="skip",
             ),
             row=row, col=1,
@@ -3063,124 +3068,16 @@ def make_cqr_fan_plot(per_reading_path: str | Path) -> go.Figure:
         fig.update_yaxes(title_text="SSC (mg/L)", row=row, col=1)
 
     fig.update_layout(
-        title="Prediction Intervals \u2014 Selected Holdout Sites",
-        height=500,
+        title="Empirical Conformal 90% Prediction Intervals — Selected Sites",
+        height=550,
         legend=dict(x=0.01, y=1.02, orientation="h", bgcolor="rgba(255,255,255,0.85)"),
     )
 
-    # Reduce subplot title font size
     for ann in fig.layout.annotations:
         if hasattr(ann, "font") and ann.font is not None:
             ann.font.size = 10
         else:
             ann.font = dict(size=10)
-
-    apply_plotly_style(fig)
-    return fig
-
-
-def make_cqr_coverage_by_regime(
-    per_reading_path: str | Path,
-    disagg_path: str | Path,
-) -> go.Figure:
-    """Bar chart of 90% PI coverage by SSC range bins and collection method."""
-    df = pd.read_parquet(Path(per_reading_path))
-    is_real = _has_cqr_data(df)
-
-    if not is_real:
-        fig = go.Figure()
-        fig.add_annotation(
-            x=0.5, y=0.5, xref="paper", yref="paper",
-            text="CQR prediction intervals pending \u2014 model training in progress",
-            showarrow=False,
-            font=dict(size=16, color=BAD_COLOR),
-        )
-        fig.update_layout(
-            title="90% Prediction Interval Coverage by Regime",
-            height=400,
-        )
-        apply_plotly_style(fig)
-        return fig
-
-    # SSC range bins
-    ssc_bins = [
-        ("< 10", 0, 10),
-        ("10\u2013100", 10, 100),
-        ("100\u20131k", 100, 1000),
-        ("> 1k", 1000, 1e9),
-    ]
-
-    # Collection methods
-    methods = sorted(df["collection_method"].dropna().unique().tolist())
-
-    # Compute actual 90% coverage by bin
-    ssc_coverages = {}
-    for label, lo, hi in ssc_bins:
-        mask = (df["y_true_native"] >= lo) & (df["y_true_native"] < hi)
-        sub = df[mask]
-        if len(sub) > 0 and "q05" in sub.columns and "q95" in sub.columns:
-            covered = (
-                (sub["y_true_native"] >= sub["q05"])
-                & (sub["y_true_native"] <= sub["q95"])
-            )
-            ssc_coverages[label] = covered.mean()
-        else:
-            ssc_coverages[label] = np.nan
-
-    method_coverages = {}
-    for m in methods:
-        sub = df[df["collection_method"] == m]
-        if len(sub) > 0 and "q05" in sub.columns and "q95" in sub.columns:
-            covered = (
-                (sub["y_true_native"] >= sub["q05"])
-                & (sub["y_true_native"] <= sub["q95"])
-            )
-            method_coverages[m] = covered.mean()
-        else:
-            method_coverages[m] = np.nan
-
-    fig = go.Figure()
-
-    # SSC range bars
-    fig.add_trace(
-        go.Bar(
-            x=list(ssc_coverages.keys()),
-            y=list(ssc_coverages.values()),
-            name="SSC Range",
-            marker_color=COLORS["blue"],
-            hovertemplate="%{x}: %{y:.1%}<extra></extra>",
-        )
-    )
-
-    # Collection method bars
-    fig.add_trace(
-        go.Bar(
-            x=list(method_coverages.keys()),
-            y=list(method_coverages.values()),
-            name="Collection Method",
-            marker_color=COLORS["orange"],
-            hovertemplate="%{x}: %{y:.1%}<extra></extra>",
-        )
-    )
-
-    # Nominal 90% reference line
-    fig.add_hline(
-        y=0.90,
-        line_dash="dash",
-        line_color=REF_COLOR,
-        annotation_text="90% nominal",
-        annotation_position="top right",
-        annotation_font_size=11,
-    )
-
-    fig.update_layout(
-        title="90% Prediction Interval Coverage by Regime",
-        yaxis_title="Actual Coverage",
-        yaxis=dict(tickformat=".0%", range=[0.75, 1.0]),
-        height=400,
-        barmode="group",
-        legend=dict(x=0.01, y=0.99, bgcolor="rgba(255,255,255,0.85)"),
-    )
 
     apply_plotly_style(fig)
     return fig
@@ -3252,20 +3149,6 @@ def make_adaptation_surprise(per_site_path: str | Path) -> go.Figure:
 
     # Horizontal line at delta = 0
     fig.add_hline(y=0, line=dict(color=REF_COLOR, width=1.5, dash="dash"))
-
-    # Quadrant labels
-    quadrants = [
-        (-0.3, 0.25, "Was bad, fixed"),
-        (0.6, 0.15, "Was good, improved"),
-        (-0.3, -0.15, "Was bad, still bad"),
-        (0.6, -0.15, "Was good, got worse"),
-    ]
-    for qx, qy, txt in quadrants:
-        fig.add_annotation(
-            x=qx, y=qy, text=txt, showarrow=False,
-            font=dict(size=10, color=COLORS["gray"]),
-            bgcolor="rgba(255,255,255,0.7)",
-        )
 
     fig.update_layout(
         title="Adaptation Surprise \u2014 Who Benefits Most?",
@@ -3675,8 +3558,7 @@ def make_rating_curves(
         })
 
     fig.update_layout(
-        height=500,
-        legend=dict(x=0.01, y=0.99, bgcolor="rgba(255,255,255,0.85)"),
+        height=600,
     )
 
     # Add shared axis labels
@@ -3722,13 +3604,8 @@ def make_geology_disaggregation(disagg_path: str | Path) -> go.Figure:
     # Sort by R2 ascending so highest is at top of horizontal bars
     sub = sub.sort_values("r2", ascending=True).reset_index(drop=True)
 
-    fig = make_subplots(
-        rows=1, cols=2,
-        subplot_titles=["R\u00b2 by Group", "MAPE (%) by Group"],
-        horizontal_spacing=0.18,
-    )
+    fig = go.Figure()
 
-    # R2 bars
     fig.add_trace(
         go.Bar(
             y=sub["group"],
@@ -3740,10 +3617,43 @@ def make_geology_disaggregation(disagg_path: str | Path) -> go.Figure:
             showlegend=False,
             name="R\u00b2",
         ),
-        row=1, col=1,
     )
 
-    # MAPE bars
+    fig.update_layout(
+        title=f"R\u00b2 by {dim_label}",
+        xaxis_title="R\u00b2",
+        height=400,
+    )
+
+    apply_plotly_style(fig)
+    return fig
+
+
+def make_geology_mape(disagg_path: str | Path) -> go.Figure:
+    """Horizontal bar chart of MAPE by geology type (or collection method)."""
+    df = pd.read_parquet(Path(disagg_path))
+
+    if "dominant_lithology" in df["dimension"].values:
+        sub = df[df["dimension"] == "dominant_lithology"].copy()
+        dim_label = "Dominant Lithology"
+    elif "collection_method" in df["dimension"].values:
+        sub = df[df["dimension"] == "collection_method"].copy()
+        dim_label = "Collection Method"
+    else:
+        fig = go.Figure()
+        fig.add_annotation(
+            x=0.5, y=0.5, xref="paper", yref="paper",
+            text="No geology or collection method data available",
+            showarrow=False, font=dict(size=16),
+        )
+        fig.update_layout(height=400)
+        apply_plotly_style(fig)
+        return fig
+
+    sub = sub.sort_values("mape_pct", ascending=True).reset_index(drop=True)
+
+    fig = go.Figure()
+
     fig.add_trace(
         go.Bar(
             y=sub["group"],
@@ -3755,23 +3665,20 @@ def make_geology_disaggregation(disagg_path: str | Path) -> go.Figure:
             showlegend=False,
             name="MAPE %",
         ),
-        row=1, col=2,
     )
 
     fig.update_layout(
-        title=f"Disaggregated Performance by {dim_label}",
-        height=450,
+        title=f"MAPE (%) by {dim_label}",
+        xaxis_title="MAPE (%)",
+        height=400,
     )
-
-    fig.update_xaxes(title_text="R\u00b2", row=1, col=1)
-    fig.update_xaxes(title_text="MAPE (%)", row=1, col=2)
 
     apply_plotly_style(fig)
     return fig
 
 
 # ---------------------------------------------------------------------------
-# Geology Slope Graph — connected dot plot across metrics
+# Geology Slope Graph — REMOVED (was confusing, replaced by separate bars)
 # ---------------------------------------------------------------------------
 
 def make_geology_slopegraph(disagg_path: str | Path) -> go.Figure:
@@ -4248,4 +4155,438 @@ def make_sediment_load_timescale(per_reading_path: str | Path) -> go.Figure:
         height=450,
     )
     apply_plotly_style(fig)
+    return fig
+
+
+# ---------------------------------------------------------------------------
+# Sediment load comparison figures (v11 vs OLS vs USGS 80155)
+# ---------------------------------------------------------------------------
+
+_LOAD_SITES = [
+    "USGS-01480617",  # Brandywine
+    "USGS-01473169",  # Valley Creek
+    "USGS-09327000",  # Ferron Creek
+]
+
+_USGS_COLOR = OBS_COLOR   # USGS 80155 = "truth" = dark gray
+_V11_COLOR = MODEL_COLOR  # v11 = model = orange
+_OLS_LOAD_COLOR = OLS_COLOR  # OLS = vermillion
+
+
+def _load_site_name(site_id: str, summary: list[dict]) -> str:
+    """Get short display name from summary JSON."""
+    for s in summary:
+        if s["site_id"] == site_id:
+            return s["name"]
+    return site_id
+
+
+def make_load_total_bars(
+    data_dir: str | Path,
+    summary_path: str | Path,
+) -> go.Figure:
+    """Period-total sediment loads: USGS 80155 vs v11 vs OLS, per site."""
+    data_dir = Path(data_dir)
+    with open(Path(summary_path)) as f:
+        summary = json.load(f)
+
+    site_labels = []
+    usgs_totals, v11_totals, ols_totals = [], [], []
+    v11_pct, ols_pct = [], []
+
+    for site_id in _LOAD_SITES:
+        name = _load_site_name(site_id, summary).split(",")[0]
+        site_labels.append(name)
+
+        path = data_dir / f"load_daily_loads_{site_id}.parquet"
+        if not path.exists():
+            usgs_totals.append(0)
+            v11_totals.append(0)
+            ols_totals.append(0)
+            v11_pct.append(0)
+            ols_pct.append(0)
+            continue
+
+        df = pd.read_parquet(path)
+        # Sum each method's full series independently
+        usgs_t = df["load_80155"].sum()
+        v11_t = df["load_v11"].sum() if "load_v11" in df.columns else 0
+        ols_t = df["load_ols"].sum() if "load_ols" in df.columns else 0
+
+        usgs_totals.append(usgs_t)
+        v11_totals.append(v11_t)
+        ols_totals.append(ols_t)
+        v11_pct.append(100 * (v11_t - usgs_t) / usgs_t if usgs_t > 0 else 0)
+        ols_pct.append(100 * (ols_t - usgs_t) / usgs_t if usgs_t > 0 else 0)
+
+    fig = go.Figure()
+
+    fig.add_trace(go.Bar(
+        x=site_labels, y=usgs_totals,
+        name="USGS 80155 (gold standard)",
+        marker_color=_USGS_COLOR,
+        hovertemplate="%{x}<br>USGS 80155: %{y:,.0f} tons<extra></extra>",
+    ))
+    fig.add_trace(go.Bar(
+        x=site_labels, y=v11_totals,
+        name="v11 CatBoost (turbidity-informed)",
+        marker_color=_V11_COLOR,
+        hovertemplate="%{x}<br>v11: %{y:,.0f} tons<extra></extra>",
+    ))
+    fig.add_trace(go.Bar(
+        x=site_labels, y=ols_totals,
+        name="OLS (discharge-only)",
+        marker_color=_OLS_LOAD_COLOR,
+        hovertemplate="%{x}<br>OLS: %{y:,.0f} tons<extra></extra>",
+    ))
+
+    # Annotate % error above v11 and OLS bars
+    for i, label in enumerate(site_labels):
+        fig.add_annotation(
+            x=label, y=v11_totals[i],
+            text=f"{v11_pct[i]:+.0f}%",
+            showarrow=False, yshift=12,
+            font=dict(size=10, color=_V11_COLOR),
+        )
+        fig.add_annotation(
+            x=label, y=ols_totals[i],
+            text=f"{ols_pct[i]:+.0f}%",
+            showarrow=False, yshift=12,
+            font=dict(size=10, color=_OLS_LOAD_COLOR),
+        )
+
+    fig.update_layout(
+        title="Total Sediment Load by Method",
+        yaxis_title="Total Load (tons)",
+        height=450,
+        barmode="group",
+        legend=dict(x=0.01, y=0.99, bgcolor="rgba(255,255,255,0.85)"),
+    )
+
+    apply_plotly_style(fig)
+    return fig
+
+
+def make_load_cumulative_timeseries(
+    data_dir: str | Path,
+    summary_path: str | Path,
+) -> go.Figure:
+    """Cumulative sediment load over time for each site (3 panels)."""
+    data_dir = Path(data_dir)
+    with open(Path(summary_path)) as f:
+        summary = json.load(f)
+
+    fig = make_subplots(
+        rows=3, cols=1,
+        shared_xaxes=False,
+        subplot_titles=[_load_site_name(s, summary) for s in _LOAD_SITES],
+        vertical_spacing=0.08,
+    )
+
+    for i, site_id in enumerate(_LOAD_SITES):
+        row = i + 1
+        path = data_dir / f"load_daily_loads_{site_id}.parquet"
+        if not path.exists():
+            continue
+        df = pd.read_parquet(path)
+
+        # Cumulative sums (skip NaN)
+        for col, name, color, dash in [
+            ("load_80155", "USGS 80155", _USGS_COLOR, "solid"),
+            ("load_v11", "v11 CatBoost", _V11_COLOR, "solid"),
+            ("load_ols", "OLS", _OLS_LOAD_COLOR, "dash"),
+        ]:
+            if col not in df.columns:
+                continue
+            cum = df[col].fillna(0).cumsum()
+            fig.add_trace(
+                go.Scatter(
+                    x=df.index, y=cum,
+                    mode="lines",
+                    line=dict(color=color, width=2, dash=dash),
+                    name=name if i == 0 else None,
+                    showlegend=(i == 0),
+                    legendgroup=col,
+                    hovertemplate=(
+                        f"{name}<br>"
+                        "Date: %{x|%Y-%m-%d}<br>"
+                        "Cumulative: %{y:,.0f} tons<extra></extra>"
+                    ),
+                ),
+                row=row, col=1,
+            )
+
+        fig.update_yaxes(title_text="Cumulative Load (tons)", row=row, col=1)
+
+    fig.update_layout(
+        title="Cumulative Sediment Load Over Time",
+        height=700,
+        legend=dict(x=0.01, y=1.03, orientation="h", bgcolor="rgba(255,255,255,0.85)"),
+    )
+
+    for ann in fig.layout.annotations:
+        if hasattr(ann, "font") and ann.font is not None:
+            ann.font.size = 11
+        else:
+            ann.font = dict(size=11)
+
+    apply_plotly_style(fig)
+    return fig
+
+
+def make_load_daily_scatter(
+    data_dir: str | Path,
+    summary_path: str | Path,
+) -> go.Figure:
+    """Predicted vs observed daily loads (log-log scatter) for all sites."""
+    data_dir = Path(data_dir)
+    with open(Path(summary_path)) as f:
+        summary = json.load(f)
+
+    fig = make_subplots(
+        rows=1, cols=3,
+        shared_yaxes=True,
+        subplot_titles=[_load_site_name(s, summary) for s in _LOAD_SITES],
+        horizontal_spacing=0.06,
+    )
+
+    for i, site_id in enumerate(_LOAD_SITES):
+        col_idx = i + 1
+        path = data_dir / f"load_daily_loads_{site_id}.parquet"
+        if not path.exists():
+            continue
+        df = pd.read_parquet(path).dropna(subset=["load_80155"])
+        # Filter to days with actual transport
+        df = df[df["load_80155"] > 0.01]
+
+        for method, color, marker_sym, name in [
+            ("load_v11", _V11_COLOR, "circle", "v11"),
+            ("load_ols", _OLS_LOAD_COLOR, "diamond", "OLS"),
+        ]:
+            valid = df.dropna(subset=[method])
+            valid = valid[valid[method] > 0]
+            fig.add_trace(
+                go.Scatter(
+                    x=valid["load_80155"], y=valid[method],
+                    mode="markers",
+                    marker=dict(
+                        size=4, color=color, opacity=0.5,
+                        symbol=marker_sym,
+                    ),
+                    name=name if i == 0 else None,
+                    showlegend=(i == 0),
+                    legendgroup=method,
+                    hovertemplate=(
+                        f"{name}<br>"
+                        "USGS: %{x:.1f} tons/day<br>"
+                        "Predicted: %{y:.1f} tons/day<extra></extra>"
+                    ),
+                ),
+                row=1, col=col_idx,
+            )
+
+        # 1:1 reference line
+        rng = [0.01, df["load_80155"].max() * 2]
+        fig.add_trace(
+            go.Scatter(
+                x=rng, y=rng,
+                mode="lines",
+                line=dict(color=REF_COLOR, dash="dash", width=1),
+                name="1:1" if i == 0 else None,
+                showlegend=(i == 0),
+                legendgroup="ref",
+                hoverinfo="skip",
+            ),
+            row=1, col=col_idx,
+        )
+
+        fig.update_xaxes(type="log", title_text="USGS 80155 (tons/day)", row=1, col=col_idx)
+        if col_idx == 1:
+            fig.update_yaxes(type="log", title_text="Predicted (tons/day)", row=1, col=col_idx)
+        else:
+            fig.update_yaxes(type="log", row=1, col=col_idx)
+
+    fig.update_layout(
+        title="Daily Load: Predicted vs USGS 80155",
+        height=400,
+        legend=dict(x=0.01, y=0.99, bgcolor="rgba(255,255,255,0.85)"),
+    )
+
+    for ann in fig.layout.annotations:
+        if hasattr(ann, "font") and ann.font is not None:
+            ann.font.size = 11
+        else:
+            ann.font = dict(size=11)
+
+    apply_plotly_style(fig)
+    return fig
+
+
+def make_load_event_bars(
+    data_dir: str | Path,
+    summary_path: str | Path,
+    top_n: int = 12,
+) -> go.Figure:
+    """Top storm events: USGS 80155 vs v11 vs OLS grouped bars (3 panels)."""
+    data_dir = Path(data_dir)
+    with open(Path(summary_path)) as f:
+        summary = json.load(f)
+
+    fig = make_subplots(
+        rows=3, cols=1,
+        shared_xaxes=False,
+        subplot_titles=[_load_site_name(s, summary) for s in _LOAD_SITES],
+        vertical_spacing=0.10,
+    )
+
+    for i, site_id in enumerate(_LOAD_SITES):
+        row = i + 1
+        path = data_dir / f"load_event_loads_{site_id}.parquet"
+        if not path.exists():
+            continue
+        ef = pd.read_parquet(path)
+        # Take top N events by USGS 80155 load
+        ef = ef.dropna(subset=["load_80155_tons"])
+        ef = ef.nlargest(top_n, "load_80155_tons").sort_values("start")
+
+        event_labels = [f"E{eid}" for eid in ef["event_id"]]
+
+        fig.add_trace(go.Bar(
+            x=event_labels, y=ef["load_80155_tons"],
+            name="USGS 80155" if i == 0 else None,
+            showlegend=(i == 0),
+            legendgroup="80155",
+            marker_color=_USGS_COLOR,
+            hovertemplate="USGS: %{y:,.0f} tons<extra></extra>",
+        ), row=row, col=1)
+
+        fig.add_trace(go.Bar(
+            x=event_labels, y=ef["load_v11_tons"],
+            name="v11 CatBoost" if i == 0 else None,
+            showlegend=(i == 0),
+            legendgroup="v11",
+            marker_color=_V11_COLOR,
+            hovertemplate="v11: %{y:,.0f} tons<extra></extra>",
+        ), row=row, col=1)
+
+        fig.add_trace(go.Bar(
+            x=event_labels, y=ef["load_ols_tons"],
+            name="OLS" if i == 0 else None,
+            showlegend=(i == 0),
+            legendgroup="ols",
+            marker_color=_OLS_LOAD_COLOR,
+            hovertemplate="OLS: %{y:,.0f} tons<extra></extra>",
+        ), row=row, col=1)
+
+        fig.update_yaxes(title_text="Event Load (tons)", row=row, col=1)
+
+    fig.update_layout(
+        title=f"Top {top_n} Storm Events: Load Comparison",
+        height=700,
+        barmode="group",
+        legend=dict(x=0.01, y=1.03, orientation="h", bgcolor="rgba(255,255,255,0.85)"),
+    )
+
+    for ann in fig.layout.annotations:
+        if hasattr(ann, "font") and ann.font is not None:
+            ann.font.size = 11
+        else:
+            ann.font = dict(size=11)
+
+    apply_plotly_style(fig)
+    return fig
+
+
+def make_load_metrics_table(summary_path: str | Path) -> go.Figure:
+    """Summary metrics table: R², Spearman, bias, load ratio by site and method."""
+    with open(Path(summary_path)) as f:
+        summary = json.load(f)
+
+    sites = [s for s in summary if s["site_id"] in _LOAD_SITES]
+
+    rows = []
+    for s in sites:
+        name = s["name"].split(",")[0]
+        for scale in ["daily", "daily_transport", "monthly"]:
+            if scale not in s:
+                continue
+            for method_key, method_label in [("v11", "v11"), ("ols", "OLS")]:
+                if method_key not in s[scale]:
+                    continue
+                m = s[scale][method_key]
+                scale_label = {
+                    "daily": "All Days",
+                    "daily_transport": "Transport Days",
+                    "monthly": "Monthly",
+                }.get(scale, scale)
+                rows.append({
+                    "Site": name,
+                    "Scale": scale_label,
+                    "Method": method_label,
+                    "R²": m.get("r2"),
+                    "Spearman": m.get("spearman"),
+                    "Bias %": m.get("pbias_pct"),
+                    "Load Ratio": m.get("total_load_ratio"),
+                })
+
+    if not rows:
+        fig = go.Figure()
+        fig.add_annotation(x=0.5, y=0.5, xref="paper", yref="paper",
+                           text="No load comparison data available.", showarrow=False)
+        fig.update_layout(height=300)
+        apply_plotly_style(fig)
+        return fig
+
+    # Build columnar data
+    cols = ["Site", "Scale", "Method", "R²", "Spearman", "Bias %", "Load Ratio"]
+    col_data = {c: [] for c in cols}
+    for r in rows:
+        for c in cols:
+            val = r.get(c)
+            if isinstance(val, float) and val is not None:
+                if c in ("R²", "Spearman"):
+                    col_data[c].append(f"{val:.3f}")
+                elif c == "Bias %":
+                    col_data[c].append(f"{val:+.1f}%")
+                elif c == "Load Ratio":
+                    col_data[c].append(f"{val:.2f}x")
+                else:
+                    col_data[c].append(str(val))
+            else:
+                col_data[c].append(str(val) if val is not None else "—")
+
+    # Color cells by method — blue (v11) vs light gray (OLS) for colorblind safety
+    cell_colors = []
+    for c in cols:
+        col_colors = []
+        for r in rows:
+            if r["Method"] == "v11":
+                col_colors.append("rgba(0, 114, 178, 0.10)")  # light blue
+            else:
+                col_colors.append("rgba(150, 150, 150, 0.10)")  # light gray
+        cell_colors.append(col_colors)
+
+    fig = go.Figure(data=[go.Table(
+        header=dict(
+            values=[f"<b>{c}</b>" for c in cols],
+            fill_color="#f0f0f0",
+            align="center",
+            font=dict(size=12),
+            height=30,
+        ),
+        cells=dict(
+            values=[col_data[c] for c in cols],
+            fill_color=cell_colors,
+            align="center",
+            font=dict(size=11),
+            height=26,
+        ),
+    )])
+
+    fig.update_layout(
+        title="Load Estimation Metrics by Site, Scale, and Method",
+        height=max(350, 50 + 26 * len(rows)),
+        margin=dict(l=10, r=10, t=50, b=10),
+    )
+
     return fig
