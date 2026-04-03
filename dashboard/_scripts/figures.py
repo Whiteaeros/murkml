@@ -4360,6 +4360,305 @@ def make_shap_failure_comparison(
 
 
 # ---------------------------------------------------------------------------
+# First flush event traces + Hysteresis loops
+# ---------------------------------------------------------------------------
+
+
+def _find_storm_events(sdf, max_gap_hrs=48, min_samples=8, min_ssc_ratio=3):
+    """Identify distinct storm events in a site's time series."""
+    sdf = sdf.sort_values("sample_time").reset_index(drop=True)
+    gaps = sdf["sample_time"].diff().dt.total_seconds() / 3600
+    event_id = (gaps > max_gap_hrs).cumsum()
+    events = []
+    for eid, grp in sdf.groupby(event_id):
+        if len(grp) >= min_samples:
+            ssc_max = grp["y_true_native"].max()
+            ssc_min = max(grp["y_true_native"].min(), 1)
+            if ssc_max / ssc_min >= min_ssc_ratio:
+                events.append(grp)
+    return events
+
+
+def make_first_flush_traces(
+    per_reading_path: str | Path,
+    conformal_summary_path: str | Path | None = None,
+    n_events: int = 4,
+) -> go.Figure:
+    """Time series of SSC during storm events with conformal prediction bands.
+
+    Picks the most dramatic events across holdout sites. Shows observed SSC,
+    predicted SSC, and 90% conformal bands if available.
+    """
+    df = pd.read_parquet(Path(per_reading_path))
+    df["sample_time"] = pd.to_datetime(df["sample_time"])
+
+    # Load conformal offsets if available
+    conf = None
+    if conformal_summary_path is not None:
+        cp = Path(conformal_summary_path)
+        if cp.exists():
+            conf = json.load(open(cp))
+
+    # Find best storm events across all sites
+    all_events = []
+    for site_id in df["site_id"].unique():
+        sdf = df[df["site_id"] == site_id]
+        if len(sdf) < 15:
+            continue
+        events = _find_storm_events(sdf)
+        for ev in events:
+            all_events.append((site_id, ev["y_true_native"].max(), ev))
+
+    # Pick top N by peak SSC, prefer different sites
+    all_events.sort(key=lambda x: x[1], reverse=True)
+    picked = []
+    seen_sites = set()
+    for site_id, peak, ev in all_events:
+        if site_id not in seen_sites:
+            picked.append((site_id, ev))
+            seen_sites.add(site_id)
+        if len(picked) >= n_events:
+            break
+
+    colors = [COLORS["blue"], COLORS["vermillion"], COLORS["green"], COLORS["orange"]]
+
+    fig = make_subplots(
+        rows=len(picked), cols=1,
+        shared_xaxes=False,
+        subplot_titles=[
+            f"{sid} — peak {ev['y_true_native'].max():.0f} mg/L"
+            for sid, ev in picked
+        ],
+        vertical_spacing=0.08,
+    )
+
+    for i, (site_id, ev) in enumerate(picked):
+        row = i + 1
+        ev = ev.sort_values("sample_time")
+        times = ev["sample_time"]
+        obs = ev["y_true_native"].values
+        pred = ev["y_pred_native"].values
+        color = colors[i % len(colors)]
+
+        # Conformal bands
+        if conf is not None and "continuous_knots" in conf:
+            knots = conf["continuous_knots"]
+            pred_knots = np.array(knots["knot_pred_values_mgL"])
+            lo_off = np.array(knots["lo_offsets_90"])
+            hi_off = np.array(knots["hi_offsets_90"])
+            lo_at = np.interp(pred, pred_knots, lo_off)
+            hi_at = np.interp(pred, pred_knots, hi_off)
+            band_lo = np.maximum(pred + lo_at, 0)
+            band_hi = pred + hi_at
+
+            r, g, b = int(color[1:3], 16), int(color[3:5], 16), int(color[5:7], 16)
+            fig.add_trace(
+                go.Scatter(
+                    x=pd.concat([times, times[::-1]]),
+                    y=np.concatenate([band_hi, band_lo[::-1]]),
+                    fill="toself",
+                    fillcolor=f"rgba({r},{g},{b},0.12)",
+                    line=dict(width=0),
+                    name="90% PI" if i == 0 else None,
+                    showlegend=(i == 0),
+                    legendgroup="pi",
+                    hoverinfo="skip",
+                ),
+                row=row, col=1,
+            )
+
+        # Predicted
+        fig.add_trace(
+            go.Scatter(
+                x=times, y=pred,
+                mode="lines",
+                line=dict(color=color, width=2),
+                name="Predicted" if i == 0 else None,
+                showlegend=(i == 0),
+                legendgroup="pred",
+                hovertemplate="Pred: %{y:.0f} mg/L<extra></extra>",
+            ),
+            row=row, col=1,
+        )
+
+        # Observed
+        fig.add_trace(
+            go.Scatter(
+                x=times, y=obs,
+                mode="markers+lines",
+                marker=dict(size=6, color=OBS_COLOR),
+                line=dict(color=OBS_COLOR, width=1, dash="dot"),
+                name="Observed" if i == 0 else None,
+                showlegend=(i == 0),
+                legendgroup="obs",
+                hovertemplate="Obs: %{y:.0f} mg/L<extra></extra>",
+            ),
+            row=row, col=1,
+        )
+
+        fig.update_yaxes(title_text="SSC (mg/L)", row=row, col=1)
+
+    fig.update_layout(
+        title="First Flush Event Traces with Prediction Intervals",
+        height=250 * len(picked),
+    )
+
+    for ann in fig.layout.annotations:
+        if hasattr(ann, "font") and ann.font is not None:
+            ann.font.size = 10
+        else:
+            ann.font = dict(size=10)
+
+    apply_plotly_style(fig)
+    return fig
+
+
+def make_hysteresis_loops(
+    per_reading_path: str | Path,
+    n_events: int = 4,
+) -> go.Figure:
+    """SSC vs discharge hysteresis loops during storm events.
+
+    Clockwise loops = sediment arrives before the flow peak (supply-limited).
+    Counter-clockwise = sediment lags flow (transport-limited).
+    Color encodes time progression through the event (dark=start, light=end).
+    """
+    df = pd.read_parquet(Path(per_reading_path))
+    df["sample_time"] = pd.to_datetime(df["sample_time"])
+
+    # Find events with both Q and SSC
+    valid = df.dropna(subset=["discharge_instant", "y_true_native"])
+    valid = valid[valid["discharge_instant"] > 0]
+
+    all_events = []
+    for site_id in valid["site_id"].unique():
+        sdf = valid[valid["site_id"] == site_id]
+        if len(sdf) < 15:
+            continue
+        events = _find_storm_events(sdf, min_samples=10)
+        for ev in events:
+            q_range = ev["discharge_instant"].max() / max(ev["discharge_instant"].min(), 1)
+            if q_range >= 2:  # need meaningful Q variation
+                all_events.append((site_id, ev["y_true_native"].max(), ev))
+
+    all_events.sort(key=lambda x: x[1], reverse=True)
+    picked = []
+    seen_sites = set()
+    for site_id, peak, ev in all_events:
+        if site_id not in seen_sites:
+            picked.append((site_id, ev))
+            seen_sites.add(site_id)
+        if len(picked) >= n_events:
+            break
+
+    if not picked:
+        fig = go.Figure()
+        fig.add_annotation(
+            x=0.5, y=0.5, xref="paper", yref="paper",
+            text="No storm events with sufficient Q+SSC data found",
+            showarrow=False, font=dict(size=14),
+        )
+        fig.update_layout(height=400)
+        apply_plotly_style(fig)
+        return fig
+
+    n_cols = 2
+    n_rows = (len(picked) + 1) // 2
+
+    subplot_titles = []
+    for sid, ev in picked:
+        peak_ssc = ev["y_true_native"].max()
+        subplot_titles.append(f"{sid.replace('USGS-', '')} (peak {peak_ssc:.0f} mg/L)")
+    while len(subplot_titles) < n_rows * n_cols:
+        subplot_titles.append("")
+
+    fig = make_subplots(
+        rows=n_rows, cols=n_cols,
+        subplot_titles=subplot_titles,
+        horizontal_spacing=0.10,
+        vertical_spacing=0.12,
+    )
+
+    for i, (site_id, ev) in enumerate(picked):
+        row = i // n_cols + 1
+        col = i % n_cols + 1
+        ev = ev.sort_values("sample_time")
+
+        Q = ev["discharge_instant"].values
+        ssc_obs = ev["y_true_native"].values
+        ssc_pred = ev["y_pred_native"].values
+        n = len(ev)
+
+        # Time progression: 0=start, 1=end
+        t_norm = np.linspace(0, 1, n)
+
+        # Observed loop (arrows via lines colored by time)
+        fig.add_trace(
+            go.Scatter(
+                x=Q, y=ssc_obs,
+                mode="markers+lines",
+                marker=dict(
+                    size=7,
+                    color=t_norm,
+                    colorscale=[[0, OBS_COLOR], [1, COLORS["gray"]]],
+                    showscale=(i == 0),
+                    colorbar=dict(
+                        title="Time",
+                        tickvals=[0, 1],
+                        ticktext=["Start", "End"],
+                        len=0.4,
+                        thickness=10,
+                        x=1.02,
+                    ) if i == 0 else None,
+                ),
+                line=dict(color=OBS_COLOR, width=1),
+                name="Observed" if i == 0 else None,
+                showlegend=(i == 0),
+                legendgroup="obs",
+                hovertemplate="Q: %{x:.0f} cfs<br>SSC: %{y:.0f} mg/L<extra></extra>",
+            ),
+            row=row, col=col,
+        )
+
+        # Predicted loop
+        fig.add_trace(
+            go.Scatter(
+                x=Q, y=ssc_pred,
+                mode="markers+lines",
+                marker=dict(
+                    size=5,
+                    color=t_norm,
+                    colorscale=[[0, MODEL_COLOR], [1, COLORS["yellow"]]],
+                    showscale=False,
+                ),
+                line=dict(color=MODEL_COLOR, width=1, dash="dash"),
+                name="Predicted" if i == 0 else None,
+                showlegend=(i == 0),
+                legendgroup="pred",
+                hovertemplate="Q: %{x:.0f} cfs<br>Pred: %{y:.0f} mg/L<extra></extra>",
+            ),
+            row=row, col=col,
+        )
+
+        fig.update_xaxes(title_text="Discharge (cfs)", row=row, col=col)
+        fig.update_yaxes(title_text="SSC (mg/L)", row=row, col=col)
+
+    fig.update_layout(
+        title="Hysteresis Loops — SSC vs Discharge During Storm Events",
+        height=350 * n_rows,
+    )
+
+    for ann in fig.layout.annotations:
+        if hasattr(ann, "font") and ann.font is not None:
+            ann.font.size = 10
+        else:
+            ann.font = dict(size=10)
+
+    apply_plotly_style(fig)
+    return fig
+
+
+# ---------------------------------------------------------------------------
 # Discharge-weighted sediment load validation
 # ---------------------------------------------------------------------------
 

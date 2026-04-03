@@ -114,6 +114,39 @@ fig = make_rating_curves(
 fig.show()
 ```
 
+## Storm Event Traces
+
+Most of a river's annual sediment budget moves during a handful of storm events — high-flow pulses lasting hours to days where SSC can spike by two orders of magnitude. Getting these events right matters more for practical applications (load estimation, habitat impact) than getting baseflow right. This figure shows 4 of the largest storm events in the holdout data, with observed SSC (gray), predicted SSC (colored line), and the 90% empirical conformal prediction band (shaded). A good prediction tracks the rise and fall of SSC and captures the peak magnitude; the prediction band should widen during the peak (higher uncertainty at extreme concentrations) and contain most of the observed points.
+
+```{python}
+#| echo: false
+#| label: fig-first-flush
+from _scripts.figures import make_first_flush_traces
+
+fig = make_first_flush_traces(
+    Path("dashboard_data/per_reading.parquet"),
+    conformal_summary_path=Path("dashboard_data/conformal_conformal_summary.json"),
+    n_events=4,
+)
+fig.show()
+```
+
+## Hysteresis Loops
+
+During a storm event, the relationship between discharge (flow rate) and SSC traces out a loop rather than a straight line. **Clockwise loops** mean sediment concentration peaks before discharge does — the first rush of water scours easily-available material from the channel bed and banks, then runs out of sediment supply even as flow continues rising. **Counter-clockwise loops** mean sediment lags flow — typical of distant sediment sources or snowmelt events where sediment mobilization takes time. The shape of the loop reveals transport physics that a simple Q→SSC rating curve cannot capture, but a turbidity-informed model can, because turbidity responds to what's actually in the water column. Dark dots mark the start of the event; light dots mark the end. Dashed lines show model predictions traversing the same loop.
+
+```{python}
+#| echo: false
+#| label: fig-hysteresis
+from _scripts.figures import make_hysteresis_loops
+
+fig = make_hysteresis_loops(
+    Path("dashboard_data/per_reading.parquet"),
+    n_events=4,
+)
+fig.show()
+```
+
 ## Feature Importance
 
 The model uses 72 input features: the turbidity reading itself, plus watershed characteristics such as land cover fractions, soil texture, geology, drainage area, and long-term climate averages. To understand which features matter and *how* they matter, we use SHAP (SHapley Additive exPlanations) — a method that computes each feature's contribution to each individual prediction.
