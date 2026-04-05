@@ -1,0 +1,261 @@
+# murkml Model Configuration
+# THE single source of truth for feature lists, hyperparameters, and transform settings.
+#
+# History:
+#   v9: 72 features (optimized_drop_list.txt applied — predates many engineered features)
+#   v11 (legacy): 137 features — train_tiered.py never applied drop list
+#   v11_golden_master: reproduced legacy 137-feature behavior (Phase 4)
+#   v12: 88 curated features — importance >= 0.1 in v11 CatBoost PredictionValuesChange
+#
+# Feature selection rationale: CatBoost importance >= 0.1 threshold drops 49 features
+# (18 with zero splits + 31 with near-zero importance). Keeps all features that
+# CatBoost meaningfully splits on. Validated through Phase 5 of zero-regression refactor.
+#
+# To change the model: edit THIS file, then retrain. Nowhere else.
+
+version: "v12"
+
+# === Feature groups (for human readability + Pydantic cross-validation) ===
+features:
+  sensor:
+    - turbidity_instant
+    - turbidity_mean_1hr
+    - turbidity_min_1hr
+    - turbidity_max_1hr
+    - turbidity_std_1hr
+    - turbidity_range_1hr
+    - turbidity_slope_1hr
+    - conductance_instant
+    - do_instant
+    - temp_instant
+    - discharge_instant
+    - sensor_offset
+    - days_since_last_visit
+    - discharge_slope_2hr
+    - Q_7day_mean
+    - Q_30day_mean
+    - Q_ratio_7d
+    - turb_Q_ratio
+  temporal:
+    - doy_sin
+    - doy_cos
+  weather:
+    - precip_24h
+    - precip_48h
+    - precip_7d
+    - precip_30d
+    - days_since_rain
+    - temp_at_sample
+  engineered:
+    - log_turbidity_instant
+    - log_drainage_area
+  site:
+    - latitude
+    - longitude
+    - drainage_area_km2
+    - elevation_m
+  land_cover:
+    - forest_pct
+    - developed_pct
+    - wetland_pct
+    - shrub_pct
+    - grass_pct
+  surficial_geology:
+    - pct_siliciclastic
+    - pct_nonite_resid
+    - pct_extrusive_volcanic
+    - pct_glacial_till_clay
+    - pct_glacial_lake_fine
+    - pct_eolian_coarse
+    - pct_eolian_fine
+    - pct_colluvial_sediment
+  geochemistry:
+    - geo_cao
+    - geo_sio2
+    - geo_al2o3
+    - geo_fe2o3
+    - geo_mgo
+    - geo_k2o
+    - geo_na2o
+  soils:
+    - clay_pct
+    - sand_pct
+    - soil_permeability
+    - soil_rock_depth
+    - water_table_depth
+    - soil_organic_matter
+    - soil_erodibility
+  hydrology:
+    - precip_mean_mm
+    - temp_mean_c
+    - baseflow_index
+    - runoff_mean
+    - wetness_index
+    - slope_pct
+    - hydraulic_conductivity
+    - hydrologic_connectivity
+  anthropogenic:
+    - dam_density
+    - road_density
+    - pop_density
+    - npdes_density
+    - wwtp_all_density
+    - septic_density
+    - superfund_density
+    - mine_density
+    - fertilizer_rate
+    - nitrogen_surplus
+    - ag_drainage_pct
+    - rock_nitrogen
+    - compressive_strength
+  sgmc_lithology:
+    - sgmc_metamorphic_schist
+    - sgmc_metamorphic_sedimentary_clastic
+    - sgmc_metamorphic_undifferentiated
+    - sgmc_sedimentary_chemical
+    - sgmc_sedimentary_clastic
+    - sgmc_sedimentary_undifferentiated
+  categoricals:
+    - collection_method
+    - sensor_family
+
+# === Authoritative column order for CatBoost .fit() ===
+# Preserves legacy column ordering for features that remain.
+feature_order:
+  - turbidity_instant
+  - turbidity_mean_1hr
+  - turbidity_min_1hr
+  - turbidity_max_1hr
+  - turbidity_std_1hr
+  - turbidity_range_1hr
+  - turbidity_slope_1hr
+  - conductance_instant
+  - do_instant
+  - temp_instant
+  - discharge_instant
+  - sensor_offset
+  - days_since_last_visit
+  - discharge_slope_2hr
+  - Q_7day_mean
+  - Q_30day_mean
+  - Q_ratio_7d
+  - turb_Q_ratio
+  - doy_sin
+  - doy_cos
+  - precip_24h
+  - precip_48h
+  - precip_7d
+  - precip_30d
+  - days_since_rain
+  - temp_at_sample
+  - log_turbidity_instant
+  - latitude
+  - longitude
+  - drainage_area_km2
+  - forest_pct
+  - developed_pct
+  - wetland_pct
+  - shrub_pct
+  - grass_pct
+  - pct_siliciclastic
+  - pct_nonite_resid
+  - pct_extrusive_volcanic
+  - pct_glacial_till_clay
+  - pct_glacial_lake_fine
+  - pct_eolian_coarse
+  - pct_eolian_fine
+  - pct_colluvial_sediment
+  - geo_cao
+  - geo_sio2
+  - geo_al2o3
+  - geo_fe2o3
+  - geo_mgo
+  - geo_k2o
+  - geo_na2o
+  - clay_pct
+  - sand_pct
+  - soil_permeability
+  - soil_rock_depth
+  - water_table_depth
+  - soil_organic_matter
+  - soil_erodibility
+  - precip_mean_mm
+  - temp_mean_c
+  - elevation_m
+  - baseflow_index
+  - runoff_mean
+  - wetness_index
+  - dam_density
+  - road_density
+  - pop_density
+  - npdes_density
+  - wwtp_all_density
+  - septic_density
+  - superfund_density
+  - mine_density
+  - fertilizer_rate
+  - nitrogen_surplus
+  - ag_drainage_pct
+  - rock_nitrogen
+  - compressive_strength
+  - hydraulic_conductivity
+  - hydrologic_connectivity
+  - slope_pct
+  - sgmc_metamorphic_schist
+  - sgmc_metamorphic_sedimentary_clastic
+  - sgmc_metamorphic_undifferentiated
+  - sgmc_sedimentary_chemical
+  - sgmc_sedimentary_clastic
+  - sgmc_sedimentary_undifferentiated
+  - log_drainage_area
+  - collection_method
+  - sensor_family
+
+# === Monotone constraints (physics: more turbidity = more sediment) ===
+monotone_constraints:
+  - turbidity_instant
+  - turbidity_mean_1hr
+  - turbidity_min_1hr
+  - turbidity_max_1hr
+
+# === Metadata columns (never features) ===
+exclude_cols:
+  - site_id
+  - sample_time
+  - lab_value
+  - match_gap_seconds
+  - window_count
+  - is_nondetect
+  - hydro_event
+  - ssc_log1p
+  - ssc_value
+  - total_phosphorus_log1p
+  - nitrate_nitrite_log1p
+  - orthophosphate_log1p
+  - tds_evaporative_log1p
+
+# === CatBoost hyperparameters (locked after HP sweep 2026-04-02) ===
+catboost:
+  depth: 6
+  learning_rate: 0.05
+  l2_leaf_reg: 3
+  iterations: 500
+  early_stopping_rounds: 50
+  boosting_type: Plain
+  random_seed: 42
+  thread_count: 5
+
+# === Transform (locked after sweep 2026-03-28) ===
+transform:
+  type: boxcox
+  lambda: 0.2
+
+# === Unit documentation (declarative, not runtime-enforced) ===
+units:
+  turbidity: FNU
+  discharge: CFS
+  conductance: uS/cm
+  temperature: degC
+  dissolved_oxygen: mg/L
+  ph: standard_units
+  ssc: mg/L

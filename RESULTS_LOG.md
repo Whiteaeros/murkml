@@ -4,9 +4,72 @@ Reference for paper writing. Captures key results, expert panel findings, and de
 
 ---
 
-## v11 Results (2026-04-01) — CURRENT BEST
+## v12 Results (2026-04-05) — CURRENT BEST
+
+**v11 superseded.** v12 is a zero-regression refactored pipeline with curated 88-feature set.
+
+### What Changed
+
+**Architecture:** Full pipeline refactor. Single config file (`config/features.yaml`), Pydantic-validated. One code path for feature selection (eliminates the v11 duplicated-path bug). Golden master validation: all 6 checks PASS.
+
+**Feature count fix:** v10/v11 trained on 137 features because `train_tiered.py` never loaded `optimized_drop_list.txt`. v12 uses 88 features selected by CatBoost PredictionValuesChange importance >= 0.1. Drops 49 features (18 zero-split + 31 near-zero importance).
+
+**Model:** ssc_C_sensor_basic_watershed_v12.cbm
+- 260 training sites, 23,615 samples, **88 features** (86 numeric + 2 categorical)
+- Box-Cox lambda=0.2, Plain boosting, 500 trees (final model), 483 median trees/fold
+- BCF_mean=1.277 (loads), BCF_median=0.959 (individual predictions)
+
+**LOGO CV (260 folds):**
+
+| Metric | v11 (137 feat) | v12 (88 feat) | Delta |
+|---|---|---|---|
+| R²(log) | 0.763 | 0.757 | -0.006 |
+| KGE(log) | 0.779 | 0.779 | 0.000 |
+| R²(native) | 0.421 | 0.404 | -0.017 |
+| RMSE | 137.0 | 138.2 | +1.2 |
+| Bias | +12.6% | +12.1% | **-0.5%** |
+
+**Holdout (78 sites, 6026 samples):**
+
+| Metric | v11 | v12 | Delta |
+|---|---|---|---|
+| NSE | 0.306 | 0.304 | -0.002 |
+| Log-NSE | 0.804 | 0.798 | -0.006 |
+| RMSE (mg/L) | 731.5 | 732.7 | +1.1 |
+| MAPE | 40.1% | 40.2% | +0.1% |
+| Within-2x | 70.0% | 69.6% | -0.4% |
+| Spearman | 0.907 | 0.905 | -0.002 |
+| Bias | -36.6% | -36.8% | -0.2% |
+| **MedSiteR²** | **0.402** | **0.408** | **+0.007** |
+
+**MedSiteR² improved** despite 36% fewer features — dropped features were noise.
+
+**Extreme-event performance (unchanged):**
+
+| SSC Tier | v11 Bias | v12 Bias | Delta |
+|---|---|---|---|
+| Low (<50) | +50.6% | +52.0% | +1.4% |
+| Med (50-500) | -2.8% | -3.1% | -0.4% |
+| High (500-5K) | -44.5% | -44.7% | -0.2% |
+| Extreme (>5K) | -82.1% | -82.4% | -0.3% |
+
+**Adaptation curve (N=10, random):** MedR²=0.493, MAPE=35.2%, Within-2x=78.2%
+
+**Files:**
+- `config/features.yaml` — single source of truth for all model config
+- `data/results/models/ssc_C_sensor_basic_watershed_v12.cbm` — production model
+- `data/results/models/ssc_C_sensor_basic_watershed_v12_meta.json` — complete metadata
+- `data/results/evaluations/v12_*` — holdout evaluation outputs
+- `data/results/logo_folds_ssc_C_v12.parquet` — per-fold CV metrics
+- `data/results/logo_predictions_ssc_C_v12.parquet` — per-sample OOF predictions
+
+---
+
+## v11 Results (2026-04-01) — SUPERSEDED by v12
 
 **v10 superseded.** v11 adds extreme data expansion + Plain boosting.
+
+**NOTE (2026-04-05):** v11 was documented as having 72 features but actually had 137. `train_tiered.py` never loaded `optimized_drop_list.txt`. All v11 metrics are valid (the model trained and evaluated correctly on 137 features), but the feature count in this log was wrong. See v12 for the corrected pipeline.
 
 ### Provisional Data Experiment (2026-04-04)
 
