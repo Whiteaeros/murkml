@@ -1,6 +1,6 @@
 """Train murkml CatBoost model.
 
-Thin CLI: loads config → loads data → trains model → saves artifacts.
+Thin CLI: loads config -> loads data -> runs CV -> saves model + results.
 All logic lives in src/murkml/ modules.
 
 Usage:
@@ -12,11 +12,13 @@ from __future__ import annotations
 import argparse
 import json
 import logging
+import os
 import sys
 import time
 from pathlib import Path
 
 import numpy as np
+import pandas as pd
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
@@ -24,12 +26,7 @@ sys.path.insert(0, str(PROJECT_ROOT / "src"))
 from murkml.config import load_config
 from murkml.data.loader import prepare_training_data
 from murkml.training.cv import run_logo_cv
-from murkml.training.model import (
-    build_catboost_params,
-    compute_monotone_constraints,
-    save_model,
-    train_final_model,
-)
+from murkml.training.model import save_model, train_final_model
 
 logging.basicConfig(
     level=logging.INFO,
@@ -39,7 +36,8 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 DATA_DIR = PROJECT_ROOT / "data"
-MODELS_DIR = DATA_DIR / "results" / "models"
+RESULTS_DIR = DATA_DIR / "results"
+MODELS_DIR = RESULTS_DIR / "models"
 
 
 def parse_args() -> argparse.Namespace:
@@ -47,7 +45,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--config", type=Path, default=PROJECT_ROOT / "config" / "features.yaml",
                         help="Path to YAML config")
     parser.add_argument("--cv-mode", choices=["logo", "none"], default="logo",
-                        help="Cross-validation mode (logo=Leave-One-Group-Out)")
+                        help="Cross-validation mode")
     parser.add_argument("--label", type=str, default=None,
                         help="Model label (overrides config version for output naming)")
     parser.add_argument("--n-jobs", type=int, default=6,
@@ -74,6 +72,7 @@ def main():
     data = prepare_training_data(DATA_DIR, config)
     X, y = data["X"], data["y"]
     sites = data["sites"]
+    lab_values = data["lab_values"]
     feature_names = data["feature_names"]
     cat_indices = data["cat_indices"]
 
@@ -84,33 +83,40 @@ def main():
         logger.info(f"Running LOGO CV (n_jobs={args.n_jobs})...")
         cv_result = run_logo_cv(
             X, y, sites, cat_indices, config, feature_names,
-            thread_count=max(1, (6 * 5) // args.n_jobs),  # ~5 threads per job
+            lab_values=lab_values,
             n_jobs=args.n_jobs,
         )
 
-        # Report CV metrics
-        oof = cv_result["oof_predictions"]
-        from murkml.evaluate.metrics import r_squared, kge, rmse
-        from scipy.special import inv_boxcox1p
-
-        r2_log = r_squared(y, oof)
-        kge_log = kge(y, oof)
-
-        # Native-space metrics
-        y_native = inv_boxcox1p(y, config.transform.lmbda)
-        oof_native = inv_boxcox1p(np.clip(oof, 0, None), config.transform.lmbda)
-        rmse_native = rmse(y_native, oof_native)
-
+        # Compute summary metrics from per-fold results
+        fold_df = pd.DataFrame(cv_result["fold_metrics"])
         logger.info(
-            f"CV Results: R²(log)={r2_log:.4f} | KGE(log)={kge_log:.4f} | "
-            f"RMSE(native)={rmse_native:.1f} mg/L"
+            f"CV Results (median per-fold): "
+            f"R²(log)={fold_df['r2_log'].median():.4f} | "
+            f"KGE(log)={fold_df['kge_log'].median():.4f} | "
+            f"R²(native)={fold_df['r2_native'].median():.4f} | "
+            f"RMSE(native)={fold_df['rmse_native_mgL'].median():.1f} mg/L | "
+            f"Bias={fold_df['pbias_native'].median():.1f}% | "
+            f"Trees median={fold_df['n_trees'].median():.0f}"
         )
+
+        # Save CV results to disk
+        out_dir = RESULTS_DIR
+        out_dir.mkdir(parents=True, exist_ok=True)
+
+        fold_df.to_parquet(out_dir / f"logo_folds_ssc_C_{label}.parquet", index=False)
+        logger.info(f"Saved fold metrics: {len(fold_df)} folds")
+
+        if cv_result["sample_records"]:
+            records_df = pd.DataFrame(cv_result["sample_records"])
+            records_df.to_parquet(out_dir / f"logo_predictions_ssc_C_{label}.parquet", index=False)
+            logger.info(f"Saved per-sample predictions: {len(records_df)} records")
 
     # Save final model
     if not args.skip_save:
         logger.info("Training final model...")
         model, metadata = train_final_model(
-            X, y, cat_indices, config, feature_names,
+            X, y, sites, cat_indices, config, feature_names,
+            lab_values=lab_values,
             thread_count=config.catboost.thread_count,
         )
         model_path, meta_path = save_model(model, metadata, config, MODELS_DIR, label)
