@@ -17,8 +17,8 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 EVAL_DIR = PROJECT_ROOT / "data" / "results" / "evaluations"
 DASH_DATA = Path(__file__).resolve().parent.parent / "dashboard_data"
 
-# v11 is the current model
-EVAL_PREFIX = "v11_extreme_eval"
+# v12 is the current model (88 features, refactored pipeline)
+EVAL_PREFIX = "v12"
 
 
 def prep():
@@ -83,8 +83,13 @@ def prep():
         print(f"  Copied empirical conformal ({len(list(conformal_dir.iterdir()))} files)")
 
     # --- SHAP values and feature importance ---
-    shap_vals = EVAL_DIR.parent / "shap_values_ssc_C_sensor_basic_watershed_v11.parquet"
-    shap_imp = EVAL_DIR.parent / "shap_importance_ssc_C_sensor_basic_watershed_v11.parquet"
+    # Try v12 SHAP first, fall back to v11
+    shap_vals = EVAL_DIR.parent / "shap_values_ssc_C_sensor_basic_watershed_v12.parquet"
+    shap_imp = EVAL_DIR.parent / "shap_importance_ssc_C_sensor_basic_watershed_v12.parquet"
+    if not shap_vals.exists():
+        shap_vals = EVAL_DIR.parent / "shap_values_ssc_C_sensor_basic_watershed_v11.parquet"
+    if not shap_imp.exists():
+        shap_imp = EVAL_DIR.parent / "shap_importance_ssc_C_sensor_basic_watershed_v11.parquet"
     if shap_vals.exists():
         shutil.copy(shap_vals, DASH_DATA / "shap_values.parquet")
         print(f"  Copied shap_values.parquet ({shap_vals.stat().st_size // 1024} KB)")
@@ -94,8 +99,8 @@ def prep():
 
     # Generate CatBoost built-in feature importance as JSON
     model_dir = PROJECT_ROOT / "data" / "results" / "models"
-    model_cbm = model_dir / "ssc_C_sensor_basic_watershed_v11_extreme_expanded.cbm"
-    model_meta = model_dir / "ssc_C_sensor_basic_watershed_v11_extreme_expanded_meta.json"
+    model_cbm = model_dir / "ssc_C_sensor_basic_watershed_v12.cbm"
+    model_meta = model_dir / "ssc_C_sensor_basic_watershed_v12_meta.json"
     if model_cbm.exists() and model_meta.exists():
         try:
             from catboost import CatBoostRegressor

@@ -10,7 +10,8 @@ graph TD
     V4["v4 Stable Platform<br/>357 sites, 44 feat<br/>Box-Cox 0.2, Monotone ON<br/>R2 log=0.718, Holdout=0.472"]
     V9["v9 CONTAMINATED<br/>254 train, 72 feat<br/>Trained on holdout+vault<br/>ALL EVALS INVALID"]
     V10["v10 First Honest Model<br/>254 train, 72 feat<br/>R2=0.756, KGE=0.777<br/>Holdout MedR2=0.393<br/>Adapted N=10 R2=0.492"]
-    V11["v11 CURRENT BEST<br/>260 train, 72 feat<br/>Plain boosting, 485 trees<br/>Holdout MedR2=0.402<br/>Spearman=0.907<br/>Adapted N=10 R2=0.493"]
+    V11["v11 SUPERSEDED<br/>260 train, 137 feat<br/>Plain boosting, 485 trees<br/>Holdout MedR2=0.402<br/>Spearman=0.907"]
+    V12["v12 CURRENT BEST<br/>260 train, 88 feat<br/>Refactored pipeline<br/>Holdout MedR2=0.408<br/>Spearman=0.905<br/>88 feat = 49 noise dropped"]
 
     FEAS -->|"Proves 15min alignment works"| POC
     POC -->|"First cross-site model"| S17
@@ -23,6 +24,7 @@ graph TD
     V4 -->|"+SGMC lithology, 3-way split<br/>72 feat locked by expert panel<br/>Bayesian adaptation integrated"| V9
     V9 -->|"Contamination discovered<br/>Dual BCF, 135 records cleaned<br/>Proper holdout exclusion"| V10
     V10 -->|"10 extreme sites added<br/>Plain boosting adopted<br/>291/78/37 split"| V11
+    V11 -->|"Feature count bug found<br/>137 not 72: drop list never loaded<br/>Zero-regression refactor<br/>88 features via importance>=0.1"| V12
 
     S17 -->|"Multi-param tested"| MPARAM["Multi-Param Dead End<br/>TP R2=0.62 at 42 sites<br/>collapsed to 0.08 at 72<br/>Nitrate=-0.72, OrthoP=-1.31<br/>Dissolved not predictable from turb"]
 
@@ -125,9 +127,9 @@ graph TD
     end
     BCF_DUAL -.->|"Dual BCF integrated"| V10
 
-    V11 -->|"External validation"| EXT2["260 NTU Sites<br/>11K samples, 6 organizations<br/>Spearman=0.927 zero-shot<br/>Cross-network proven"]
+    V12 -->|"External validation"| EXT2["260 NTU Sites<br/>11K samples, 6 organizations<br/>Spearman=0.927 zero-shot<br/>Cross-network proven"]
 
-    V11 -->|"Paper analyses"| PAPER
+    V12 -->|"Paper analyses"| PAPER
     subgraph PAPER ["Paper Ready"]
         direction TB
         P_OLS["OLS benchmark<br/>CatBoost wins at every N<br/>N=2 temporal: 0.36 vs -0.56"]
@@ -160,7 +162,7 @@ graph TD
     V10 -->|"Extreme expansion"| EXTREME["Extreme Data Expansion<br/>NWIS hotspots + ScienceBase<br/>10 new sites, 1267 samples<br/>Top-1% underpred: -37% to -25%"]
     EXTREME -.-> V11
 
-    V11 -->|"Strategic decisions"| STRAT
+    V12 -->|"Strategic decisions"| STRAT
     subgraph STRAT ["Strategic Decisions"]
         direction TB
         ST_WRITE["Stop improving, start writing<br/>All 4 reviewers unanimous<br/>Submitted 0.80 beats unsubmitted 0.83"]
@@ -169,7 +171,7 @@ graph TD
         ST_BIAS["Geographic bias identified<br/>CA+OR+KS = 50% of candidates<br/>Zero: loess belt, iron range, arid SW<br/>35-site gap-fill plan designed"]
     end
 
-    V11 -->|"Shelved for future"| SHELVED
+    V12 -->|"Shelved for future"| SHELVED
     subgraph SHELVED ["Investigated and Shelved"]
         direction TB
         SH_Q90["Q90 quantile specialist<br/>Tanaka red-team: shifts ALL<br/>predictions up, not just extremes<br/>149 extreme samples insufficient"]
@@ -211,7 +213,8 @@ graph TD
     class L8 finding
     class L9 strategic
 
-    class V11 current
+    class V12 current
+    class V11 milestone
     class V9 contaminated
     class V5,V6,V8GPB,V8MERF,MPARAM dead
     class LKGE,LSQRT,LLIN dead
