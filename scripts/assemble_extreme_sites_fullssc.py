@@ -145,7 +145,7 @@ def load_hotspot_ssc(site_id: str) -> pd.DataFrame:
     return sub[["datetime", "ssc_mg_L"]].rename(columns={"ssc_mg_L": "ssc_value"})
 
 
-def align_site(site_id: str) -> pd.DataFrame:
+def align_site(site_id: str, include_provisional: bool = False) -> pd.DataFrame:
     """Full pipeline for one site: load → QC → align → rename.
 
     Returns empty DataFrame if no pairs found (expected for most sites
@@ -166,7 +166,7 @@ def align_site(site_id: str) -> pd.DataFrame:
     logger.info(f"  {len(turb_raw)} raw turbidity records ({turb_raw['time'].min().date()} to {turb_raw['time'].max().date()})")
 
     # Apply QC
-    turb_qc, qc_stats = filter_continuous(turb_raw, datetime_col="time")
+    turb_qc, qc_stats = filter_continuous(turb_raw, datetime_col="time", include_provisional=include_provisional)
     pct = qc_stats.get("pct_retained", "?")
     logger.info(f"  Turbidity QC: {pct}% retained ({len(turb_qc)} records)")
 
@@ -248,7 +248,7 @@ def align_site(site_id: str) -> pd.DataFrame:
 
         # QC filter
         try:
-            param_qc, _ = filter_continuous(param_df, datetime_col="time")
+            param_qc, _ = filter_continuous(param_df, datetime_col="time", include_provisional=include_provisional)
         except Exception:
             aligned[f"{pname}_instant"] = np.nan
             continue
@@ -548,8 +548,18 @@ def assign_split(dataset: pd.DataFrame) -> pd.DataFrame:
 # ─────────────────────────────────────────────────────────────
 
 def main():
+    import argparse
     import warnings
     warnings.filterwarnings("ignore")
+
+    parser = argparse.ArgumentParser(description="Assemble extreme-event site pairs")
+    parser.add_argument("--include-provisional", action="store_true",
+                        help="Include Provisional continuous sensor data")
+    args = parser.parse_args()
+    include_provisional = args.include_provisional
+
+    if include_provisional:
+        logger.info("*** INCLUDING PROVISIONAL DATA ***")
 
     logger.info("=" * 60)
     logger.info("Assembling extreme-event site pairs")
@@ -565,7 +575,7 @@ def main():
 
     for site_id in TARGET_SITES:
         n_sites_attempted += 1
-        result = align_site(site_id)
+        result = align_site(site_id, include_provisional=include_provisional)
         if result.empty:
             n_sites_no_overlap += 1
         else:

@@ -240,7 +240,7 @@ def load_continuous(site_id: str, param_code: str) -> pd.DataFrame:
     return df
 
 
-def align_site(site_id: str) -> pd.DataFrame:
+def align_site(site_id: str, include_provisional: bool = False) -> pd.DataFrame:
     """Full alignment pipeline for one site.
 
     1. Load discrete SSC
@@ -265,7 +265,7 @@ def align_site(site_id: str) -> pd.DataFrame:
         return pd.DataFrame()
 
     # QC filter turbidity
-    turb_filtered, qc_stats = filter_continuous(turb)
+    turb_filtered, qc_stats = filter_continuous(turb, include_provisional=include_provisional)
     logger.info(f"  Turbidity QC: {qc_stats.get('pct_retained', '?')}% retained")
 
     # Align SSC samples with turbidity
@@ -313,7 +313,7 @@ def align_site(site_id: str) -> pd.DataFrame:
             continue
 
         # QC filter
-        cont_filtered, _ = filter_continuous(cont)
+        cont_filtered, _ = filter_continuous(cont, include_provisional=include_provisional)
         if cont_filtered.empty:
             aligned[f"{pname}_instant"] = np.nan
             continue
@@ -358,8 +358,18 @@ def align_site(site_id: str) -> pd.DataFrame:
 
 
 def main():
+    import argparse
     import warnings
     warnings.filterwarnings("ignore")
+
+    parser = argparse.ArgumentParser(description="Assemble paired turbidity-SSC dataset")
+    parser.add_argument("--include-provisional", action="store_true",
+                        help="Include Provisional (not yet reviewed) continuous sensor data in addition to Approved")
+    args = parser.parse_args()
+    include_provisional = args.include_provisional
+
+    if include_provisional:
+        print("*** INCLUDING PROVISIONAL DATA ***")
 
     start_run("assemble_ssc")
 
@@ -395,10 +405,10 @@ def main():
     import time as _time
     from joblib import Parallel, delayed
 
-    def _safe_align(site_id, idx, total):
+    def _safe_align(site_id, idx, total, include_provisional=False):
         t0 = _time.time()
         try:
-            result = align_site(site_id)
+            result = align_site(site_id, include_provisional=include_provisional)
             elapsed = _time.time() - t0
             if elapsed > 30:
                 logger.warning(f"  SLOW: {site_id} took {elapsed:.1f}s")
@@ -413,7 +423,7 @@ def main():
     logger.info(f"Assembling {n_total} sites with 8 parallel workers...")
 
     results = Parallel(n_jobs=8, backend="loky", verbose=10)(
-        delayed(_safe_align)(sid, i, n_total) for i, sid in enumerate(available_sites)
+        delayed(_safe_align)(sid, i, n_total, include_provisional=include_provisional) for i, sid in enumerate(available_sites)
     )
     all_aligned = [r for r in results if not r.empty]
     logger.info(f"Assembly complete: {len(all_aligned)}/{n_total} sites produced paired data")

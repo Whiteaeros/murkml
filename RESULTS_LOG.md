@@ -8,6 +8,88 @@ Reference for paper writing. Captures key results, expert panel findings, and de
 
 **v10 superseded.** v11 adds extreme data expansion + Plain boosting.
 
+### Provisional Data Experiment (2026-04-04)
+
+**Question:** Does including USGS "Provisional" continuous sensor data (recent data not yet reviewed by hydrographers) improve model performance, particularly for extreme events?
+
+**Background:** v11 trains only on "Approved" sensor data. Provisional data is just recent data in the review queue — same sensor hardware, same QC qualifiers (ICE, EQUIP, MAINT still filtered). We hypothesized provisional data might help because: (1) it adds temporal coverage from more recent years, (2) it enriches the extreme SSC tail (+38% more samples above 5,000 mg/L).
+
+**Pipeline:** Modified `qc.py` `filter_continuous()` to accept `include_provisional=True`, threaded through both `assemble_dataset.py` and `assemble_extreme_sites_fullssc.py`, ran full 5-step assembly pipeline (base + extreme expansion + merge + dedup).
+
+**Dataset comparison:**
+
+| Metric | v11 (Approved only) | v12 (+ Provisional) |
+|---|---|---|
+| Total samples | 36,341 | 36,710 (+369) |
+| Total sites | 405 | 409 (+4) |
+| Tier C samples | 23,624 | 23,873 (+249) |
+| Tier C sites | 260 | 263 (+3) |
+| SSC > 1,000 mg/L | 2,526 | 2,691 (+6.5%) |
+| SSC > 5,000 mg/L | 311 | 430 (+38%) |
+| P99 SSC | 4,456 | 5,879 |
+
+**GKF5 results:** v11 KGE = 0.786, v12 KGE = 0.799 (+0.013). Appeared promising but GKF5 is not holdout.
+
+**Holdout results (78 sites, same split):**
+
+| Metric | v11 | v12 | Delta |
+|---|---|---|---|
+| MedSiteR² | 0.402 | 0.365 | **-0.037** |
+| MedSiteSpearman | 0.876 | 0.855 | -0.021 |
+| MAPE | 40.1% | 41.7% | +1.6% |
+| Within-2x | 70.0% | 68.3% | -1.7% |
+| N=10 random MedR² | 0.493 | 0.453 | -0.040 |
+| Head-to-head | — | — | 36 v12 wins, 38 v11 wins |
+
+**Extreme-event performance (the whole point):**
+
+| SSC range | v11 median bias | v12 median bias |
+|---|---|---|
+| < 50 mg/L | +21.3% | +27.0% (worse) |
+| 50-200 | -5.1% | -9.2% (worse) |
+| 200-1K | -19.6% | -21.7% (worse) |
+| 1K-5K | -54.8% | -58.5% (worse) |
+| > 5K | -80.1% | -80.4% (same) |
+| Top 1% | -79.4% | -80.0% (same) |
+
+**Conclusion:** Provisional data hurts general performance (-0.037 MedSiteR²) and does not help extreme events. The +38% more extreme training samples made zero difference at the >5K tail. The -80% extreme underprediction is a structural limitation (Box-Cox compression + sensor saturation physics), not a data scarcity problem. The approved-only QC filter is NOT the bottleneck.
+
+**Files preserved:**
+- `data/processed/turbidity_ssc_paired_with_provisional.parquet` — v12 dataset (36,710 samples)
+- `data/results/models/ssc_C_sensor_basic_watershed_v12_provisional_proper.cbm` — v12 model
+- `data/results/evaluations/v12_provisional_holdout_*` — v12 holdout evaluation
+- v11 dataset and model unchanged.
+
+### Hyperparameter Sensitivity Sweep (2026-04-02)
+
+Varied one CatBoost hyperparameter at a time around v11 defaults. GKF5, Box-Cox 0.2, monotone ON. No models saved — CV metrics only.
+
+| Experiment | KGE | Alpha | Bias% | BCF | Time |
+|---|---|---|---|---|---|
+| **baseline (depth=6, lr=0.05, l2=3)** | **0.786** | **0.821** | **-7.2** | **1.326** | 58s |
+| depth=4 | 0.777 | 0.830 | -8.4 | 1.424 | 33s |
+| depth=8 | 0.770 | 0.824 | -15.6 | 1.308 | 155s |
+| depth=10 | 0.740 | 0.790 | -15.8 | 1.336 | 472s |
+| lr=0.01 (2000 iter) | 0.766 | 0.818 | -7.1 | 1.352 | 258s |
+| lr=0.03 (1000 iter) | 0.765 | 0.817 | -4.7 | 1.351 | 128s |
+| lr=0.10 | 0.772 | 0.821 | -12.8 | 1.446 | 53s |
+| lr=0.20 | 0.759 | 0.840 | -11.8 | 1.484 | 42s |
+| l2=1 | 0.784 | 0.834 | -9.8 | 1.363 | 67s |
+| l2=5 | 0.778 | 0.835 | -11.9 | 1.293 | 69s |
+| l2=10 | 0.774 | 0.830 | -11.0 | 1.385 | 69s |
+| l2=30 | 0.772 | 0.829 | -6.3 | 1.333 | 69s |
+| es=25 | 0.773 | 0.820 | -6.9 | 1.332 | 65s |
+| es=100 | 0.782 | 0.825 | -13.1 | 1.319 | 76s |
+| Ordered boosting | 0.778 | 0.815 | -9.6 | 1.361 | 443s |
+
+**Key findings:**
+1. **v11 defaults are optimal.** Baseline KGE=0.786 is the best across all 15 experiments.
+2. **Model is stable.** Total KGE spread = 0.046 (0.740-0.786). Excluding extreme depth=10, spread = 0.027.
+3. **Depth is most sensitive.** Deeper trees (8, 10) overfit; depth=6 is the sweet spot.
+4. **L2 regularization barely matters.** l2=1 to l2=30 varies KGE by only 0.012.
+5. **Learning rate is robust.** 20x range (0.01-0.20) varies KGE by only 0.027.
+6. **Ordered vs Plain:** No meaningful difference (0.778 vs 0.786) but Plain is 7.6x faster.
+
 **Model:** ssc_C_sensor_basic_watershed_v11_extreme_plain.cbm (or equivalent versioned name)
 - 260 training sites, 23,624 samples, 72 features (137 in tier, 65 dropped)
 - Box-Cox lambda=0.2, Plain boosting, 485 trees, 47-minute training time

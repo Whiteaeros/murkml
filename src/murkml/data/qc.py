@@ -41,16 +41,17 @@ def filter_continuous(
     approval_col: str = "approval_status",
     qualifier_col: str = "qualifier",
     datetime_col: str = "datetime",
+    include_provisional: bool = False,
 ) -> tuple[pd.DataFrame, dict]:
     """Apply QC filtering to continuous sensor data.
 
     Rules (from domain expert review):
-    - Keep only approval_status = "Approved"
+    - Keep only approval_status = "Approved" (or also "Provisional" if include_provisional=True)
     - Exclude records with qualifiers: Ice, Eqp, Bkw, Mnt, e, ***, --
     - Extend Ice exclusion by 48hr after flag ends (NOT YET IMPLEMENTED — see TODO below)
     - Extend Mnt exclusion by 4hr after flag ends (NOT YET IMPLEMENTED — see TODO below)
     - Keep Fld (flood) data — critical for storm events
-    - Exclude Provisional data for MVP
+    - Qualifier-based QC applies regardless of approval status
 
     WARNING: If approval_col or qualifier_col are missing from the input DataFrame,
     the corresponding filter is silently SKIPPED (only a log warning is emitted).
@@ -89,9 +90,14 @@ def filter_continuous(
         already_full = raw_vals.isin({"Approved", "Provisional"})
         df.loc[~already_full, approval_col] = mapped[~already_full].fillna(raw_vals[~already_full])
 
-        mask_approved = df[approval_col] == "Approved"
+        if include_provisional:
+            mask_approved = df[approval_col].isin(["Approved", "Provisional"])
+        else:
+            mask_approved = df[approval_col] == "Approved"
         stats["n_not_approved"] = int((~mask_approved).sum())
+        stats["n_provisional_included"] = int((df[approval_col] == "Provisional").sum()) if include_provisional else 0
         stats["approval_filter_applied"] = True
+        stats["include_provisional"] = include_provisional
         df = df[mask_approved].copy()
     else:
         raise ValueError(

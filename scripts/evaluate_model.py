@@ -1,16 +1,17 @@
 #!/usr/bin/env python
-"""Deterministic evaluation pipeline for murkml CatBoost models on holdout sites.
+"""Deterministic evaluation pipeline for murkml CatBoost models on holdout/vault sites.
 
 Usage:
     python scripts/evaluate_model.py \
       --model data/results/models/ssc_C_v4_boxcox02.cbm \
       --meta data/results/models/ssc_C_v4_boxcox02_meta.json \
       --label v4_test \
-      --adaptation bayesian
+      --adaptation bayesian \
+      --partition holdout          # or "vault" for vault sites
 
 Produces three output files:
-  1. {label}_per_reading.parquet  — every holdout sample
-  2. {label}_per_site.parquet     — one row per holdout site
+  1. {label}_per_reading.parquet  — every sample in the partition
+  2. {label}_per_site.parquet     — one row per site in the partition
   3. {label}_summary.json         — adaptation curve, overall metrics, parameters
 """
 
@@ -100,9 +101,9 @@ def inverse_transform(values: np.ndarray, transform_type: str, lmbda: float | No
 # Data loading
 # ---------------------------------------------------------------------------
 
-def load_holdout_data(meta: dict) -> pd.DataFrame:
-    """Load holdout data with all features, exactly one way."""
-    logger.info("Loading holdout data...")
+def load_holdout_data(meta: dict, partition: str = "holdout") -> pd.DataFrame:
+    """Load partition data with all features, exactly one way."""
+    logger.info(f"Loading {partition} data...")
 
     # 1. Load paired data
     paired = pd.read_parquet(DATA_DIR / "processed" / "turbidity_ssc_paired.parquet")
@@ -115,9 +116,9 @@ def load_holdout_data(meta: dict) -> pd.DataFrame:
         split = pd.read_parquet(split_path_3way)
     else:
         split = pd.read_parquet(split_path_2way)
-    holdout_ids = set(split[split["role"] == "holdout"]["site_id"])
+    holdout_ids = set(split[split["role"] == partition]["site_id"])
     holdout = paired[paired["site_id"].isin(holdout_ids)].copy()
-    logger.info(f"  Holdout filter: {len(holdout)} samples, {holdout['site_id'].nunique()} sites")
+    logger.info(f"  {partition.title()} filter: {len(holdout)} samples, {holdout['site_id'].nunique()} sites")
 
     # 3. Merge basic site attributes
     basic = pd.read_parquet(DATA_DIR / "site_attributes.parquet")
@@ -147,14 +148,15 @@ def load_holdout_data(meta: dict) -> pd.DataFrame:
     if "drainage_area_km2" in holdout.columns and "log_drainage_area" not in holdout.columns:
         holdout["log_drainage_area"] = np.log1p(holdout["drainage_area_km2"].clip(lower=0))
 
-    # Assertions
+    # Assertions (vault partition may have fewer samples)
     n_sites = holdout["site_id"].nunique()
     n_samples = len(holdout)
+    min_samples = 100 if partition == "vault" else MIN_HOLDOUT_SAMPLES
     assert n_sites >= MIN_HOLDOUT_SITES, (
-        f"Too few holdout sites: {n_sites} (minimum {MIN_HOLDOUT_SITES})"
+        f"Too few {partition} sites: {n_sites} (minimum {MIN_HOLDOUT_SITES})"
     )
-    assert n_samples >= MIN_HOLDOUT_SAMPLES, (
-        f"Too few holdout samples: {n_samples} (minimum {MIN_HOLDOUT_SAMPLES})"
+    assert n_samples >= min_samples, (
+        f"Too few {partition} samples: {n_samples} (minimum {min_samples})"
     )
     logger.info(f"  VERIFIED: {n_sites} sites, {n_samples} samples")
 
@@ -529,6 +531,7 @@ def get_cal_test_split(
     Modes:
         random: Random selection (optimistic — cal spans full record)
         temporal: First N chronologically (realistic — predict the future)
+        temporal_block: Random start, N consecutive (realistic with MC averaging)
         seasonal: N samples from the dominant season (typical — one field campaign)
     """
     if n_cal >= n_site:
@@ -539,6 +542,14 @@ def get_cal_test_split(
     elif mode == "temporal":
         # First N in chronological order (data must be pre-sorted by date)
         cal_idx = np.arange(n_cal)
+    elif mode == "temporal_block":
+        # Random start point, then N consecutive samples
+        max_start = n_site - n_cal
+        if max_start <= 0:
+            cal_idx = np.arange(n_site)
+        else:
+            start = rng.integers(0, max_start + 1)
+            cal_idx = np.arange(start, start + n_cal)
     elif mode == "seasonal":
         # Calibrate from ONE season (peak SSC month ± 1), test on OTHER seasons.
         # This tests cross-seasonal transfer — the hardest realistic scenario.
@@ -653,12 +664,18 @@ def _run_single_adaptation(
     if n_val >= n_site:
         return []
 
-    # Temporal mode: 1 deterministic split (no MC trials)
-    trial_range = 1 if mode == "temporal" else n_trials
+    # Temporal mode: 1 deterministic split; temporal_block: adaptive per site
+    if mode == "temporal":
+        trial_range = 1
+    elif mode == "temporal_block":
+        max_starts = n_site - n_val
+        trial_range = min(max(max_starts, 1), n_trials)
+    else:
+        trial_range = n_trials
 
     trial_metrics = []
     # Mode-specific seed offset to ensure different RNG streams per mode
-    mode_offsets = {"random": 0, "temporal": 100_000, "seasonal": 200_000}
+    mode_offsets = {"random": 0, "temporal": 100_000, "seasonal": 200_000, "temporal_block": 300_000}
     mode_offset = mode_offsets.get(mode, 0)
 
     for trial in range(trial_range):
@@ -931,6 +948,7 @@ def save_summary(
 
     summary = {
         "label": label,
+        "partition": args.partition,
         "model_path": str(args.model),
         "meta_path": str(args.meta),
         "adaptation_method": args.adaptation,
@@ -939,8 +957,8 @@ def save_summary(
             "bcf_k_mult": args.bcf_k_mult, "n_trials": args.n_trials,
             "seed": args.seed, "split_modes": args.split_modes.split(","),
         },
-        "holdout_sites": int(readings["site_id"].nunique()),
-        "holdout_samples": len(readings),
+        f"{args.partition}_sites": int(readings["site_id"].nunique()),
+        f"{args.partition}_samples": len(readings),
         "baselines": {k: _clean(v) for k, v in baselines.items()},
         "zero_shot": _clean({
             "pooled_nse": pooled["nse"],
@@ -1009,6 +1027,7 @@ def print_summary(readings: pd.DataFrame, adaptation: dict, method: str, baselin
     for mode in sorted(adaptation.keys()):
         mode_data = adaptation[mode]
         label = {"random": "RANDOM (optimistic)", "temporal": "TEMPORAL (first N, predict rest)",
+                 "temporal_block": "TEMPORAL BLOCK (random start, N consecutive)",
                  "seasonal": "SEASONAL (one season cal, all test)"}.get(mode, mode.upper())
         print(f"\nAdaptation curve — {label} ({method}):")
         print(f"  {'N':>4s}  {'Med R²':>8s}  {'95% CI':>16s}  {'Log-NSE':>8s}  "
@@ -1053,8 +1072,11 @@ def main():
     parser.add_argument("--bcf-mode", type=str, default="median",
                         choices=["median", "mean"],
                         help="Which BCF to use: median for individual predictions (default), mean for load estimation")
-    parser.add_argument("--split-modes", type=str, default="random,temporal,seasonal",
-                        help="Comma-separated split modes (default: random,temporal,seasonal)")
+    parser.add_argument("--split-modes", type=str, default="random,temporal,temporal_block,seasonal",
+                        help="Comma-separated split modes (default: random,temporal,temporal_block,seasonal)")
+    parser.add_argument("--partition", type=str, default="holdout",
+                        choices=["holdout", "vault"],
+                        help="Which partition to evaluate: holdout (default) or vault")
     parser.add_argument("--output-dir", type=str, default=None,
                         help="Output directory (default: data/results/evaluations/)")
     args = parser.parse_args()
@@ -1079,6 +1101,7 @@ def main():
         meta["bcf"] = meta.get("bcf_mean", meta.get("bcf", 1.0))
         bcf_source = "bcf_mean"
 
+    logger.info(f"Partition: {args.partition}")
     logger.info(f"Model: {model_path}")
     logger.info(f"Transform: {meta['transform_type']} (lambda={meta.get('transform_lmbda')})")
     logger.info(f"BCF: {meta['bcf']:.4f} ({bcf_source}, method={meta.get('bcf_method', 'unknown')})")
@@ -1104,7 +1127,7 @@ def main():
     )
 
     # Load data
-    holdout = load_holdout_data(meta)
+    holdout = load_holdout_data(meta, partition=args.partition)
 
     # Generate predictions
     logger.info("Generating predictions...")
