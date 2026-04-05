@@ -57,7 +57,8 @@ def main():
     logger.info(f"Partition: {args.partition}")
 
     # During Phase 4 migration: call legacy evaluate_model.py via its main function
-    # After Phase 4: call evaluate/holdout.py functions directly
+    # TODO: Replace with evaluate/holdout.py calls after full extraction
+    sys.path.insert(0, str(PROJECT_ROOT / "scripts"))
     from evaluate_model import main as legacy_main
 
     # Reconstruct sys.argv for legacy script
