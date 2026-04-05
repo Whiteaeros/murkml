@@ -126,12 +126,44 @@ Each entry records: training config, dataset, performance, and what changed from
   - OLS benchmark and bootstrap CIs completed
   - CQR MultiQuantile training failed (23 hrs, Box-Cox compression defeats quantile learning for extremes)
 
-### murkml-11-extreme-plain (CURRENT BEST)
+### murkml-12-refactored (CURRENT BEST)
+- **Date:** 2026-04-05
+- **Training sites:** 260 (291 train - 31 w/o StreamCat)
+- **Samples:** 23,615 (23,624 minus 9 duplicate rows removed)
+- **Total dataset:** 36,341 samples, 405 sites
+- **Features:** 88 (86 numeric + 2 categorical: collection_method, sensor_family)
+- **Transform:** Box-Cox lambda=0.2
+- **Monotone:** ON (turbidity_instant, turbidity_mean_1hr, turbidity_min_1hr, turbidity_max_1hr)
+- **Boosting:** Plain
+- **CV:** LOGO (260 folds)
+- **R²(log):** 0.757
+- **MedSiteR²:** 0.404
+- **KGE:** 0.779
+- **RMSE:** 138.2 mg/L
+- **Bias:** +12.1%
+- **BCF:** Dual — bcf_mean=1.277, bcf_median=0.959
+- **Trees:** 500 (final model), 483 median/fold
+- **Training time:** 49 minutes
+- **Split:** data/train_holdout_vault_split.parquet (same as v11)
+- **Config:** config/features.yaml (Pydantic-validated single source of truth)
+- **Saved model:** data/results/models/ssc_C_sensor_basic_watershed_v12.cbm
+- **Holdout (78 sites):** MedSiteR²=0.408, Spearman=0.905, MAPE=40.2%, Bias=-36.8%
+- **Key changes from v11:**
+  - Zero-regression refactored pipeline (config.py, loader.py, training/cv.py, training/model.py)
+  - Feature count bug fixed: v11 used 137 features (train_tiered.py never loaded drop list)
+  - 88 features selected by CatBoost PredictionValuesChange importance >= 0.1
+  - 49 noise features dropped (18 zero-split + 31 near-zero)
+  - MedSiteR² improved 0.402 → 0.408 despite 36% fewer features
+  - 9 duplicate (site_id, sample_time) rows identified and removed
+  - 19 dead scripts archived
+  - Golden master validation framework established
+
+### murkml-11-extreme-plain (SUPERSEDED by v12)
 - **Date:** 2026-04-01
 - **Training sites:** 260 (291 train - 31 w/o StreamCat)
 - **Samples:** 23,624
 - **Total dataset:** 36,341 samples, 405 sites (expanded from 35,074/396 in v10)
-- **Features:** 72 (137 in tier, 65 dropped)
+- **Features:** 137 (NOTE: was documented as "72 (137 in tier, 65 dropped)" but train_tiered.py never applied the drop list — model actually used all 137)
 - **Transform:** Box-Cox lambda=0.2
 - **Monotone:** ON (turbidity_instant, turbidity_max_1hr)
 - **Boosting:** Plain (switched from Ordered — same quality, 1/4 training time)

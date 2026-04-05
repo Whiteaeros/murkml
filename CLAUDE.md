@@ -6,42 +6,31 @@
 
 **Owner:** Kaleb — water science student, graduating mid-2026. Not on a deadline. Exploring what's possible, with eventual commercial product and paper goals.
 
-## Current State (2026-04-01)
+## Current State (2026-04-05)
 
-**Current model: v11 (BEST — supersedes v10)**
-- CatBoost, 260 training sites, 23,624 samples, 72 features (137 in tier, 65 dropped)
-- Box-Cox lambda=0.2, **Plain boosting** (not Ordered), 485 trees
-- BCF_mean=1.297 (for loads), BCF_median=0.975 (for individual predictions)
-- Trained in 47 minutes (vs ~3 hrs for Ordered boosting — same quality, 1/4 the time)
-- Dataset expanded: 36,341 total samples, 405 sites (was 35,074/396 in v10)
-  - 10 new extreme-event sites from NWIS hotspots + ScienceBase
-  - New vault: USGS-09153270 (Cement Creek CO, 329 samples, max 121,000 mg/L)
-  - New holdout: USGS-06902000 (MO), USGS-07170000 (KS)
-- Samples >=1000 mg/L: 2,549 (7.0%), >=5000: 312 (0.9%), max=121,000 mg/L
+**Current model: v12 (BEST — supersedes v11)**
+- CatBoost, 260 training sites, 23,615 samples, **88 features** (86 numeric + 2 categorical)
+- Box-Cox lambda=0.2, Plain boosting, 500 trees (final model), 483 median/fold
+- BCF_mean=1.277 (for loads), BCF_median=0.959 (for individual predictions)
+- **Config-driven:** `config/features.yaml` is the single source of truth (Pydantic-validated)
+- **Training script:** `scripts/train.py` (thin CLI wrapping modular pipeline)
+- Dataset: 36,341 total samples, 405 sites
 - Split: 291 train / 78 holdout / 37 vault
 
-**v11 Holdout (78 sites, bcf_median):**
-- MedSiteR²=0.402, MAPE=40.1%, Within-2x=70.0%, Spearman=0.907, Log-NSE=0.804, Bias=-36.6%
+**v12 Holdout (78 sites, bcf_median):**
+- MedSiteR²=0.408, MAPE=40.2%, Within-2x=69.6%, Spearman=0.905, Log-NSE=0.798, Bias=-36.8%
 
-**v11 Adaptation:**
-- N=10 random: MedSiteR²=0.493, MAPE=34.6%, Within-2x=76.5%
-- N=10 temporal: MedSiteR²=0.389, MAPE=38.6%
-- N=10 seasonal: MedSiteR²=0.431, MAPE=40.1%
+**v12 Adaptation:**
+- N=10 random: MedSiteR²=0.493, MAPE=35.2%, Within-2x=78.2%
 
-**v11 Extreme metrics:**
-- Top 1% underprediction: -25% (improved from -28% v10, -37% original)
-- Top 5%: Within-2x=71.5%
+**v12 vs v11:** 36% fewer features, MedSiteR² improved (+0.007), all other metrics within noise.
 
-**v11 Disaggregated:**
-- Carbonate: R²=0.807, Volcanic: R²=0.195
-- Depth-integrated: R²=0.321, Auto-point: R²=0.238
-- SSC <50: R²=-60.6 (overpredicts), >5K: R²=-3.4 (underpredicts)
+**Feature count history (IMPORTANT):**
+- v9: 72 features (optimized_drop_list.txt applied by old scripts)
+- v10/v11: 137 features (train_tiered.py NEVER loaded the drop list — bug discovered 2026-04-05)
+- v12: 88 features (CatBoost importance >= 0.1 threshold, proper pipeline)
 
-**OLS benchmark: CatBoost beats at every N** (N=2 temporal delta=+0.93)
-
-**v11 Bootstrap CIs (95%, site-level blocking):** MedSiteR²=0.402 [0.358, 0.440], N=10 random: 0.493 [0.440, 0.547], KGE: 0.186 [0.078, 0.406], Spearman: 0.874 [0.836, 0.899]
-
-**v10 superseded.** v10 was first honest model (254 sites, 22,995 samples). See MODEL_VERSIONS.md.
+**v10/v11 superseded.** v11 was documented as "72 features" but actually had 137. See MODEL_VERSIONS.md.
 **NOTE:** v9 was contaminated — trained on 357 sites including 76 holdout + 36 vault. All v9 numbers are invalid.
 
 **Bayesian site adaptation (the killer feature):**
@@ -55,8 +44,8 @@
 - Site heterogeneity is THE problem — no architecture change fixes it
 - Site adaptation (Bayesian shrinkage) is the solution and the product
 - Aggregate metrics lie — dropping weather improved median R² but destroyed first flush and extremes
-- Feature ablation is in the noise floor — 72 vs 58 features statistically indistinguishable (p=0.81)
-- CatBoost handles irrelevant features internally — no need to prune
+- Feature ablation at small scale is in the noise floor — but 137 vs 88 features showed MedSiteR² improvement
+- CatBoost handles irrelevant features but 49 noise features were dropped in v12 with no metric loss
 - Low-SSC overprediction is sensor contamination (DOM, algae), not model failure
 - Extreme underprediction is particle size shift, not just sensor saturation
 - Model ranks correctly on foreign NTU data (Spearman 0.93) — adaptation just fixes the scale
@@ -70,7 +59,7 @@
 - Collection methods: depth_integrated 15,381, auto_point 14,444, grab 4,638, unknown 746
 - 28 SGMC watershed lithology features (355 sites with coverage)
 - 260 external NTU validation sites (11K samples, 6 organizations)
-- 65 features on drop list (`data/optimized_drop_list.txt`), always pass via `--drop-features`
+- Feature list defined in `config/features.yaml` (88 features). The old `data/optimized_drop_list.txt` is obsolete.
 - 3-way split: data/train_holdout_vault_split.parquet (291 train / 78 holdout / 37 vault; 135 anomalous records cleaned)
 - New vault site: USGS-09153270 (Cement Creek CO, 329 samples, max 121,000 mg/L)
 - New holdout sites: USGS-06902000 (MO), USGS-07170000 (KS)
@@ -95,8 +84,10 @@
 - First-flush Spearman=0.902 confirmed on v11 holdout events
 
 **What's next:**
-- Paper writing (WRR target)
+- Paper writing (WRR target) — v12 is the model described in the paper
 - Vault one-shot (37 sites, LAST — after paper methodology finalized)
+- evaluate/holdout.py extraction (currently delegates to legacy evaluate_model.py)
+- Unit tests for new modules (test_config.py, test_loader.py, etc.)
 - WEPP integration: future investigation (advisor's work, post-paper)
 
 ## How the Pipeline Works
@@ -120,24 +111,19 @@
 
 5. ATTRIBUTES: Load watershed features
    Script: src/murkml/data/attributes.py (load_streamcat_attrs, build_feature_tiers)
-   + SGMC lithology merged in train_tiered.py (~line 950)
-   → Tier A: sensor-only (37 features, 396 sites)
-   → Tier B: + basic attrs (42 features, 396 sites)
-   → Tier C: + StreamCat + SGMC (137 features pre-drop, 72 post-drop, 357 sites)
+   + SGMC lithology merged in loader.py
+   → Tier C: StreamCat + SGMC → 88 features selected by config/features.yaml
 
-6. TRAINING: CatBoost with Box-Cox lambda=0.2, monotone, Plain boosting, Dual BCF (mean for loads, median for predictions)
-   Script: scripts/train_tiered.py
-   Flags: --param ssc --tier C --transform boxcox --boxcox-lambda 0.2 --n-jobs 12
-          --drop-features "$(cat data/optimized_drop_list.txt)"
-          --boosting-type Plain  (Ordered is slow; Plain is equivalent for this dataset)
+6. TRAINING: CatBoost with Box-Cox lambda=0.2, monotone, Plain boosting, Dual BCF
+   Config: config/features.yaml (ALL settings in one file, Pydantic-validated)
+   Script: scripts/train.py --config config/features.yaml --cv-mode logo --label v12
+   Modules: src/murkml/config.py, data/loader.py, training/cv.py, training/model.py
    → data/results/models/ssc_*.cbm + *_meta.json
 
 7. EVALUATION:
-   → scripts/evaluate_model.py (canonical: holdout eval + adaptation curves, Bayesian/old_2param/ols)
-   → scripts/site_adaptation_bayesian.py (Bayesian k-sweep with Student-t)
-   → scripts/site_adaptation.py (older 2-param, random + temporal splits)
-   → scripts/empirical_conformal_intervals.py (Mondrian conformal intervals — 5 SSC bins, 90.6% holdout coverage)
-   → scripts/prediction_intervals.py (legacy conformal intervals)
+   → scripts/evaluate.py (new CLI, delegates to evaluate_model.py)
+   → scripts/evaluate_model.py (canonical: holdout eval + adaptation curves)
+   → scripts/empirical_conformal_intervals.py (Mondrian conformal intervals)
    → scripts/error_analysis.py (failure modes by site characteristics)
    → scripts/compare_vs_usgs.py (head-to-head vs USGS OLS)
 ```
@@ -146,10 +132,14 @@
 
 | File | What it does |
 |------|-------------|
-| `scripts/train_tiered.py` | Main training. Key flags: `--cv-mode gkf5\|logo`, `--transform boxcox`, `--boxcox-lambda 0.2`, `--drop-features`, `--skip-ridge`, `--skip-save-model`, `--skip-shap`, `--n-jobs 12`, `--label`. |
-| `scripts/evaluate_model.py` | Canonical holdout evaluation. Adaptation methods: bayesian (staged, Student-t), old_2param, ols. Flags: `--k 15`, `--df 4`, `--slope-k 10`, `--bcf-k-mult 3.0`, `--bcf-mode {mean,median}` (default: median). |
-| `scripts/site_adaptation_bayesian.py` | Bayesian k-sweep with Student-t shrinkage. Reference implementation. |
-| `scripts/ablation_matrix.py` | Automated ablation runner. Calls train_tiered.py as subprocess. |
+| `config/features.yaml` | **THE single source of truth.** All features, hyperparams, transform, monotone constraints. Pydantic-validated. |
+| `scripts/train.py` | New training CLI. `--config`, `--cv-mode logo`, `--label v12`, `--n-jobs 6`. |
+| `scripts/train_tiered.py` | Legacy training (still present, not archived — used by evaluate.py delegation). |
+| `scripts/evaluate_model.py` | Canonical holdout evaluation. `--bcf-mode median` (default). |
+| `src/murkml/config.py` | Pydantic models validating features.yaml. `load_config()`. |
+| `src/murkml/data/loader.py` | Unified data loading: load → merge → split → transform → select features. ONE code path. |
+| `src/murkml/training/cv.py` | LOGO CV with per-fold NaN imputation, metrics, progress logging. |
+| `src/murkml/training/model.py` | Final model training with early stopping, BCF, complete metadata. |
 | `scripts/assemble_dataset.py` | Builds paired dataset from continuous + discrete data. |
 | `src/murkml/data/features.py` | Feature engineering: hydrograph, cross-sensor, seasonality, weather. |
 | `src/murkml/data/attributes.py` | Loads StreamCat, builds feature tiers. `load_streamcat_attrs()`, `build_feature_tiers()`. |
@@ -161,7 +151,7 @@
 
 - SSC only (param 80154), NOT TSS (00530) — different methods
 - Turbidity FNU only (param 63680), NOT NTU (00076) — diverge above 400
-- Target: Box-Cox(SSC, lambda=0.2) with Dual BCF (bcf_mean=1.297 for loads, bcf_median=0.975 for individual predictions) [v11 values]
+- Target: Box-Cox(SSC, lambda=0.2) with Dual BCF (bcf_mean=1.277 for loads, bcf_median=0.959 for individual predictions) [v12 values]
 - All timestamps UTC
 - DO saturation: Benson & Krause (1984) polynomial ONLY — never linear approx
 - QC qualifiers come as array strings `"['ICE' 'EQUIP']"` — must parse this format

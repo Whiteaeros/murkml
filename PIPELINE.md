@@ -155,15 +155,15 @@ Three tiers used for ablation testing:
 |------|----------|---------|
 | A | Sensor readings only (turbidity, conductance, DO, pH, temp, discharge + engineered) — 37 features, 396 sites | Baseline — what can sensors alone tell us? |
 | B | A + basic site attributes (lat, lon, drainage area, elevation) — 42 features, 396 sites | Does location help? |
-| C | B + StreamCat + SGMC lithology — 137 features pre-drop, 72 post-drop, 357 sites | Does watershed context help? |
+| C | B + StreamCat + SGMC lithology — 88 features (v12, selected by config/features.yaml), 260 sites | Does watershed context help? |
 
-Tier C is the production tier. 65 features on `data/optimized_drop_list.txt` are always dropped via `--drop-features`. The B vs C improvement is statistically significant (p<0.01).
+Tier C is the production tier. Feature selection is defined in `config/features.yaml` (88 features in v12). The old `data/optimized_drop_list.txt` is obsolete — use `scripts/train.py` with the YAML config.
 
 ---
 
 ## Step 8: Train
 
-**Script:** `train_tiered.py` (main training — all tiers, all params)
+**Script:** `scripts/train.py` (v12+ — config-driven, modular pipeline). Legacy: `train_tiered.py` (still present but superseded).
 
 **Model:** CatBoost (gradient-boosted trees) with depth=6, lr=0.05, l2_reg=3, 500 iter max, ordered boosting. Key flags: `--cv-mode gkf5|logo`, `--transform boxcox`, `--boxcox-lambda 0.2`, `--drop-features`, `--skip-ridge`, `--n-jobs 12`, `--label`.
 
@@ -202,8 +202,11 @@ python scripts/download_streamcat.py
 python scripts/compute_watershed_lithology.py
 
 # 6. Train (Tier C, Box-Cox 0.2, LOGO CV)
-python scripts/train_tiered.py --param ssc --tier C --transform boxcox --boxcox-lambda 0.2 \
-    --n-jobs 12 --drop-features "$(cat data/optimized_drop_list.txt)"
+# v12+ (recommended):
+python scripts/train.py --config config/features.yaml --cv-mode logo --label v12 --n-jobs 6
+
+# Legacy (still works but uses hardcoded config):
+# python scripts/train_tiered.py --param ssc --tier C --transform boxcox --boxcox-lambda 0.2 --n-jobs 12
 
 # 7. Evaluate (holdout + adaptation + external)
 python scripts/evaluate_model.py --model data/results/models/ssc_C_sensor_basic_watershed_v10_clean_dualbcf.cbm \
@@ -231,7 +234,7 @@ data/
   weather/             <- GridMET daily weather per site
     USGS_{site_no}/daily_weather.parquet
   train_holdout_vault_split.parquet  <- 3-way split (254/76/36)
-  optimized_drop_list.txt            <- 65 features to drop
+  optimized_drop_list.txt            <- OBSOLETE (v9-era, never loaded by train_tiered.py)
   results/
     models/            <- saved .cbm + _meta.json files
     evaluations/       <- per-reading, per-site, summary JSONs
