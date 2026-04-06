@@ -90,9 +90,24 @@ stateDiagram-v2
         plain_boost --> v11_train
     }
 
-    v11_era --> paper_ready : v11 = current best
+    v11_era --> v12_refactor : Feature count bug found (137 not 72)
 
-    state "Paper Ready (Apr 1+)" as paper_ready {
+    state "v12 Refactor (Apr 5)" as v12_refactor {
+        bug_found : train_tiered.py never loaded drop list
+        golden : Golden master, 6 checks PASS
+        modular : Modular pipeline (config.py, loader.py, cv.py, model.py)
+        archive : 19 dead scripts archived
+        v12_train : v12 trained: 88 features, MedR2=0.408
+
+        bug_found --> golden
+        golden --> modular
+        modular --> v12_train
+        archive --> v12_train
+    }
+
+    v12_refactor --> paper_ready : v12 = current best
+
+    state "Paper Ready (Apr 5+)" as paper_ready {
         ols : OLS benchmark, wins at every N
         ci : Bootstrap CIs, site-level blocking
         ext260 : 260 NTU sites, Spearman=0.927
