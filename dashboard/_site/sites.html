@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.36">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Site Explorer – murkml Dashboard</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-a0f9fd0d421825b736dc1bbcbcba2219.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
+
+
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+<script>
+
+window.PlotlyConfig = {MathJaxConfig: 'local'};
+
+if (window.MathJax && window.MathJax.Hub && window.MathJax.Hub.Config) {window.MathJax.Hub.Config({SVG: {font: "STIX-Web"}});}
+
+</script>
+
+<script type="module">import "https://cdn.plot.ly/plotly-3.4.0.min"</script>
+
+
+
+
+
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">murkml Dashboard</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./index.html"> 
+<span class="menu-text">Overview</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./performance.html"> 
+<span class="menu-text">Performance</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./adaptation.html"> 
+<span class="menu-text">Adaptation</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="./sites.html" aria-current="page"> 
+<span class="menu-text">Sites</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./external.html"> 
+<span class="menu-text">External</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./uncertainty.html"> 
+<span class="menu-text">Uncertainty</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./loads.html"> 
+<span class="menu-text">Loads</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./diagnostics.html"> 
+<span class="menu-text">Diagnostics</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#site-map" id="toc-site-map" class="nav-link active" data-scroll-target="#site-map">Site Map</a></li>
+  <li><a href="#holdout-site-table" id="toc-holdout-site-table" class="nav-link" data-scroll-target="#holdout-site-table">Holdout Site Table</a></li>
+  <li><a href="#best-and-worst-sites" id="toc-best-and-worst-sites" class="nav-link" data-scroll-target="#best-and-worst-sites">Best and Worst Sites</a></li>
+  <li><a href="#site-detail-pages" id="toc-site-detail-pages" class="nav-link" data-scroll-target="#site-detail-pages">Site Detail Pages</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Site Explorer</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>The 405 sites in this dataset span the continental United States, covering a wide range of climates, geology types, land uses, and watershed sizes. This page lets you explore how the model performs across that geographic and hydrologic diversity. The three-way split — training, holdout, vault — ensures that model evaluation is honest: holdout and vault sites were never used to make any modeling decisions, so their performance reflects true out-of-sample generalization. The vault set is reserved for a single, irreversible final evaluation at the end of the project (used once, to avoid unconsciously optimizing for it).</p>
+<section id="site-map" class="level2">
+<h2 class="anchored" data-anchor-id="site-map">Site Map</h2>
+<p>Geographic distribution of all sites in the dataset. Training sites (blue) were used to build the model. Holdout sites (orange) were never seen during training and are used for honest evaluation. Vault sites (purple) are reserved for one-shot final validation. Dot size reflects the number of paired SSC-turbidity samples at each site.</p>
+<div id="cell-fig-study-area-map" class="cell" data-execution_count="1">
+<div id="fig-study-area-map" class="cell-output cell-output-display quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-study-area-map-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div>            <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_SVG"></script><script>if (window.MathJax && window.MathJax.Hub && window.MathJax.Hub.Config) {window.MathJax.Hub.Config({SVG: {font: "STIX-Web"}});}</script>                <script>window.PlotlyConfig = {MathJaxConfig: 'local'};</script>
+        <script charset="utf-8" src="https://cdn.plot.ly/plotly-3.4.0.min.js" integrity="sha256-KEmPoupLpFyGMyGAiOsiNDbKDKAvxXAn/W+oQa0ZAfk=" crossorigin="anonymous"></script>                <div id="006669e2-6de1-451e-9e79-b05fb0c20ce2" class="plotly-graph-div" style="height:500px; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("006669e2-6de1-451e-9e79-b05fb0c20ce2")) {                    Plotly.newPlot(                        "006669e2-6de1-451e-9e79-b05fb0c20ce2",                        [{"hoverinfo":"text","lat":{"dtype":"f8","bdata":"nZ8kVcKiQkCrUw779+lDQPHhSFY0CkVAQ1N2+kHnQ0BiPPfckaNCQFmX6Gbe7UNAxs8UdNo4RUDEHE6qx3xIQBXnh5X69ERA600UOpJTRkBB\u002fLJqxnVIQGyNrQxPWkdA9rXLCoerQkADSMibV7NAQDVbu+XRqkVAxqKOM3LPRkC4HoXrUbhCQKdKKSIiKkNAiDMaVHb4QEC5hwgoImxIQFGI2\u002fwaH0NAFjENPw8NRUDmqyaASXVDQHHK\u002fYoM9kJAWsHK\u002fP77Q0B+XHbjOIJDQJBNj\u002fnCWENAtBawLrgPQkDATn8wTwxFQMfz+EGGMkFAEqi8JVI7RUDL77jRFbtCQH0Z1p6jA0RAil6hak+9R0BHBndvXoVDQOsq7om\u002fY0hAHIYD37yiREASr19uf3BBQGHA1McqqEVAKbAApgxaR0Bcj8L1KARBQMZpiCr8BUVAIqGxH3cFQ0ApXI\u002fC9SBEQIPsaUUj6UBASED5edtwRUDlMPN4NYlDQEcGd29e9UBAWJHyDzLYQEBwYgYyVI5DQFAAxciSt05AofUygnRAQUB1rb1PVdU6QF+A2C1dnkNAwNmcOdoBRUDVTEqDUwlFQD02dkdOTENA97KrmGNgQ0BS5Fr+jfBEQHR+5Zyz9EFAc4XScvtzQ0CGO9UpqHlFQLZLPBw0H0JAEGc0qOzIQUB6OaqikfhDQPm4HbfrfENAfu6ZXyyRRUD4WeFtECM5QNjz866To0JAvJaQD3p2Q0Dp4+t8iQVCQF7m6K\u002ffsURA+wEwGglwQUDG+7MXuKdDQNrN5zenTkVAPLpTMuegQ0DOT5IqYfFDQKFqsk6uhEJAwQDjlftqRkAqrBI0f0lEQKP0GvVvEEVA8bC7Bp7vQUAkN9Q5UGVGQEHkwru7g0NAiplUn3EgR0AqYsc19AY+QGk5rzWE00RAi3vi780LQ0AAAAAAAFhDQENbKV8rJUNAAq0KHvA4SEC6EMxNq05DQKJFtvP90ENAy82BL5YcQ0AdISSHX7tCQBf2D33S10RAPuXaSMB3Q0Diypcf0aFCQIhmXECBEENAkL+0qE8qRUA39LtVfPJHQFU\u002fJZ03pjxAonHybKATREBwYgYyVNpAQFtu3Yu3DUdA+FPjpZv0R0CTnOFApyVDQJ8pKtFI6EFAXLv+bsvmQEDkgJ9pcOpAQLFE80IyF0dAtxA\u002fWvc9QUBF4pKhsrtBQBSzXgzlsERAKjeTZ0UjQ0D0Ghb+ZwNEQEI0Ri1FhENADvpvseQnOUCnuAWmLs9EQPWLK5E4uUNAkps8wO4qQ0CVUoZgC45FQAaQkDevdkNAevNlszS2QkBhwNTHKoQ1QK0mmeZnJ0NA6abFx8T2RECHQnhy1fJCQOaKWrN4J0VAPWIV6yvfQEAk7xzKULFEQESU5doGJEJAmyykspcVSEBHOblbaQ1FQEkb\u002fR6rxERAZG7GgqXPREDVcgxtpfZHQJREQM+w70NA8YiGnCmcREBpvSn24TtBQB4V\u002f3dETEVA4NkeveEERUDvK6Q20AFEQM13jelL\u002fDpAZEraQ7HlQEDzKXQcx7lFQFfpMFfteUNAVg4tsp0XRkD52YZZAeJDQAskKH6MaUNAZDvfT437QkApXI\u002fC9RBBQGRK2kOx4UBAa9m1GJcQQ0D81ZB2K+lAQOrU8IhlQUdA33ssO0ztQUDsUbgeheNAQFWk4+YrhEFATpJ07vK8REDJdr6fGs9BQHLAzzQ41UBAEGc0qOwoQ0ANafkm8nBDQLtmTYepQ0ZAhVs+kpLqQUDPYPgt34xDQDNRpeLWpkRAwtOWAB1jQ0BSKp\u002ft6v5DQCbWVqqTWkBAXTSFSjN3Q0DCr0eX7QJFQNh+dOJZCUJAReKSobLzQUCA7YHSJ4VDQNtbX17f\u002fkNA7nw\u002fNV4aSEDZcQ19wS9FQByGA9+8LkNA7FG4HoX7QECmeAGbGINFQCuHFtnOT0RAfO+x7DDtQECxgxCxPXFDQHOz5Jb7r0ZAo5U5ZYfVQEB5FcbU5QZCQPLSTWIQgDVA+y3PvebWQEA8TtGRXNRDQHuDL0ymFEdAiY5PjiNoQ0A8Db1qCupDQAjYu\u002f1B\u002fkNAsk5T08cURkC9oM+RphBFQOSAn2lwSkVAkNm8HopTRkCq5DE9wGhCQB+iLNc2q0NA12owiYoOR0Bp54\u002fEJgBDQJhFckOdWkxAapIOxdMKRUCHSPIBJs9CQAaQkDevBkRAlcdoV4BkQ0Db7P5ng6ZEQMMoSjqxL0VAhReOMcETRkDD0CwB3xxDQD6V9Kx7J0NACCKLNPFETUA6kst\u002fSLtDQEZeGOFUxURA\u002fExitZ6tQkBUD0U\u002forlEQGrLb4c8fkNAlJn7eQ3yQkATXiearAZDQG6I8ZpXA0xAi5iGn4cMRUA0g7akvOdAQBKlvcEXKkNAvkUOrgwRRUDAvWNfT1NFQB1aZDvfZzVAfu6ZXyzZQECI7ZNIR+1EQP3jc91K60BAKVyPwvWoREDEFFkpjOhDQCkyhK0j6kRAz8alhaYQQkDYfnTiWUk1QIPsaUUj6UBA6tTwiGUVR0BAUp8\u002fyCBDQEYrc8oOIzlAIJ8MZRPwO0DOp9BxHBNEQLwhS+5JKUJAyM785tWEQ0D7uOzGcSRDQAFaqVYVgEdAcO2GZRpEQ0Bn170ViblEQJVoh8eXWTVAvGNnwA\u002fGQEAAAAAAAJBFQKFqsk6u8kNAwoanV8rmQkCRcVoqztpAQAaQkDevjkVA7yukNtD1RECXpJXvVzZIQPYVWoxwjUNA\u002fw778yOSRUDx4UhWND5BQNSd5YHhpUVAliner58mSEBD4Vi8\u002fZBDQLx0kxgEDkVA4J8QCfheQ0BqQFJ+sSxDQG+6ZYf4uUZAUccZeQ9UNUA58wbzshJGQLYfnXhWDENAJdrh8WUIRUBkZ37zampCQD2h8DzlkkZApcDAe2AQRUB3yEHHlttDQEjhehSuq0NAR7OqDIDHREAU00M8K2I1QBV\u002fqdliHkNANA432IINRUCnI4CbRYNDQBBbOBgD+kBAryR5ru8LQ0BNoIhFDAhEQA=="},"legendgroup":"training","lon":{"dtype":"f8","bdata":"UCNnQIEAVMC6QkirVBVTwGvSEtBplVLAgWVbvA46VcBLMOb4MvpTwJaVJqUg8lLAGfVaGgkAVsD1aXC2FJBewB6n6EguI1LAOrLyy2CIXsAXu31WGZRewB\u002fMN+yI5lbAWoUougnHV8Bs9vadFblWwChOSTGbsF3AC8iofBmrXsB\u002fgFqx5H9ewKrbNBERZV7AB4\u002fb1OUGVcCWpHxSt6VewBXHgVfLa17AWM+DmuWTUsAPHrepyztTwDQjzWlg21fADHVY4RbrUsDhXdMoyZhXwDUlWYcjqVPAhAasZmeKV8CVLe0vlpJSwKxI+QcZ7lbA+4ywTc+7U8D+KOrMPXFewH3uX7QiIVPAt3gdFo+QXsBQyyj5xb5ewLOmaJvRhl7Ad6gB3t2dVcC9ZZgk4CtXwMlgIGPJrVPAa9eEtMYaV8DH4QZbsAVVwKLFY1C3kVLAl2NoK+V6XsCnuAWmLnNawA0fbAyVEVXAtpoaDQX\u002fVMBVEtkH2e1XwObBJ+fV+FTA+6JOiiAVVcB+XHbjOJ5XwM+B5QgZ3mHANCQ4Pw+JV8BY\u002fnxbsEVUwPeM6a6RJFjA\u002feNz3UqRUsAx3Ax5fJVSwB6xivWVQ1PAIToEjgQFW8AUp6SYTYlSwI5AvK5fyFXAKVyPwvWoV8A5tMh2vpdSwOSsPg1Oj1fAi3vi780nV8D+ABiNBCBTwOt7R2y7T1PA7pmAutxuVsDN387PHkRUwKALNOkA\u002fFPAdnZs4xNVU8DrIXWWtIhXwI2B0NUxrVXA6i3UUNkpV8AinWj0tjJTwPS1V7SzwVTA249OPCv8UsD3Yt6Zv5ZVwGIm9nUF+FrAxm00gLeWXsDpJjEIrHhSwHP+YL\u002frkFLA8s02N6bGVcBqDyDoDaVewCykV15NtFfAC\u002flW2pjeXcD\u002frnTjgtBXwB5HWscEfVLAukJpuf0JVsB0zk9xHGtewP5l9+Rhal7AyddUzHeVXsD\u002fC1+6JJZewJHX3gLkplbAiDMaVHZgXsD6AO7Di4FewPPgk\u002fNq5lXAlS3tL5aoV8Cb0xuklvpTwPyp8dJNTlPA5+RFJuDPVMDv0GaL2hZfwAcGtYShWFjA0RPgBVswU8DCBCRQsxJVwMix9QzhM1zAuB6F61GGXsDkwtxJn3BewL6uFSMBv1XAi3vi780VVcDeMkwS8BVVwLc0bbW9y17AOJDkqBKIV8AqgHOQoUJXwLj+AuZGlFTAYvq5\u002fGJtXsCCsoQQ61tXwEXikqGyPVPArkfhehRGVMDqPM9E\u002fd9VwBHJ6xzeqVPA2CssuB9qXsAEbKxpA2lWwFhIr7yarFfAQM1\u002f\u002frF+XsA5l4fxP75jwNf1sLxQbF7AJ2FLNG2cXsDEGQ0qO1xYwJB\u002fC1cs0FTASMvc11wkVcAk7xzKUPVRwIOluoCXjlfAAvOQKR9eXsDLkkrCz5NSwO+2wT9bBVbAViDE30DLVcC4ByEg30FYwBJmf0Ujl1XAHhe0FPm9VcBdlmU+VoFdwNPZyeAoulTAB9Dv+zd+UsDwmMtXEyNTwLraiv1lJ1TAkfx3M1keVcDweyeoWSBTwHUp6NXEPVPAQCZjxiWUXsByAFh48vJSwPd14JwRUVPAVOOlm8SkVsAUrkfhegRVwOFzcWUaDlXAGO630dtOU8Bw09moEhxVwPsGJjeKMlzAuB6F61HEVcDz4JPzagJVwLyvyoXKT1bAmTtE7UjvVMA77kqBu5RawHWTGARWDlXAqNzpc9p4VsBHX5xTpFtTwHE9CtejAFbA3F53X7qsVcC4VEp0O5NXwIb9Q5804l7AyAFg4UlmXsCkYUIWsxBTwKB2rt4XL1jAKiT0ji7aWsCQHQpVoORRwO11nOwwhVfArkfhehTGVcAzi3F67r5ewHNyM5rkEFPAdX16xwRFXsCSWPc0TNBUwOkykMLQaF7AnOFhNfEQVcA6nRoesYFVwBBCm3d3T1bABGysaQMFVcDc7oqFRlVTwL62I0Hdtl7Aoi8Yt6wJVcD6b2\u002fIUIVXwOXbcXmiwWPAc\u002f5gv+sWVcDY6VECLGpWwGjQK\u002fkzOVzAp567EyJPU8BjJlEv+PFSwOXmwBdLjlLA3Gox01GVXsA1dFiGXY9SwE4j0ttEfF7ApaKx9nfXWcBv\u002f4C9eAFbwJq22h4YaFPAhqIG9P40XMCREEDFTHxVwN3A0xo5hGDALjR8sLGEXsD203\u002fW\u002fOVZwDnDw2riKVPALZz\u002fslb1WsAbV21I7aZUwDKl\u002fShN0VHAE6ABUCCCV8At7dRcbl9ewDXMM6PdYVPAZmZmZma2YMCP5PIf0vxXwDEHpHFmI1LA00YagZ35WcBQ\u002fBhz1zVSwHJh7qRPQFPAPPDWnn5kXsByhRwAFmxewL9k48EWQmDAgavhx72cUsBNVMrG3g9VwBMFRNK4al7AASyXMpV9XsCl2NE41IZVwJ7vp8ZLuWPA2MdUC7YMVcD6ztSQ3c5ewPc2oiAdHFXA6i3UUNkZWMDMeAAwQ+xSwFVNEHWfkFXAqdvZV56kV8ClfoObMbpjwLgehetR\u002fFTAJwhobHmjW8BDdc6qqmpewN0OaERERFTAsE46NqdxWMC8dJMYBCxTwB\u002fIMN3aq1fADkNQ2kCXV8C+iXzyi2VewH4UGi2s317AEyuCg+arVMA3YnfLH9dUwESAHUlTt2PAGURaGcOiVsCxj6kWbG1WwBJmf0UjT1fAe7vKf22ZXsC0stiBTg9VwOflC7WBalbAFm+eycKkUsBF\u002fk+0YWRewIyjzcynzlvA3hULjXFnU8AefkgJi4dXwBboyet3sV3AGS1RB8NaXsC7kFicu0FbwHHly4\u002fonFLAAu31iyUFW8BVAOcgQ2lewN+b8FwpqV7AinQ\u002fp6C5Y8A3wdyTrKRewOULWkjAX17An9ydUnGWUsCApD5\u002fkJ1UwIU0dP3MiV7AAiuHFtmQUsCJUFvZ9GxWwCUcH9KUaFPA1uw3ycUHUsBer\u002fptWcBjwDA9qxYia17Aw\u002fUoXI+SUsDEJjJzAZZXwMc1mUzw7lbA11ZH6S1vXsDXWHhN\u002fiBTwA=="},"marker":{"color":"#0072B2","line":{"color":"white","width":0.5},"opacity":0.8,"size":{"dtype":"f8","bdata":"9AQkkpfqI0DmnT8zT1AbQDR4M7kXjCpAAAAAAAAAIUCwOl6\u002f398fQNHR2YZyqRtACi5bZkLyMUCwOl6\u002f398nQGjdsB\u002fwDyBAoJb04FS4KUCrPp1XeYsrQMhSG+lW9CJABPHZO3TMJkCrPp1XeYsrQOehlk5pSB5AYIUPAGMkHkDGwnav7nEsQKotbR0sphxAWnbiXfN8IkBzaRYdz1MhQMVprWBwfSRAUWypb7tzL0BWkD9f4GgkQPJp6xBkxiBAQql4k1D1I0Dg5L3Zx0kkQGQKPNA7TyhAOOLOnEY7H0DitcnrzVYrQPsXia+yMhpA7S4oiiSRLECngBv9MZogQGy2b2Y7fBhAAAAAAAAAKUD5o00HDEwnQHV86dQ\u002flRpAeGixUDd9I0DKCp0obS0mQPaXm2gGqSBA5tIsOp6nKkCznfLrC2ElQEnoW0CTnSxA+3pFIwQdLkAsg3sSLlQcQPaXm2gGqSBAdhtpO9jfMED0fTuQao8eQODkvdnHSSRA4OS92cdJJEDk1s8Ka78lQCRVlcecCyNABlwb+8AfIEBc2LueLHMkQEDtFfbydCZAYxxl2mjXKkCtThUAVa0iQCB1kcRSjzBApB+0CHX3HkANae57e4UpQEnoW0CTnSxAqi1tHSymHEDiYLQCsiIjQEQFvqcVWCJAX1AZDGqTI0Dj2AaParIeQJBf\u002f\u002f799ydASxCZccVnLkDaqVJdvrktQLD2iWYHESdAbaenWO99H0CuZyvmgxkfQD0O2Cd5GSJAOOLOnEY7H0Dw0GKhbvouQC92b\u002fKeaitAYxxl2mjXKkAxq7G+TtkhQDy4TUtU4iRAyFIb6Vb0GkCDKSIYA7IhQAT6ZWhQ5iZAU1SvmYrMK0D0fTuQao8mQHV86dQ\u002flSJAxDL+VpVRMEAAAAAAAAAlQHQdNEHOYClAWtyetCB0JUDtfnrmiFIsQMAcIRduZBpA56GWTmlIJkAc7rHZXyocQOPMlLnCGy9AKqrXTEXmIUB1fOnUP5UaQKq48sEdJiJAVCuqLH5hGUB4aLFQN30jQOJgtAKyIhtAAAAAAAAAIEDWlFSYFYohQPPJGlwYtiVAMgkTpSP2HEBNF8gQNDghQAAAAAAAACVAwBwhF25kGkBtp6dY730fQNQMBqOcxydApv0gnkawJECMxqqNSlomQPApI0yJGSxAEvxsuC0OIUAAAAAAAAAaQHn0c4HN1ydAyUL8omPEJECjYS7U4DQkQKKjsw3lUi9A+qwwohVsJkBU+svNu\u002fEYQOPT1iHIjClAhPZXswc\u002fGEA0V2RuMpgmQPsXia+yMhpAdB00Qc5gKUDa9BVCxlYwQDjizpxGOx9A4mC0ArIiI0CngBv9MZogQKBDMWMZbyFA+qwwohVsHkCBZX6cR5UoQAZcG\u002fvAHyBAAAAAAAAAJEA0OqcL2Z4nQO5X1oPZXSBAFM4CYEUcIUA0V2RuMpgmQKBDMWMZbyFAGryZ3AtGIUC201Os974XQPPZqKRoii1AmwzxQfrkKkCat\u002f5JOUQdQHV86dQ\u002flSJA4mC0ArIiI0BmnEK4SnYoQLqXU+URZSdAVCuqLH5hGUCqLW0dLKYcQAAAAAAAABpAc2kWHc9TIUB8wKC4XFEmQDjclrVg4yBAeGixUDd9G0CJp8b1fb8fQDanPIBCFSRAHHl35myOJ0D0fTuQao8mQHhosVA3fSNA8mnrEGTGIEBsrsVNS7kiQPJp6xBkxiBAoILYS8akIUClsHZj9Q8wQF7HUyqW0ihA3n6o2qrtJUD4hqT4+ZklQPlNZDSDbylA0dHZhnKpG0DJQvyiY8QkQMbCdq\u002fucSxAAAAAAAAAMkDr8fX39+8nQBRYHfmpdSdA1AwGo5zHJ0BU+svNu\u002fEYQJLbI8qPOiVAqrjywR0mIkBRO3sEx+EoQMhSG+lW9BpApv0gnkawJEAmixK\u002f3pEkQAAAAAAAABhAEmg4jo2QHUCEUvEmoeovQMAcIRduZBpAQo+KXEcqIUDZ7a5xy8MmQCvlisaPPypArrx7o\u002fshJ0CD\u002fcomGG0gQODkvdnHSSRAL3Zv8p5qK0ALgrs6d5cZQLqXU+URZSdAAAAAAAAAHECJp8b1fb8fQIFlfpxHlShA\u002fCYymsG3IECqLW0dLKYcQJ98j1lYmylAgP\u002fPTGbOJEB1fOnUP5UaQFp24l3zfCJAYrxEhAmcJEAAAAAAAAAtQD0O2Cd5GSJAAAAAAAAAHkBuz60iv1wnQKQftAh19x5A1pRUmBWKIUC0CX\u002f3KvMhQHYDCzx0azBALIN7Ei5UHEBc2LueLHMkQAZcG\u002fvAHyBAqSGaSTMOKkCA\u002f89MZs4cQDUgiabNySpA88kaXBi2HUDi1m1boegiQDIJE6Uj9hxA9LVPLuXuJkAS\u002fGy4LQ4hQKotbR0sphxA5p0\u002fM09QI0Dk1s8Ka78lQM6Xkz\u002fq8ChA9pebaAapIEALxxNqwKAqQGyuxU1LuSJAfvextJlqHUBGan1Hcy8gQHG\u002fakgqaClAtBwK+dI7KUDWxY+pfzcwQBGK88M\u002f7CRAhPZXswc\u002fGEAZL68FVogjQKLv5f4zrydA\u002fCYymsG3GEDWlFSYFYohQPAInjZntCNAX1AZDGqTI0B4aLFQN30bQD\u002fiERahfCFAAAAAAAAAIUCC+LZH7tQgQPR9O5BqjyZAFuHJaAjVG0Dj2AaParIeQAAAAAAAACVAFM4CYEUcIUCD\u002fcomGG0gQOehlk5pSB5Aup39zQ1yI0CaIZU1apQwQEn+3vKboilA+BpqkB27JkCc\u002fGftt3AiQHhosVA3fRtAAAAAAAAAKkAAAAAAAIAwQKdWVFn8wipAl5AECkfMIUBSClfUQ4sgQGy2b2Y7fBhAeo+CvuXQMECqLW0dLKYcQPiUEabEDCJAdXzp1D+VGkALgrs6d5cZQAAAAAAAABxA+BpqkB27JkD2l5toBqkgQCT42XBbHCpAHO6x2V8qHEAAAAAAAAAyQPsXia+yMhpAFM4CYEUcIUDi1m1boegiQKQftAh19x5A88kaXBi2HUAAAAAAAAAcQA=="}},"mode":"markers","name":"Training (284)","showlegend":true,"text":["02054750\u003cbr\u003eTraining\u003cbr\u003eN=142","01576980\u003cbr\u003eTraining\u003cbr\u003eN=32","0136230002\u003cbr\u003eTraining\u003cbr\u003eN=344","03275500\u003cbr\u003eTraining\u003cbr\u003eN=81","0205551614\u003cbr\u003eTraining\u003cbr\u003eN=63","01478100\u003cbr\u003eTraining\u003cbr\u003eN=34","05527910\u003cbr\u003eTraining\u003cbr\u003eN=778","12214500\u003cbr\u003eTraining\u003cbr\u003eN=252","01184490\u003cbr\u003eTraining\u003cbr\u003eN=65","14180300\u003cbr\u003eTraining\u003cbr\u003eN=314","12214350\u003cbr\u003eTraining\u003cbr\u003eN=382","04026005\u003cbr\u003eTraining\u003cbr\u003eN=120","07183500\u003cbr\u003eTraining\u003cbr\u003eN=219","0728875070\u003cbr\u003eTraining\u003cbr\u003eN=382","432004118453400\u003cbr\u003eTraining\u003cbr\u003eN=51","14144700\u003cbr\u003eTraining\u003cbr\u003eN=50","11169750\u003cbr\u003eTraining\u003cbr\u003eN=418","11447830\u003cbr\u003eTraining\u003cbr\u003eN=40","02205865\u003cbr\u003eTraining\u003cbr\u003eN=110","12213100\u003cbr\u003eTraining\u003cbr\u003eN=87","11455315\u003cbr\u003eTraining\u003cbr\u003eN=156","01362370\u003cbr\u003eTraining\u003cbr\u003eN=550","01651730\u003cbr\u003eTraining\u003cbr\u003eN=154","07183000\u003cbr\u003eTraining\u003cbr\u003eN=77","01480870\u003cbr\u003eTraining\u003cbr\u003eN=143","06893820\u003cbr\u003eTraining\u003cbr\u003eN=151","01632900\u003cbr\u003eTraining\u003cbr\u003eN=266","071948095\u003cbr\u003eTraining\u003cbr\u003eN=58","01362357\u003cbr\u003eTraining\u003cbr\u003eN=374","07263878\u003cbr\u003eTraining\u003cbr\u003eN=26","04213500\u003cbr\u003eTraining\u003cbr\u003eN=423","11173200\u003cbr\u003eTraining\u003cbr\u003eN=74","01576003\u003cbr\u003eTraining\u003cbr\u003eN=18","12113390\u003cbr\u003eTraining\u003cbr\u003eN=289","11448800\u003cbr\u003eTraining\u003cbr\u003eN=234","12208000\u003cbr\u003eTraining\u003cbr\u003eN=28","05516665\u003cbr\u003eTraining\u003cbr\u003eN=132","07263296\u003cbr\u003eTraining\u003cbr\u003eN=201","04219768\u003cbr\u003eTraining\u003cbr\u003eN=75","04024000\u003cbr\u003eTraining\u003cbr\u003eN=348","02334885\u003cbr\u003eTraining\u003cbr\u003eN=179","01362487\u003cbr\u003eTraining\u003cbr\u003eN=425","11185185\u003cbr\u003eTraining\u003cbr\u003eN=489","401530105475401\u003cbr\u003eTraining\u003cbr\u003eN=38","023362095\u003cbr\u003eTraining\u003cbr\u003eN=75","04144032\u003cbr\u003eTraining\u003cbr\u003eN=663","06888990\u003cbr\u003eTraining\u003cbr\u003eN=53","02208150\u003cbr\u003eTraining\u003cbr\u003eN=151","02203700\u003cbr\u003eTraining\u003cbr\u003eN=151","06893620\u003cbr\u003eTraining\u003cbr\u003eN=189","15209700\u003cbr\u003eTraining\u003cbr\u003eN=122","07355880\u003cbr\u003eTraining\u003cbr\u003eN=66","02292010\u003cbr\u003eTraining\u003cbr\u003eN=155","06887000\u003cbr\u003eTraining\u003cbr\u003eN=209","01362500\u003cbr\u003eTraining\u003cbr\u003eN=355","01362297\u003cbr\u003eTraining\u003cbr\u003eN=114","01658000\u003cbr\u003eTraining\u003cbr\u003eN=631","09144250\u003cbr\u003eTraining\u003cbr\u003eN=56","01363556\u003cbr\u003eTraining\u003cbr\u003eN=307","03433637\u003cbr\u003eTraining\u003cbr\u003eN=425","06893350\u003cbr\u003eTraining\u003cbr\u003eN=40","01349527\u003cbr\u003eTraining\u003cbr\u003eN=124","07194933\u003cbr\u003eTraining\u003cbr\u003eN=107","07075270\u003cbr\u003eTraining\u003cbr\u003eN=134","01576045\u003cbr\u003eTraining\u003cbr\u003eN=54","01646000\u003cbr\u003eTraining\u003cbr\u003eN=255","05406500\u003cbr\u003eTraining\u003cbr\u003eN=502","250802081035500\u003cbr\u003eTraining\u003cbr\u003eN=472","0205551460\u003cbr\u003eTraining\u003cbr\u003eN=227","0164579522\u003cbr\u003eTraining\u003cbr\u003eN=60","07048495\u003cbr\u003eTraining\u003cbr\u003eN=57","05515500\u003cbr\u003eTraining\u003cbr\u003eN=102","072632966\u003cbr\u003eTraining\u003cbr\u003eN=58","01589000\u003cbr\u003eTraining\u003cbr\u003eN=528","04161820\u003cbr\u003eTraining\u003cbr\u003eN=377","01493112\u003cbr\u003eTraining\u003cbr\u003eN=355","03353415\u003cbr\u003eTraining\u003cbr\u003eN=97","09363500\u003cbr\u003eTraining\u003cbr\u003eN=166","14181900\u003cbr\u003eTraining\u003cbr\u003eN=30","01311875\u003cbr\u003eTraining\u003cbr\u003eN=94","01362345\u003cbr\u003eTraining\u003cbr\u003eN=222","03601630\u003cbr\u003eTraining\u003cbr\u003eN=392","14182500\u003cbr\u003eTraining\u003cbr\u003eN=212","06892513\u003cbr\u003eTraining\u003cbr\u003eN=112","12510500\u003cbr\u003eTraining\u003cbr\u003eN=607","08069500\u003cbr\u003eTraining\u003cbr\u003eN=169","01372058\u003cbr\u003eTraining\u003cbr\u003eN=302","03381495\u003cbr\u003eTraining\u003cbr\u003eN=181","384115121402501\u003cbr\u003eTraining\u003cbr\u003eN=413","11455167\u003cbr\u003eTraining\u003cbr\u003eN=27","12200500\u003cbr\u003eTraining\u003cbr\u003eN=204","383653122204601\u003cbr\u003eTraining\u003cbr\u003eN=37","05586300\u003cbr\u003eTraining\u003cbr\u003eN=534","11336685\u003cbr\u003eTraining\u003cbr\u003eN=98","372750122012701\u003cbr\u003eTraining\u003cbr\u003eN=28","04092485\u003cbr\u003eTraining\u003cbr\u003eN=103","385608094380300\u003cbr\u003eTraining\u003cbr\u003eN=22","02055080\u003cbr\u003eTraining\u003cbr\u003eN=132","0166818985\u003cbr\u003eTraining\u003cbr\u003eN=31","04167150\u003cbr\u003eTraining\u003cbr\u003eN=64","12042800\u003cbr\u003eTraining\u003cbr\u003eN=91","08188500\u003cbr\u003eTraining\u003cbr\u003eN=188","01573660\u003cbr\u003eTraining\u003cbr\u003eN=42","02203831\u003cbr\u003eTraining\u003cbr\u003eN=85","12323720\u003cbr\u003eTraining\u003cbr\u003eN=169","12155500\u003cbr\u003eTraining\u003cbr\u003eN=27","11455268\u003cbr\u003eTraining\u003cbr\u003eN=60","03432472\u003cbr\u003eTraining\u003cbr\u003eN=249","02336240\u003cbr\u003eTraining\u003cbr\u003eN=161","02336120\u003cbr\u003eTraining\u003cbr\u003eN=206","14246900\u003cbr\u003eTraining\u003cbr\u003eN=404","07355870\u003cbr\u003eTraining\u003cbr\u003eN=82","07257500\u003cbr\u003eTraining\u003cbr\u003eN=25","04199500\u003cbr\u003eTraining\u003cbr\u003eN=251","11455280\u003cbr\u003eTraining\u003cbr\u003eN=163","06900050\u003cbr\u003eTraining\u003cbr\u003eN=149","01649190\u003cbr\u003eTraining\u003cbr\u003eN=544","250921081054200\u003cbr\u003eTraining\u003cbr\u003eN=208","05536356\u003cbr\u003eTraining\u003cbr\u003eN=20","01608500\u003cbr\u003eTraining\u003cbr\u003eN=308","11455143\u003cbr\u003eTraining\u003cbr\u003eN=17","05406457\u003cbr\u003eTraining\u003cbr\u003eN=213","385520094420000\u003cbr\u003eTraining\u003cbr\u003eN=26","372525121584701\u003cbr\u003eTraining\u003cbr\u003eN=302","16200000\u003cbr\u003eTraining\u003cbr\u003eN=609","11455276\u003cbr\u003eTraining\u003cbr\u003eN=58","11516530\u003cbr\u003eTraining\u003cbr\u003eN=124","375350097262800\u003cbr\u003eTraining\u003cbr\u003eN=74","04168400\u003cbr\u003eTraining\u003cbr\u003eN=89","02336728\u003cbr\u003eTraining\u003cbr\u003eN=52","01118500\u003cbr\u003eTraining\u003cbr\u003eN=275","07194880\u003cbr\u003eTraining\u003cbr\u003eN=66","12186000\u003cbr\u003eTraining\u003cbr\u003eN=144","01362368\u003cbr\u003eTraining\u003cbr\u003eN=244","05537980\u003cbr\u003eTraining\u003cbr\u003eN=70","04095090\u003cbr\u003eTraining\u003cbr\u003eN=83","05082500\u003cbr\u003eTraining\u003cbr\u003eN=213","03353420\u003cbr\u003eTraining\u003cbr\u003eN=89","05517500\u003cbr\u003eTraining\u003cbr\u003eN=86","342804118011501\u003cbr\u003eTraining\u003cbr\u003eN=15","04165500\u003cbr\u003eTraining\u003cbr\u003eN=464","01364500\u003cbr\u003eTraining\u003cbr\u003eN=357","01576007\u003cbr\u003eTraining\u003cbr\u003eN=44","02276877\u003cbr\u003eTraining\u003cbr\u003eN=112","02336526\u003cbr\u003eTraining\u003cbr\u003eN=124","04249000\u003cbr\u003eTraining\u003cbr\u003eN=271","01651000\u003cbr\u003eTraining\u003cbr\u003eN=237","14162050\u003cbr\u003eTraining\u003cbr\u003eN=22","01478220\u003cbr\u003eTraining\u003cbr\u003eN=40","01654107\u003cbr\u003eTraining\u003cbr\u003eN=25","07017610\u003cbr\u003eTraining\u003cbr\u003eN=87","02334480\u003cbr\u003eTraining\u003cbr\u003eN=205","02203950\u003cbr\u003eTraining\u003cbr\u003eN=79","0166818623\u003cbr\u003eTraining\u003cbr\u003eN=33","02336313\u003cbr\u003eTraining\u003cbr\u003eN=62","12324400\u003cbr\u003eTraining\u003cbr\u003eN=146","03432522\u003cbr\u003eTraining\u003cbr\u003eN=242","02207185\u003cbr\u003eTraining\u003cbr\u003eN=212","07030392\u003cbr\u003eTraining\u003cbr\u003eN=132","04193490\u003cbr\u003eTraining\u003cbr\u003eN=77","08317400\u003cbr\u003eTraining\u003cbr\u003eN=115","02203900\u003cbr\u003eTraining\u003cbr\u003eN=77","05595000\u003cbr\u003eTraining\u003cbr\u003eN=93","01656903\u003cbr\u003eTraining\u003cbr\u003eN=582","040851385\u003cbr\u003eTraining\u003cbr\u003eN=283","03432100\u003cbr\u003eTraining\u003cbr\u003eN=194","06894000\u003cbr\u003eTraining\u003cbr\u003eN=185","11523000\u003cbr\u003eTraining\u003cbr\u003eN=304","11425500\u003cbr\u003eTraining\u003cbr\u003eN=34","01576516\u003cbr\u003eTraining\u003cbr\u003eN=163","08057410\u003cbr\u003eTraining\u003cbr\u003eN=418","385553107243301\u003cbr\u003eTraining\u003cbr\u003eN=860","01111230\u003cbr\u003eTraining\u003cbr\u003eN=254","07048600\u003cbr\u003eTraining\u003cbr\u003eN=239","034336392\u003cbr\u003eTraining\u003cbr\u003eN=249","11448750\u003cbr\u003eTraining\u003cbr\u003eN=20","015765185\u003cbr\u003eTraining\u003cbr\u003eN=175","12187900\u003cbr\u003eTraining\u003cbr\u003eN=103","04166500\u003cbr\u003eTraining\u003cbr\u003eN=285","11455139\u003cbr\u003eTraining\u003cbr\u003eN=30","02335350\u003cbr\u003eTraining\u003cbr\u003eN=161","04119400\u003cbr\u003eTraining\u003cbr\u003eN=158","05567500\u003cbr\u003eTraining\u003cbr\u003eN=16","02206500\u003cbr\u003eTraining\u003cbr\u003eN=46","01645704\u003cbr\u003eTraining\u003cbr\u003eN=572","452230122512201\u003cbr\u003eTraining\u003cbr\u003eN=27","02204037\u003cbr\u003eTraining\u003cbr\u003eN=84","07048550\u003cbr\u003eTraining\u003cbr\u003eN=218","16210200\u003cbr\u003eTraining\u003cbr\u003eN=333","02203655\u003cbr\u003eTraining\u003cbr\u003eN=229","05576195\u003cbr\u003eTraining\u003cbr\u003eN=71","12323840\u003cbr\u003eTraining\u003cbr\u003eN=151","01654500\u003cbr\u003eTraining\u003cbr\u003eN=377","01478120\u003cbr\u003eTraining\u003cbr\u003eN=23","01408500\u003cbr\u003eTraining\u003cbr\u003eN=237","14162200\u003cbr\u003eTraining\u003cbr\u003eN=36","01362330\u003cbr\u003eTraining\u003cbr\u003eN=62","11504115\u003cbr\u003eTraining\u003cbr\u003eN=275","06436760\u003cbr\u003eTraining\u003cbr\u003eN=76","09364010\u003cbr\u003eTraining\u003cbr\u003eN=40","01636846\u003cbr\u003eTraining\u003cbr\u003eN=310","12323700\u003cbr\u003eTraining\u003cbr\u003eN=164","03302060\u003cbr\u003eTraining\u003cbr\u003eN=28","15024800\u003cbr\u003eTraining\u003cbr\u003eN=110","11510700\u003cbr\u003eTraining\u003cbr\u003eN=159","07126485\u003cbr\u003eTraining\u003cbr\u003eN=441","01575598\u003cbr\u003eTraining\u003cbr\u003eN=102","09136100\u003cbr\u003eTraining\u003cbr\u003eN=49","04199000\u003cbr\u003eTraining\u003cbr\u003eN=236","01104455\u003cbr\u003eTraining\u003cbr\u003eN=56","05321995\u003cbr\u003eTraining\u003cbr\u003eN=91","11336680\u003cbr\u003eTraining\u003cbr\u003eN=99","01668000\u003cbr\u003eTraining\u003cbr\u003eN=617","15041200\u003cbr\u003eTraining\u003cbr\u003eN=38","06889160\u003cbr\u003eTraining\u003cbr\u003eN=155","01193050\u003cbr\u003eTraining\u003cbr\u003eN=66","07126300\u003cbr\u003eTraining\u003cbr\u003eN=326","01196500\u003cbr\u003eTraining\u003cbr\u003eN=41","01650800\u003cbr\u003eTraining\u003cbr\u003eN=353","11313315\u003cbr\u003eTraining\u003cbr\u003eN=47","11337190\u003cbr\u003eTraining\u003cbr\u003eN=119","15008000\u003cbr\u003eTraining\u003cbr\u003eN=42","0136219503\u003cbr\u003eTraining\u003cbr\u003eN=223","02336152\u003cbr\u003eTraining\u003cbr\u003eN=82","11455146\u003cbr\u003eTraining\u003cbr\u003eN=40","11509500\u003cbr\u003eTraining\u003cbr\u003eN=128","04108660\u003cbr\u003eTraining\u003cbr\u003eN=189","16265000\u003cbr\u003eTraining\u003cbr\u003eN=287","02203960\u003cbr\u003eTraining\u003cbr\u003eN=75","11520500\u003cbr\u003eTraining\u003cbr\u003eN=347","02336410\u003cbr\u003eTraining\u003cbr\u003eN=115","06796500\u003cbr\u003eTraining\u003cbr\u003eN=45","01479820\u003cbr\u003eTraining\u003cbr\u003eN=67","04101500\u003cbr\u003eTraining\u003cbr\u003eN=303","07195500\u003cbr\u003eTraining\u003cbr\u003eN=297","16247100\u003cbr\u003eTraining\u003cbr\u003eN=597","02207400\u003cbr\u003eTraining\u003cbr\u003eN=167","06192980\u003cbr\u003eTraining\u003cbr\u003eN=17","11455335\u003cbr\u003eTraining\u003cbr\u003eN=133","250813081040000\u003cbr\u003eTraining\u003cbr\u003eN=246","08211200\u003cbr\u003eTraining\u003cbr\u003eN=19","01573710\u003cbr\u003eTraining\u003cbr\u003eN=91","071912213\u003cbr\u003eTraining\u003cbr\u003eN=137","06893830\u003cbr\u003eTraining\u003cbr\u003eN=134","11447850\u003cbr\u003eTraining\u003cbr\u003eN=33","12035000\u003cbr\u003eTraining\u003cbr\u003eN=90","03216070\u003cbr\u003eTraining\u003cbr\u003eN=81","04195500\u003cbr\u003eTraining\u003cbr\u003eN=78","16249000\u003cbr\u003eTraining\u003cbr\u003eN=212","07288500\u003cbr\u003eTraining\u003cbr\u003eN=35","05406497\u003cbr\u003eTraining\u003cbr\u003eN=54","06901500\u003cbr\u003eTraining\u003cbr\u003eN=169","374811122235001\u003cbr\u003eTraining\u003cbr\u003eN=83","02203873\u003cbr\u003eTraining\u003cbr\u003eN=71","05406479\u003cbr\u003eTraining\u003cbr\u003eN=51","01434498\u003cbr\u003eTraining\u003cbr\u003eN=131","12189500\u003cbr\u003eTraining\u003cbr\u003eN=633","09326500\u003cbr\u003eTraining\u003cbr\u003eN=311","04231600\u003cbr\u003eTraining\u003cbr\u003eN=217","07355860\u003cbr\u003eTraining\u003cbr\u003eN=109","431745118462300\u003cbr\u003eTraining\u003cbr\u003eN=33","12188380\u003cbr\u003eTraining\u003cbr\u003eN=324","09163500\u003cbr\u003eTraining\u003cbr\u003eN=625","013621955\u003cbr\u003eTraining\u003cbr\u003eN=352","09149500\u003cbr\u003eTraining\u003cbr\u003eN=96","11455140\u003cbr\u003eTraining\u003cbr\u003eN=73","14211550\u003cbr\u003eTraining\u003cbr\u003eN=18","16238500\u003cbr\u003eTraining\u003cbr\u003eN=657","14163000\u003cbr\u003eTraining\u003cbr\u003eN=40","11336790\u003cbr\u003eTraining\u003cbr\u003eN=101","01362295\u003cbr\u003eTraining\u003cbr\u003eN=28","03524740\u003cbr\u003eTraining\u003cbr\u003eN=23","14209700\u003cbr\u003eTraining\u003cbr\u003eN=36","01362336\u003cbr\u003eTraining\u003cbr\u003eN=217","05576100\u003cbr\u003eTraining\u003cbr\u003eN=75","01636845\u003cbr\u003eTraining\u003cbr\u003eN=328","01127500\u003cbr\u003eTraining\u003cbr\u003eN=37","16213000\u003cbr\u003eTraining\u003cbr\u003eN=820","11455338\u003cbr\u003eTraining\u003cbr\u003eN=26","01362350\u003cbr\u003eTraining\u003cbr\u003eN=83","06893890\u003cbr\u003eTraining\u003cbr\u003eN=119","07364122\u003cbr\u003eTraining\u003cbr\u003eN=56","11455478\u003cbr\u003eTraining\u003cbr\u003eN=47","01575900\u003cbr\u003eTraining\u003cbr\u003eN=36"],"type":"scattergeo"},{"hoverinfo":"text","lat":{"dtype":"f8","bdata":"+XAkKxoRRUDKbkXmuiRFQHnErg78IENA33vJEBHhQkDLCQNkooZDQI2XbhKDBEVADzG5rB25RkBli2LBFuxBQNSUCWQb+0NAcT0K16PoQUC9Cr6jJQpEQPT91Hjp8kBAlnfVA2bBREBytspdlb5EQLxMA\u002fUcL0NAocmT3pYNRkDxM4nVev9DQCRev9z+GERAXmiu00hjR0Anr4SkBc5DQOk1LPzPUkNAp3bIxf\u002foQEBNEo3mr9NAQHV6OUd4gUdAz4LUFmxpNUC\u002fSGjLOXhHQOl+b09nZkVARjIWEzzcREA5w8Nq4ulCQM6n0HEcR0RArBfof16xPUBVkgqdNuhBQC81Y008G0NAAuSVNfsGREAsNnvaQO9AQLgehetR+ENA7yukNtBpRkD3ick8bts9QFHdGuCbB0NA2n1cVVUlQ0C2H514VgxBQJ+HwZnrvEZAeuVZzeP6R0CnfMaNdNNBQDIl7aHYVkdA\u002fBWVgUEeRECJDtzc8\u002fpEQE1xC0xdHkNAwk1no0q0Q0AMWmnO0SJIQG6jAbwFxkFALDZ72kCnREDSEF1pfC1CQD6M94DMl0FAta3BVmR4Q0A9L9P+IINFQNqp+\u002fgyqEJAqPKHsCsMRUAD2usXS+pAQAkDKnf6H0hAbJR51C0lPkCDVAbl6MtEQOb8XlSchUVA2SY2m55vREBo6SvE+uJAQOdlXlhICUZAVvTiH5EeQ0BuasEHhr9DQC\u002fyupfe+EVAD1nuFpLqQ0AdeuZA6uNEQH089N2tmE1AgPJW4T8iQkDIzvzm1XRDQBYFbpsxjENA1shsmLrYQEA="},"legendgroup":"holdout","lon":{"dtype":"f8","bdata":"ys3kWdGOUsBtdGsl9u5UwFXdI5srYV7Atta8T\u002fpUVsCEIbyHlQdewEk4oc5kl1LAdgqoJnftXsA7wg4IGcJVwNsq0g5J81LAIKnPH2TAVcDe0oPlfN1SwGq8dJMYFlXAX0sjwa\u002f+XsDIP9jOHIpWwJltAmcEAFjAuAFEZtPtVcAEW18D5hBTwLYfnXhWJFPAYMrAAS0oWMD4ROixd\u002f5XwMrDQq1pl17ALUhtwRYaVcDWhi+4izRVwNF7vsHy6V7AfnIUIIq5Y8Dl3x3PHdRewMrN5FnRkFLArkfhehR8UsD8k1OW\u002fJpewN97LDtMpVLAUTermZDNVsAGa\u002fcGOsFVwKAEkaDTal7AjS81nfghU8CJ1y+3PxhVwMjO\u002fObVsFLAlS3tL5YsUcB4X5ULlX5WwLtmTYepY17AlC6ikl9oXsBCUerc\u002fgRVwFnJfWFo7l7AyO\u002fIsyYZX8Cz\u002fXW4Z1RawNZD6ixpzFvA7p0sEBhzWsAIoc27++FUwIXrUbgeYV7A0biqy+0VU8B5JF6eznhewPg9RWlKLVfAMzMzMzOvVcBrJ++Ir7FXwDEqBM3C11TAWPH8WPeqV8AZGvRKfvlVwKfVRiut+1PARKitbHqSUsCarzfW6ghVwMSQQZNpZV7AIUiUrPnHV8ChV9FZxVxSwC7Wgb1TAFbAkgMbfIYJX8DHNZlM8ARVwKanfpRHAVXA9AZObHRhXsCIvpqHPBZTwMXIkjmWsV7AVPlD2BX2UsAYzcr2IZBWwINStHKvSmHAmpXtQ158V8C6Qmm5\u002fa1XwFTQo5hyy1vAidcvtz8QVcA="},"marker":{"cmax":1,"cmin":0,"color":{"dtype":"f8","bdata":"AAAAAAAAAABLRMX9YsflPyBLBss2ZsG\u002foDy6zGZj6j\u002fIUO\u002fwWW\u002fdP+rMrSCS7NU\u002fIS4rjo8i7D+g9hEQl+jEv+z\u002fdl9Bdtc\u002ftMSVnYag2j9ijV5iu8riP44hMIapReI\u002f8qixCaef5j8g3QedT1XYPzAzh1JBReM\u002f5VnBEHT27T+If7liOh3pP1BbdoHjJb2\u002fqPkdHQSNzD\u002fkpatE2A\u002fpP0qFr26Ev9k\u002fWSiT0Lyx4T\u002fKHMHg5vjYP5GyDSx7kew\u002fcOwO+VV8y7+AdvShfG64vwDNM9OWMNq\u002fOCtlruW9CMCEXPJqLRHXvwAAAAAAAAAAws5Zt9Sx4T\u002fo2QPgg8vXv+S9DcB4yw7AKpUe6F424z+0VbyjPADaPw2NKelQGQPA4H+D7md2xj9\u002fvvbdhKXkPwAAAAAAAAAA6aYIqmNp4z8abl3b2H7gPyi9XrQx0LY\u002f9OFGd\u002fpT4z\u002foC03cR3LMv\u002fhmUCnL9Mw\u002ffBg44QSh9b8EmxDU21nUPzQniIGHIO4\u002fnDMIrvI46T9Mn+BXmTbhP0Dt9FsFRec\u002fZEIOECuj1z\u002fMIKk9g+rfP2EPahGu8Oc\u002fyIKteMTS3j9I7IrPf6\u002fCv3cmuvovg+w\u002fNo2lalGa6z\u002fclXh6C6HGPwsNK95Qo+I\u002fUO2n0tcsuj+aooCIoc4lwIhOl\u002fMJauG\u002fQDjpN2D1sb9g\u002fANtxOHcv2g+UdfuoN8\u002fAAAAAAAAAACuIn094E\u002fgP+hPjdCQ\u002fbo\u002feTkK7zS66j9yN8LlMRrSPwzbo1ol\u002fei\u002fvGgCWwJy6D\u002fQo4T37MnSP25JlRTxXds\u002fJH7MmfQ+2j8="},"colorbar":{"len":0.4,"title":{"text":"R²"},"y":0.3},"colorscale":[[0.0,"#D55E00"],[0.5,"#F0E442"],[1.0,"#009E73"]],"line":{"color":"white","width":0.5},"opacity":0.8,"size":{"dtype":"f8","bdata":"w8dlZLKpJkCE9lezBz8gQID\u002fz0xmzhxAP+IRFqF8IUAAAAAAAAAyQAAAAAAAACVAqi1tHSymHEBwuC1rwcYpQOLWbVuh6CJA0dHZhnKpI0CquPLBHSYiQPJp6xBkxiBAdgMLPHRrMEDEhFcqOD8iQKBDMWMZbyFAQP83c5k1K0BmnEK4SnYoQBq8mdwLRiFAKqrXTEXmIUB1fOnUP5UaQBq8mdwLRiFASf7e8puiKUBEBb6nFVgiQAuCuzp3lyFAcGD\u002fAP4HKEDa0xlQMIYnQJtmzBpvWSlALJ6hq7b9MUDQygfqLb8hQBtoaTxRoSJAvpnBcbnuMECmfGQqYG0nQF9QGQxqkyNAsItvYKdKKUBwe7aaIIkiQAZcG\u002fvAHyBAcHu2miCJIkCi0S6djL8pQAAAAAAAACFAFuHJaAjVI0DKCp0obS0mQIa5kxZbtydAw8dlZLKpJkCw0A6VaB0dQBbhyWgI1RtAbLZvZjt8GEDLjZx3NXErQAAAAAAAACRAsNAOlWgdJUCq6v+nqlQtQGy2b2Y7fCBAdgnZXdlmI0DmnT8zT1AjQOadPzNPUCNAQo+KXEcqGUDOeT\u002fcmj8sQIT2V7MHPyBA8mnrEGTGIEBSClfUQ4sgQKQftAh19x5AyUL8omPEJEDR0dmGcqkbQLA6Xr\u002ff3x9AJGPs35lbI0D8JjKawbcgQP5Vl3YweCxAttNTrPe+F0BwYP8A\u002fgcoQD45FYxXwyhAHO6x2V8qHEDDwWgFZEUuQJeQBApHzBlAC4K7OneXGUCXkAQKR8wZQKq48sEdJiJATRfIEDQ4IUA="}},"mode":"markers","name":"Holdout (76)","showlegend":true,"text":["01362322\u003cbr\u003eHoldout\u003cbr\u003eN=215","04174500\u003cbr\u003eHoldout\u003cbr\u003eN=68","11447890\u003cbr\u003eHoldout\u003cbr\u003eN=41","05599490\u003cbr\u003eHoldout\u003cbr\u003eN=90","10336645\u003cbr\u003eHoldout\u003cbr\u003eN=822","01362286\u003cbr\u003eHoldout\u003cbr\u003eN=169","14302480\u003cbr\u003eHoldout\u003cbr\u003eN=40","03432516\u003cbr\u003eHoldout\u003cbr\u003eN=316","01480617\u003cbr\u003eHoldout\u003cbr\u003eN=119","034324715\u003cbr\u003eHoldout\u003cbr\u003eN=136","01473169\u003cbr\u003eHoldout\u003cbr\u003eN=103","02336340\u003cbr\u003eHoldout\u003cbr\u003eN=77","11530500\u003cbr\u003eHoldout\u003cbr\u003eN=617","05447500\u003cbr\u003eHoldout\u003cbr\u003eN=105","07182390\u003cbr\u003eHoldout\u003cbr\u003eN=89","04085427\u003cbr\u003eHoldout\u003cbr\u003eN=369","015765195\u003cbr\u003eHoldout\u003cbr\u003eN=271","01573695\u003cbr\u003eHoldout\u003cbr\u003eN=86","05061500\u003cbr\u003eHoldout\u003cbr\u003eN=98","06889110\u003cbr\u003eHoldout\u003cbr\u003eN=28","11453590\u003cbr\u003eHoldout\u003cbr\u003eN=86","02336300\u003cbr\u003eHoldout\u003cbr\u003eN=311","02337410\u003cbr\u003eHoldout\u003cbr\u003eN=107","12037400\u003cbr\u003eHoldout\u003cbr\u003eN=92","16274100\u003cbr\u003eHoldout\u003cbr\u003eN=257","12031000\u003cbr\u003eHoldout\u003cbr\u003eN=241","01351500\u003cbr\u003eHoldout\u003cbr\u003eN=301","01372043\u003cbr\u003eHoldout\u003cbr\u003eN=783","374938122251801\u003cbr\u003eHoldout\u003cbr\u003eN=95","01400500\u003cbr\u003eHoldout\u003cbr\u003eN=113","07381600\u003cbr\u003eHoldout\u003cbr\u003eN=669","03432504\u003cbr\u003eHoldout\u003cbr\u003eN=238","11455350\u003cbr\u003eHoldout\u003cbr\u003eN=134","01576000\u003cbr\u003eHoldout\u003cbr\u003eN=299","02336360\u003cbr\u003eHoldout\u003cbr\u003eN=111","01465850\u003cbr\u003eHoldout\u003cbr\u003eN=66","01036390\u003cbr\u003eHoldout\u003cbr\u003eN=111","07374525\u003cbr\u003eHoldout\u003cbr\u003eN=315","11313460\u003cbr\u003eHoldout\u003cbr\u003eN=81","11455165\u003cbr\u003eHoldout\u003cbr\u003eN=140","02334578\u003cbr\u003eHoldout\u003cbr\u003eN=201","14301500\u003cbr\u003eHoldout\u003cbr\u003eN=247","12043000\u003cbr\u003eHoldout\u003cbr\u003eN=215","08380500\u003cbr\u003eHoldout\u003cbr\u003eN=43","06076590\u003cbr\u003eHoldout\u003cbr\u003eN=35","09013500\u003cbr\u003eHoldout\u003cbr\u003eN=18","04176500\u003cbr\u003eHoldout\u003cbr\u003eN=378","11447903\u003cbr\u003eHoldout\u003cbr\u003eN=144","01585075\u003cbr\u003eHoldout\u003cbr\u003eN=172","12166300\u003cbr\u003eHoldout\u003cbr\u003eN=455","07075250\u003cbr\u003eHoldout\u003cbr\u003eN=72","05517010\u003cbr\u003eHoldout\u003cbr\u003eN=130","07191222\u003cbr\u003eHoldout\u003cbr\u003eN=128","03501500\u003cbr\u003eHoldout\u003cbr\u003eN=128","06893300\u003cbr\u003eHoldout\u003cbr\u003eN=21","04087170\u003cbr\u003eHoldout\u003cbr\u003eN=410","02055379\u003cbr\u003eHoldout\u003cbr\u003eN=68","01362356\u003cbr\u003eHoldout\u003cbr\u003eN=77","02207135\u003cbr\u003eHoldout\u003cbr\u003eN=73","12187500\u003cbr\u003eHoldout\u003cbr\u003eN=56","08070200\u003cbr\u003eHoldout\u003cbr\u003eN=163","01200600\u003cbr\u003eHoldout\u003cbr\u003eN=34","04087119\u003cbr\u003eHoldout\u003cbr\u003eN=63","405219124085601\u003cbr\u003eHoldout\u003cbr\u003eN=129","02207160\u003cbr\u003eHoldout\u003cbr\u003eN=76","04142000\u003cbr\u003eHoldout\u003cbr\u003eN=419","11447905\u003cbr\u003eHoldout\u003cbr\u003eN=15","01581752\u003cbr\u003eHoldout\u003cbr\u003eN=257","14151000\u003cbr\u003eHoldout\u003cbr\u003eN=281","01478185\u003cbr\u003eHoldout\u003cbr\u003eN=37","05420500\u003cbr\u003eHoldout\u003cbr\u003eN=496","15129120\u003cbr\u003eHoldout\u003cbr\u003eN=24","07049050\u003cbr\u003eHoldout\u003cbr\u003eN=23","385446094430700\u003cbr\u003eHoldout\u003cbr\u003eN=24","09327000\u003cbr\u003eHoldout\u003cbr\u003eN=103","02203863\u003cbr\u003eHoldout\u003cbr\u003eN=85"],"type":"scattergeo"},{"hoverinfo":"text","lat":{"dtype":"f8","bdata":"9Y6mvE79QUDniSmJ0xhDQLYfOk4beENA5ibFIuE4PUDKwAEt3TZDQL0yFBwDtkVAGIgz+cWKQ0DnCqXl9ndDQDaR\u002fDUXcj5AVzonD+5cQ0B7FK5H4eJAQFWSCp02CEVA6VLQq4nXQEBXaxeJv3VDQEsnK+lVYEZAGK6SuFz+RECkbfyJyh5MQLgR5NqvVkRA2O4\u002fruTiQ0CxIc2SXxxEQINuiiL\u002fdkNAoiLzbWaXREDeCrzuCBtIQC0+qgYG3ERAbHJ83beQNUCApD5\u002fkOlBQMY9K6PwlkJAl8ZQyntgRkDZxX5gWApEQHyQ0FxIrkNAtCC1BVvoQEBakHdY8vNAQKkAzkGGCkFA\u002fw778yMyQ0BI4XoUrt9DQGCVqGrE\u002f0VA"},"legendgroup":"vault","lon":{"dtype":"f8","bdata":"nykq0chCV8BLq8a3HGpewAeP29TlplfAxDmPL8aWWMAqIbMOIgpYwFKeeTns\u002fFTADR9sDJWVV8BWJMvu7tZawGdXa3JCzFbAW3Imt7duXsDdMwF1uQNVwInXL7c\u002f0FTAT3BW6ZMaVcDQIE\u002fcO\u002f5dwHSVk\u002fVAiF7A\u002ftigBr4mUsBtrMQ8K1xgwNV46SYxDl\u002fA3rU67zUUU8DxKoypy7FSwGb8NTjVVVPA86DqocfVVcBTIR6Jl5VewLO8YZGVTlTA2NZP\u002f9nDY8Bi+rn8YsFVwCh9IeS8Q1bAN5g8VAmTXsAteFWQ9C1TwJhuEoPAMFPADsOBb17\u002fVMBmZmZmZg5VwAaQkDev9lTAKU2UztGoVsC9ijFVVfFSwDKC13j6uV7A"},"marker":{"color":"#CC79A7","line":{"color":"white","width":0.5},"opacity":0.8,"size":{"dtype":"f8","bdata":"VCuqLH5hGUCkH7QIdfceQKeAG\u002f0xmiBAkr19gnOeI0AGXBv7wB8gQAAAAAAAACdAEmg4jo2QJUBAsBrEqb8vQFE7ewTH4ShAo2Eu1OA0MECA\u002f89MZs4kQFT6y8278RhAFuHJaAjVI0B+97G0mWolQM55P9yaPyxASKoqjzkXLkCat\u002f5JOUQdQNHR2YZyqSNAGS+vBVaII0CjYS7U4DQwQImnxvV9vx9A5p0\u002fM09QI0AqqtdMReYhQNwylDV35CVA8GPpnIn9MEBkCjzQO08oQOiANTb5RCNAXx+GZi0XI0CpIZpJMw4qQCyDexIuVDBAyUL8omPEJEBghQ8AYyQmQHzAoLhcUSZAyFIb6Vb0GkDEhFcqOD8iQFzYu54scyRA"}},"mode":"markers","name":"Vault (36)","showlegend":true,"text":["07055814\u003cbr\u003eVault\u003cbr\u003eN=22","11455385\u003cbr\u003eVault\u003cbr\u003eN=56","06893390\u003cbr\u003eVault\u003cbr\u003eN=74","08181800\u003cbr\u003eVault\u003cbr\u003eN=135","07179750\u003cbr\u003eVault\u003cbr\u003eN=66","04157005\u003cbr\u003eVault\u003cbr\u003eN=225","06893970\u003cbr\u003eVault\u003cbr\u003eN=184","09132095\u003cbr\u003eVault\u003cbr\u003eN=564","07374000\u003cbr\u003eVault\u003cbr\u003eN=285","11452600\u003cbr\u003eVault\u003cbr\u003eN=596","02207120\u003cbr\u003eVault\u003cbr\u003eN=164","04175120\u003cbr\u003eVault\u003cbr\u003eN=20","02203603\u003cbr\u003eVault\u003cbr\u003eN=140","10336780\u003cbr\u003eVault\u003cbr\u003eN=180","14179000\u003cbr\u003eVault\u003cbr\u003eN=410","01184000\u003cbr\u003eVault\u003cbr\u003eN=488","15015595\u003cbr\u003eVault\u003cbr\u003eN=44","404038124131801\u003cbr\u003eVault\u003cbr\u003eN=136","01577500\u003cbr\u003eVault\u003cbr\u003eN=133","01463500\u003cbr\u003eVault\u003cbr\u003eN=596","0164578734\u003cbr\u003eVault\u003cbr\u003eN=62","05518000\u003cbr\u003eVault\u003cbr\u003eN=128","12170300\u003cbr\u003eVault\u003cbr\u003eN=98","04212100\u003cbr\u003eVault\u003cbr\u003eN=193","16210500\u003cbr\u003eVault\u003cbr\u003eN=675","034325065\u003cbr\u003eVault\u003cbr\u003eN=266","03612600\u003cbr\u003eVault\u003cbr\u003eN=127","14181500\u003cbr\u003eVault\u003cbr\u003eN=123","01574000\u003cbr\u003eVault\u003cbr\u003eN=326","01589290\u003cbr\u003eVault\u003cbr\u003eN=608","02207385\u003cbr\u003eVault\u003cbr\u003eN=163","02336030\u003cbr\u003eVault\u003cbr\u003eN=200","02217274\u003cbr\u003eVault\u003cbr\u003eN=205","07018500\u003cbr\u003eVault\u003cbr\u003eN=30","01478245\u003cbr\u003eVault\u003cbr\u003eN=105","14152000\u003cbr\u003eVault\u003cbr\u003eN=155"],"type":"scattergeo"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"},"margin":{"b":0,"l":0,"r":0,"t":30}}},"geo":{"scope":"usa","showland":true,"landcolor":"#f5f5f5","showlakes":true,"lakecolor":"#e0f0ff","showcountries":false,"showsubunits":true,"subunitcolor":"#cccccc","subunitwidth":0.5,"projection":{"type":"albers usa"}},"legend":{"x":0.0,"y":1.02,"bgcolor":"rgba(255,255,255,0.9)","bordercolor":"#cccccc","borderwidth":1,"font":{"size":11},"orientation":"h","yanchor":"bottom","xanchor":"left"},"title":{"text":"Study Area: 284 Training + 76 Holdout + 36 Vault Sites"},"height":500,"font":{"family":"Source Sans Pro, Helvetica, Arial, sans-serif","size":13},"margin":{"l":60,"r":30,"t":80,"b":60},"xaxis":{"showgrid":true,"gridcolor":"#EEEEEE","gridwidth":1,"zeroline":false},"yaxis":{"showgrid":true,"gridcolor":"#EEEEEE","gridwidth":1,"zeroline":false},"plot_bgcolor":"white","paper_bgcolor":"white"},                        {"responsive": true}                    ).then(function(){
+                            
+var gd = document.getElementById('006669e2-6de1-451e-9e79-b05fb0c20ce2');
+var x = new MutationObserver(function (mutations, observer) {{
+        var display = window.getComputedStyle(gd).display;
+        if (!display || display === 'none') {{
+            console.log([gd, 'removed!']);
+            Plotly.purge(gd);
+            observer.disconnect();
+        }}
+}});
+
+// Listen for the removal of the full notebook cells
+var notebookContainer = gd.closest('#notebook-container');
+if (notebookContainer) {{
+    x.observe(notebookContainer, {childList: true});
+}}
+
+// Listen for the clearing of the current output cell
+var outputEl = gd.closest('.output');
+if (outputEl) {{
+    x.observe(outputEl, {childList: true});
+}}
+
+                        })                };            </script>        </div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-study-area-map-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1
+</figcaption>
+</figure>
+</div>
+</div>
+</section>
+<section id="holdout-site-table" class="level2">
+<h2 class="anchored" data-anchor-id="holdout-site-table">Holdout Site Table</h2>
+<p>This sortable table gives the full scorecard for every holdout site — the 78 locations used for honest model evaluation. R² (equivalent to NSE, Nash-Sutcliffe Efficiency) is the primary ranking metric: values above 0.7 (green) indicate the model captures most SSC variability at that site; 0.3–0.7 (blue) indicates moderate skill; 0–0.3 (yellow) indicates marginal skill; and negative values (red) mean the model is actively worse than predicting the site’s long-run average. Sorting by different columns (MAPE, Within-2x, Spearman) highlights different aspects of performance and can reveal sites where the model ranks correctly but is systematically biased in absolute scale. Click any column header to sort.</p>
+<div id="cell-fig-site-table" class="cell" data-execution_count="2">
+<div id="fig-site-table" class="cell-output cell-output-display quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-site-table-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div>            <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_SVG"></script><script>if (window.MathJax && window.MathJax.Hub && window.MathJax.Hub.Config) {window.MathJax.Hub.Config({SVG: {font: "STIX-Web"}});}</script>                <script>window.PlotlyConfig = {MathJaxConfig: 'local'};</script>
+        <script charset="utf-8" src="https://cdn.plot.ly/plotly-3.4.0.min.js" integrity="sha256-KEmPoupLpFyGMyGAiOsiNDbKDKAvxXAn/W+oQa0ZAfk=" crossorigin="anonymous"></script>                <div id="4c663613-6fb3-4b24-98e8-5d42cd3467de" class="plotly-graph-div" style="height:600px; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("4c663613-6fb3-4b24-98e8-5d42cd3467de")) {                    Plotly.newPlot(                        "4c663613-6fb3-4b24-98e8-5d42cd3467de",                        [{"cells":{"align":"left","fill":{"color":[["white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white"],["white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white"],["#009E73","#009E73","#009E73","#009E73","#009E73","#009E73","#009E73","#009E73","#009E73","#009E73","#009E73","#009E73","#009E73","#009E73","#009E73","#56B4E9","#56B4E9","#56B4E9","#56B4E9","#56B4E9","#56B4E9","#56B4E9","#56B4E9","#56B4E9","#56B4E9","#56B4E9","#56B4E9","#56B4E9","#56B4E9","#56B4E9","#56B4E9","#56B4E9","#56B4E9","#56B4E9","#56B4E9","#56B4E9","#56B4E9","#56B4E9","#56B4E9","#56B4E9","#56B4E9","#56B4E9","#56B4E9","#56B4E9","#F0E442","#F0E442","#F0E442","#F0E442","#F0E442","#F0E442","#F0E442","#F0E442","#F0E442","#D55E00","#D55E00","#D55E00","#D55E00","#D55E00","#D55E00","#D55E00","#D55E00","#D55E00","#D55E00","#D55E00","#D55E00","#D55E00","#D55E00","#D55E00","#D55E00","#D55E00","#D55E00","#D55E00","#FFFFFF","#FFFFFF","#FFFFFF","#FFFFFF"],["white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white"],["white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white"],["white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white","white"]]},"font":{"size":11},"height":25,"values":[["USGS-11447903","USGS-04085427","USGS-12037400","USGS-02055379","USGS-14302480","USGS-01362356","USGS-01478185","USGS-05599490","USGS-01585075","USGS-015765195","USGS-06889110","USGS-07049050","USGS-03501500","USGS-07075250","USGS-11530500","USGS-04174500","USGS-07374525","USGS-11455165","USGS-12043000","USGS-07182390","USGS-01576000","USGS-01473169","USGS-12187500","USGS-02336340","USGS-07381600","USGS-02336300","USGS-12166300","USGS-02334578","USGS-01581752","USGS-07191222","USGS-04142000","USGS-06893300","USGS-10336645","USGS-09327000","USGS-034324715","USGS-02203863","USGS-02336360","USGS-11453590","USGS-02337410","USGS-05447500","USGS-05517010","USGS-01480617","USGS-01362286","USGS-04176500","USGS-385446094430700","USGS-05420500","USGS-06076590","USGS-05061500","USGS-02207135","USGS-01036390","USGS-14151000","USGS-08070200","USGS-14301500","USGS-405219124085601","USGS-12031000","USGS-01573695","USGS-11447890","USGS-04087170","USGS-03432516","USGS-16274100","USGS-08380500","USGS-374938122251801","USGS-03432504","USGS-01351500","USGS-02207160","USGS-04087119","USGS-15129120","USGS-09013500","USGS-01465850","USGS-01372043","USGS-11455350","USGS-01200600","USGS-01362322","USGS-01400500","USGS-11313460","USGS-11447905"],["38.2, -121.5","44.1, -87.7","47.0, -123.7","37.3, -79.9","45.4, -123.7","42.1, -74.3","39.8, -75.8","37.8, -89.3","39.4, -76.3","40.0, -76.3","39.6, -96.0","36.3, -93.9","35.2, -83.4","35.5, -92.7","41.5, -124.0","42.3, -83.7","29.9, -90.0","38.3, -121.6","48.0, -124.4","38.4, -96.0","40.1, -76.5","40.1, -75.5","48.2, -121.6","33.9, -84.3","29.7, -91.2","33.8, -84.4","48.3, -121.9","34.1, -84.1","39.5, -76.3","36.4, -94.8","44.1, -84.0","38.9, -94.7","39.1, -120.1","39.1, -111.2","35.8, -87.0","33.7, -84.3","33.9, -84.4","38.6, -122.4","33.7, -84.8","41.5, -90.2","41.3, -86.7","40.0, -75.8","42.0, -74.4","42.0, -83.5","38.9, -94.7","41.8, -90.3","46.7, -111.2","46.8, -96.6","33.8, -84.1","44.8, -68.7","43.9, -122.8","30.1, -95.1","45.5, -123.7","40.9, -124.1","46.9, -123.3","40.2, -76.6","38.3, -121.5","43.0, -87.9","35.8, -87.0","21.4, -157.8","35.7, -105.3","37.8, -122.4","35.8, -87.0","42.8, -74.3","33.8, -84.1","43.0, -88.0","59.2, -138.3","40.2, -105.8","39.9, -74.8","41.7, -73.9","38.2, -121.7","41.6, -73.4","42.1, -74.2","40.6, -74.6","38.1, -121.6","38.2, -121.5"],["0.941","0.936","0.893","0.891","0.879","0.863","0.835","0.825","0.788","0.785","0.783","0.764","0.748","0.727","0.707","0.681","0.645","0.607","0.604","0.602","0.600","0.587","0.582","0.571","0.553","0.553","0.538","0.515","0.510","0.499","0.494","0.482","0.460","0.428","0.416","0.410","0.406","0.402","0.390","0.380","0.369","0.367","0.343","0.318","0.294","0.283","0.226","0.223","0.177","0.175","0.105","0.102","0.089","-0.070","-0.095","-0.114","-0.136","-0.146","-0.163","-0.215","-0.222","-0.360","-0.372","-0.409","-0.451","-0.544","-0.781","-1.352","-2.387","-3.093","-3.849","-10.904","—","—","—","—"],["27.5","31.5","23.2","30.7","27.8","34.2","51.3","18.4","42.6","30.1","30.7","57.3","27.2","32.9","28.2","48.0","25.0","28.2","32.5","27.8","25.4","19.1","36.7","41.5","26.1","46.3","34.7","58.5","65.0","32.8","35.8","41.5","108.6","58.8","41.2","41.3","46.0","59.7","61.7","45.9","37.3","21.7","77.0","37.3","56.6","34.4","30.1","20.0","54.0","103.9","62.0","45.8","28.9","27.3","52.7","33.8","55.2","48.7","63.5","75.4","75.0","29.3","68.2","49.5","109.9","71.4","128.7","33.3","36.8","65.4","57.7","53.7","—","—","—","—"],["-1.7","-1.5","+13.6","-20.3","-11.5","-10.0","+10.6","-3.6","+13.5","-16.8","-38.4","-35.9","-27.7","-0.2","+2.9","-4.8","-16.0","+16.8","-7.8","-32.9","-23.8","-23.1","-38.4","-17.9","+13.0","-12.1","-16.8","-10.9","-19.4","-28.2","-41.7","-31.5","-30.4","-54.3","-12.0","-41.4","-36.3","-46.7","-29.7","-28.6","-44.7","-29.7","-59.4","+5.8","-59.0","-15.8","-44.1","-41.1","-19.3","+3.1","-37.1","-44.7","-42.6","-2.0","+19.1","+47.3","-80.9","-12.7","-68.4","+64.8","-82.2","-50.3","-71.6","+33.6","+73.4","-58.3","+118.0","+49.3","+69.4","-71.3","+78.5","-51.2","—","—","—","—"],[7,161,19,64,30,34,22,24,163,31,28,9,128,48,313,65,66,11,61,84,3,177,34,58,71,100,95,88,260,101,197,20,154,103,33,60,91,32,84,45,126,205,39,199,24,120,34,12,52,10,195,159,175,76,45,39,40,387,313,112,16,3,217,65,48,11,21,20,32,12,13,2,1,1,1,1]]},"header":{"align":"left","fill":{"color":"#0072B2"},"font":{"color":"white","size":12},"values":["Site ID","Location","R²","MAPE (%)","Bias (%)","n"]},"type":"table"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"},"margin":{"b":0,"l":0,"r":0,"t":30}}},"title":{"text":"Holdout Site Performance (n=76 sites)"},"height":600,"font":{"family":"Source Sans Pro, Helvetica, Arial, sans-serif","size":13},"margin":{"l":60,"r":30,"t":80,"b":60},"legend":{"font":{"size":11},"orientation":"h","yanchor":"bottom","y":1.02,"xanchor":"left","x":0.0,"bgcolor":"rgba(255,255,255,0.9)"},"xaxis":{"showgrid":true,"gridcolor":"#EEEEEE","gridwidth":1,"zeroline":false},"yaxis":{"showgrid":true,"gridcolor":"#EEEEEE","gridwidth":1,"zeroline":false},"plot_bgcolor":"white","paper_bgcolor":"white"},                        {"responsive": true}                    ).then(function(){
+                            
+var gd = document.getElementById('4c663613-6fb3-4b24-98e8-5d42cd3467de');
+var x = new MutationObserver(function (mutations, observer) {{
+        var display = window.getComputedStyle(gd).display;
+        if (!display || display === 'none') {{
+            console.log([gd, 'removed!']);
+            Plotly.purge(gd);
+            observer.disconnect();
+        }}
+}});
+
+// Listen for the removal of the full notebook cells
+var notebookContainer = gd.closest('#notebook-container');
+if (notebookContainer) {{
+    x.observe(notebookContainer, {childList: true});
+}}
+
+// Listen for the clearing of the current output cell
+var outputEl = gd.closest('.output');
+if (outputEl) {{
+    x.observe(outputEl, {childList: true});
+}}
+
+                        })                };            </script>        </div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-site-table-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2
+</figcaption>
+</figure>
+</div>
+</div>
+</section>
+<section id="best-and-worst-sites" class="level2">
+<h2 class="anchored" data-anchor-id="best-and-worst-sites">Best and Worst Sites</h2>
+<p>Rather than summarizing performance as a single number, this gallery shows the actual scatter plots for the 6 best and 6 worst holdout sites. Visual inspection reveals patterns that metrics miss: are the worst sites characterized by a systematic offset (bias) that adaptation could fix, or is the data fundamentally noisy with no consistent turbidity-SSC signal? Sites in the top row are where the global model succeeds out of the box; sites in the bottom row are candidates for prioritizing local calibration samples. Each panel shows observed SSC (x-axis) against predicted SSC (y-axis), with the 1:1 reference line indicating perfect agreement. Minimum 5 samples per site required for inclusion.</p>
+<div id="cell-fig-site-gallery" class="cell" data-execution_count="3">
+<div id="fig-site-gallery" class="cell-output cell-output-display quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-site-gallery-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div>            <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_SVG"></script><script>if (window.MathJax && window.MathJax.Hub && window.MathJax.Hub.Config) {window.MathJax.Hub.Config({SVG: {font: "STIX-Web"}});}</script>                <script>window.PlotlyConfig = {MathJaxConfig: 'local'};</script>
+        <script charset="utf-8" src="https://cdn.plot.ly/plotly-3.4.0.min.js" integrity="sha256-KEmPoupLpFyGMyGAiOsiNDbKDKAvxXAn/W+oQa0ZAfk=" crossorigin="anonymous"></script>                <div id="21e6ab89-fe46-4455-9e3f-f44053fa1643" class="plotly-graph-div" style="height:500px; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("21e6ab89-fe46-4455-9e3f-f44053fa1643")) {                    Plotly.newPlot(                        "21e6ab89-fe46-4455-9e3f-f44053fa1643",                        [{"hoverinfo":"skip","line":{"color":"#CCCCCC","width":1},"mode":"lines","showlegend":false,"x":[-1.2,4.2],"y":[-1.2,4.2],"type":"scatter","xaxis":"x","yaxis":"y"},{"customdata":{"dtype":"f8","bdata":"AAAAAAAANkBO8ceqgQA9QAAAAAAAADNAjdxYYQGzOEAAAAAAAABDQPQOlU4+8UJAAAAAAACAQEAGrzTKDeg6QAAAAAAAACRAHjbN1dZzKkAAAAAAAAAiQNGCt0I\u002f8yZAAAAAAACAWkAWEcSY13VWQA==","shape":"7, 2"},"hovertemplate":"Obs: %{customdata[0]:.1f}\u003cbr\u003ePred: %{customdata[1]:.1f}\u003cextra\u003e\u003c\u002fextra\u003e","marker":{"color":"#0072B2","opacity":0.7,"size":5},"mode":"markers","showlegend":false,"x":{"dtype":"f8","bdata":"7qN4NJB69T8QwftVxnX0P5CfIyrLRvk\u002f7rrkRdVL+D8AAAAAAADwP\u002f3VT5Ynie4\u002fYqy9j9MzAEA="},"y":{"dtype":"f8","bdata":"Wnn5ghpm9z8Mf7GVbkj2P3p9+3pjQfk\u002fjuk8SLHg9j\u002fHxISVZ\u002fHxPz02iuTC9PA\u002fPT1y\u002f29B\u002fz8="},"type":"scatter","xaxis":"x","yaxis":"y"},{"hoverinfo":"skip","line":{"color":"#CCCCCC","width":1},"mode":"lines","showlegend":false,"x":[-1.2,4.2],"y":[-1.2,4.2],"type":"scatter","xaxis":"x2","yaxis":"y2"},{"customdata":{"dtype":"f8","bdata":"AAAAAAAAVEBP28lbRxlaQAAAAAAAwHFAQHNOVLoAdkAAAAAAAMBuQAPxeimlJmNAAAAAAACATkA4Xuqvm6FTQAAAAAAAwFZAcyKxZwLGYEAAAAAAAIBLQLE2DJ23b1NAAAAAAAAAQUBlHZ2IF7JKQAAAAAAAgFRAdvcENbpERkAAAAAAAABOQK5LVAwtmU1AAAAAAAAARECrRiQPehxJQAAAAAAAQFRAnT3elrlMWEAAAAAAAABOQANUISVRok9AAAAAAADgZkDd9xzhdGpjQAAAAAAAgE1AI++ZeCXYU0AAAAAAAIBLQD2sOP1mD0VAAAAAAAAAQUAf6acZROM\u002fQAAAAAAAAEVAShgnuEY+QUAAAAAAAABDQGmZx5q6pEFAAAAAAACAQECN20teVKc\u002fQAAAAAAAADtAsrGcIFkTNUAAAAAAAIBAQAdzHZ9CWjZAAAAAAACAQUB\u002fZN4Sg8k4QAAAAAAAgENAoAjX20EhQEAAAAAAAAAyQNW9Rne7HTJAAAAAAACAT0BGgdlvzH9EQAAAAAAAQGFAoKkYCdDKWkAAAAAAAIBoQLP87klqV3BAAAAAAABgYUDJpnQA+oZwQAAAAAAAgFJARGyAXDecYkAAAAAAAAAiQDuMi35ykyhAAAAAAAAALkAwYKmO7Dw0QAAAAAAAADxAcM7sDsiQSEAAAAAAAAAoQC1d\u002f+AzJSZAAAAAAAAAJkAJCmjs4ZAmQAAAAAAAAChA4O++v\u002fsYM0AAAAAAAAAgQI2gLvzhOjRAAAAAAAAAHECRj96gh3M2QAAAAAAAACBAS3qi0ze2IUAAAAAAAABBQESm4bKcYxVAAAAAAAAAM0BEpuGynGMVQAAAAAAAAENARKbhspxjFUAAAAAAAAAzQMXaGldrZx5AAAAAAAAALkDEBw2zZHwfQAAAAAAAACxAppR8di6pHEAAAAAAAIBAQOKYv+B9JRhAAAAAAAAANUDimL\u002fgfSUYQAAAAAAAADpATwKcoP\u002fkF0AAAAAAAIBJQOskpJ0Ef0NAAAAAAACAUkCGigcH\u002fS9OQAAAAAAAQFFAVgFQPOonVkAAAAAAAIBHQPNZ52UBJk9AAAAAAAAAOUASMBIaTVZCQAAAAAAAAEFA5+WMbeslPUAAAAAAAIBQQA2Jj5iJklJAAAAAAADAXkCUa5HGtjJjQAAAAAAAgF5A25kTygYMZEAAAAAAAABZQBRWQ3BltlpAAAAAAACYnEDVszXlshiYQAAAAAAAUItAlpJvfKzwiEAAAAAAABByQIQDirbZ93lAAAAAAADAXEAv8u9+iD1qQAAAAAAA4GFAW4kEZdsea0AAAAAAAMBcQCo4Sg8gMGpAAAAAAADAWkDSlXw85PRlQAAAAAAAQGNA4qpDivtSaUAAAAAAAEBQQEb5eliTbllAAAAAAAAATEBahHFy2mxVQAAAAAAAgEVAfcyJWCqWUEAAAAAAAIBDQN\u002fC7zKOeUpAAAAAAACARkCJDgqc7Go4QAAAAAAAAElA16IzM3j0UEAAAAAAAIBPQDs1OwZzLFRAAAAAAADAZ0DIi0xg0VxwQAAAAAAA4GNA6L\u002fRZPRJakAAAAAAAABVQOIbb5fnqFlAAAAAAADAUkAqXZUV349VQAAAAAAAACpA9zgS38+cNUAAAAAAAAA\u002fQC8iqwInzUJAAAAAAAAAN0A3MY3khSg2QAAAAAAAADVALAuhxpMKOUAAAAAAAAAzQDdOtAydZzhAAAAAAAAALkDdbBqijs8vQAAAAAAAADFA4qNhvAkmQkAAAAAAAAAqQGwkRiVjNjRAAAAAAAAALkDFUqbN\u002fBwzQAAAAAAAACRAGu30I9DJKUAAAAAAAAAoQOMjfjjjVjBAAAAAAAAAPED5FJxtg2hEQAAAAAAAAEZA615rvRPwS0AAAAAAAIBDQKCRVm29M0VAAAAAAABAUkA2mEtYtHdKQAAAAAAAwFVAQnH2VOdaWEAAAAAAAABYQB9p5MJ2z1VAAAAAAABAUkDZ+aCW6MlVQAAAAAAAAFJACt1vfl3RTUAAAAAAAIBXQPgBbOHPi1hAAAAAAACAUUAbQdWbbFZVQAAAAAAAwFRAApVfMNZhVUAAAAAAAEBQQOVw021L+ExAAAAAAABAUEDTfiy5k\u002fJNQAAAAAAAgFFAmNgu19+9TkAAAAAAAIBRQK\u002fpcGckUE9AAAAAAAAAUkDZNLZJWKZTQAAAAAAAwFJAGORHltKpUEAAAAAAAIBAQK7jGs88VBxAAAAAAAAAPkDsVoYbCfMiQAAAAAAAACZACqf1+2OwM0AAAAAAAABFQPZRjEh3UkNAAAAAAACARkAi5u8\u002fvcVIQAAAAAAAAE1AA4Yb93s0SUAAAAAAAIBFQGpNgJCf1EBAAAAAAAAAKkAhaWXRIbkgQAAAAAAAAEBAIWll0SG5IEAAAAAAAABWQFR71FNRvxlAAAAAAACARUAC+G1s9ygeQAAAAAAAAD9ACntTUHWDOkAAAAAAAAA5QFtsKmxgd0BAAAAAAAAAV0AccbZ2Mj5AQAAAAAAAAD9AreaVXxqWOkAAAAAAAAA9QGVr0AmDTDhAAAAAAAAAM0CodUeMoxI5QAAAAAAAgElA2ODLav6FSUAAAAAAAIBBQImvAbZe+ypAAAAAAAAAPEA75k\u002fZXuk7QAAAAAAAAEVAMLHE9qyuMUAAAAAAAIBRQFW0BVmzjUBAAAAAAABAUkANwI8onXlSQAAAAAAAAEZAEzNvIit5NUAAAAAAAAAkQN506dra8yVAAAAAAAAAHEBEXxiKqdMlQAAAAAAAADBAoMdo57sJNUAAAAAAAAAyQMZ7YpHoHTVAAAAAAAAAKECuhzj0c64sQAAAAAAAABhAgpiqg0DeL0AAAAAAAABfQIdayTMpoRpAAAAAAAAAMkCBULX7lYU0QAAAAAAAgFZAhPWYZvBHNkAAAAAAAABXQGFIPTsogUtAAAAAAACAQEBZE\u002fAxe9lBQAAAAAAAAFNAfiprogJ1SUAAAAAAAABAQM3jpyr7J0pAAAAAAACASUBh+VtG5TlSQAAAAAAAgEhAgBsYDhWEPUAAAAAAAIBKQGGFj0gxMT1AAAAAAAAAMkBAVCAIfHM1QAAAAAAAwFRAyTk75Hb2IUAAAAAAAAA0QIE2HJwAZhlAAAAAAACAVkB0Qr6rNoYYQAAAAAAAACJAwNf2j8g\u002fMUAAAAAAAAA3QBGYr3aO7zdAAAAAAAAAX0A5kNxZHkhhQAAAAAAAgENA345RLvOBNkAAAAAAAIBhQJRp0YRrFF5AAAAAAAAAQkAVXfaze1s7QAAAAAAAgEhAsY9QP3StREAAAAAAAAAoQCxO32gk\u002fiJAAAAAAABAVUBnxkKL5VgjQAAAAAAAADFARXdyI801KEAAAAAAAAA2QO7HTqeHAjVAAAAAAAAANkAmYuK2X3YoQAAAAAAAgEdAMpd4xjbcNUA=","shape":"161, 2"},"hovertemplate":"Obs: %{customdata[0]:.1f}\u003cbr\u003ePred: %{customdata[1]:.1f}\u003cextra\u003e\u003c\u002fextra\u003e","marker":{"color":"#0072B2","opacity":0.7,"size":5},"mode":"markers","showlegend":false,"x":{"dtype":"f8","bdata":"f5t3fA5z\u002fj+pbqldZaADQCzw3pWiIANA8BtfBLaQ\u002fD9veHjJO1j\u002fP+\u002fmKIyG2Ps\u002fF1xzCfCA+D\u002fY6ilG+57+P\u002f\u002fTu7lOc\u002fw\u002f\u002f7xPqAmi+T\u002f91U+WJ4n+P\u002f\u002fTu7lOc\u002fw\u002ft4j59H8ZAkDu8EDraFX8P+\u002fmKIyG2Ps\u002fF1xzCfCA+D8fOng\u002f1Pj5P5CfIyrLRvk\u002f7rrkRdVL+D9+4Luw3eb2P+665EXVS\u002fg\u002foIeUsYC0+D\u002fOB1ApAHX5P37JT5+YFfQ\u002fHlHkUBnK\u002fD+\u002f5ivteB4BQJ9E5FmKVgJAhHuP8eQkAUAAPw6FX+j9P\u002f3VT5Ynie4\u002fABdsEUXR8j8fIwwujyf3P3+y441TRPE\u002fb8VQYIup8D9\u002fsuONU0TxP\u002f427\u002fgc5uw\u002fP8x4CwsL6z\u002f+Nu\u002f4HObsPxdccwnwgPg\u002fEMH7VcZ19D+QnyMqy0b5PxDB+1XGdfQ\u002fABdsEUXR8j+fRORZilbyP+665EXVS\u002fg\u002fn1tQa88n9T\u002fP8OMXu6P2PxZz3xo1Uvs\u002fAD8OhV\u002fo\u002fT\u002f+7i8G7Wv9P566+K7pwPo\u002fAUOwV\u002fZd9j8XXHMJ8ID4P26ZDBraHP0\u002f7ADLKyC4AEA4fUNs3bAAQAAAAAAAAABAt4j59H8ZCkCIzF8lN4gHQJd9SzXrrwNAgA06Jk98AEDfawbSID4BQIANOiZPfABA\u002fIbhjy08AEAHhRrdCoABQM8zlG+xAf0\u002fnwE0ApT4+z\u002f1MLzRryL6P84HUCkAdfk\u002ffwwA945z+j+AIdgr+y77Px5R5FAZyvw\u002fiOD9KuM6AkDht3MYdpwBQJ4YoBPZyf4\u002fgDhEPUAA\u002fj9PErxDttLxP+ZnWBSe3Pc\u002ff\u002fmbIKPJ9T+fW1Brzyf1PxDB+1XGdfQ\u002fABdsEUXR8j+XfUs166\u002fzP08SvEO20vE\u002fABdsEUXR8j8AAAAAAADwP3+y441TRPE\u002fHyMMLo8n9z9ugqAIlUv6P84HUCkAdfk\u002fZLShoSvQ\u002fT9pWf9WRQj\u002fP\u002f5NWwpit\u002f8\u002fZLShoSvQ\u002fT9+hp9Horf9Px2ZIIPukf8\u002fIGa8hYWF\u002fT\u002fZmtM6i7T+P88zlG+xAf0\u002fzzOUb7EB\u002fT8gZryFhYX9PyBmvIWFhf0\u002ffoafR6K3\u002fT+AOEQ9QAD+P+665EXVS\u002fg\u002ff\u002fWT5Umi9z9vxVBgi6nwPx86eD\u002fU+Pk\u002ffwwA945z+j9qQpNFADf8P\u002fUwvNGvIvo\u002fTxK8Q7bS8T9\u002fWMckGBX4P+5gyNyZHP8\u002f9TC80a8i+j\u002fmZ1gUntz3PwFDsFf2XfY\u002ff7bryKxr\u002fz\u002fmZ1gUntz3P+pja3H7Zfc\u002fEMH7VcZ19D8Wc98aNVL7P6CHlLGAtPg\u002fHyMMLo8n9z8fOng\u002f1Pj5PyBmvIWFhf0\u002fZLShoSvQ\u002fT9ugqAIlUv6PwAAAAAAAPA\u002fP8x4CwsL6z\u002f\u002feZ9QE0TzP37JT5+YFfQ\u002ff7LjjVNE8T\u002f+p3dzneboP3MSVN5TvwBAfslPn5gV9D\u002f\u002f6ifLk0T\u002fP3+268isa\u002f8\u002f7rrkRdVL+D8Qfkv+zxf+P39YxyQYFfg\u002fFnPfGjVS+z8\u002fzHgLCwv7P0N6U0uilvs\u002ffslPn5gV9D\u002fZmtM6i7T+P4DeJ9QE0fQ\u002f\u002f+ony5NE\u002fz\u002f91U+WJ4nuP3\u002f5myCjyfU\u002fcxJU3lO\u002fAEDOB1ApAHX5P1Ai8ixFKwFA\u002fqd3c53m+D8\u002fzHgLCwv7P3+y441TRPE\u002fF58jYebe\u002fj+XfUs166\u002fzP+6jeDSQevU\u002f7qN4NJB69T+euviu6cD6Pw=="},"y":{"dtype":"f8","bdata":"QQ3Bf0EmAEAj2yQvb18EQFkNhlV0ewFA\u002f1j8lvRR\u002fj+oGk1mjgUBQPzzmC41QP4\u002fX2V4eLij+z8QOzCKKGH6P25DtIVUW\u002fw\u002fdnn87+A2+z9DcuKldc3\u002fP1KIkien0fw\u002fKdZxJKyHAUD2No3lJ2X+P7GxDhXr\u002ffk\u002f8gK9BdgO+D\u002flqABnNpr4P\u002fhaIfUGw\u002fg\u002fWHFKHLwB+D+\u002f8yNsMy71P8d+QpTYlvU\u002fPxJLqcBO9j\u002f6J0K8eiP4P3Ecm4IJIfQ\u002fzCiU9+TN+T+GxTrMlD0AQIHpPJLbVgNApA94pOlgA0A2KNu3+mEBQA8zMDWDbvE\u002fQDs3pA\u002fm9D\u002fm25jeyw\u002f7PxdCVptBtfA\u002fIJMPGrrW8D+MGMdp4370P4dXUy5c5fQ\u002fTZl5Ka+e9T9ucGJpuk\u002fuP3sHgPzcTOc\u002feweA\u002fNxM5z97B4D83EznP\u002fP0q0QXMOw\u002fH+khOH6s7D9Wqi\u002fZCV7rPx\u002frmk1C\u002fOg\u002fH+uaTUL86D\u002fepsD08dboP3BEwZKmdPk\u002fd7FKYGN+\u002fD8\u002fVyXqKSn\u002fP5ahEpEitvw\u002fYUwPYZ8H+T\u002f97uiGC2\u002f3P9FJzoNS7\u002f0\u002fCGNHKaR9AUCVD+zeH6QBQMeujgPuOgBAkGf3LEyBCUCgg2NSZTcHQOhgpj7Q8gRAIR1SHJSTAkAYwKZR7LACQK\u002fFSC\u002fNkQJA9PDJzA31AUAVBTy+93MCQOZku2Q8DwBA2VVzuYHt\u002fj\u002fwOZKDKSb9P\u002fJENHzxlPs\u002fMOXSZAk09j\u002f6gw65PE39PxXe2+Zugv4\u002fdaOAcAFYA0DA15vBOJUCQMYpDEMrFwBAGfQy7tP4\u002fj\u002fwicif9Fr1P+ue54IZNPk\u002fcBGuElGH9T8FiOxX5mD2PyOBPiIYM\u002fY\u002fmKILZoY58z8jquYrPfX4Pwi6e7bQ4\u002fQ\u002fJ1m6OliA9D\u002fexUq5K8TxP8Vq62NqafM\u002fhVEx1\u002fvF+T94L\u002fFIn\u002fT7P4zatRXeCfo\u002fKMkfGXWU+z8raVhsgtH\u002fPzFx91U0Df8\u002ftvLrAm8L\u002fz+BQvYNeWj8P5nS4LNo3\u002f8\u002fdamXsDfm\u002fj+RgHsg7un+PwqhimAnNfw\u002fy3wgGzJw\u002fD9ppNyHwJ78Pzj1tKKCv\u002fw\u002fVSHrmaFT\u002fj9yoaPVYC79P\u002fpJJwucNOs\u002fx4UGMQRA7z87Rd51JLX0P8gnQkyzZPk\u002fCAi0p7Ye+z9bOZ5ygj37P3OxRVoeb\u002fg\u002fJE5IhmOD7T8kTkiGY4PtP6Ugd7Sk4Ok\u002fayjb1m0T7D+XjKSMhcb2P53Y\u002f6IySPg\u002foz6WNOcv+D8gCmHEZsv2P3KVE2RcK\u002fY\u002fj+LUqCJj9j\u002fsTB0K11P7P3Znu7anFPI\u002flni4Ou8h9z9sB6Li6\u002fXzP5kYQPKXUfg\u002fFSuMDPnl\u002fT9VLNBpdU\u002f1P\u002fgIckq0pfA\u002fwvkgJHyb8D9mv+c4Byv1Py0NOOOtMfU\u002f+9ls0FCB8j8onkZmuzzzP36incWAWOo\u002fG0NzEdb+9D+xsMUyJJH1P8JrqmTR2Ps\u002feIGEyq7X+D+CbDDSNU\u002f7Px2vvStnf\u002fs\u002fFkyOO9jN\u002fT\u002f7eJsvWoX3P\u002fkh1fm6cfc\u002fznlTTZ5N9T+CKNXnyIHuP11G\u002fdMasOk\u002fhpkt934z6T8uSNgIzcnzP7yFqPaTEPY\u002feKaWJRsgAUDmwNtFJKP1P4R55GGGpABAJbmIcEH+9j\u002fN6+ezTd35PzbLlxQnSO8\u002fiCZAlfKJ7z\u002f7eoTt1VPxP6nj6aulKPU\u002f3BJ27UVm8T+QCillOW\u002f1Pw=="},"type":"scatter","xaxis":"x2","yaxis":"y2"},{"hoverinfo":"skip","line":{"color":"#CCCCCC","width":1},"mode":"lines","showlegend":false,"x":[-1.2,4.2],"y":[-1.2,4.2],"type":"scatter","xaxis":"x3","yaxis":"y3"},{"customdata":{"dtype":"f8","bdata":"AAAAAAAAFEBNeueA6aMYQAAAAAAAAChAK5PFRzRvMEAAAAAAAAAoQCuTxUc0bzBAAAAAAAAAKEDKkiso+YowQAAAAAAAoGpAI\u002fjZIGXPcUAAAAAAAOBqQJDJzM32GnFAAAAAAAAga0CQyczN9hpxQAAAAAAAQF5AUy\u002f1NCDPbEAAAAAAAIBdQKhNdk5JmW5AAAAAAACAXEDYrSuRWJRwQAAAAAAAwIBAO7b60bAxgkAAAAAAAKCEQDu2+tGwMYJAAAAAAACAiEDYeRc6uc6DQAAAAAAAgElAbhnY3bV9TkAAAAAAAIBJQAIjCKIlQk1AAAAAAACASUACIwiiJUJNQAAAAAAAIHJAK87WNAFzdUAAAAAAAOByQCvO1jQBc3VAAAAAAACgc0ArztY0AXN1QA==","shape":"19, 2"},"hovertemplate":"Obs: %{customdata[0]:.1f}\u003cbr\u003ePred: %{customdata[1]:.1f}\u003cextra\u003e\u003c\u002fextra\u003e","marker":{"color":"#0072B2","opacity":0.7,"size":5},"mode":"markers","showlegend":false,"x":{"dtype":"f8","bdata":"AUOwV\u002fZd5j9\u002fsuONU0TxP3+y441TRPE\u002ff7LjjVNE8T\u002fpikt8haACQDspyn7VqAJAA2cKzRGxAkBvxVBgi6kAQLdntN82kwBAiMrbh4p0AEBXAGlZVNUFQLdMBg1tjgZAHyMMLo8nB0AWc98aNVL7PxZz3xo1Uvs\u002fFnPfGjVS+z\u002f1sbW4\u002fbIDQMnUTuEN1wNAFRlXQLb5A0A="},"y":{"dtype":"f8","bdata":"sxjzLklE6T9nnowTunPzP2eejBO6c\u002fM\u002fIcMf8W1\u002f8z\u002fRpfN9Z6MDQAq7dKl9fwNACrt0qX1\u002fA0CoPVkHpeYCQMBuowpAHANAn5rG\u002f7djA0ANqr2b4h4GQA2qvZviHgZAI5FMdnRqBkBrgvB1MJD8PzYsdsjHRvw\u002fNix2yMdG\u002fD9XQgDqxEgEQFdCAOrESARAV0IA6sRIBEA="},"type":"scatter","xaxis":"x3","yaxis":"y3"},{"hoverinfo":"skip","line":{"color":"#CCCCCC","width":1},"mode":"lines","showlegend":false,"x":[-1.2,4.2],"y":[-1.2,4.2],"type":"scatter","xaxis":"x4","yaxis":"y4"},{"customdata":{"dtype":"f8","bdata":"AAAAAAAAIEDUeWZwGBQjQAAAAAAAADpAYEEc1L6uEkAAAAAAAAAgQIkPFJDogCFAAAAAAAAAJkCJGRqa+KEUQAAAAAAAwFJAJu+Sw+E7XEAAAAAAAAA4QIIi3zjpAzpAAAAAAAAAKkARfXh7Z20lQAAAAAAAADVAQ+IBIePIM0AAAAAAAIBEQBUhh8FNmSFAAAAAAAAAPkCj1RIIMPAiQAAAAAAAAEZAs3qycoXPIEAAAAAAAABBQGcBwNh1Az9AAAAAAAAAPUDQHJxWVkcaQAAAAAAAQFVABgX9l0E5VUAAAAAAAPBwQNvXTaf+W29AAAAAAAAAP0AfXNRrf4crQAAAAAAAgE9AfKNGHQOGD0AAAAAAAAAgQEv4unCT4hNAAAAAAAAAM0D\u002fg83BxjEVQAAAAAAAADVAaqfryUVePEAAAAAAAAAqQO\u002fhU7s2eFJAAAAAAAAAREBpn42P+phDQAAAAAAAACRAFY2qG9J0HEAAAAAAAKBpQGI8rS8ubWpAAAAAAADAf0DlbwegsVSAQAAAAAAAACZAcfXNs93gKEAAAAAAAAAyQJk21\u002ftxMSZAAAAAAAAALkCfrm\u002f51VAiQAAAAAAAABRA\u002fqKY2qG4GUAAAAAAAIBCQHZKt\u002f1uvhhAAAAAAAAAQUCu8LsjHoYmQAAAAAAAAD9Aj93Qb3AfJUAAAAAAAIBaQKlCqsKKKFdAAAAAAABAXUAuu0NxemhcQAAAAAAAADtA+vJJ9\u002fUEN0AAAAAAALBxQBtcHLQej2ZAAAAAAAAQgUCFB2Fp55F5QAAAAAAAAFBAOHHncmoBGkAAAAAAAKBqQINc0SxQEWZAAAAAAABAX0C+dTqxKXRhQAAAAAAAADdAk3DYQvStIEAAAAAAAKBgQN3Qjz0LJFxAAAAAAAAAT0BhTnbsf69MQAAAAAAAgERAjtimcuWXG0AAAAAAAMBvQE2\u002fM9bZnmBAAAAAAAAAPkDmOexBeQBDQAAAAAAAAC5ADZ5uJzj8GEAAAAAAAABiQIjuWsLk919AAAAAAAAAQUDRoCOXh\u002fAoQAAAAAAAgEJA+C+7xwWRJ0AAAAAAAEBgQE6grQK8WU1AAAAAAAAANkBzYi+ZQ6c4QAAAAAAAADxAaBimSwK5KkAAAAAAAAAYQLhDoW4tnBZAAAAAAAAAO0Abw42dC2c0QAAAAAAAAFJA3yJ\u002fpnzmSUAAAAAAAAAgQNBV571zkShAAAAAAAAAJkDYTV+fhccaQAAAAAAAAG1AQd\u002fpDEWucEAAAAAAAAAuQNgs6ebxaBxAAAAAAABAYUAKm0496D1XQAAAAAAAYG5APhH7GI75ZUAAAAAAAABCQPu6lxIS6z1AAAAAAAAARUD7upcSEus9QA==","shape":"64, 2"},"hovertemplate":"Obs: %{customdata[0]:.1f}\u003cbr\u003ePred: %{customdata[1]:.1f}\u003cextra\u003e\u003c\u002fextra\u003e","marker":{"color":"#0072B2","opacity":0.7,"size":5},"mode":"markers","showlegend":false,"x":{"dtype":"f8","bdata":"\u002fjbv+Bzm7D\u002fP8OMXu6P2P\u002f427\u002fgc5uw\u002fb8VQYIup8D+AOEQ9QAD+P\u002f6QC2JYFfY\u002fTxK8Q7bS8T+fW1Brzyf1P1gMAnL2zfk\u002ff\u002fWT5Umi9z9ugqAIlUv6PxdccwnwgPg\u002f6mNrcftl9z8XnyNh5t7+P7XSg5q4dgNA5mdYFJ7c9z8eUeRQGcr8P\u002f427\u002fgc5uw\u002fEMH7VcZ19D+fW1Brzyf1P08SvEO20vE\u002f\u002f7xPqAmi+T8AAAAAAADwP+wW7c54fgJAa4q935ulBUBvxVBgi6nwP37JT5+YFfQ\u002fABdsEUXR8j8BQ7BX9l3mP4Bg5rBaF\u002fk\u002fF1xzCfCA+D\u002fmZ1gUntz3P2KsvY\u002fTMwBAp\u002f5xB6WLAEB+4Luw3eb2P2\u002fT6jRCnQNANyaaQcXlBUD+Nu\u002f4HOb8P+mKS3yFoAJAQDLEwXjGAEB\u002f+Zsgo8n1P5gT3O2l\u002fQBAZkaA6KKt\u002fD9YDAJy9s35PyubqXUZPQNAf\u002fWT5Umi9z8AF2wRRdHyP3+y441TRAFAF1xzCfCA+D+AYOawWhf5PygJ3iFb6QBA7qN4NJB69T8fIwwujyf3P\u002f6nd3Od5ug\u002ffuC7sN3m9j9+hp9Horf9P\u002f427\u002fgc5uw\u002fb8VQYIup8D+1f\u002fH2hOwCQAAXbBFF0fI\u002fv+Yr7XgeAUC+5fG9uBUDQP6nd3Od5vg\u002fHzp4P9T4+T8="},"y":{"dtype":"f8","bdata":"lRvTIC5Y7z+dA\u002fD1iWvlP9ifor2mJe4\u002fz86\u002fi8TM5j+DCJ6yMmwAQIqGeZnGpPY\u002fdFQg+qB68D8EgNBUxL30P+SbntX3OO4\u002fZiDfVO097z+r++5B8pXtP93ruZlk3fc\u002flR71clAp6j\u002fe\u002flt\u002fsdz+PzhMhpAWMgNA1WbSoWE48j8CKbfJsg7jP2QECBZ1SeY\u002fS86PplUs5z9BurBgzT73P2T5VDhy5f0\u002fo1faJOF9+T9H56jhjkTrP5cQ\u002fnHdmQJAPJbj0cm+BUC1dZrGRITxP0SmivUXufA\u002fMUGocgbH7j+4OMhyCN3pPyS3tII2U+k\u002f7rFhuWjT8D9ErzX9KWHwP39o9aXhd\u002f8\u002fa8ADRqtxAEDg9DGlIsv1P4p21DkhDQJAHC1bbRHlBEByuf6VJATqP5F9bzmK+QFA9JYkwuooAUD+H4VhFnrtP0Fr+IBCaQBAmup2Y5sj\u002fD8AXP9n\u002ftbqP6jLCnJo\u002fQBAxktKgvdG+T9MxUQwv3XpP\u002fCj\u002fHiv2gBAuKI0ZKOI8T+7uALC5iPxP5GMxJxfTPw\u002fz\u002ftFLCBF9j8So3l\u002fewPyP3K0G5FdEug\u002fLGgACXf09D\u002ffy\u002fwC6237P1hMxsXybfE\u002fXgXVfHds6j8337N+ImkDQIYnD+fAPus\u002f15Ri00d+\u002fz+WPJaiyvUBQJ8s+y1vnfc\u002fnyz7LW+d9z8="},"type":"scatter","xaxis":"x4","yaxis":"y4"},{"hoverinfo":"skip","line":{"color":"#CCCCCC","width":1},"mode":"lines","showlegend":false,"x":[-1.2,4.2],"y":[-1.2,4.2],"type":"scatter","xaxis":"x5","yaxis":"y5"},{"customdata":{"dtype":"f8","bdata":"AAAAAAAA8D\u002f9TlYEPgAUQAAAAAAAAAhAoJAPvlEGEUAAAAAAAAAAQKCQD75RBhFAAAAAAAAAIECuJ8n4hmE2QAAAAAAAACRArFyV1TPiJEAAAAAAAAA0QMWlitdV7D9AAAAAAACATkAI7ibl+i9MQAAAAAAAABRAtuo+K8v9FEAAAAAAAAAIQI0nM9wBKihAAAAAAAAAFED4HbKuGzMnQAAAAAAAgE9A1HlHKjPMUkAAAAAAAABIQNR5RyozzFJAAAAAAAAAT0DUeUcqM8xSQAAAAAAAADVADJklvi58PkAAAAAAAAA1QAyZJb4ufD5AAAAAAAAAMUC51ERDU0JAQAAAAAAAADJAudREQ1NCQEAAAAAAACBrQMJO5quWVGFAAAAAAABAZ0DCTuarllRhQAAAAAAAQG5AlX7ir0QeZUAAAAAAAOBrQJV+4q9EHmVAAAAAAACAR0COmYUYSKBLQAAAAAAAgExAjpmFGEigS0AAAAAAAABLQNpkBaIgGExAAAAAAACASEDaZAWiIBhMQAAAAAAA0HNAW5vy6zjocUAAAAAAAPByQMrVj4wx\u002fXBAAAAAAADwcUDK1Y+MMf1wQAAAAAAAIHFAAtAd61sWYUAAAAAAAOBiQALQHetbFmFA","shape":"30, 2"},"hovertemplate":"Obs: %{customdata[0]:.1f}\u003cbr\u003ePred: %{customdata[1]:.1f}\u003cextra\u003e\u003c\u002fextra\u003e","marker":{"color":"#0072B2","opacity":0.7,"size":5},"mode":"markers","showlegend":false,"x":{"dtype":"f8","bdata":"AAAAAAAAAAD91U+WJ4neP\u002f95n1ATRNM\u002f\u002fjbv+Bzm7D8AAAAAAADwP4DeJ9QE0fQ\u002f8BtfBLaQ\u002fD8BQ7BX9l3mP\u002f3VT5Ynid4\u002fAUOwV\u002fZd5j8eUeRQGcr8P35vMzZd5vo\u002fZkaA6KKt\u002fD+fW1Brzyf1P59bUGvPJ\u002fU\u002fl31LNeuv8z9+yU+fmBX0PwNnCs0RsQJA8x0KZ\u002fYnAkCutGTKDRIDQAqjXg9UyQJAnrr4runA+j+Qto87EBj8P\u002f6+44Tit\u002fs\u002fP8x4CwsL+z9BqsRbKwIEQJqKwpf+2QNAPDnf+72pA0AK9Phdg4ADQInlOneLbgFA"},"y":{"dtype":"f8","bdata":"679vbyFe5j8J96uj7CDkPwn3q6PsIOQ\u002fwmFUiRqZ9T\u002flOE1650zwP6\u002fBDa3REPg\u002fWOqxE3IE\u002fD9789KmFQrnP9WUIYVyUPE\u002fCsB+Dv4H8T84lKQ1xAT+PziUpDXEBP4\u002fOJSkNcQE\u002fj\u002fA3Rp90r73P8DdGn3Svvc\u002fqgAAFKsx+D+qAAAUqzH4PxuMGwmcIgFAG4wbCZwiAUBvOL9XbdIBQG84v1dt0gFApwog86ng+z+nCiDzqeD7P8d\u002faEeO\u002fvs\u002fx39oR47++z9GNRYAPKgDQAQvsGFseQNABC+wYWx5A0CMxvirCxYBQIzG+KsLFgFA"},"type":"scatter","xaxis":"x5","yaxis":"y5"},{"hoverinfo":"skip","line":{"color":"#CCCCCC","width":1},"mode":"lines","showlegend":false,"x":[-1.2,4.2],"y":[-1.2,4.2],"type":"scatter","xaxis":"x6","yaxis":"y6"},{"customdata":{"dtype":"f8","bdata":"AAAAAAAA8D+vjY4X+r4QQAAAAAAAgFRARAFdU6\u002fwUUAAAAAAAEBSQMA\u002fTW56eFFAAAAAAAAAKED48HdqcTYwQAAAAAAAAENAYD7sIfrUU0AAAAAAAAAxQCMFCxsnlzxAAAAAAADAV0Da6h5fv\u002fNhQAAAAAAAwGlA5h+uv9HsaUAAAAAAAGBsQI+uYhblGW1AAAAAAAAA8D\u002f6PK7yI2oLQAAAAAAAACJA7BRR+\u002fw2KUAAAAAAAIBIQH2NVNdW50VAAAAAAADAf0B52A8NW4F4QAAAAAAAeINAD3nvEn6xdkAAAAAAAIBDQHObN3ZioUJAAAAAAAAA8D81cuW0wDsQQAAAAAAAAPA\u002f+X9N75oBEUAAAAAAAIBUQDm0NBRjRFNAAAAAAAAARkDNjzxYkrtGQAAAAAAAABhAY6sFaI4bDkAAAAAAAAAUQCEbTS2B0w1AAAAAAAAAAEAhG00tgdMNQAAAAAAAgGRArAhLLuyHZ0AAAAAAAADwP2g2iOg5uwtAAAAAAAAAAEAkl6xHwoYEQAAAAAAAAABAxQ88Qa5YAkAAAAAAAAAAQJoaZ6bobfo\u002fAAAAAAAA8D+HvIZSKEH7PwAAAAAAADxAMojwGoZINkAAAAAAAABAQCEqXBZ6djtAAAAAAAAACEA+fPP8qtkgQAAAAAAAAENAmgPEf6b\u002fTEAAAAAAAADwP5OWdOEMLAxAAAAAAAAATEB\u002fTpodi61CQA==","shape":"34, 2"},"hovertemplate":"Obs: %{customdata[0]:.1f}\u003cbr\u003ePred: %{customdata[1]:.1f}\u003cextra\u003e\u003c\u002fextra\u003e","marker":{"color":"#0072B2","opacity":0.7,"size":5},"mode":"markers","showlegend":false,"x":{"dtype":"f8","bdata":"AAAAAAAAAADY6ilG+57+P2S0oaEr0P0\u002ff7LjjVNE8T+QnyMqy0b5P5d9SzXrr\u002fM\u002fkeLTgcGk\u002fz\u002fuLDbRzIICQAxmqRUk2QJAAAAAAAAAAAD91U+WJ4nuPz\u002fMeAsLC\u002fs\u002fa4q935ulBUBjtouMHFsGQM4HUCkAdfk\u002fAAAAAAAAAAAAAAAAAAAAANjqKUb7nv4\u002fboKgCJVL+j\u002f+p3dzneboPwFDsFf2XeY\u002f\u002f3mfUBNE0z+s5CgNALgBQAAAAAAAAAAA\u002f3mfUBNE0z\u002f\u002feZ9QE0TTP\u002f95n1ATRNM\u002fAAAAAAAAAAAfIwwujyf3P39YxyQYFfg\u002f\u002fdVPlieJ3j+QnyMqy0b5PwAAAAAAAAAAnwE0ApT4+z8="},"y":{"dtype":"f8","bdata":"C6DvdjTm4z+ox0I5trH9P7+6qUuIgv0\u002fBdExYpBb8z+yRG+1C2T+P4Vr1TquTPc\u002frBUOUfVBAUBNTrGw04gCQJo8dsid7wJAwGkxCtYd4T9+be55KZzxP5GNB6TGQ\u002fo\u002f9wTE+T2\u002fBEA5tOnT6noEQKUcSYjZI\u002fk\u002fV8Cc4pl34z\u002fdBBH6Eh3kP42ETh6mMP4\u002ftvC1kNyF+j9PvnroNGviP7FrzLTKSeI\u002fsWvMtMpJ4j+LXFdUpTICQC6lMaa0RuE\u002ftmZ4AbUw2j+FLdNbyxHXPwaAmu5Q5ss\u002fMMGO4tibzT83jUHiUpH1P1LN90kZBfc\u002f7\u002fvHIFOe7T\u002fCp23T6jb8P2yMIGPNfuE\u002ficTCAGEo+T8="},"type":"scatter","xaxis":"x6","yaxis":"y6"},{"hoverinfo":"skip","line":{"color":"#CCCCCC","width":1},"mode":"lines","showlegend":false,"x":[-1.2,4.2],"y":[-1.2,4.2],"type":"scatter","xaxis":"x7","yaxis":"y7"},{"customdata":{"dtype":"f8","bdata":"AAAAAACAQUDIf4hdUJA6QAAAAAAAAEBAlGOS9X9KIEAAAAAAAAA4QHjgkwG\u002fEiBAAAAAAAAAVEAGqB9OAWwsQAAAAAAAADRA0zIU8a6vKEAAAAAAAABSQEa+r\u002fGtGSNAAAAAAAAAQ0BPgDVrPEw8QAAAAAAAAD5A2gAJFnAnIUAAAAAAAAAUQP1iRVcYWiZAAAAAAAAAGECGhSN4s6ghQAAAAAAAABBAvxhgmFTVIEA=","shape":"11, 2"},"hovertemplate":"Obs: %{customdata[0]:.1f}\u003cbr\u003ePred: %{customdata[1]:.1f}\u003cextra\u003e\u003c\u002fextra\u003e","marker":{"color":"#D55E00","opacity":0.7,"size":5},"mode":"markers","showlegend":false,"x":{"dtype":"f8","bdata":"oIeUsYC0+D9\u002fWMckGBX4P\u002f6QC2JYFfY\u002ff5t3fA5z\u002fj+A3ifUBNH0P36Gn0eit\u002f0\u002fkJ8jKstG+T9\u002f9ZPlSaL3PwFDsFf2XeY\u002f\u002fqd3c53m6D\u002f\u002feZ9QE0TjPw=="},"y":{"dtype":"f8","bdata":"kys+QuPJ9j91uN3QPSbtP4JEmNNb9uw\u002fhpun2SRx8j\u002fG1cpvenbxP9JcT9U+XO8\u002fbSgG9mA69z\u002fGhG8X5d3tP\u002feHQ5vGxfA\u002fleB\u002fNhtF7j8zZxrcvprtPw=="},"type":"scatter","xaxis":"x7","yaxis":"y7"},{"hoverinfo":"skip","line":{"color":"#CCCCCC","width":1},"mode":"lines","showlegend":false,"x":[-1.2,4.2],"y":[-1.2,4.2],"type":"scatter","xaxis":"x8","yaxis":"y8"},{"customdata":{"dtype":"f8","bdata":"AAAAAAAAHEBEMlWJgb4vQAAAAAAAADtAJ6mY0J9xTUAAAAAAAABEQABnIHR1gk1AAAAAAACAQ0CvnGU7yDVSQAAAAAAAADZAhqNHpO\u002fxV0AAAAAAAAAYQDPbheUBCjRAAAAAAAAANkA55tw3jelUQAAAAAAAgE1AmOvV8KYRWEAAAAAAAABFQHjll3kRTExAAAAAAAAAPUCqUn1aInlUQAAAAAAAADJAf7L7MK27REAAAAAAAAAIQFq4oMwEsDtAAAAAAACAQUDlq7L3zwFUQAAAAAAAgElAEwIYJghpXUAAAAAAAEiGQPcJcxim75hAAAAAAAAALkD\u002fku1nQZ5GQAAAAAAAACxAJJNG58bBR0AAAAAAAAA8QMMz3zC8xUdAAAAAAACAQECd+qaMXEc0QAAAAAAAAEtAD7hbQjWpUUAAAAAAAAAUQNTlUbp9QDBA","shape":"21, 2"},"hovertemplate":"Obs: %{customdata[0]:.1f}\u003cbr\u003ePred: %{customdata[1]:.1f}\u003cextra\u003e\u003c\u002fextra\u003e","marker":{"color":"#D55E00","opacity":0.7,"size":5},"mode":"markers","showlegend":false,"x":{"dtype":"f8","bdata":"P8x4CwsL6z9+4Luw3eb2P\u002f+8T6gJovk\u002fzgdQKQB1+T\u002fuo3g0kHr1P\u002f6nd3Od5ug\u002f7qN4NJB69T\u002fu8EDraFX8Px86eD\u002fU+Pk\u002f6mNrcftl9z9+yU+fmBX0P\u002f3VT5Ynid4\u002foIeUsYC0+D8Wc98aNVL7P7Mwepog0wZAABdsEUXR8j+fRORZilbyPx8jDC6PJ\u002fc\u002f7rrkRdVL+D\u002f+vuOE4rf7PwFDsFf2XeY\u002f"},"y":{"dtype":"f8","bdata":"uaJK5Ms18z+YFRU6BVL8PzFsjyn9Vfw\u002fq+5jlUbM\u002fT+\u002fWmFvTrP\u002fP3eT1A1+1PQ\u002fvppwiWfC\u002fj8POCqIfLz\u002fP7vilz5bC\u002fw\u002fr+YDHKec\u002fj\u002fIM8maE+L5P3y2u1KZE\u002fc\u002fsrwRqK9z\u002fj+jDwxSgZAAQM6WIS7DnwlAhPAXu+B8+j90O97AQdT6P\u002fGxCglq1fo\u002fQQalJaTp9D\u002f3CFApz5X9P72qvondX\u002fM\u002f"},"type":"scatter","xaxis":"x8","yaxis":"y8"},{"hoverinfo":"skip","line":{"color":"#CCCCCC","width":1},"mode":"lines","showlegend":false,"x":[-1.2,4.2],"y":[-1.2,4.2],"type":"scatter","xaxis":"x9","yaxis":"y9"},{"customdata":{"dtype":"f8","bdata":"AAAAAAAA8D9ekNCrycICQAAAAAAAAABARvGNpp9t\u002fj8AAAAAAAAAQI3jtBbkev4\u002fAAAAAAAAAEDLbC54Ycz\u002fPwAAAAAAAABANJvz4mWb\u002fz8AAAAAAAAAQK2I8gqMMf4\u002fAAAAAAAAAEBDPvc9UjUAQAAAAAAAAAhARSZPwIK4EEAAAAAAAADwP6RyjeDk1v0\u002fAAAAAAAA8D\u002fDT+EDYfz+PwAAAAAAAABAqR5gipMLAEAAAAAAAAAAQAzbF09ez\u002f4\u002fAAAAAAAA8D\u002fp4unEn0f9PwAAAAAAAABA62HfheddAEAAAAAAAADgP1cQUxafPf4\u002fAAAAAAAA4D9Pa\u002fk87EQEQAAAAAAAAAhASTWCESF4GkAAAAAAAAAIQHLVHYgEkA5AAAAAAAAA4D9wo5T564ACQAAAAAAAAOA\u002faQiQbhhOAkA=","shape":"20, 2"},"hovertemplate":"Obs: %{customdata[0]:.1f}\u003cbr\u003ePred: %{customdata[1]:.1f}\u003cextra\u003e\u003c\u002fextra\u003e","marker":{"color":"#D55E00","opacity":0.7,"size":5},"mode":"markers","showlegend":false,"x":{"dtype":"f8","bdata":"AAAAAAAAAAD\u002feZ9QE0TTP\u002f95n1ATRNM\u002f\u002f3mfUBNE0z\u002f\u002feZ9QE0TTP\u002f95n1ATRNM\u002f\u002f3mfUBNE0z\u002f91U+WJ4nePwAAAAAAAAAAAAAAAAAAAAD\u002feZ9QE0TTP\u002f95n1ATRNM\u002fAAAAAAAAAAD\u002feZ9QE0TTP\u002f95n1ATRNO\u002f\u002f3mfUBNE07\u002f91U+WJ4neP\u002f3VT5Ynid4\u002f\u002f3mfUBNE07\u002f\u002feZ9QE0TTvw=="},"y":{"dtype":"f8","bdata":"eeYLBMKw1z\u002fOUzpWs93RP0aZDDLP6dE\u002fKCgkARkX0z++edAVJ+zSP0RfaUicptE\u002f8jXeMRug0z\u002fuZier1eDjP4K50YWqUtE\u002fCqj7uete0j+HbDFAKFjTP474UzluNtI\u002fUSsLEvLL0D\u002fC6cq7XOXTPxvFyoq3sdE\u002fZYK6vP7W2T\u002flGFRPBkPqP0M\u002fMumPoOI\u002fo+oWAYBO1z\u002fOu5FWvQHXPw=="},"type":"scatter","xaxis":"x9","yaxis":"y9"},{"hoverinfo":"skip","line":{"color":"#CCCCCC","width":1},"mode":"lines","showlegend":false,"x":[-1.2,4.2],"y":[-1.2,4.2],"type":"scatter","xaxis":"x10","yaxis":"y10"},{"customdata":{"dtype":"f8","bdata":"AAAAAAAAHECf2G0Z8bEaQAAAAAAAADVAVaoI6Lr0NEAAAAAAAAA3QOLgKIgRCT5AAAAAAAAANkA4vksihAZGQAAAAAAAAEBA14+NuelwS0AAAAAAAIBLQPenyIfOAFNAAAAAAACAUEC+480mazFbQAAAAAAAwFNAaLYJH9DwXEAAAAAAAIBVQLvddxXhAmVAAAAAAABAV0DkwArudN5mQAAAAAAAwFZA8kCm3pAqa0AAAAAAAEBUQJ21prWOGGFAAAAAAACAS0BsMbZhHKJbQAAAAAAAgE5AVU7qGfqvV0AAAAAAAAA\u002fQJlVVtt4I0JAAAAAAAAAQUBbiugXbqRBQAAAAAAAAD9AbSh+n2MDQkAAAAAAAIBBQBByN\u002fp\u002flz5AAAAAAAAAQEBNbbiySd5DQAAAAAAAAEFAPEDNQ1OeQ0AAAAAAAABAQECElN3X70FAAAAAAACAQEAUREInjoJBQAAAAAAAAE1A9LMd5irWVkAAAAAAAIBKQEBSIdsIilpAAAAAAACATEC5H8j22XdhQAAAAAAAAEdArlAF7GMsX0AAAAAAAABDQB2Suhft2VhAAAAAAAAAKEBcntCkTvsoQAAAAAAAACxASX9QJQjzMkAAAAAAAABAQOnrpjJkmkVAAAAAAAAAKEC1Vxw6ClEiQAAAAAAAABxAJ3xuslXtHkA=","shape":"32, 2"},"hovertemplate":"Obs: %{customdata[0]:.1f}\u003cbr\u003ePred: %{customdata[1]:.1f}\u003cextra\u003e\u003c\u002fextra\u003e","marker":{"color":"#D55E00","opacity":0.7,"size":5},"mode":"markers","showlegend":false,"x":{"dtype":"f8","bdata":"P8x4CwsL6z+fW1Brzyf1P3\u002f5myCjyfU\u002f7qN4NJB69T9\u002fWMckGBX4P+\u002fmKIyG2Ps\u002fbpkMGtoc\u002fT9uiZE5rlz+P3UP5KW08\u002f4\u002fZV3s+ed+\u002fz9veHjJO1j\u002fP\u002f3VT5Ynif4\u002f7+YojIbY+z\u002fwG18EtpD8P+ZnWBSe3Pc\u002fF1xzCfCA+D\u002fmZ1gUntz3P6CHlLGAtPg\u002ff1jHJBgV+D8XXHMJ8ID4P39YxyQYFfg\u002f7rrkRdVL+D9qQpNFADf8P0N6U0uilvs\u002fkLaPOxAY\u002fD\u002f\u002f18P0p5r6P5CfIyrLRvk\u002ff7LjjVNE8T+fRORZilbyP39YxyQYFfg\u002ff7LjjVNE8T8\u002fzHgLCwvrPw=="},"y":{"dtype":"f8","bdata":"mP\u002fL9T9h6j\u002ffDvvDEyT1P4hRKk1jpPc\u002fzg0ynKNN+j\u002fBtjWUtdT7P+FpDIUbGP4\u002fDGuB1MlKAEA+KM9IMIIAQLalBd7ozQFAi9ur8UMZAkDAbvH+a7ICQE62LRN+FgFAzl9fRhJZAEA5g+TMD6D\u002fP3ApyphB9Pg\u002f5D3G0ujC+D8N7sRD7Of4P26cy7oJxfc\u002fK1+zREmW+T8Zj90vxn\u002f5PyB2Du9d4Pg\u002fYgoiXYS1+D+ya1\u002fT\u002fV7\u002fP4UFEBwkNQBA\u002fuzppaYpAUCK0knxScQAQG2EhMVi9f8\u002fvpHoeaOL8T8rI2KSBnH0P7JcIS0yK\u002fo\u002f0+c7GC7H7j9xZU0wyGzsPw=="},"type":"scatter","xaxis":"x10","yaxis":"y10"},{"hoverinfo":"skip","line":{"color":"#CCCCCC","width":1},"mode":"lines","showlegend":false,"x":[-1.2,4.2],"y":[-1.2,4.2],"type":"scatter","xaxis":"x11","yaxis":"y11"},{"customdata":{"dtype":"f8","bdata":"AAAAAAAAJkAxjg1mI2cRQAAAAAAAADZA1aja3ykoF0AAAAAAAAA5QF9RkElhDyFAAAAAAAAAMkD8xEbYzrkfQAAAAAAAAC5ADR5tTlGEEEAAAAAAAAAgQOXHAUgNvxFAAAAAAAAAKEB4HfgONQYTQAAAAAAAgEBAqsomoXsxD0AAAAAAAAAoQCHnNaxo4hBAAAAAAAAAN0D2pVe+WicSQAAAAAAAACZAOzxMvSS\u002fEUAAAAAAAAA0QBz05EzN6glA","shape":"12, 2"},"hovertemplate":"Obs: %{customdata[0]:.1f}\u003cbr\u003ePred: %{customdata[1]:.1f}\u003cextra\u003e\u003c\u002fextra\u003e","marker":{"color":"#D55E00","opacity":0.7,"size":5},"mode":"markers","showlegend":false,"x":{"dtype":"f8","bdata":"b8VQYIup8D\u002fuo3g0kHr1PwFDsFf2XfY\u002ffslPn5gV9D8AF2wRRdHyP\u002f427\u002fgc5uw\u002ff7LjjVNE8T\u002fuuuRF1Uv4P3+y441TRPE\u002ff\u002fmbIKPJ9T9vxVBgi6nwP4DeJ9QE0fQ\u002f"},"y":{"dtype":"f8","bdata":"CC2g9hdv5D8Enu+FYmfoP9fiqMxZyu0\u002fqzshcX\u002fH7D\u002fLx\u002fsPMLXjP1cEHXadtOQ\u002fVCcK7AKs5T+ATfOAPOniP1HA4yd9A+Q\u002fEW96Zl8F5T+FBunUr7TkP2\u002fyEu3\u002fVeA\u002f"},"type":"scatter","xaxis":"x11","yaxis":"y11"},{"hoverinfo":"skip","line":{"color":"#CCCCCC","width":1},"mode":"lines","showlegend":false,"x":[-1.2,4.2],"y":[-1.2,4.2],"type":"scatter","xaxis":"x12","yaxis":"y12"},{"customdata":{"dtype":"f8","bdata":"AAAAAAAAQUBhHW\u002fGkO9CQAAAAAAAAEBAkA2psz6PVUAAAAAAAAA+QCACMqLDLEdAAAAAAAAAN0A3R6H2hyNKQAAAAAAAADhA7fFq\u002f6vmQEAAAAAAAAAsQCJN4pyeTDVAAAAAAAAAKkCQDWsOnyY1QAAAAAAAACZAYo65Tg5aMUAAAAAAAAAwQO6FvYnnGDVAAAAAAAAALEDhRWqeiAUvQAAAAAAAACZANY6zDsa1OkAAAAAAAAAgQCbvvc1W3TNAAAAAAAAAHEDEd0+ja383QA==","shape":"13, 2"},"hovertemplate":"Obs: %{customdata[0]:.1f}\u003cbr\u003ePred: %{customdata[1]:.1f}\u003cextra\u003e\u003c\u002fextra\u003e","marker":{"color":"#D55E00","opacity":0.7,"size":5},"mode":"markers","showlegend":false,"x":{"dtype":"f8","bdata":"F1xzCfCA+D9\u002fWMckGBX4P3\u002f1k+VJovc\u002ff\u002fmbIKPJ9T\u002f+kAtiWBX2P59E5FmKVvI\u002fTxK8Q7bS8T9vxVBgi6nwP\u002f95n1ATRPM\u002fn0TkWYpW8j9vxVBgi6nwP\u002f427\u002fgc5uw\u002fP8x4CwsL6z8="},"y":{"dtype":"f8","bdata":"ThXR4sVA+T+hztk9oPj+P6LyqgUhqPo\u002fk4hEbTh++z8zSSf5jXb4P\u002fIDNOf7QPU\u002fkjQWQ4s09T96owluWtTzP4wF\u002fScIMPU\u002fvhqSrdYM8z\u002f\u002f457oqNP2P4WzcHvvxPQ\u002fmCXF+7jv9T8="},"type":"scatter","xaxis":"x12","yaxis":"y12"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"},"margin":{"b":0,"l":0,"r":0,"t":30}}},"xaxis":{"anchor":"y","domain":[0.0,0.13333333333333333],"tickfont":{"size":8},"range":[-1.2,4.2],"tickvals":[0.0,1.0,2.0,3.0,4.0],"ticktext":["1","10","100","1k","10k"],"showgrid":true,"gridcolor":"#EEEEEE","gridwidth":1,"zeroline":false},"yaxis":{"anchor":"x","domain":[0.56,1.0],"tickfont":{"size":8},"range":[-1.2,4.2],"tickvals":[0.0,1.0,2.0,3.0,4.0],"ticktext":["1","10","100","1k","10k"],"showgrid":true,"gridcolor":"#EEEEEE","gridwidth":1,"zeroline":false},"xaxis2":{"anchor":"y2","domain":[0.17333333333333334,0.30666666666666664],"tickfont":{"size":8},"range":[-1.2,4.2],"tickvals":[0.0,1.0,2.0,3.0,4.0],"ticktext":["1","10","100","1k","10k"]},"yaxis2":{"anchor":"x2","domain":[0.56,1.0],"tickfont":{"size":8},"range":[-1.2,4.2],"tickvals":[0.0,1.0,2.0,3.0,4.0],"ticktext":["1","10","100","1k","10k"]},"xaxis3":{"anchor":"y3","domain":[0.3466666666666667,0.48],"tickfont":{"size":8},"range":[-1.2,4.2],"tickvals":[0.0,1.0,2.0,3.0,4.0],"ticktext":["1","10","100","1k","10k"]},"yaxis3":{"anchor":"x3","domain":[0.56,1.0],"tickfont":{"size":8},"range":[-1.2,4.2],"tickvals":[0.0,1.0,2.0,3.0,4.0],"ticktext":["1","10","100","1k","10k"]},"xaxis4":{"anchor":"y4","domain":[0.52,0.6533333333333333],"tickfont":{"size":8},"range":[-1.2,4.2],"tickvals":[0.0,1.0,2.0,3.0,4.0],"ticktext":["1","10","100","1k","10k"]},"yaxis4":{"anchor":"x4","domain":[0.56,1.0],"tickfont":{"size":8},"range":[-1.2,4.2],"tickvals":[0.0,1.0,2.0,3.0,4.0],"ticktext":["1","10","100","1k","10k"]},"xaxis5":{"anchor":"y5","domain":[0.6933333333333334,0.8266666666666667],"tickfont":{"size":8},"range":[-1.2,4.2],"tickvals":[0.0,1.0,2.0,3.0,4.0],"ticktext":["1","10","100","1k","10k"]},"yaxis5":{"anchor":"x5","domain":[0.56,1.0],"tickfont":{"size":8},"range":[-1.2,4.2],"tickvals":[0.0,1.0,2.0,3.0,4.0],"ticktext":["1","10","100","1k","10k"]},"xaxis6":{"anchor":"y6","domain":[0.8666666666666667,1.0],"tickfont":{"size":8},"range":[-1.2,4.2],"tickvals":[0.0,1.0,2.0,3.0,4.0],"ticktext":["1","10","100","1k","10k"]},"yaxis6":{"anchor":"x6","domain":[0.56,1.0],"tickfont":{"size":8},"range":[-1.2,4.2],"tickvals":[0.0,1.0,2.0,3.0,4.0],"ticktext":["1","10","100","1k","10k"]},"xaxis7":{"anchor":"y7","domain":[0.0,0.13333333333333333],"tickfont":{"size":8},"range":[-1.2,4.2],"tickvals":[0.0,1.0,2.0,3.0,4.0],"ticktext":["1","10","100","1k","10k"]},"yaxis7":{"anchor":"x7","domain":[0.0,0.44],"tickfont":{"size":8},"range":[-1.2,4.2],"tickvals":[0.0,1.0,2.0,3.0,4.0],"ticktext":["1","10","100","1k","10k"]},"xaxis8":{"anchor":"y8","domain":[0.17333333333333334,0.30666666666666664],"tickfont":{"size":8},"range":[-1.2,4.2],"tickvals":[0.0,1.0,2.0,3.0,4.0],"ticktext":["1","10","100","1k","10k"]},"yaxis8":{"anchor":"x8","domain":[0.0,0.44],"tickfont":{"size":8},"range":[-1.2,4.2],"tickvals":[0.0,1.0,2.0,3.0,4.0],"ticktext":["1","10","100","1k","10k"]},"xaxis9":{"anchor":"y9","domain":[0.3466666666666667,0.48],"tickfont":{"size":8},"range":[-1.2,4.2],"tickvals":[0.0,1.0,2.0,3.0,4.0],"ticktext":["1","10","100","1k","10k"]},"yaxis9":{"anchor":"x9","domain":[0.0,0.44],"tickfont":{"size":8},"range":[-1.2,4.2],"tickvals":[0.0,1.0,2.0,3.0,4.0],"ticktext":["1","10","100","1k","10k"]},"xaxis10":{"anchor":"y10","domain":[0.52,0.6533333333333333],"tickfont":{"size":8},"range":[-1.2,4.2],"tickvals":[0.0,1.0,2.0,3.0,4.0],"ticktext":["1","10","100","1k","10k"]},"yaxis10":{"anchor":"x10","domain":[0.0,0.44],"tickfont":{"size":8},"range":[-1.2,4.2],"tickvals":[0.0,1.0,2.0,3.0,4.0],"ticktext":["1","10","100","1k","10k"]},"xaxis11":{"anchor":"y11","domain":[0.6933333333333334,0.8266666666666667],"tickfont":{"size":8},"range":[-1.2,4.2],"tickvals":[0.0,1.0,2.0,3.0,4.0],"ticktext":["1","10","100","1k","10k"]},"yaxis11":{"anchor":"x11","domain":[0.0,0.44],"tickfont":{"size":8},"range":[-1.2,4.2],"tickvals":[0.0,1.0,2.0,3.0,4.0],"ticktext":["1","10","100","1k","10k"]},"xaxis12":{"anchor":"y12","domain":[0.8666666666666667,1.0],"tickfont":{"size":8},"range":[-1.2,4.2],"tickvals":[0.0,1.0,2.0,3.0,4.0],"ticktext":["1","10","100","1k","10k"]},"yaxis12":{"anchor":"x12","domain":[0.0,0.44],"tickfont":{"size":8},"range":[-1.2,4.2],"tickvals":[0.0,1.0,2.0,3.0,4.0],"ticktext":["1","10","100","1k","10k"]},"annotations":[{"font":{"size":9},"showarrow":false,"text":"11447903 (R²=0.94)","x":0.06666666666666667,"xanchor":"center","xref":"paper","y":1.0,"yanchor":"bottom","yref":"paper"},{"font":{"size":9},"showarrow":false,"text":"04085427 (R²=0.94)","x":0.24,"xanchor":"center","xref":"paper","y":1.0,"yanchor":"bottom","yref":"paper"},{"font":{"size":9},"showarrow":false,"text":"12037400 (R²=0.89)","x":0.41333333333333333,"xanchor":"center","xref":"paper","y":1.0,"yanchor":"bottom","yref":"paper"},{"font":{"size":9},"showarrow":false,"text":"02055379 (R²=0.89)","x":0.5866666666666667,"xanchor":"center","xref":"paper","y":1.0,"yanchor":"bottom","yref":"paper"},{"font":{"size":9},"showarrow":false,"text":"14302480 (R²=0.88)","x":0.76,"xanchor":"center","xref":"paper","y":1.0,"yanchor":"bottom","yref":"paper"},{"font":{"size":9},"showarrow":false,"text":"01362356 (R²=0.86)","x":0.9333333333333333,"xanchor":"center","xref":"paper","y":1.0,"yanchor":"bottom","yref":"paper"},{"font":{"size":9},"showarrow":false,"text":"04087119 (R²=-0.54)","x":0.06666666666666667,"xanchor":"center","xref":"paper","y":0.44,"yanchor":"bottom","yref":"paper"},{"font":{"size":9},"showarrow":false,"text":"15129120 (R²=-0.78)","x":0.24,"xanchor":"center","xref":"paper","y":0.44,"yanchor":"bottom","yref":"paper"},{"font":{"size":9},"showarrow":false,"text":"09013500 (R²=-1.35)","x":0.41333333333333333,"xanchor":"center","xref":"paper","y":0.44,"yanchor":"bottom","yref":"paper"},{"font":{"size":9},"showarrow":false,"text":"01465850 (R²=-2.39)","x":0.5866666666666667,"xanchor":"center","xref":"paper","y":0.44,"yanchor":"bottom","yref":"paper"},{"font":{"size":9},"showarrow":false,"text":"01372043 (R²=-3.09)","x":0.76,"xanchor":"center","xref":"paper","y":0.44,"yanchor":"bottom","yref":"paper"},{"font":{"size":9},"showarrow":false,"text":"11455350 (R²=-3.85)","x":0.9333333333333333,"xanchor":"center","xref":"paper","y":0.44,"yanchor":"bottom","yref":"paper"},{"font":{"color":"#0072B2","size":9},"showarrow":false,"text":"\u003cb\u003eBest\u003c\u002fb\u003e","textangle":-90,"x":-0.02,"xref":"paper","y":0.78,"yref":"paper"},{"font":{"color":"#D55E00","size":9},"showarrow":false,"text":"\u003cb\u003eWorst\u003c\u002fb\u003e","textangle":-90,"x":-0.02,"xref":"paper","y":0.22,"yref":"paper"}],"title":{"text":"Best and Worst Holdout Sites by R² (n ≥ 5 samples)"},"height":500,"font":{"family":"Source Sans Pro, Helvetica, Arial, sans-serif","size":13},"margin":{"l":60,"r":30,"t":80,"b":60},"legend":{"font":{"size":11},"orientation":"h","yanchor":"bottom","y":1.02,"xanchor":"left","x":0.0,"bgcolor":"rgba(255,255,255,0.9)"},"plot_bgcolor":"white","paper_bgcolor":"white"},                        {"responsive": true}                    ).then(function(){
+                            
+var gd = document.getElementById('21e6ab89-fe46-4455-9e3f-f44053fa1643');
+var x = new MutationObserver(function (mutations, observer) {{
+        var display = window.getComputedStyle(gd).display;
+        if (!display || display === 'none') {{
+            console.log([gd, 'removed!']);
+            Plotly.purge(gd);
+            observer.disconnect();
+        }}
+}});
+
+// Listen for the removal of the full notebook cells
+var notebookContainer = gd.closest('#notebook-container');
+if (notebookContainer) {{
+    x.observe(notebookContainer, {childList: true});
+}}
+
+// Listen for the clearing of the current output cell
+var outputEl = gd.closest('.output');
+if (outputEl) {{
+    x.observe(outputEl, {childList: true});
+}}
+
+                        })                };            </script>        </div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-site-gallery-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3
+</figcaption>
+</figure>
+</div>
+</div>
+</section>
+<section id="site-detail-pages" class="level2">
+<h2 class="anchored" data-anchor-id="site-detail-pages">Site Detail Pages</h2>
+<p>Each holdout site has its own detail page showing its location on a map, the full observed-vs-predicted scatter with metrics, and the raw turbidity-SSC rating curve. These are particularly useful for investigating individual failures — understanding whether a site’s poor performance is explainable by a known physical reason (e.g., a reservoir immediately upstream, a recurring algae bloom, or a mine drainage input that contaminates the turbidity signal). Click a site ID below to open its detail page.</p>
+<ul>
+<li><a href="sites/USGS-01036390.html">USGS-01036390</a></li>
+<li><a href="sites/USGS-01200600.html">USGS-01200600</a></li>
+<li><a href="sites/USGS-01351500.html">USGS-01351500</a></li>
+<li><a href="sites/USGS-01362286.html">USGS-01362286</a></li>
+<li><a href="sites/USGS-01362322.html">USGS-01362322</a></li>
+<li><a href="sites/USGS-01362356.html">USGS-01362356</a></li>
+<li><a href="sites/USGS-01372043.html">USGS-01372043</a></li>
+<li><a href="sites/USGS-01400500.html">USGS-01400500</a></li>
+<li><a href="sites/USGS-01465850.html">USGS-01465850</a></li>
+<li><a href="sites/USGS-01473169.html">USGS-01473169</a></li>
+<li><a href="sites/USGS-01478185.html">USGS-01478185</a></li>
+<li><a href="sites/USGS-01480617.html">USGS-01480617</a></li>
+<li><a href="sites/USGS-01573695.html">USGS-01573695</a></li>
+<li><a href="sites/USGS-01576000.html">USGS-01576000</a></li>
+<li><a href="sites/USGS-015765195.html">USGS-015765195</a></li>
+<li><a href="sites/USGS-01581752.html">USGS-01581752</a></li>
+<li><a href="sites/USGS-01585075.html">USGS-01585075</a></li>
+<li><a href="sites/USGS-02055379.html">USGS-02055379</a></li>
+<li><a href="sites/USGS-02203863.html">USGS-02203863</a></li>
+<li><a href="sites/USGS-02207135.html">USGS-02207135</a></li>
+<li><a href="sites/USGS-02207160.html">USGS-02207160</a></li>
+<li><a href="sites/USGS-02334578.html">USGS-02334578</a></li>
+<li><a href="sites/USGS-02336300.html">USGS-02336300</a></li>
+<li><a href="sites/USGS-02336340.html">USGS-02336340</a></li>
+<li><a href="sites/USGS-02336360.html">USGS-02336360</a></li>
+<li><a href="sites/USGS-02337410.html">USGS-02337410</a></li>
+<li><a href="sites/USGS-034324715.html">USGS-034324715</a></li>
+<li><a href="sites/USGS-03432504.html">USGS-03432504</a></li>
+<li><a href="sites/USGS-03432516.html">USGS-03432516</a></li>
+<li><a href="sites/USGS-03501500.html">USGS-03501500</a></li>
+<li><a href="sites/USGS-04085427.html">USGS-04085427</a></li>
+<li><a href="sites/USGS-04087119.html">USGS-04087119</a></li>
+<li><a href="sites/USGS-04087170.html">USGS-04087170</a></li>
+<li><a href="sites/USGS-04142000.html">USGS-04142000</a></li>
+<li><a href="sites/USGS-04174500.html">USGS-04174500</a></li>
+<li><a href="sites/USGS-04176500.html">USGS-04176500</a></li>
+<li><a href="sites/USGS-05061500.html">USGS-05061500</a></li>
+<li><a href="sites/USGS-05420500.html">USGS-05420500</a></li>
+<li><a href="sites/USGS-05447500.html">USGS-05447500</a></li>
+<li><a href="sites/USGS-05517010.html">USGS-05517010</a></li>
+<li><a href="sites/USGS-05599490.html">USGS-05599490</a></li>
+<li><a href="sites/USGS-06076590.html">USGS-06076590</a></li>
+<li><a href="sites/USGS-06889110.html">USGS-06889110</a></li>
+<li><a href="sites/USGS-06893300.html">USGS-06893300</a></li>
+<li><a href="sites/USGS-07049050.html">USGS-07049050</a></li>
+<li><a href="sites/USGS-07075250.html">USGS-07075250</a></li>
+<li><a href="sites/USGS-07182390.html">USGS-07182390</a></li>
+<li><a href="sites/USGS-07191222.html">USGS-07191222</a></li>
+<li><a href="sites/USGS-07374525.html">USGS-07374525</a></li>
+<li><a href="sites/USGS-07381600.html">USGS-07381600</a></li>
+<li><a href="sites/USGS-08070200.html">USGS-08070200</a></li>
+<li><a href="sites/USGS-08380500.html">USGS-08380500</a></li>
+<li><a href="sites/USGS-09013500.html">USGS-09013500</a></li>
+<li><a href="sites/USGS-09327000.html">USGS-09327000</a></li>
+<li><a href="sites/USGS-10336645.html">USGS-10336645</a></li>
+<li><a href="sites/USGS-11313460.html">USGS-11313460</a></li>
+<li><a href="sites/USGS-11447890.html">USGS-11447890</a></li>
+<li><a href="sites/USGS-11447903.html">USGS-11447903</a></li>
+<li><a href="sites/USGS-11447905.html">USGS-11447905</a></li>
+<li><a href="sites/USGS-11453590.html">USGS-11453590</a></li>
+<li><a href="sites/USGS-11455165.html">USGS-11455165</a></li>
+<li><a href="sites/USGS-11455350.html">USGS-11455350</a></li>
+<li><a href="sites/USGS-11530500.html">USGS-11530500</a></li>
+<li><a href="sites/USGS-12031000.html">USGS-12031000</a></li>
+<li><a href="sites/USGS-12037400.html">USGS-12037400</a></li>
+<li><a href="sites/USGS-12043000.html">USGS-12043000</a></li>
+<li><a href="sites/USGS-12166300.html">USGS-12166300</a></li>
+<li><a href="sites/USGS-12187500.html">USGS-12187500</a></li>
+<li><a href="sites/USGS-14151000.html">USGS-14151000</a></li>
+<li><a href="sites/USGS-14301500.html">USGS-14301500</a></li>
+<li><a href="sites/USGS-14302480.html">USGS-14302480</a></li>
+<li><a href="sites/USGS-15129120.html">USGS-15129120</a></li>
+<li><a href="sites/USGS-16274100.html">USGS-16274100</a></li>
+<li><a href="sites/USGS-374938122251801.html">USGS-374938122251801</a></li>
+<li><a href="sites/USGS-385446094430700.html">USGS-385446094430700</a></li>
+<li><a href="sites/USGS-405219124085601.html">USGS-405219124085601</a></li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+<p>murkml — SSC prediction from turbidity across 260 USGS sites</p>
+</div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

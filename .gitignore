@@ -27,6 +27,6 @@ cache/
 gap_fill.log
 gap_fill_progress.json
 *.code-workspace
-dashboard/_site/
+dashboard/_site/sites/
 dashboard/_freeze/
 dashboard/dashboard_data/
