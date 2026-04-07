@@ -2,6 +2,8 @@
 
 Predict water quality from continuous sensor data using ML surrogate models.
 
+**[Dashboard](dashboard/_site/index.html)** — Interactive results explorer (performance, adaptation curves, site maps, load estimation, diagnostics).
+
 ## What it does
 
 - **Loads USGS data automatically** — continuous sensors (turbidity, conductance, DO, pH, temp) and discrete lab samples (sediment, nutrients) via the `dataretrieval` package
